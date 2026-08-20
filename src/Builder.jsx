@@ -1,0 +1,604 @@
+/* ================================================================== */
+/* LOADOUT BUILDER                                                    */
+/* The first surface where you author something the app has to keep.   */
+/*                                                                    */
+/* Tapping a slot opens a picker over the whole screen, and that       */
+/* picker reuses the tier row so ratings, flags and provenance are in  */
+/* front of you at the moment you choose, rather than one screen away. */
+/* ================================================================== */
+
+import { useState, useMemo, useEffect, useCallback } from "react";
+import {
+  X, Search, Plus, Save, Copy, Trash2, Star, Lock, AlertTriangle,
+  Thermometer, Flame, ChevronLeft, Backpack,
+} from "lucide-react";
+
+import {
+  TierRow, TierBadge, ItemArt, sourceLabelFor, itemStatSummary,
+  FACTIONS, FACTION_THEME, BIOMES, MISSION_TYPES, DIFFICULTIES, CAT_META, STRAT_GROUP, FactionBar,
+} from "./Armory.jsx";
+import { CATEGORIES, getItem, itemName, judgedTier, TIER_RANK, averageRank, rank, eatsBackpack } from "./lib/items.js";
+import {
+  presets, SLOTS, STRAT_SLOTS, emptyLoadout, forkPreset,
+  deriveHeat, heatSources, deriveFire, backpackUsers, hasBackpackConflict, loadoutItemIds,
+} from "./lib/loadouts.js";
+
+/* ------------------------------------------------------------------ */
+/* Picker overlay                                                      */
+/* ------------------------------------------------------------------ */
+
+function Picker({ slot, stratSlot, current, faction, brief, takenBackpack, taken = [], lockedSet, favoriteItems, onPick, onClear, onClose }) {
+  const [query, setQuery] = useState("");
+  /* Unavailable gear is hidden by default. You are choosing what to    */
+  /* actually drop with, and a list full of things you do not own is    */
+  /* a list you have to read past every time.                           */
+  const [showLocked, setShowLocked] = useState(false);
+  const favSet = useMemo(() => new Set(favoriteItems), [favoriteItems]);
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  /* Ranked for the faction the build is for, not averaged across all     */
+  /* three. A build says it is for bots, so the picker should lead with   */
+  /* what is good against bots rather than what is good on balance.       */
+  const pool = useMemo(() => {
+    const category = CATEGORIES.find((c) => c.slot === slot);
+    const all = category ? category.items : [];
+    const score = (it) => rank(it.ratings[faction].tier);
+    return all
+      .filter((it) => {
+        /* You cannot bring the same stratagem twice, so anything already */
+        /* sitting in another slot is not an option here.                 */
+        if (taken.includes(it.id)) return false;
+        if (!showLocked && lockedSet.has(it.id)) return false;
+        if (query && !it.name.toLowerCase().includes(query.toLowerCase())) return false;
+        return true;
+      })
+      .slice()
+      .sort((a, b) => {
+        const aFav = favSet.has(a.id) ? 0 : 1;
+        const bFav = favSet.has(b.id) ? 0 : 1;
+        if (aFav !== bFav) return aFav - bFav;
+        /* Unrated sorts last but is never removed. Being seen is the    */
+        /* only way a new warbond weapon ever gets tried.                */
+        const aNew = a.ratings[faction].tier ? 0 : 1;
+        const bNew = b.ratings[faction].tier ? 0 : 1;
+        if (aNew !== bNew) return aNew - bNew;
+        const d = score(b) - score(a);
+        if (d !== 0) return d;
+        return a.name.localeCompare(b.name);
+      });
+  }, [slot, query, showLocked, lockedSet, favSet, faction, taken]);
+
+  /* The best rating actually available in this slot for this faction, so */
+  /* "top pick" means top of what you can reach rather than a fixed tier. */
+  const topRank = useMemo(
+    () => pool.reduce((best, it) => Math.max(best, rank(it.ratings[faction].tier)), 0),
+    [pool, faction]
+  );
+
+  const hiddenCount = useMemo(() => {
+    const category = CATEGORIES.find((c) => c.slot === slot);
+    if (!category) return 0;
+    return category.items.filter((it) => lockedSet.has(it.id)).length;
+  }, [slot, lockedSet]);
+
+  const title = stratSlot != null ? `Stratagem ${stratSlot + 1}` : (SLOTS.find((s) => s.slot === slot) || {}).label;
+  const factionMeta = FACTIONS.find((f) => f.id === faction) || FACTIONS[0];
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col bg-base-950">
+      <div className="flex items-center gap-3 border-b border-base-800 px-4 py-3">
+        <button onClick={onClose} aria-label="Close picker"
+          className="rounded p-1.5 text-base-400 hover:bg-base-800 hover:text-base-100">
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <div className="min-w-0">
+          <h2 className="text-lg font-bold leading-tight" style={{ fontFamily: "'Oswald', sans-serif" }}>{title}</h2>
+          <p className="text-[11px]" style={{ color: factionMeta.hex }}>
+            Ranked for {factionMeta.label}
+          </p>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          {current ? (
+            <button onClick={onClear}
+              className="rounded border border-base-700 px-2.5 py-1 text-xs text-base-400 hover:border-red-600 hover:text-red-400">
+              Clear slot
+            </button>
+          ) : null}
+          <button onClick={onClose} aria-label="Close"
+            className="rounded p-1.5 text-base-400 hover:bg-base-800 hover:text-base-100">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3 border-b border-base-800 px-4 py-2.5">
+        <div className="relative min-w-[200px] flex-1">
+          <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-base-500" />
+          <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search"
+            className="w-full rounded border border-base-700 bg-base-900 py-1.5 pl-7 pr-2 text-xs text-base-100 placeholder-base-600 outline-none focus:border-base-500" />
+        </div>
+        {hiddenCount > 0 ? (
+          <button onClick={() => setShowLocked((v) => !v)} aria-pressed={showLocked}
+            className={"rounded border px-2.5 py-1.5 text-xs transition-colors " +
+              (showLocked
+                ? "border-accent-500 bg-accent-500 text-accent-950"
+                : "border-base-700 bg-base-900 text-base-400 hover:border-base-500 hover:text-base-100")}>
+            <Lock className="mr-1 inline-block h-3.5 w-3.5 align-[-2px]" />
+            {showLocked ? `Showing ${hiddenCount} locked` : `${hiddenCount} locked hidden`}
+          </button>
+        ) : null}
+        <span className="text-[11px] text-base-500">
+          {pool.length} to choose from
+          {taken.length ? `, ${taken.length} already in this build` : ""}
+        </span>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4">
+        {pool.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-base-700 py-10 text-center text-sm text-base-400">
+            {hiddenCount > 0 && !showLocked
+              ? "Everything here is marked as not unlocked. Show the locked ones, or open Collection to fix what you own."
+              : "Nothing matches that search. Clear it to see the full list."}
+          </div>
+        ) : (
+          <div className="mx-auto flex max-w-4xl flex-col gap-1.5">
+            {pool.map((it) => {
+              const best = topRank > 0 && rank(it.ratings[faction].tier) === topRank;
+              /* Warn before the pick, not after. Choosing this would be */
+              /* the second thing wanting your back.                     */
+              const clash = takenBackpack && (it.stratType === "backpack" || it.usesBackpackSlot === true);
+              return (
+                <div key={it.id} className="relative">
+                  {best || clash ? (
+                    <div className="mb-0.5 flex items-center gap-2 pl-1 text-[10px]">
+                      {best ? (
+                        <span className="font-semibold uppercase tracking-wider" style={{ color: factionMeta.hex }}>
+                          Top pick vs {factionMeta.short}
+                        </span>
+                      ) : null}
+                      {clash ? (
+                        <span className="flex items-center gap-1 text-accent-400">
+                          <Backpack className="h-3 w-3" /> clashes with {takenBackpack.name}
+                        </span>
+                      ) : null}
+                    </div>
+                  ) : null}
+                  <TierRow item={it} factionFilter={faction} brief={brief}
+                    isLocked={lockedSet.has(it.id)} lockedByWarbond={false}
+                    toggleLock={() => {}} isFav={favSet.has(it.id)} toggleFav={() => {}}
+                    open={false} onToggleOpen={() => {}}
+                    onSelect={() => onPick(it.id)} />
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Slot                                                                */
+/* ------------------------------------------------------------------ */
+
+function Slot({ label, itemId, locked, onOpen, warn }) {
+  const item = itemId ? getItem(itemId) : null;
+  const stratMeta = item && item.slot === "stratagem" ? CAT_META[item.stratType] : null;
+
+  return (
+    <button onClick={onOpen}
+      className={"flex w-full items-center gap-3 rounded-lg border p-2.5 text-left transition-colors " +
+        (item
+          ? "border-base-800 bg-base-900 hover:border-base-600"
+          : "border-dashed border-base-700 bg-base-900/40 hover:border-base-500")}>
+      {item ? (
+        <ItemArt item={item} className="h-10 w-10" dim={locked} />
+      ) : (
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-dashed border-base-700 text-base-600">
+          <Plus className="h-4 w-4" />
+        </span>
+      )}
+
+      <span className="min-w-0 flex-1">
+        <span className="block text-[10px] font-semibold uppercase tracking-wider text-base-500"
+          style={{ fontFamily: "'Oswald', sans-serif" }}>
+          {label}
+        </span>
+        {item ? (
+          <>
+            <span className={"flex items-center gap-1.5 truncate text-sm " + (locked ? "text-base-500 line-through" : "text-base-100")}
+              style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+              {locked ? <Lock className="h-3 w-3 shrink-0 text-accent-500" /> : null}
+              {item.name}
+              {eatsBackpack(item) ? (
+                <span className={"h-1.5 w-1.5 shrink-0 rounded-full " + (warn ? "bg-red-500" : "bg-accent-500")}
+                  title="Uses your backpack slot" />
+              ) : null}
+            </span>
+            <span className="block truncate text-[11px] text-base-500">
+              {[sourceLabelFor(item), ...itemStatSummary(item)].join(" · ")}
+            </span>
+          </>
+        ) : (
+          <span className="block text-sm text-base-600">Empty, tap to choose</span>
+        )}
+      </span>
+
+      {item ? (
+        <span className="flex shrink-0 items-center gap-1">
+          {stratMeta ? (
+            <stratMeta.Icon className="h-4 w-4" style={{ color: STRAT_GROUP[stratMeta.group].hex }} />
+          ) : null}
+          {FACTIONS.map((f) => (
+            <TierBadge key={f.id} tier={item.ratings[f.id].tier} />
+          ))}
+        </span>
+      ) : null}
+    </button>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Builder                                                             */
+/* ------------------------------------------------------------------ */
+
+const MultiToggle = ({ label, hint, options, value, onChange }) => (
+  <div>
+    <div className="mb-1.5 flex items-baseline gap-2">
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500"
+        style={{ fontFamily: "'Oswald', sans-serif" }}>{label}</span>
+      {hint ? <span className="text-[9px] lowercase text-base-600">{hint}</span> : null}
+    </div>
+    <div className="flex flex-wrap gap-1.5">
+      {options.map((o) => {
+        const on = value.includes(o.id);
+        return (
+          <button key={o.id}
+            onClick={() => onChange(on ? value.filter((v) => v !== o.id) : [...value, o.id])}
+            aria-pressed={on} title={o.title}
+            className={"rounded border px-2.5 py-1.5 text-xs transition-colors " +
+              (on ? "border-base-200 bg-base-200 text-base-900"
+                 : "border-base-700 bg-base-900 text-base-400 hover:border-base-500 hover:text-base-100")}>
+            {o.label}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+);
+
+export default function Builder({ state, loadoutId, navigate, faction, brief }) {
+  const stored = state.loadouts.find((l) => l.id === loadoutId);
+  const preset = presets.find((p) => p.id === loadoutId);
+
+  const [draft, setDraft] = useState(() => {
+    if (stored) return stored;
+    if (preset) return forkPreset(preset);
+    /* A fresh build starts on the front you already told the tool you are */
+    /* dropping on. You can still change it per build below.               */
+    return emptyLoadout(faction || undefined);
+  });
+  const [picking, setPicking] = useState(null);
+  const [dirty, setDirty] = useState(Boolean(preset && !stored));
+  const [justSaved, setJustSaved] = useState(false);
+
+  /* Following a link to a different build swaps the draft rather than   */
+  /* leaving you editing the previous one under a new title.             */
+  useEffect(() => {
+    if (stored) { setDraft(stored); setDirty(false); }
+    else if (preset) { setDraft(forkPreset(preset)); setDirty(true); }
+    else if (loadoutId) { setDraft(emptyLoadout(faction || undefined)); setDirty(false); }
+  }, [loadoutId]);
+
+  const patch = useCallback((changes) => {
+    setDraft((d) => ({ ...d, ...changes }));
+    setDirty(true);
+    setJustSaved(false);
+  }, []);
+
+  const heat = deriveHeat(draft);
+  const heatFrom = heatSources(draft);
+  const packs = backpackUsers(draft);
+  const conflict = hasBackpackConflict(draft);
+  const lockedHere = loadoutItemIds(draft).filter((id) => state.lockedSet.has(id));
+  const filled = loadoutItemIds(draft).length;
+  const theme = FACTION_THEME[draft.faction];
+
+  const save = () => {
+    state.saveLoadout({ ...draft, heat });
+    setDirty(false);
+    setJustSaved(true);
+    if (!stored) navigate(`builder/${draft.id}`);
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* The same control the tier list and Drop Bay carry, but bound to  */}
+      {/* the build rather than to the brief. A build is for a front and   */}
+      {/* keeps that when you save it, so changing it here changes what    */}
+      {/* you are making, not where the rest of the tool is looking. The   */}
+      {/* picker below already ranks by it.                                */}
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500"
+          style={{ fontFamily: "'Oswald', sans-serif" }}>
+          This build is for
+        </span>
+        <FactionBar faction={draft.faction} onChoose={(id) => patch({ faction: id })} />
+      </div>
+
+      {picking ? (
+        <Picker
+          slot={picking.slot}
+          stratSlot={picking.stratSlot}
+          current={picking.stratSlot != null ? draft.strats[picking.stratSlot] : draft[picking.key]}
+          faction={draft.faction}
+          brief={brief}
+          takenBackpack={
+            picking.stratSlot == null
+              ? null
+              : packs.find((p) => p.id !== draft.strats[picking.stratSlot]) || null
+          }
+          taken={
+            picking.stratSlot == null
+              ? []
+              : draft.strats.filter((id, i) => id && i !== picking.stratSlot)
+          }
+          lockedSet={state.lockedSet}
+          favoriteItems={state.favoriteItems}
+          onPick={(id) => {
+            if (picking.stratSlot != null) {
+              const next = [...draft.strats];
+              next[picking.stratSlot] = id;
+              patch({ strats: next });
+            } else {
+              patch({ [picking.key]: id });
+            }
+            setPicking(null);
+          }}
+          onClear={() => {
+            if (picking.stratSlot != null) {
+              const next = [...draft.strats];
+              next[picking.stratSlot] = null;
+              patch({ strats: next });
+            } else {
+              patch({ [picking.key]: null });
+            }
+            setPicking(null);
+          }}
+          onClose={() => setPicking(null)}
+        />
+      ) : null}
+
+      {/* Identity */}
+      <div className="rounded-lg border border-base-800 bg-base-900 overflow-hidden">
+        <div className="h-1 w-full" style={{ backgroundColor: theme.hex }} />
+        <div className="flex flex-wrap items-center gap-3 p-3">
+          <input value={draft.name} onChange={(e) => patch({ name: e.target.value })}
+            aria-label="Loadout name"
+            className="min-w-[200px] flex-1 rounded border border-base-700 bg-base-900 px-2.5 py-1.5 text-lg font-bold text-base-100 outline-none focus:border-base-500"
+            style={{ fontFamily: "'Oswald', sans-serif" }} />
+          <div className="flex shrink-0 items-center gap-1.5">
+            <button onClick={save} disabled={!dirty}
+              className={"flex items-center gap-1.5 rounded border px-3 py-1.5 text-xs transition-colors " +
+                (dirty
+                  ? "border-base-200 bg-base-200 text-base-900 hover:bg-base-100"
+                  : "border-base-800 bg-base-900 text-base-600 cursor-default")}>
+              <Save className="h-3.5 w-3.5" />
+              {dirty ? "Save" : justSaved ? "Saved" : "No changes"}
+            </button>
+            {stored ? (
+              <>
+                <button onClick={() => { const c = state.duplicate(draft); navigate(`builder/${c.id}`); }}
+                  title="Duplicate"
+                  className="rounded border border-base-700 p-1.5 text-base-400 hover:border-base-500 hover:text-base-100">
+                  <Copy className="h-3.5 w-3.5" />
+                </button>
+                <button onClick={() => { state.deleteLoadout(draft.id); navigate("bay"); }}
+                  title="Delete"
+                  className="rounded border border-base-700 p-1.5 text-base-400 hover:border-red-600 hover:text-red-400">
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </>
+            ) : null}
+          </div>
+        </div>
+
+        {preset && !stored ? (
+          <p className="border-t border-base-800 bg-base-800/40 px-3 py-2 text-[11px] text-base-400">
+            Forked from the curated build <span className="text-base-200">{preset.name}</span>. The original is untouched;
+            save to keep this copy.
+          </p>
+        ) : null}
+      </div>
+
+      {/* Warnings */}
+      {conflict || lockedHere.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          {conflict ? (
+            <div className="flex items-start gap-2 rounded-lg border border-red-800/60 bg-red-950/30 px-3 py-2 text-[11px] text-red-300">
+              <Backpack className="mt-px h-3.5 w-3.5 shrink-0" />
+              <span>
+                <span className="font-semibold">Two things want your back: </span>
+                {packs.map((p) => p.name).join(" and ")}. Only one can come. Left as a warning rather than blocked, since
+                a squadmate can carry a pack for you.
+              </span>
+            </div>
+          ) : null}
+          {lockedHere.length > 0 ? (
+            <div className="flex items-start gap-2 rounded-lg border border-accent-800/60 bg-accent-950/40 px-3 py-2 text-[11px] text-accent-300">
+              <Lock className="mt-px h-3.5 w-3.5 shrink-0" />
+              <span>
+                {lockedHere.length} {lockedHere.length === 1 ? "item is" : "items are"} marked as not unlocked:{" "}
+                {lockedHere.map(itemName).join(", ")}.
+              </span>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {/* Slots */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="flex flex-col gap-2">
+          {SLOTS.map((s) => (
+            <Slot key={s.key} label={s.label} itemId={draft[s.key]}
+              locked={state.lockedSet.has(draft[s.key])}
+              onOpen={() => setPicking({ key: s.key, slot: s.slot, stratSlot: null })} />
+          ))}
+        </div>
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: STRAT_SLOTS }, (_, i) => (
+            <Slot key={i} label={`Stratagem ${i + 1}`} itemId={draft.strats[i]}
+              locked={state.lockedSet.has(draft.strats[i])}
+              warn={conflict && draft.strats[i] && packs.some((p) => p.id === draft.strats[i])}
+              onOpen={() => setPicking({ key: null, slot: "stratagem", stratSlot: i })} />
+          ))}
+          <div className="rounded-lg border border-base-800 bg-base-900/40 px-3 py-2 text-[11px] text-base-500">
+            {filled} of 9 slots filled
+            {packs.length === 1 ? (
+              <span className="ml-2 text-base-400">
+                <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-accent-500 align-middle" />
+                {packs[0].name} takes your backpack
+              </span>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      {/* Metadata */}
+      <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-base-500"
+              style={{ fontFamily: "'Oswald', sans-serif" }}>Mission</span>
+            <div className="flex flex-wrap gap-1.5">
+              {MISSION_TYPES.map((m) => (
+                <button key={m.id} onClick={() => patch({ mission: m.id })} aria-pressed={draft.mission === m.id}
+                  className={"rounded border px-2.5 py-1.5 text-xs transition-colors " +
+                    (draft.mission === m.id ? "border-base-200 bg-base-200 text-base-900"
+                      : "border-base-700 bg-base-900 text-base-400 hover:border-base-500 hover:text-base-100")}>
+                  {m.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <MultiToggle label="Difficulty" hint="hard gate" options={DIFFICULTIES}
+            value={draft.diff} onChange={(v) => patch({ diff: v })} />
+
+          <MultiToggle label="Built for these biomes" hint="leave empty for anywhere"
+            options={BIOMES.filter((b) => b.id !== "any")}
+            value={draft.biomes} onChange={(v) => patch({ biomes: v })} />
+
+          <div>
+            <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-base-500"
+              style={{ fontFamily: "'Oswald', sans-serif" }}>Behaviour</span>
+            <div className="flex flex-col gap-1.5 text-[11px]">
+              <span className={"flex items-center gap-1.5 " + (heat ? "text-base-200" : "text-base-500")}>
+                <Thermometer className="h-3.5 w-3.5" />
+                {heat
+                  ? `Heat dependent, from ${heatFrom.map((i) => i.name).join(", ")}`
+                  : "Not heat dependent"}
+              </span>
+              <span className="text-base-600">
+                Worked out from the gear you hold, so hot biomes gate it automatically.
+              </span>
+              <button onClick={() => patch({ fire: !draft.fire })} aria-pressed={draft.fire}
+                className={"mt-1 flex w-fit items-center gap-1.5 rounded border px-2.5 py-1.5 transition-colors " +
+                  (draft.fire ? "border-accent-500 bg-accent-500 text-accent-950"
+                    : "border-base-700 bg-base-900 text-base-400 hover:border-base-500 hover:text-base-100")}>
+                <Flame className="h-3.5 w-3.5" />
+                Fire based kit
+              </button>
+              {draft.fire !== deriveFire(draft) ? (
+                <span className="text-base-600">
+                  The gear suggests {deriveFire(draft) ? "yes" : "no"}. Your call wins.
+                </span>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="sm:col-span-2 lg:col-span-3">
+            <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-base-500"
+              style={{ fontFamily: "'Oswald', sans-serif" }}>Note</span>
+            <textarea value={draft.blurb} onChange={(e) => patch({ blurb: e.target.value })} rows={2}
+              placeholder="What this build is for. Short and opinionated beats hedged."
+              className="w-full rounded border border-base-700 bg-base-900 px-2.5 py-1.5 text-xs text-base-100 placeholder-base-600 outline-none focus:border-base-500" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Picking something to open                                           */
+/* ------------------------------------------------------------------ */
+
+export function BuilderIndex({ state, navigate }) {
+  const mine = state.loadouts;
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-center gap-3">
+        <button onClick={() => navigate("builder/new")}
+          className="flex items-center gap-1.5 rounded border border-base-200 bg-base-200 px-3 py-1.5 text-xs text-base-900 hover:bg-base-100">
+          <Plus className="h-3.5 w-3.5" /> New loadout
+        </button>
+        <span className="text-[11px] text-base-500">{mine.length} of your own, {presets.length} curated presets</span>
+      </div>
+
+      <div>
+        <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-base-300"
+          style={{ fontFamily: "'Oswald', sans-serif" }}>Yours</h3>
+        {mine.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-base-700 px-4 py-8 text-center">
+            <p className="text-sm text-base-400">Nothing built yet.</p>
+            <p className="mt-1 text-xs text-base-600">
+              Start from scratch, or open a curated build below and fork it.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {mine.map((l) => <BuildLink key={l.id} loadout={l} onOpen={() => navigate(`builder/${l.id}`)} />)}
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-base-300"
+          style={{ fontFamily: "'Oswald', sans-serif" }}>Curated presets</h3>
+        <p className="mb-2 text-[11px] text-base-500">
+          Opening one forks it into a copy of your own. The originals never change.
+        </p>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {presets.map((l) => <BuildLink key={l.id} loadout={l} preset onOpen={() => navigate(`builder/${l.id}`)} />)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BuildLink({ loadout, preset, onOpen }) {
+  const theme = FACTION_THEME[loadout.faction];
+  const filled = loadoutItemIds(loadout).length;
+  return (
+    <button onClick={onOpen}
+      className="flex items-center gap-3 rounded-lg border border-base-800 bg-base-900 p-2.5 text-left hover:border-base-600">
+      <span className="h-8 w-1 shrink-0 rounded" style={{ backgroundColor: theme.hex }} />
+      <span className="min-w-0 flex-1">
+        <span className={`block truncate text-sm font-bold ${theme.text}`} style={{ fontFamily: "'Oswald', sans-serif" }}>
+          {loadout.name}
+        </span>
+        <span className="block truncate text-[11px] text-base-500">
+          {preset ? "Preset · " : ""}{filled} of 9 slots
+          {loadout.blurb ? ` · ${loadout.blurb}` : ""}
+        </span>
+      </span>
+    </button>
+  );
+}

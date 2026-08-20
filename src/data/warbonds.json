@@ -1,0 +1,29 @@
+{
+  "warbonds": [
+    { "id": "mobilize-free", "name": "Mobilize (free)", "tier": "standard" },
+    { "id": "steeled-veterans", "name": "Steeled Veterans", "tier": "premium" },
+    { "id": "cutting-edge", "name": "Cutting Edge", "tier": "premium" },
+    { "id": "democratic-detonation", "name": "Democratic Detonation", "tier": "premium" },
+    { "id": "polar-patriots", "name": "Polar Patriots", "tier": "premium" },
+    { "id": "viper-commandos", "name": "Viper Commandos", "tier": "premium" },
+    { "id": "freedoms-flame", "name": "Freedom's Flame", "tier": "premium" },
+    { "id": "chemical-agents", "name": "Chemical Agents", "tier": "premium" },
+    { "id": "truth-enforcers", "name": "Truth Enforcers", "tier": "premium" },
+    { "id": "servants-of-freedom", "name": "Servants of Freedom", "tier": "premium" },
+    { "id": "borderline-justice", "name": "Borderline Justice", "tier": "premium" },
+    { "id": "urban-legends", "name": "Urban Legends", "tier": "premium" },
+    { "id": "masters-of-ceremony", "name": "Masters of Ceremony", "tier": "premium" },
+    { "id": "force-of-law", "name": "Force of Law", "tier": "premium" },
+    { "id": "control-group", "name": "Control Group", "tier": "premium" },
+    { "id": "dust-devils", "name": "Dust Devils", "tier": "premium" },
+    { "id": "redacted-regiment", "name": "Redacted Regiment", "tier": "premium" },
+    { "id": "entrenched-division", "name": "Entrenched Division", "tier": "premium" },
+    { "id": "exo-experts", "name": "Exo Experts", "tier": "premium" },
+    { "id": "python-commandos", "name": "Python Commandos", "tier": "premium" },
+    { "id": "siege-breakers", "name": "Siege Breakers", "tier": "premium" },
+    { "id": "halo-odst", "name": "Halo: ODST", "tier": "legendary" },
+    { "id": "righteous-revenants", "name": "Righteous Revenants", "tier": "legendary" },
+    { "id": "castellans-creed", "name": "Castellan's Creed", "tier": "legendary" }
+  ],
+  "acquisitionLabels": { "warbond": "Warbond", "requisition": "Requisition", "starter": "Starter", "superstore": "Superstore", "campaign": "Campaign Reward", "superCitizen": "Super Citizen Edition", "armorSet": "Armor sets" }
+}

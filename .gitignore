@@ -1,0 +1,18 @@
+node_modules
+dist
+dist-ssr
+*.local
+
+# Screen capture kept in this folder for reference. Too big for git.
+*.mp4
+
+# Art is copied out of "All images" by npm run images, so committing it
+# would put the same 12.5MB in the repo twice. The manifest is kept.
+src/assets/items/
+src/assets/warbonds/
+src/assets/ui/
+src/assets/themes/
+public/favicon.svg
+
+# Raw wiki pulls. Cache only, re-fetchable with npm run wiki -- --refresh
+.wiki-cache/

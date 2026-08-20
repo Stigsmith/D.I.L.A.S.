@@ -1,0 +1,294 @@
+# **HD2 Armory: Roadmap**
+
+> What is agreed but not built, what is blocked and on what, and the questions that must be answered rather than guessed when each session opens. Decisions that affect how the code works live in `CLAUDE.md`; this file is what comes next. The tool is now called Democracy Deployment System, D.D.S., a working title.
+
+---
+
+## The dependency chain
+
+> [!danger] Accounts, Exchange and live squad are not three independent features
+> They have an ordering dependency and building them out of order means building the same plumbing twice.
+
+Everything below rests on one primitive: **data living somewhere that is not one browser, plus identity to say whose it is.** Today every lock, favorite, profile and build sits in `localStorage`, which is scoped to one browser on one machine. That is why a second player has to set the tool up again from scratch on their own device.
+
+**Recommended order:**
+
+1. **Auth and shared storage.** The only genuinely new infrastructure. For two users the free tier of Supabase or Cloudflare D1 covers it and neither needs a server to run.
+2. **Exchange.** Write a document, fetch it by id. This is a subset of what live squad needs, so it doubles as the share mechanism for the storage half.
+3. **Live squad compare.** Needs subscribe and push, which publishing a loadout never does. Budget the realtime layer separately rather than expecting Exchange to hand it over.
+
+> [!success] The warning engine is already built and does not block on any of this
+> `src/lib/squad.js` runs nine checks over two to four builds and is a pure function over a list of loadouts. It does not care whether a slot was filled by hand or by a connected party member. When live squad lands, the engine is already there.
+
+---
+
+## Where v2 and v3 stand against the phased plan
+
+> [!info] Written 20 August 2026, at the end of the overhaul session
+> Two roadmaps now exist: the release labels in the sidebar, `v2` and `v3`, and the phases in the contextual scoring plan. They are not competing. They are **two tracks that only touch at the end.**
+
+### The two tracks
+
+| | What it is | Needs |
+|---|---|---|
+| **Phases 0 to 5** | Making the tool smarter about one player's decision | Nothing new. No server, no account, no network call at runtime |
+| **v2 and v3** | Making the tool social | Auth and shared storage, in the order at the top of this file |
+
+Everything shipped in 1.3.0 through 1.9.0 sits in the first track. **None of it moved the second track forward, and none of it was blocked by it.** That is why the overhaul could run to completion without touching the dependency chain.
+
+### What changed about v2 and v3
+
+| Item | Label | Status after the overhaul |
+|---|---|---|
+| **Auth and shared storage** | v2 | **Unchanged.** Still the only genuinely new infrastructure, still first in its own chain, still nothing else can land before it |
+| **Exchange** | v3 | **Dependency unchanged, contents now defined.** It is today's Drop Bay grid, plus the 39 curated builds, plus other people's. And it gained a practical prerequisite: an Exchange full of strangers' builds is unbrowsable without **Phase 5 loadout scoring** to rank and filter it |
+| **Squad** | v2 | **Split in two.** The warning engine half is local and lands in Phase 5 with no infrastructure at all, because `squad.js` already runs over a list of builds and does not care where they came from. The live party half still needs the chain |
+| **Profiles** | shipped | **Unchanged.** Still separate from accounts, still possibly redundant once accounts exist. See the section above |
+| **Account page, login art** | v2 | **Unchanged.** Behind auth, as it always was |
+| **Monetised theme packs** | was aspirational | **Dead.** Two independent blockers: extracted game art, and the wiki data being CC BY-NC-SA, which forbids commercial use outright |
+
+### Where the tracks meet
+
+**Phase 6.** Drop Bay becomes the pre-drop screen and the grid it is today becomes Exchange. That phase is the handover point:
+
+- The Drop Bay half works **locally, for one player**, with no infrastructure. It can be built at any time.
+- The Exchange half **cannot ship until v3**, because there is nowhere for other people's builds to live.
+- So Phase 6 splits: build the drop screen when Phase 5 lands, and let Exchange inherit the grid whenever storage arrives.
+
+### The order that now makes sense
+
+1. **Phase 2.5**, enemy armour. One pull, unlocks the armour penetration rule the engine already has a slot for
+2. **Phase 4**, the three judgement tags. Small, and it closes the gaps `context-rules.json` currently admits to
+3. **Phase 5**, loadout and squad scoring. The biggest remaining piece, and the one both Exchange and the drop screen wait on
+4. **Phase 6a**, Drop Bay becomes the drop screen. Local, no infrastructure
+5. **v2**, auth and shared storage. The infrastructure step, unchanged
+6. **v3**, Exchange inherits the grid, and live party fills the drop screen's slots
+
+**The starmap is part of step 4, not a later phase.** It is the drop screen's entry point: you click the planet where you clicked it in the game and the brief fills itself. It draws from shipped data and needs no network call. The live colouring layer is optional, needs no account, and can arrive whenever. See the section below.
+
+> [!tip] The useful property to protect
+> Nothing in phases 0 to 6a needs a network call at runtime. The planet table, the weapon stats and the mission list are all fetched once by a script and shipped as JSON. Keeping that true for as long as possible is what lets the whole first track ship without ever standing up a server.
+
+### One loose end from this session
+
+Drop Bay still filters on the five original internal mission ids while the brief now carries seventy real mission names. Neither is broken and they do not read each other, but they should become one thing when Drop Bay is rebuilt in Phase 6a.
+
+---
+
+## Drop Bay becomes the drop screen, and the grid becomes Exchange
+
+> [!info] Decided 20 August 2026. This supersedes the party auto-fill section above, which described bolting party state onto the grid Drop Bay has now
+> Drop Bay is currently a browser: a grid of every build, with the squad panel sitting on top of it. Those are two different jobs and only one of them belongs on the screen you look at in the thirty seconds before you drop.
+
+**The split:**
+
+| Surface | Job |
+|---|---|
+| **Drop Bay** | The moment before the drop. Who is bringing what, where you are going, what is going to hurt |
+| **Exchange** | Browsing builds. Roughly what Drop Bay looks like today, plus other people's |
+
+### What Drop Bay turns into
+
+A staging screen with two stages, because picking a loadout and reading the squad are different activities and doing both in one view is what makes the current screen busy.
+
+**Stage one, the main screen.** Everything about the drop, nothing about choosing:
+
+- The brief across the top: planet, biome and hazards, faction, mission, difficulty
+- One slot per squad member, each showing that member's confirmed gear
+- Squad level warnings and coverage, which is what `src/lib/squad.js` already produces
+- Mission information and tips for the team, keyed to the selected mission
+- A sense of what other people are taking on this planet or this mission
+
+**Stage two, choosing.** Tapping your own slot opens a picker over the screen, the same pattern the builder already uses. You choose, you **confirm**, and the loadout is **locked into your slot** on the main screen.
+
+> [!tip] The confirm step is the point, not ceremony
+> A slot that silently reflects whatever you last touched cannot tell the difference between "still deciding" and "this is what I am dropping with". The squad warnings are only worth reading once the answer is the second one. Confirm is what makes a slot mean something to the other three people looking at it.
+
+### What Exchange turns into
+
+Today's Drop Bay, kept: the grid, the cards, the filters, the favourites. `LoadoutCard` and the filter controls move rather than being rebuilt.
+
+**The 39 curated builds move here.** They are legacy generations made before this project had stats or scoring behind it, and the measured evidence agrees: 35 of 39 use an S or S+ primary, 13 distinct primaries appear across all of them, and three A tier marksman rifles for bots appear zero times. They are a starting point to browse, not a default view worth putting in front of a new player.
+
+> [!warning] They cannot actually move until Exchange exists, and Exchange needs shared storage
+> Exchange sits behind auth and a shared store in the dependency chain at the top of this file. Until then the presets have nowhere to go, so the interim question is only how prominent they are in Drop Bay, not whether they are there.
+
+### What this changes about the earlier sections
+
+- **Party auto-fill** stops being a feature bolted onto compare slots. A squad member's slot on the drop screen *is* the compare slot, so the auto-fill question becomes the natural behaviour of the screen rather than an addition to it. The open question about what an unpicked slot shows is answered by the confirm step: an unconfirmed slot reads as still deciding.
+- **Better base loadouts, authored offline** was scoped as "author better ones". The intent has changed to "get them out of the default view". That is cheaper, and it removes the pressure to hand author 39 replacements before the generator is good enough to roll them.
+- **The squad panel** stops being a sticky bar above a grid and becomes the screen. That is a better home for it than the one it has.
+
+---
+
+## The live starmap, and when a runtime API call is justified
+
+> [!success] Revised 20 August 2026. The map is the entry to the drop screen, not a feature bolted beside it
+> The curator's framing, and it is better than the one this section held first: **you open Drop Bay onto the galaxy map, click the planet in the same place you clicked it in the game less than a minute ago, and the whole brief fills itself.** Faction, biome, hazards, and eventually the live effects. One click instead of four dropdowns.
+>
+> The reasoning is spatial recall. Finding a planet again in the same shape of map is instant. Finding it in an alphabetical list of 281 is not, and it is a worse experience than the one the game already gave you.
+
+### Two different things get called "keeping it up to date"
+
+Deciding this once, in writing, is what stops the tool acquiring a network dependency by accident.
+
+| | What it is | How it should be fetched |
+|---|---|---|
+| **Patch data** | Weapon stats, biomes, hazards, missions, tiers, **and planet map positions** | **Build time, never runtime.** A runtime call buys the same data and adds latency, an outage risk and CORS |
+| **Live war state** | Who currently holds a planet, liberation, active campaigns, the Major Order, and active planet effects such as Gloom, the Predator and Incineration strains, and the Hulk, Devastator and Factory Strider surges | **Runtime, or not at all.** It changes hour to hour and cannot be a shipped table |
+
+> [!success] Map positions are patch data, which is what makes the whole idea work
+> **Shipped on 20 August 2026.** `api.helldivers2.dev/api/v1/planets` returns all 281 planets, matching our table exactly, with a normalised `position` of x and y in roughly -1 to 1, Super Earth at the origin, plus `waypoints`, which are the supply lines between them. It wants `X-Super-Client` and `X-Super-Contact` headers and refuses the request without them.
+>
+> A planet does not move, so this is patch data. `npm run wiki` fetches it at build time and discards the live half of the response. **274 of 281 planets now carry coordinates and 339 supply lines are recorded**, all shipped, no runtime call.
+>
+> That means **the map is static first**. It draws, pans, and fills the brief with no network call at all. The live API only ever colours in who currently holds what.
+
+### The rule to build it under
+
+> [!danger] The API decorates, it never carries
+> The **shipped table is the source of truth for identity and layout**: planet names, sectors, biomes, permanent hazards, and where each planet sits on the map.
+>
+> The API adds ownership, active campaigns and current effects on top. If it is unreachable you lose the colouring, not the map, not the picker, and not your brief. No spinner on the critical path.
+>
+> **Never ship ownership.** It rotates, and a stale territory map is worse than an uncoloured one.
+
+### What live state adds once it is there
+
+- Only offering planets with an **active campaign**, since those are the only ones you can actually drop on
+- Faction filled exactly from who holds the planet, rather than guessed from the territory
+- **Active planet effects feeding the scoring engine**, which is the real prize: 156 are published, including the enemy surges and strains that genuinely change what you should bring
+- The Major Order as context
+
+### The look: a data visualisation, not a recreation
+
+The Companion site recreates the in-game holo table and lands in the uncanny valley. This tool should not compete on that.
+
+- Faction territory tinted with the **locked faction hexes**, the same values every badge and card already uses
+- Sectors as labelled groups, since a sector is how people talk about the map
+- Supply lines as plain edges
+- **No scanlines, no CRT curvature, no holographic glow.** The ambient layer already carries per theme atmosphere and it sits behind the content, where a texture belongs
+
+The game's interface is designed to look like military hardware. A planning tool is designed to be read. The map should match the game's **layout**, because that is what makes the click instant, and not its **styling**, because that is what makes it unreadable.
+
+### Order, revised
+
+The map moves **out of Phase 7 and into Phase 6a**, alongside the drop screen, because it is that screen's entry point rather than a later addition. Building a planet dropdown, then a drop screen, then replacing the dropdown with a map is doing the work twice.
+
+The live layer stays optional and can arrive whenever. It needs no account, so it is independent of v2.
+
+> [!success] The training manual is out of this project entirely
+> It was the last thing still depending on a source already caught being twelve planets behind. `api.helldivers2.dev` is the same organisation as the JSON dataset, returns exactly our 281, and carries supply lines the training manual never had. The join is by name rather than by index, because two sources agreeing on an order is not something to bet a map on.
+>
+> **Seven planets have no coordinates**, all of them Void content whose names carry a suffix the API does not use: Hydrobius (Void), Senge 23 (Void), and the five UVP entries. Edge cases in live Major Order content, worth a look when the map is built.
+
+> [!info] The second source closed an open question
+> The spike recorded that biome and hazard accuracy per planet was unverified, because nothing else carried biome data to check against. The API does. **Biomes agree on 274 of 276** planets present in both. The two that differ, Sangis and Alderidge Cove, hold each other's biome, which reads as a swap in one source rather than a systematic problem.
+>
+> Hazards agreed on **none** of them, and that turned out to be the useful finding: the two sources carry different fields and neither is a superset. `weather_effects` holds the temperature, `environmentals` holds the headline condition, and Widow's Harbor is extreme cold in one and meteor storms in the other. They are unioned now, which took hazard assignments from 440 to 544. `normal_temperature` was also being counted as a hazard and is not one.
+
+---
+
+## Accounts before profiles
+
+> [!failure] Profiles solved a smaller problem than assumed
+> They were built because the squad requirements treated per member ownership as a hard prerequisite. In practice the second player spent five minutes setting up on his own device and the problem evaporated. A Helldivers collection only ever grows, so a second profile on one machine has no job to do.
+
+**The real need is cross device persistence:** log in elsewhere and your collection is there. That is an accounts feature, not a profiles feature.
+
+> [!question] Does the profile concept get absorbed into accounts
+> Recommendation is **no, keep them separate.** A profile is *what one player owns*. An account is *who you are*. One account holding several profiles is the only case that ever justified profiles, planning for someone who is not connected. Making the profile dropdown the account switcher would confuse two different things and delete that case. Profiles can stay unused, or come out of Collection later if they clutter it.
+
+---
+
+## Party auto-fill on the compare slots
+
+Drop Bay's squad compare takes two to four builds and warns on the combination. It is entirely manual and static: picking a build for slot two does not mean anyone is running it, and if a real squadmate changes their loadout the comparison has no way to know.
+
+**The ask:** once party or account state exists, one compare slot auto-fills with whatever the party member currently has selected. Manual selection stays for every slot when not in a party, and for slots beyond the connected member.
+
+> [!question] Fallback behaviour must be decided, not invented
+> If you are in a party and the other player has not picked a loadout yet, does their slot show empty, show a placeholder, or fall back to manual selection until they pick? Decide this explicitly in that session. It is exactly the kind of edge case that produces a technically correct and wrong feeling result when guessed.
+
+---
+
+## Warning logic, a wider set
+
+The nine checks that exist cover anti-armor, chaff, medium armor penetration, objective, cave terrain, teamkill overlap, duplicate boosters and backpack contention. **More scenarios are wanted, and more varied ones.**
+
+Planned as a **separate non-code session**, because it is a design problem rather than an implementation one. Bring to it:
+
+- What else actually kills a run, beyond the gaps already covered
+- Whether range band, engagement distance and ammo economy become tagged axes or stay human judgment
+- Whether difficulty should scale thresholds rather than just gate them on or off
+
+> [!tip] The same logic is what makes a build generator possible
+> A coverage engine run over one loadout instead of four is a build validator. A validator plus a search over the item pool is a generator. The warning work and the generator work are the same work done twice if they are not planned together.
+
+---
+
+## Better base loadouts, authored offline
+
+> [!bug] The 39 curated builds are tier maximised and it shows
+> Measured, not guessed.
+
+| | |
+|---|---|
+| Primaries using an S or S+ | **35 of 39** |
+| Distinct primaries across all 39 | **13 of 52** |
+| Distinct secondaries | **6 of 24** |
+| Grenade Pistol appearances | 16 of 39 |
+| Eruptor appearances | 11 of 39 |
+| Bugs: primaries rated A or better, and used | 31 available, **8 used** |
+| Bots marksman rifles rated A, and used | 3 available, **0 used** |
+
+The last row is the whole problem in one line. An A tier marksman rifle against bots is a better fit for how some people play than the S+ Coyote, and the current set never offers the trade.
+
+> [!warning] The intent changed on 20 August 2026
+> This was scoped as "author 39 better ones". It is now "get them out of the default view and into Exchange". The numbers below are still the evidence for why the current set is weak, but replacing them by hand is no longer the answer: the scoring engine plus the roll the dice generator is, and neither needs 39 hand written replacements first.
+
+**The plan:** a separate tool or Claude project that reads this project's data plus a logic document and writes `loadouts.json`. Not an in-app feature.
+
+> [!danger] This is not the auto-calibration that was declined
+> That was a live picker that re-adjusted your other slots as you chose, and it stays declined. Authoring better curated builds offline and shipping them as data is curation with better tooling.
+
+**Variety has to be a hard constraint, not a hope.** Something like: no item appears in more than N builds, and every item rated A or better on a front appears at least once in that front's set. That one rule alone would have forced the Amendment and the Counter Sniper into the bots set.
+
+---
+
+## Vehicles and mechs: done, 20 August 2026
+
+> [!success] All eight are in, shipped in 1.5.0
+> Both blockers this section named are gone. The wiki fetch supplied the source data, and the art was renamed to the prefix convention so the importer attaches it automatically.
+
+| | |
+|---|---|
+| FRVs | M-102 Gunner, M-103 Supply, M-104 Incinerator |
+| Exosuits | EXO-45 Patriot, EXO-49 Emancipator, EXO-51 Lumberer, EXO-55 Breakthrough |
+| Tank | TD-220 Bastion MK XVI |
+
+New `stratType` of `vehicle`, in the blue call-in group where the game puts it. One type rather than a mech type and a vehicle type: eight rows split into two filter buckets is worse, not better.
+
+**All eight are unrated**, which is the honest state rather than a gap. No community list covers them, so they carry a dashed badge, sort last, and survive every tier floor, the same treatment the Castellan's Creed weapons get. Armor penetration, demolition force, cooldown and hull values are real and come from the game data.
+
+They also stopped being dead weight in the bundle. The eight images were being filed as unrecognised UI art and shipped anyway; named properly, they attach to their items.
+
+> [!success] Acquisition paths confirmed, and two were wrong
+> The curator supplied u.gg's vehicle page the same day. **EXO-51 Lumberer and EXO-55 Breakthrough come from the Exo Experts warbond**, not requisition, so both are warbond gateable. The **M-103 Supply and M-104 Incinerator FRVs are campaign rewards**. The other four are Patriotic Administration Center, which is the requisition path. All eight are rated, stamped 7.0.0.
+
+---
+
+## Smaller items
+
+- **A roll the dice generator in the builder.** A deliberate roll you ask for, that picks something decent without simply taking the top rated item in every slot, plus playstyle options to steer it. Parked until the coverage logic is good enough to make it worth rolling.
+- **A bug and feature request form on Support.** Blocked on shared storage, since a submission needs somewhere to go. The footer no longer claims that no data leaves your browser, so the copy no longer contradicts it.
+- **Patch notes on About.** Raised as a possibility. The tool changelog now exists and is separate from the game's patch notes; decide whether the game's notes belong in the tool at all.
+
+---
+
+## Open questions carried forward
+
+- **Fallback when a party member has not picked.** See above.
+- **Do profiles survive accounts.** See above.
+- **Does the tier ramp move.** The v2 palette studies draw the invariant ramp at different values than the app uses, S+ `#F59E0B` against the app's `#fbbf24`, and A blue against the app's teal. The app's ramp was deliberately left alone because changing it repaints Dark, Light and Neon too.
+- **The accent disagreement.** Several studies paint their signature colour on the lock and the stale chip. `CLAUDE.md` says the accent is never the brand colour, and that rule won. Worth settling if the skins are redrawn.

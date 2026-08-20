@@ -1,0 +1,577 @@
+{
+  "note": "How the brief moves a rating. Read by src/lib/score.js. Every rule here fires on data the tool already holds: the fetched weapon stats, the game's own tags, or fields curated in items.json. Nothing here is a hand written per item list. A rule states a delta in points, where roughly 14 points is one tier, or scales one from a number the game publishes. Every rule must carry a `say`, because a score that cannot explain itself is a score nobody should trust.",
+  "sourceOfHazardWording": "The hazard mechanics quoted in these sentences come from the helldivers-2/json community dataset, MIT licensed. They are the game's own descriptions, not our guesses.",
+  "rules": [
+    {
+      "id": "cold-vents-slower",
+      "when": {
+        "hazard": [
+          "extreme_cold"
+        ]
+      },
+      "match": {
+        "ventsHeat": true
+      },
+      "scaleBy": {
+        "path": "wiki.heat.coldMultiplier",
+        "from": 1,
+        "times": 26,
+        "clamp": 16
+      },
+      "say": "Icy temperatures delay heat buildup, so this fires longer before it vents. The game publishes the figure per weapon and this one is above average."
+    },
+    {
+      "id": "hot-vents-faster",
+      "when": {
+        "hazard": [
+          "intense_heat"
+        ]
+      },
+      "match": {
+        "ventsHeat": true
+      },
+      "scaleBy": {
+        "path": "wiki.heat.hotMultiplier",
+        "from": 1,
+        "times": 56,
+        "clamp": 18
+      },
+      "say": "High temperatures speed up heat buildup, so this overheats sooner than it does anywhere else."
+    },
+    {
+      "id": "cold-cuts-rate-of-fire",
+      "when": {
+        "hazard": [
+          "extreme_cold"
+        ]
+      },
+      "match": {
+        "number": [
+          {
+            "path": "wiki.handling.rpm",
+            "gte": 700
+          }
+        ]
+      },
+      "delta": -5,
+      "say": "Cold reduces rate of fire, and a weapon that leans on a high rate of fire feels that more than a slow one does."
+    },
+    {
+      "id": "ion-storms-kill-stratagems",
+      "when": {
+        "hazard": [
+          "ion_storms"
+        ]
+      },
+      "match": {
+        "slot": "stratagem"
+      },
+      "delta": -12,
+      "say": "Ion storms intermittently disable Stratagems. Anything you have to call in can simply not arrive."
+    },
+    {
+      "id": "ion-storms-favour-what-you-carry",
+      "when": {
+        "hazard": [
+          "ion_storms"
+        ]
+      },
+      "match": {
+        "slot": [
+          "primary",
+          "secondary",
+          "throwable"
+        ]
+      },
+      "delta": 6,
+      "say": "Ion storms cannot switch off what is already in your hands, which is worth more here than it usually is."
+    },
+    {
+      "id": "sandstorm-blinds-marksmen",
+      "when": {
+        "hazard": [
+          "sandstorms"
+        ]
+      },
+      "match": {
+        "category": [
+          "Marksman"
+        ]
+      },
+      "delta": -14,
+      "ceiling": "B",
+      "say": "Sandstorms greatly reduce visibility. You cannot shoot what you cannot see, and range stops being an advantage."
+    },
+    {
+      "id": "sandstorm-blinds-long-support",
+      "when": {
+        "hazard": [
+          "sandstorms"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "apw-1-anti-materiel-rifle",
+          "las-98-laser-cannon",
+          "rs-422-railgun",
+          "las-99-quasar-cannon",
+          "faf-14-spear",
+          "s-11-speargun"
+        ]
+      },
+      "delta": -14,
+      "say": "Sandstorms greatly reduce visibility. You cannot shoot what you cannot see, and range stops being an advantage.",
+      "judgement": "Our call, not a sourced field. Nothing published separates a long range support weapon from a close one: projectile velocity does not, since laser weapons read 1300 and assault rifles read 820. These six are the ones you aim at something far away.",
+      "ceiling": "B"
+    },
+    {
+      "id": "sandstorm-favours-close",
+      "when": {
+        "hazard": [
+          "sandstorms"
+        ]
+      },
+      "match": {
+        "category": [
+          "Shotgun",
+          "SMG"
+        ]
+      },
+      "delta": 10,
+      "say": "Sandstorms greatly reduce visibility, which drags every fight to the range this already wants."
+    },
+    {
+      "id": "blizzard-blinds-marksmen",
+      "when": {
+        "hazard": [
+          "blizzards"
+        ]
+      },
+      "match": {
+        "category": [
+          "Marksman"
+        ]
+      },
+      "delta": -9,
+      "say": "Blizzards moderately reduce visibility, which costs a long range weapon most of what it is for."
+    },
+    {
+      "id": "blizzard-blinds-long-support",
+      "when": {
+        "hazard": [
+          "blizzards"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "apw-1-anti-materiel-rifle",
+          "las-98-laser-cannon",
+          "rs-422-railgun",
+          "las-99-quasar-cannon",
+          "faf-14-spear",
+          "s-11-speargun"
+        ]
+      },
+      "delta": -9,
+      "say": "Blizzards moderately reduce visibility, which costs a long range weapon most of what it is for.",
+      "judgement": "Our call, not a sourced field. Nothing published separates a long range support weapon from a close one: projectile velocity does not, since laser weapons read 1300 and assault rifles read 820. These six are the ones you aim at something far away."
+    },
+    {
+      "id": "blizzard-favours-close",
+      "when": {
+        "hazard": [
+          "blizzards"
+        ]
+      },
+      "match": {
+        "category": [
+          "Shotgun",
+          "SMG"
+        ]
+      },
+      "delta": 7,
+      "say": "Blizzards moderately reduce visibility, so engagements start closer than you would choose."
+    },
+    {
+      "id": "fog-blinds-marksmen",
+      "when": {
+        "hazard": [
+          "thick_fog"
+        ]
+      },
+      "match": {
+        "category": [
+          "Marksman"
+        ]
+      },
+      "delta": -5,
+      "say": "Thick fog lightly reduces visibility. Less punishing than a storm, but a marksman weapon still loses some of its reach."
+    },
+    {
+      "id": "fog-blinds-long-support",
+      "when": {
+        "hazard": [
+          "thick_fog"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "apw-1-anti-materiel-rifle",
+          "las-98-laser-cannon",
+          "rs-422-railgun",
+          "las-99-quasar-cannon",
+          "faf-14-spear",
+          "s-11-speargun"
+        ]
+      },
+      "delta": -5,
+      "say": "Thick fog lightly reduces visibility. Less punishing than a storm, but a marksman weapon still loses some of its reach.",
+      "judgement": "Our call, not a sourced field. Nothing published separates a long range support weapon from a close one: projectile velocity does not, since laser weapons read 1300 and assault rifles read 820. These six are the ones you aim at something far away."
+    },
+    {
+      "id": "tremors-punish-standing-still",
+      "when": {
+        "hazard": [
+          "tremors"
+        ]
+      },
+      "match": {
+        "tags": [
+          "STATIONARY RELOAD"
+        ]
+      },
+      "delta": -10,
+      "say": "Tremors stun players and enemies alike, and this cannot be reloaded on the move. Being stunned mid reload is how a fight gets away from you."
+    },
+    {
+      "id": "tremors-punish-emplacements",
+      "when": {
+        "hazard": [
+          "tremors"
+        ]
+      },
+      "match": {
+        "stratType": [
+          "sentry",
+          "emplacement",
+          "mines"
+        ]
+      },
+      "delta": -6,
+      "say": "Tremors stun anything standing on the ground, including you while you are setting this up."
+    },
+    {
+      "id": "fire-tornadoes-and-fire",
+      "when": {
+        "hazard": [
+          "fire_tornadoes"
+        ]
+      },
+      "match": {
+        "damageType": "fire"
+      },
+      "delta": -8,
+      "say": "The planet is already on fire. Adding to it makes telling your fire from the planet's harder, and fire resist armor is doing double duty."
+    },
+    {
+      "id": "acid-storms-and-armor",
+      "when": {
+        "hazard": [
+          "acid_storms"
+        ]
+      },
+      "match": {
+        "slot": "armor"
+      },
+      "delta": -6,
+      "say": "Acid storms temporarily reduce armor effectiveness for everyone, so a passive that leans on staying alive through damage is worth a little less."
+    },
+    {
+      "id": "bugs-want-durable-damage",
+      "when": {
+        "faction": [
+          "bugs"
+        ]
+      },
+      "match": {
+        "number": [
+          {
+            "path": "wiki.primary.durableRatio",
+            "gte": 0.6
+          }
+        ]
+      },
+      "delta": 9,
+      "say": "Terminids are mostly large fleshy parts, and durable damage is what hurts those. This one keeps most of its damage against them where a chaff gun loses it."
+    },
+    {
+      "id": "bugs-punish-chaff-only",
+      "when": {
+        "faction": [
+          "bugs"
+        ]
+      },
+      "match": {
+        "number": [
+          {
+            "path": "wiki.primary.durableRatio",
+            "lte": 0.15
+          }
+        ],
+        "held": true
+      },
+      "delta": -7,
+      "say": "Almost all of this weapon's damage is standard rather than durable, which a Charger's backside and a Spewer's sack largely ignore."
+    },
+    {
+      "id": "bugs-punish-slow-handling",
+      "when": {
+        "faction": [
+          "bugs"
+        ]
+      },
+      "match": {
+        "number": [
+          {
+            "path": "wiki.handling.ergonomics",
+            "lte": 30
+          }
+        ],
+        "held": true
+      },
+      "delta": -8,
+      "say": "Poor ergonomics means the barrel lags behind the camera, and Hunters do not wait for you to catch up."
+    },
+    {
+      "id": "bots-want-penetration",
+      "when": {
+        "faction": [
+          "bots"
+        ]
+      },
+      "match": {
+        "held": true,
+        "tags": [
+          "HEAVY ARMOR PENETRATING",
+          "MEDIUM ARMOR PENETRATING"
+        ]
+      },
+      "delta": 8,
+      "say": "Devastator armor eats light fire all day. The game marks this as opening medium armor or better, which turns a skill check into a non-issue."
+    },
+    {
+      "id": "bots-punish-light-ap",
+      "when": {
+        "faction": [
+          "bots"
+        ]
+      },
+      "match": {
+        "held": true,
+        "notTags": [
+          "HEAVY ARMOR PENETRATING",
+          "MEDIUM ARMOR PENETRATING",
+          "ANTI-TANK",
+          "LIGHT ANTI-TANK"
+        ],
+        "number": [
+          {
+            "path": "stats.ap",
+            "lte": 2
+          }
+        ]
+      },
+      "delta": -7,
+      "say": "This does not get through Automaton armor. You can still headshot everything you meet, but you are relying on doing it every time."
+    },
+    {
+      "id": "squids-want-sustained",
+      "when": {
+        "faction": [
+          "squids"
+        ]
+      },
+      "match": {
+        "number": [
+          {
+            "path": "wiki.ammo.magazine",
+            "gte": 30
+          }
+        ],
+        "held": true
+      },
+      "delta": 6,
+      "say": "The Crusher regenerates while taking heavy damage and has to be worn down without a pause. A deep magazine is how you get one."
+    },
+    {
+      "id": "squids-punish-one-shot",
+      "when": {
+        "faction": [
+          "squids"
+        ]
+      },
+      "match": {
+        "number": [
+          {
+            "path": "wiki.ammo.magazine",
+            "lte": 6
+          }
+        ],
+        "held": true
+      },
+      "delta": -6,
+      "say": "Reloading between shots gives a Crusher the pause it needs to regenerate. Burst damage is worth less on this front than it looks."
+    },
+    {
+      "id": "nest-wants-demolition",
+      "when": {
+        "mission": [
+          "nest",
+          "blitz"
+        ]
+      },
+      "match": {
+        "number": [
+          {
+            "path": "stats.demoForce",
+            "gte": 40
+          }
+        ]
+      },
+      "delta": 12,
+      "say": "Demolition 40 closes a hole or a fabricator from outside, without spending a call-in. On this mission that is the whole job."
+    },
+    {
+      "id": "nest-wants-objective-role",
+      "when": {
+        "mission": [
+          "nest",
+          "blitz"
+        ]
+      },
+      "match": {
+        "roles": [
+          "objective"
+        ]
+      },
+      "delta": 8,
+      "say": "Closes objectives from your carried kit rather than by burning a stratagem, which is what this mission asks for over and over."
+    },
+    {
+      "id": "carry-punishes-two-handed-support",
+      "when": {
+        "mission": [
+          "carry"
+        ]
+      },
+      "match": {
+        "held": true,
+        "tags": [
+          "SUPPORT WEAPON"
+        ]
+      },
+      "delta": -8,
+      "say": "Carrying the objective means this is on your back, not in your hands, for most of the walk."
+    },
+    {
+      "id": "evacuate-wants-smoke",
+      "when": {
+        "mission": [
+          "evacuate"
+        ]
+      },
+      "match": {
+        "tags": [
+          "SMOKE"
+        ]
+      },
+      "delta": 12,
+      "say": "Smoke breaks the line of sight along the route the civilians have to walk, which is the whole problem this mission sets."
+    },
+    {
+      "id": "wave-wants-emplacements",
+      "when": {
+        "mission": [
+          "wave",
+          "defend"
+        ]
+      },
+      "match": {
+        "stratType": [
+          "sentry",
+          "emplacement",
+          "mines"
+        ]
+      },
+      "delta": 10,
+      "say": "One arena and no ground to give up. Anything you can plant and leave finally gets to sit still long enough to pay for itself."
+    },
+    {
+      "id": "hvt-wants-antitank",
+      "when": {
+        "mission": [
+          "hvt"
+        ]
+      },
+      "match": {
+        "held": true,
+        "tags": [
+          "ANTI-TANK",
+          "HEAVY ARMOR PENETRATING"
+        ]
+      },
+      "delta": 10,
+      "say": "A set number of named heavies and nothing else counts, so opening heavy armor is the entire loadout question."
+    },
+    {
+      "id": "blitz-wants-speed",
+      "when": {
+        "mission": [
+          "blitz"
+        ]
+      },
+      "match": {
+        "number": [
+          {
+            "path": "stats.demoForce",
+            "gte": 40
+          }
+        ]
+      },
+      "delta": 10,
+      "say": "Twelve minutes and a map full of structures. Closing one from outside, without lining up a throw, is what the clock rewards."
+    },
+    {
+      "id": "carry-wants-sidearm",
+      "when": {
+        "mission": [
+          "carry"
+        ]
+      },
+      "match": {
+        "slot": "secondary"
+      },
+      "delta": 14,
+      "say": "You will have an objective in one hand for most of this mission. A one handed weapon lets you shoot while carrying it; everything else means putting it down first. It does not make a bad sidearm good, it makes a good one indispensable."
+    },
+    {
+      "id": "carry-wants-smg",
+      "when": {
+        "mission": [
+          "carry"
+        ]
+      },
+      "match": {
+        "category": [
+          "SMG"
+        ]
+      },
+      "delta": 14,
+      "say": "You will have an objective in one hand for most of this mission. A one handed weapon lets you shoot while carrying it; everything else means putting it down first. It does not make a bad sidearm good, it makes a good one indispensable."
+    }
+  ],
+  "knownGaps": [
+    "Three visibility rules carry a companion that names six support weapons by id, because nothing published separates a long range support weapon from a close one. Those rules carry a `judgement` field saying so.",
+    "The visibility rules key on the Marksman category only. Special was tried and dropped: it holds a flamethrower, a stim pistol and a shotgun pistol alongside the Dominator, so it says nothing about range."
+  ]
+}

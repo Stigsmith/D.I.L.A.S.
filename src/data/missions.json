@@ -1,0 +1,748 @@
+{
+  "note": "The real mission list, from Category:Main Objectives on helldivers.wiki.gg. Each mission carries the fronts it appears on and the traits a scoring rule keys on. The traits are ours; the names and the faction split are not.",
+  "source": "helldivers.wiki.gg",
+  "licence": "CC BY-NC-SA 4.0",
+  "traits": {
+    "standard": {
+      "name": "Standard operation",
+      "line": "A full length mission with a main objective and whatever else you find on the way. Nothing here pushes your loadout in a particular direction, so bring what the front and the planet ask for."
+    },
+    "nest": {
+      "name": "Structure demolition",
+      "line": "The objective is a building or a hole and it has to come down. Anything that closes one from your own kit saves you a call-in, and you will need several of them."
+    },
+    "blitz": {
+      "name": "Blitz",
+      "line": "Destroy every nest or fabricator on the map before the clock runs out. Speed beats staying power: you want things that flatten a structure the moment you arrive, not things that win a long fight."
+    },
+    "wave": {
+      "name": "Eradicate",
+      "line": "One small arena, a kill count, and no room to run. Sustained crowd clear and things you can plant and leave earn their slot here more than anywhere else."
+    },
+    "defend": {
+      "name": "Hold the line",
+      "line": "You are standing on ground you cannot give up while it is attacked. Sentries, mines and emplacements finally get to sit still long enough to pay for themselves."
+    },
+    "evacuate": {
+      "name": "Escort",
+      "line": "Civilians have to cross open ground and they will walk into anything in the way. Smoke breaks the line of sight along their route, and area denial keeps the pressure off the path rather than off you."
+    },
+    "carry": {
+      "name": "Carry",
+      "line": "You pick something up and walk it across the map. It occupies a hand, so a one handed weapon lets you shoot while carrying and everything else means putting the objective down first."
+    },
+    "hvt": {
+      "name": "High value target",
+      "line": "A set number of named heavies and nothing else counts. Anti-tank is the whole loadout question; chaff clear is only there so you can reach them."
+    }
+  },
+  "missions": [
+    {
+      "name": "Activate Oil Pumps",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Activate TCS+ Station",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Activate Terminid Control System",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Annex Untapped Mineral Sites",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Blitz: Destroy Bio-Processors",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "blitz",
+        "nest"
+      ]
+    },
+    {
+      "name": "Blitz: Destroy Illuminate Warp Gateways",
+      "factions": [
+        "squids"
+      ],
+      "traits": [
+        "blitz",
+        "nest"
+      ]
+    },
+    {
+      "name": "Blitz: Destroy Illuminate Warp Ships",
+      "factions": [
+        "squids"
+      ],
+      "traits": [
+        "blitz",
+        "nest"
+      ]
+    },
+    {
+      "name": "Blitz: Search and Destroy",
+      "factions": [
+        "bots",
+        "bugs"
+      ],
+      "traits": [
+        "blitz",
+        "nest"
+      ],
+      "note": "Every nest or fabricator on the map, against a twelve minute clock."
+    },
+    {
+      "name": "Blitz: Secure Research Site",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "blitz"
+      ]
+    },
+    {
+      "name": "Blitz: Suppress Toxic Pollination",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "blitz"
+      ]
+    },
+    {
+      "name": "Chart Terminid Tunnels",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Cleanse Infested District",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Collect Gloom Spore Readings",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Collect Gloom-Infused Oil",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Collect Meteorological Data",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Commando: Acquire Evidence",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Commando: Extract Intel",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Commando: Secure Black Box",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "carry"
+      ],
+      "note": "Small squad, quiet approach, and a box to carry out."
+    },
+    {
+      "name": "Conduct Geological Survey",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Conduct Mobile E-711 Extraction",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Confiscate Assets",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Deactivate Terminid Control System",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Democratize the Void",
+      "factions": [
+        "squids"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Deploy Dark Fluid",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Destroy Command Bunkers",
+      "factions": [
+        "bots"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Destroy Exospire",
+      "factions": [
+        "squids"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Destroy Gazer Spire",
+      "factions": [
+        "squids"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Destroy Harvesters",
+      "factions": [
+        "squids"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Destroy Spore Lung",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Destroy Transmission Network",
+      "factions": [
+        "bots"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Eliminate Automaton Factory Strider",
+      "factions": [
+        "bots"
+      ],
+      "traits": [
+        "hvt"
+      ]
+    },
+    {
+      "name": "Eliminate Automaton Hulks",
+      "factions": [
+        "bots"
+      ],
+      "traits": [
+        "hvt"
+      ]
+    },
+    {
+      "name": "Eliminate Bile Titans",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "hvt"
+      ]
+    },
+    {
+      "name": "Eliminate Brood Commanders",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "hvt"
+      ]
+    },
+    {
+      "name": "Eliminate Chargers",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "hvt"
+      ]
+    },
+    {
+      "name": "Eliminate Devastators",
+      "factions": [
+        "bots"
+      ],
+      "traits": [
+        "hvt"
+      ]
+    },
+    {
+      "name": "Eliminate Impaler",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "hvt"
+      ]
+    },
+    {
+      "name": "Emergency Evacuation",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "evacuate",
+        "defend"
+      ],
+      "note": "Hold an evacuation zone while civilians board. It is a defence mission wearing an escort's name."
+    },
+    {
+      "name": "Enable Oil Extraction",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Eradicate Automaton Forces",
+      "factions": [
+        "bots"
+      ],
+      "traits": [
+        "wave"
+      ],
+      "note": "One arena, and they shoot back from range while you are pinned in it."
+    },
+    {
+      "name": "Eradicate Illuminate Forces",
+      "factions": [
+        "squids"
+      ],
+      "traits": [
+        "wave"
+      ]
+    },
+    {
+      "name": "Eradicate Terminid Swarm",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "wave"
+      ],
+      "note": "One arena, no cover worth the name, and everything comes at once."
+    },
+    {
+      "name": "Evacuate Colonists",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "evacuate"
+      ]
+    },
+    {
+      "name": "Evacuate High-Value Assets",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "evacuate"
+      ]
+    },
+    {
+      "name": "Extract Anomalous Material",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Extract E-711",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Extract Research Probe Data",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "carry"
+      ]
+    },
+    {
+      "name": "Free Colony",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "evacuate"
+      ]
+    },
+    {
+      "name": "Halt Cyborg Production",
+      "factions": [
+        "bots"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Infiltrate Illuminate Lair",
+      "factions": [
+        "squids"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Launch ICBM",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ],
+      "note": "A long fixed sequence at one site, which means standing in a known place for a long time."
+    },
+    {
+      "name": "Neutralize Ground-to-Orbit Defenses",
+      "factions": [
+        "bots"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Nuke Nursery",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "nest"
+      ],
+      "note": "Get a hellbomb to the nursery and survive long enough to arm it."
+    },
+    {
+      "name": "Purge Hatcheries",
+      "factions": [
+        "bugs"
+      ],
+      "traits": [
+        "nest"
+      ],
+      "note": "Bug holes, and a lot of them."
+    },
+    {
+      "name": "Rapid Acquisition",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Repel Invasion Fleet",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "defend"
+      ]
+    },
+    {
+      "name": "Restart Pumps",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Restore Air Quality",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Retrieve Essential Personnel",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "evacuate"
+      ]
+    },
+    {
+      "name": "Retrieve Recon Craft Intel",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "carry"
+      ]
+    },
+    {
+      "name": "Retrieve Valuable Data",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "carry"
+      ],
+      "note": "The SSD mission. You carry a drive between two terminals across open ground, twice."
+    },
+    {
+      "name": "Sabotage Air Base",
+      "factions": [
+        "bots"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Sabotage Orgo-Plasma Synthesis",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Sabotage Supply Bases",
+      "factions": [
+        "bots"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Seize Industrial Complex",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Spread Democracy",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Start Fuel Pumps",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "standard"
+      ]
+    },
+    {
+      "name": "Take Down Overship",
+      "factions": [
+        "squids"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Terminate Illegal Broadcast",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "nest"
+      ]
+    },
+    {
+      "name": "Upload Escape Pod Data",
+      "factions": [
+        "bots",
+        "bugs",
+        "squids"
+      ],
+      "traits": [
+        "carry"
+      ]
+    }
+  ]
+}

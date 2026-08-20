@@ -1,0 +1,853 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ================================================================== */
+/* THEME TOKENS                                                       */
+/*                                                                    */
+/* Both ramps are positional, not literal: the high end is surface,    */
+/* the low end is ink. base-950 is the furthest back and base-100 is   */
+/* the most prominent text in either theme, so every class in the app  */
+/* keeps meaning the same thing when the theme flips.                  */
+/*                                                                    */
+/* Values are space separated RGB channels rather than hex, which is   */
+/* what lets Tailwind opacity modifiers like bg-base-900/60 work.      */
+/*                                                                    */
+/* A theme declares its own base. Nothing here forces a future theme   */
+/* to ship a light and a dark variant: the 40K one is inherently dark  */
+/* and should just be dark.                                            */
+/* ================================================================== */
+
+:root {
+  /* Dark. Grey, not black. The artifact sat at near black #09090b and  */
+  /* this lifts it, which is what the build spec asks for. To go back,  */
+  /* set base-950 to 9 9 11 and base-900 to 24 24 27.                   */
+  --base-950: 18 18 20;
+  --base-900: 28 28 31;
+  --base-800: 42 42 46;
+  --base-700: 63 63 69;
+  --base-600: 82 82 90;
+  --base-500: 113 113 122;
+  --base-400: 161 161 170;
+  --base-300: 212 212 216;
+  --base-200: 228 228 231;
+  --base-100: 244 244 245;
+  --base-50: 250 250 250;
+
+  --accent-950: 69 26 3;
+  --accent-900: 120 53 15;
+  --accent-800: 146 64 14;
+  --accent-700: 180 83 9;
+  --accent-600: 217 119 6;
+  --accent-500: 245 158 11;
+  --accent-400: 251 191 36;
+  --accent-300: 252 211 77;
+  --accent-200: 253 230 138;
+  --accent-100: 254 243 199;
+  --accent-50: 255 251 235;
+
+  --brand: 234 179 8;
+  --brand-ink: 66 32 6;
+
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ */
+/* LAYOUT                                                              */
+/* One number, read by two places that have to agree.                  */
+/*                                                                     */
+/* On a wide screen the sidebar brand box and the page header sit side  */
+/* by side, so their bottom rules have to land on the same line. They   */
+/* were 86px and 61px, set independently by their own contents, and     */
+/* the 25px step was visible across the whole top of the app. Both read */
+/* this now, so they cannot drift apart again.                          */
+/*                                                                     */
+/* Below lg there is no sidebar to line up with, and the header and the */
+/* tab bar collapse into one row, so this does not apply there.         */
+/* ------------------------------------------------------------------ */
+:root {
+  --brand-box: 86px;
+}
+
+/* ------------------------------------------------------------------ */
+/* TIER RAMP                                                           */
+/* The badge encodes the rating, so it has to read the same across      */
+/* Dark, Light and Neon. Those three share this one ramp and never      */
+/* override it.                                                         */
+/*                                                                     */
+/* A warbond skin is the exception, and a deliberate one: it restyles   */
+/* the whole ladder at once so it reads as one material instead of a    */
+/* rainbow. Overriding one tier and leaving the rest is what breaks     */
+/* the badge, not overriding all six together.                          */
+/*                                                                     */
+/* Full colour values rather than RGB triples, because these are used   */
+/* in inline styles and some of them want their own alpha.              */
+/* ------------------------------------------------------------------ */
+:root {
+  --tier-splus-bg: #fbbf24;
+  --tier-splus-fg: #451a03;
+  --tier-splus-border: transparent;
+  --tier-s-bg: #c084fc;
+  --tier-s-fg: #3b0764;
+  --tier-s-border: transparent;
+  --tier-a-bg: #2dd4bf;
+  --tier-a-fg: #042f2e;
+  --tier-a-border: transparent;
+  --tier-b-bg: #4ade80;
+  --tier-b-fg: #052e16;
+  --tier-b-border: transparent;
+  --tier-c-bg: #71717a;
+  --tier-c-fg: #09090b;
+  --tier-c-border: transparent;
+  --tier-d-bg: #dc2626;
+  --tier-d-fg: #fef2f2;
+  --tier-d-border: transparent;
+}
+
+[data-theme="light"] {
+  /* Light. Off white, not pure white, so a white card still reads as a */
+  /* card rather than dissolving into the page.                         */
+  --base-950: 245 245 244;
+  --base-900: 255 255 255;
+  --base-800: 228 228 231;
+  --base-700: 212 212 216;
+  --base-600: 161 161 170;
+  --base-500: 113 113 122;
+  --base-400: 82 82 90;
+  --base-300: 63 63 70;
+  --base-200: 39 39 42;
+  --base-100: 24 24 27;
+  --base-50: 9 9 11;
+
+  /* Hand tuned rather than a flipped amber ramp, because the accent has */
+  /* to stay legible against white at every stop it is actually used at. */
+  --accent-950: 254 243 199;
+  --accent-900: 253 230 138;
+  --accent-800: 252 211 77;
+  --accent-700: 217 119 6;
+  --accent-600: 202 138 4;
+  --accent-500: 180 83 9;
+  --accent-400: 180 83 9;
+  --accent-300: 120 53 15;
+  --accent-200: 146 64 14;
+  --accent-100: 92 40 14;
+  --accent-50: 69 26 3;
+
+  --brand: 161 98 7;
+  --brand-ink: 255 251 235;
+
+  color-scheme: light;
+}
+
+[data-theme="neon"] {
+  /* Dark only, on purpose. A theme declares its own base, and neon on   */
+  /* off white is not a thing worth shipping. The ground goes to near    */
+  /* black so #FFE900 actually reads as neon rather than as mustard.     */
+  --base-950: 8 8 9;
+  --base-900: 17 17 19;
+  --base-800: 32 32 36;
+  --base-700: 52 52 58;
+  --base-600: 76 76 84;
+  --base-500: 110 110 120;
+  --base-400: 158 158 168;
+  --base-300: 210 210 216;
+  --base-200: 228 228 232;
+  --base-100: 245 245 246;
+  --base-50: 252 252 252;
+
+  /* The lock and favorite accent stays amber. Painting it neon too      */
+  /* would make a locked item and the brand mark the same colour, and    */
+  /* the lock would stop meaning anything.                               */
+  --accent-950: 69 26 3;
+  --accent-900: 120 53 15;
+  --accent-800: 146 64 14;
+  --accent-700: 180 83 9;
+  --accent-600: 217 119 6;
+  --accent-500: 245 158 11;
+  --accent-400: 251 191 36;
+  --accent-300: 252 211 77;
+  --accent-200: 253 230 138;
+  --accent-100: 254 243 199;
+  --accent-50: 255 251 235;
+
+  /* Straight off ui_logo_helldivers_yellow.svg, so the brand colour is  */
+  /* the one the game's own logo uses rather than a guess at neon.       */
+  --brand: 255 233 0;
+  --brand-ink: 10 10 6;
+
+  color-scheme: dark;
+}
+
+/* ================================================================== */
+/* WARBOND SKINS                                                      */
+/*                                                                    */
+/* One block per skin, generated from that skin's palette study by     */
+/* scripts/build-themes.mjs and then hand tuned. The study in          */
+/* All images/themes/<Name>/ is the source: it fixes the palette and   */
+/* argues the reasoning before any of it reaches the app. Read it      */
+/* before changing a value here.                                       */
+/*                                                                    */
+/* None of these override the accent ramp, so every one of them        */
+/* inherits the amber above. That is deliberate. The padlock and the   */
+/* star must never be the same colour as the brand mark or the lock    */
+/* stops meaning anything. Several studies do paint their signature    */
+/* colour there; that disagreement is recorded, not applied.           */
+/*                                                                    */
+/* None of them override the tier ramp either. The v2 Castellan's      */
+/* study relabelled it "invariant: tier badges and faction hues are    */
+/* the same values in every theme", which reverses the exemption the   */
+/* first study used. Same badge, every skin.                           */
+/* ================================================================== */
+
+[data-theme="automaton"] {
+  /* Automaton. Foundry steel and warning red.
+     Generated from automaton_theme.html. */
+  --base-950: 7 8 10;
+  --base-900: 15 19 22;
+  --base-800: 22 27 31;
+  --base-700: 42 51 58;
+  --base-600: 70 84 94;
+  --base-500: 102 116 126;
+  --base-400: 149 162 171;
+  --base-300: 183 193 201;
+  --base-200: 202 210 217;
+  --base-100: 211 219 225;
+  --base-50: 226 232 236;
+
+  --brand: 255 45 24;
+  --brand-ink: 46 8 4;
+
+  color-scheme: dark;
+}
+
+[data-theme="bile-titan"] {
+  /* Bile Titan. Terminid chitin and acid. A generic Terminid skin
+     rather than a warbond, so it takes its cue from the bugs themselves.
+     Generated from bile_titan_theme.html. */
+  --base-950: 8 7 6;
+  --base-900: 19 17 16;
+  --base-800: 28 25 23;
+  --base-700: 58 51 46;
+  --base-600: 94 83 74;
+  --base-500: 122 113 100;
+  --base-400: 173 162 148;
+  --base-300: 206 197 184;
+  --base-200: 224 216 204;
+  --base-100: 233 226 214;
+  --base-50: 241 236 228;
+
+  --brand: 199 222 31;
+  --brand-ink: 36 40 6;
+
+  color-scheme: dark;
+}
+
+/* Green is a deliberate choice rather than a mood: no faction owns it,  */
+/* so bots red, bugs orange and squids purple all stay legible against   */
+/* it. That is the one thing a base colour here has to get right.        */
+[data-theme="castellans-creed"] {
+  /* Castellan's Creed. Cadian green and gold, the first warbond skin.
+     Generated from castellans_creed_theme_v2.html. */
+  --base-950: 10 14 11;
+  --base-900: 20 28 22;
+  --base-800: 29 40 32;
+  --base-700: 62 79 66;
+  --base-600: 110 132 103;
+  --base-500: 123 136 120;
+  --base-400: 174 182 168;
+  --base-300: 206 208 197;
+  --base-200: 223 223 212;
+  --base-100: 232 230 220;
+  --base-50: 240 239 232;
+
+  --brand: 232 192 99;
+  --brand-ink: 42 35 18;
+
+  color-scheme: dark;
+}
+
+/* The two skins whose signature colour is itself yellow. Amber locks    */
+/* vanish into an amber brand, which is the exact failure the accent     */
+/* rule exists to prevent, so these two take a vermillion accent         */
+/* instead. It reads as a warning light rather than as the brand, which  */
+/* is also what a drop bay and a destroyer console actually look like.   */
+[data-theme="hellpod-drop-bay"],
+[data-theme="super-destroyer"] {
+  --accent-950: 60 14 6;
+  --accent-900: 96 24 10;
+  --accent-800: 124 32 13;
+  --accent-700: 158 44 18;
+  --accent-600: 196 58 24;
+  --accent-500: 232 74 34;
+  --accent-400: 245 112 74;
+  --accent-300: 250 150 120;
+  --accent-200: 252 186 165;
+  --accent-100: 254 218 205;
+  --accent-50: 255 240 235;
+}
+
+[data-theme="odst"] {
+  /* ODST. New Mombasa at night, Superintendent green and rain.
+     Generated from odst_theme.html. */
+  --base-950: 6 9 13;
+  --base-900: 14 20 27;
+  --base-800: 21 29 38;
+  --base-700: 38 51 63;
+  --base-600: 65 86 106;
+  --base-500: 101 117 127;
+  --base-400: 152 168 183;
+  --base-300: 185 197 209;
+  --base-200: 203 213 223;
+  --base-100: 212 221 230;
+  --base-50: 227 233 239;
+
+  --brand: 124 163 63;
+  --brand-ink: 22 29 11;
+
+  color-scheme: dark;
+}
+
+[data-theme="hellpod-drop-bay"] {
+  /* Hellpod Drop Bay. Deck plate and hazard yellow.
+     Generated from hellpod_drop_bay_theme.html. */
+  --base-950: 12 13 14;
+  --base-900: 24 26 28;
+  --base-800: 32 35 37;
+  --base-700: 51 56 60;
+  --base-600: 86 93 99;
+  --base-500: 118 126 132;
+  --base-400: 168 175 180;
+  --base-300: 201 206 209;
+  --base-200: 219 223 225;
+  --base-100: 228 231 233;
+  --base-50: 237 239 241;
+
+  --brand: 255 210 0;
+  --brand-ink: 46 38 0;
+
+  color-scheme: dark;
+}
+
+/* Sage is the ground and the brand here, which leaves the study's        */
+/* --tracer unused and the whole skin reading as quiet green. Tracer is   */
+/* the thing the Creek is actually remembered for, so it takes the        */
+/* accent: a padlock reads as a round coming through the canopy.          */
+[data-theme="malevelon-creek"] {
+  --accent-950: 58 12 6;
+  --accent-900: 92 20 10;
+  --accent-800: 120 27 14;
+  --accent-700: 154 36 19;
+  --accent-600: 196 48 26;
+  --accent-500: 255 59 34;
+  --accent-400: 255 108 84;
+  --accent-300: 255 148 128;
+  --accent-200: 255 186 172;
+  --accent-100: 255 218 210;
+  --accent-50: 255 240 236;
+}
+
+[data-theme="malevelon-creek"] {
+  /* Malevelon Creek. Blue night and tracer fire.
+     The Creek is blue, not green. The first pass here invented a green
+     black ground; the updated study corrects it to the night blue the
+     Remember the Creek poster actually uses, and the poster is now the
+     masthead. Do not drift it back toward jungle green.
+     Generated from malevelon_creek_theme.html. */
+  --base-950: 6 11 18;
+  --base-900: 13 20 29;
+  --base-800: 20 30 41;
+  --base-700: 36 51 64;
+  --base-600: 59 81 100;
+  --base-500: 100 118 134;
+  --base-400: 147 164 179;
+  --base-300: 182 195 207;
+  --base-200: 201 212 222;
+  --base-100: 210 221 230;
+  --base-50: 226 233 239;
+
+  --brand: 159 196 210;
+  --brand-ink: 29 35 38;
+
+  color-scheme: dark;
+}
+
+[data-theme="entrenched-division"] {
+  /* Entrenched Division. Trench olive and mustard, both measured off the
+     warbond badge. Smoke, gas and grit.
+     Generated from entrenched_division_theme.html. */
+  --base-950: 12 15 9;
+  --base-900: 21 26 15;
+  --base-800: 29 36 22;
+  --base-700: 56 66 42;
+  --base-600: 94 107 68;
+  --base-500: 120 128 95;
+  --base-400: 168 176 150;
+  --base-300: 200 205 184;
+  --base-200: 217 220 203;
+  --base-100: 226 228 212;
+  --base-50: 236 237 227;
+
+  --brand: 232 185 74;
+  --brand-ink: 42 33 13;
+
+  color-scheme: dark;
+}
+
+[data-theme="ministry-of-truth"] {
+  /* Ministry of Truth. Bureau paper and stamp navy, and the only light
+     skin. A theme declares its own base, which is what lets this one be
+     paper while the rest are night.
+     Generated from ministry_of_truth_theme.html. */
+  --base-950: 244 241 232;
+  --base-900: 255 255 255;
+  --base-800: 233 229 216;
+  --base-700: 196 188 166;
+  --base-600: 152 145 124;
+  --base-500: 107 101 81;
+  --base-400: 51 65 92;
+  --base-300: 31 44 69;
+  --base-200: 20 33 57;
+  --base-100: 14 27 51;
+  --base-50: 9 18 33;
+
+  /* The one skin that has to restate the accent, because the amber above
+     is tuned to survive a dark ground and washes out on paper. Same hand
+     tuned ramp the Light theme uses, for the same reason. */
+  --accent-950: 254 243 199;
+  --accent-900: 253 230 138;
+  --accent-800: 252 211 77;
+  --accent-700: 217 119 6;
+  --accent-600: 202 138 4;
+  --accent-500: 180 83 9;
+  --accent-400: 180 83 9;
+  --accent-300: 120 53 15;
+  --accent-200: 146 64 14;
+  --accent-100: 92 40 14;
+  --accent-50: 69 26 3;
+
+  --brand: 22 41 74;
+  --brand-ink: 244 241 232;
+
+  color-scheme: light;
+}
+
+[data-theme="super-destroyer"] {
+  /* Super Destroyer. Hull grey and console amber.
+     Generated from super_destroyer_theme.html. */
+  --base-950: 10 14 17;
+  --base-900: 20 26 31;
+  --base-800: 27 35 42;
+  --base-700: 46 59 69;
+  --base-600: 74 93 107;
+  --base-500: 107 124 136;
+  --base-400: 157 174 186;
+  --base-300: 189 203 211;
+  --base-200: 207 218 225;
+  --base-100: 216 226 232;
+  --base-50: 230 236 240;
+
+  --brand: 255 176 32;
+  --brand-ink: 46 32 6;
+
+  color-scheme: dark;
+}
+
+[data-theme="viper-commandos"] {
+  /* Viper Commandos. Woodland camo, with viper teal as the only light.
+     The first pass ran the whole ground teal, which made it read as an
+     aquarium rather than as jungle kit. The palette here is measured off
+     palette-reference-camo.jpg in the theme folder: olive, khaki, brown
+     and near black. Teal appears only as brand, which is what a lighting
+     accent means. Do not push the base back toward teal. */
+  --base-950: 13 15 10;
+  --base-900: 22 25 15;
+  --base-800: 31 36 22;
+  --base-700: 51 58 37;
+  --base-600: 74 90 56;
+  --base-500: 110 115 85;
+  --base-400: 168 172 128;
+  --base-300: 199 202 166;
+  --base-200: 217 218 190;
+  --base-100: 228 228 205;
+  --base-50: 238 238 224;
+
+  --brand: 95 224 210;
+  --brand-ink: 17 40 38;
+
+  color-scheme: dark;
+}
+
+/* ================================================================== */
+/* AMBIENT AND GLOW                                                   */
+/*                                                                    */
+/* The material half of a skin. A study is not only colour: the Creek  */
+/* throws tracers and drifts embers, the Foundry glows out of the      */
+/* plate, Viper Commandos lays camo under everything. The particles    */
+/* are drawn by src/Ambient.jsx; the surface glow is here, because it  */
+/* rides on hover states that already exist.                           */
+/*                                                                    */
+/* Everything is opt in through two variables. A theme that sets       */
+/* neither gets no glow and no layer, which is why Dark, Light and     */
+/* Neon are untouched.                                                 */
+/* ================================================================== */
+
+:root {
+  /* Off by default. The colour is never read while strength is 0, but  */
+  /* it has to parse, so it carries a real value rather than nothing.   */
+  --fx-glow: 255 255 255;
+  --fx-glow-strength: 0;
+  --fx-strike: 0px;
+}
+
+[data-theme="malevelon-creek"] { --fx-glow: 255 59 34; --fx-glow-strength: 0.10; --fx-strike: 3px; }
+[data-theme="automaton"] { --fx-glow: 255 45 24; --fx-glow-strength: 0.14; --fx-strike: 4px; }
+[data-theme="bile-titan"] { --fx-glow: 199 222 31; --fx-glow-strength: 0.10; --fx-strike: 3px; }
+[data-theme="hellpod-drop-bay"] { --fx-glow: 255 210 0; --fx-glow-strength: 0.09; --fx-strike: 3px; }
+[data-theme="super-destroyer"] { --fx-glow: 255 176 32; --fx-glow-strength: 0.09; --fx-strike: 3px; }
+[data-theme="viper-commandos"] { --fx-glow: 95 224 210; --fx-glow-strength: 0.09; --fx-strike: 3px; }
+[data-theme="odst"] { --fx-glow: 124 163 63; --fx-glow-strength: 0.10; --fx-strike: 3px; }
+[data-theme="entrenched-division"] { --fx-glow: 232 185 74; --fx-glow-strength: 0.10; --fx-strike: 3px; }
+
+/* Ministry of Truth takes a strike and no glow. Paper cannot emit light, */
+/* so it gets weight instead: pressed shadows under the panels and a hard */
+/* offset on the stamps, as if they had been physically pressed.          */
+[data-theme="ministry-of-truth"] { --fx-strike: 3px; }
+[data-theme="ministry-of-truth"] .fx-panel {
+  box-shadow: 0 2px 0 rgb(var(--base-700) / 0.5), 0 8px 18px rgb(14 27 51 / 0.10);
+}
+[data-theme="ministry-of-truth"] .fx-row:hover {
+  box-shadow: inset var(--fx-strike) 0 0 0 rgb(var(--brand)), 0 2px 0 rgb(var(--base-700) / 0.45);
+}
+/* The gold rule under a column header, which on paper is the only place  */
+/* a warm colour appears at all.                                          */
+[data-theme="ministry-of-truth"] .fx-rule {
+  border-bottom: 2px solid #C9A227;
+}
+
+/* The masthead carries its own art on the skins that ship one: the       */
+/* Creek's poster, the Destroyer's hull bleeding off the right edge.      */
+.fx-masthead {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+/* Every sibling after it, not just the next one: the header holds both a */
+/* title block and a control cluster, and both have to sit over the art.  */
+.fx-masthead ~ * {
+  position: relative;
+  z-index: 1;
+}
+[data-theme="castellans-creed"] { --fx-glow: 232 192 99; --fx-glow-strength: 0.08; --fx-strike: 3px; }
+
+/* A row lights along its leading edge and bleeds inward, which is what  */
+/* both the Foundry and the Creek studies do on hover. On a theme with   */
+/* no glow both insets collapse to nothing and the row is unchanged.     */
+.fx-row {
+  transition: background-color 0.18s ease, box-shadow 0.22s ease;
+}
+.fx-row:hover {
+  box-shadow:
+    inset var(--fx-strike) 0 0 0 rgb(var(--brand)),
+    inset 0 0 34px rgb(var(--fx-glow) / var(--fx-glow-strength));
+}
+
+/* The brand rule under the masthead, glowing on skins that glow. */
+.fx-stripe {
+  box-shadow: 0 0 16px rgb(var(--fx-glow) / calc(var(--fx-glow-strength) * 4));
+}
+
+/* A panel bleeding its own light onto the ground around it, which is    */
+/* what the Foundry study does to the row list and the Creek does to     */
+/* its cards. Collapses to nothing when strength is 0.                   */
+.fx-panel {
+  box-shadow: 0 0 44px rgb(var(--fx-glow) / calc(var(--fx-glow-strength) * 0.8));
+}
+
+/* ------------------------------------------------------------------ */
+/* RANGE SLIDER                                                        */
+/*                                                                     */
+/* Difficulty is the one axis in this tool that is genuinely ordered,   */
+/* so it gets a slider rather than ten chips. A range input cannot be   */
+/* styled through utility classes, so it is done here, and it reads     */
+/* the same ramp tokens everything else does rather than hard coding a  */
+/* grey that would break in the two light themes.                      */
+/*                                                                     */
+/* --fill is set inline as a percentage, which is what paints the       */
+/* track up to the handle without a second element behind it.           */
+/* ------------------------------------------------------------------ */
+
+.dds-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 1.25rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dds-range:focus { outline: none; }
+.dds-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px rgb(var(--brand) / 0.4); }
+.dds-range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px rgb(var(--brand) / 0.4); }
+
+.dds-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    rgb(var(--brand)) 0,
+    rgb(var(--brand)) var(--fill, 0%),
+    rgb(var(--base-800)) var(--fill, 0%),
+    rgb(var(--base-800)) 100%
+  );
+}
+
+.dds-range::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    rgb(var(--brand)) 0,
+    rgb(var(--brand)) var(--fill, 0%),
+    rgb(var(--base-800)) var(--fill, 0%),
+    rgb(var(--base-800)) 100%
+  );
+}
+
+.dds-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 16px;
+  width: 16px;
+  margin-top: -5px;
+  border-radius: 999px;
+  border: 2px solid rgb(var(--base-950));
+  background: rgb(var(--brand));
+  transition: transform 0.12s ease;
+}
+
+.dds-range::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 999px;
+  border: 2px solid rgb(var(--base-950));
+  background: rgb(var(--brand));
+  transition: transform 0.12s ease;
+}
+
+.dds-range:hover::-webkit-slider-thumb { transform: scale(1.15); }
+.dds-range:hover::-moz-range-thumb { transform: scale(1.15); }
+
+@media (prefers-reduced-motion: reduce) {
+  .dds-range::-webkit-slider-thumb,
+  .dds-range::-moz-range-thumb { transition: none; }
+}
+
+/* ------------------------------------------------------------------ */
+/* The particle layer itself. Fixed and inert: it sits behind every     */
+/* surface, takes no pointer events and is hidden from assistive tech.  */
+/* ------------------------------------------------------------------ */
+
+.fx-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.fx-texture {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+}
+
+.fx-firelight {
+  position: absolute;
+  border-radius: 50%;
+  animation: fx-flick 12s ease-in-out infinite;
+  will-change: opacity;
+}
+
+.fx-streak {
+  position: absolute;
+  width: 2px;
+  border-radius: 2px;
+  opacity: 0;
+  transform: rotate(24deg);
+  animation: fx-streak linear infinite;
+  will-change: transform, opacity;
+}
+
+.fx-ember {
+  position: absolute;
+  bottom: -12px;
+  border-radius: 50%;
+  opacity: 0;
+  animation: fx-rise linear infinite;
+  will-change: transform, opacity;
+}
+
+/* Rain falls rather than rises, and comes in at a slight angle so it     */
+/* reads as weather and not as a progress bar.                            */
+.fx-rain {
+  position: absolute;
+  top: -14vh;
+  width: 1px;
+  opacity: 0;
+  animation: fx-fall linear infinite;
+  will-change: transform, opacity;
+}
+
+/* Bile keeps its head. The tail is only the path it took.               */
+.fx-drip {
+  position: absolute;
+  top: -10vh;
+  border-radius: 0 0 40% 40%;
+  opacity: 0;
+  animation: fx-fall linear infinite;
+  --fx-dx: 0px;
+  will-change: transform, opacity;
+}
+
+/* Gas crosses the full width. Blur does the work, so the element itself  */
+/* is a soft ellipse and the animation only has to move it.               */
+.fx-gas {
+  position: absolute;
+  left: -40%;
+  border-radius: 50%;
+  filter: blur(46px);
+  opacity: 0;
+  animation: fx-drift linear infinite;
+  will-change: transform, opacity;
+}
+
+.fx-star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0;
+  animation: fx-twinkle ease-in-out infinite;
+  will-change: opacity;
+}
+
+/* A blueprint pressed under the page. No blend mode: on paper this is    */
+/* ink sitting in the fibre, not light.                                   */
+.fx-underlay {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+}
+
+/* A patch on the webbing, bottom right, sitting still. */
+.fx-badge {
+  position: absolute;
+  right: 22px;
+  bottom: 18px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: bottom right;
+}
+
+@keyframes fx-flick {
+  0% { opacity: 0.55; }
+  13% { opacity: 0.85; }
+  27% { opacity: 0.42; }
+  41% { opacity: 0.95; }
+  56% { opacity: 0.6; }
+  68% { opacity: 1; }
+  79% { opacity: 0.5; }
+  100% { opacity: 0.55; }
+}
+
+@keyframes fx-streak {
+  0% { transform: translate3d(0, 0, 0) rotate(24deg); opacity: 0; }
+  6% { opacity: 1; }
+  40% { opacity: 0.9; }
+  100% { transform: translate3d(var(--fx-dx), var(--fx-dy), 0) rotate(24deg); opacity: 0; }
+}
+
+@keyframes fx-rise {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  9% { opacity: var(--fx-o); }
+  84% { opacity: var(--fx-o); }
+  100% { transform: translate3d(var(--fx-dx), -102vh, 0); opacity: 0; }
+}
+
+@keyframes fx-fall {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  8% { opacity: var(--fx-o); }
+  88% { opacity: var(--fx-o); }
+  100% { transform: translate3d(var(--fx-dx), 128vh, 0); opacity: 0; }
+}
+
+@keyframes fx-drift {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  14% { opacity: var(--fx-o); }
+  86% { opacity: var(--fx-o); }
+  100% { transform: translate3d(180vw, 0, 0); opacity: 0; }
+}
+
+@keyframes fx-twinkle {
+  0%, 100% { opacity: calc(var(--fx-o) * 0.25); }
+  50% { opacity: var(--fx-o); }
+}
+
+/* ------------------------------------------------------------------ */
+/* GRAIN                                                               */
+/*                                                                     */
+/* The one texture allowed over the data. Grain is a property of the    */
+/* lens rather than of any surface, so it sits above every panel and    */
+/* above the sticky chrome, blended rather than laid on top. At a few   */
+/* percent through overlay it reads as film; raise it much and it reads */
+/* as a dirty screen.                                                   */
+/* ------------------------------------------------------------------ */
+.fx-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+}
+
+/* Nothing here is load bearing, so anyone who asked for stillness gets  */
+/* stillness. The colour stays; only the motion stops.                   */
+@media (prefers-reduced-motion: reduce) {
+  .fx-firelight,
+  .fx-streak,
+  .fx-ember,
+  .fx-rain,
+  .fx-drip,
+  .fx-gas,
+  .fx-star {
+    animation: none;
+  }
+  .fx-streak,
+  .fx-ember,
+  .fx-rain,
+  .fx-drip {
+    display: none;
+  }
+  /* Gas and stars are atmosphere rather than motion, so they stay put   */
+  /* at their resting opacity instead of vanishing.                      */
+  .fx-gas,
+  .fx-star {
+    opacity: var(--fx-o);
+  }
+  .fx-firelight {
+    opacity: 0.7;
+  }
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: rgb(var(--base-950));
+}

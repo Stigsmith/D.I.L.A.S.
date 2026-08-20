@@ -1,0 +1,194 @@
+/* ================================================================== */
+/* SQUAD CHECKS                                                       */
+/*                                                                    */
+/* A gap, plus where you are dropping, said as a sentence. Not a table */
+/* of counts. The earlier design rendered six tags with states of      */
+/* absent, thin, covered and redundant, which reads "covered" almost   */
+/* every time and gets ignored by the second drop.                     */
+/*                                                                    */
+/* Two rules keep it honest:                                           */
+/*                                                                    */
+/*  - Silence is the normal state. Nothing worth saying means nothing  */
+/*    is said, rather than a panel reporting that everything is fine.  */
+/*  - Every warning is conditioned on context. "You have no anti-tank" */
+/*    is almost always false and always boring. "No anti-tank and you  */
+/*    are dropping on bugs at 8" is a sentence worth reading.          */
+/*                                                                    */
+/* Advisory only. Nothing here removes a build or blocks a choice. The */
+/* biome hard gate is the opposite case by explicit decision: if the   */
+/* answer is do not bring this, it should not be on the card. A squad  */
+/* knowingly doubling up on mortars is making a choice about how they  */
+/* play, not an error.                                                 */
+/* ================================================================== */
+
+import { getItem } from "./items.js";
+import { loadoutItems } from "./loadouts.js";
+
+/* Stratagems that put shells, arcs or fire through your own squad. A    */
+/* hand listed set, because nothing in the source data records it.       */
+/* The EMS and Gas mortars are deliberately absent: they suppress rather */
+/* than kill, so they do not belong next to the ones that drop you.      */
+export const TEAMKILL_PRONE = [
+  "a-arc-3-tesla-tower",
+  "a-m-12-mortar-sentry",
+  "a-g-16-gatling-sentry",
+  "md-i4-incendiary-mines",
+  "orbital-380mm-he-barrage",
+];
+
+/* All tier data in this project assumes difficulty 7 and above, and     */
+/* below roughly 5 none of this matters. An unset band still warns:      */
+/* staying silent on "not specified" means the panel never fires by      */
+/* default, which is worse than firing on a drop that turned out easy.   */
+const QUIET_BANDS = ["low", "mid"];
+
+/* Exported because the panel has to say "these are switched off" rather  */
+/* than "you are covered". A squad with no anti-tank at difficulty 3 is   */
+/* still a squad with no anti-tank; we are choosing not to care, which is */
+/* not the same as it being fine. An admitted gap beats a hedged guess.   */
+export const isQuietBand = (difficulty) => QUIET_BANDS.includes(difficulty);
+
+const countMembers = (squad, test) => squad.filter((m) => m.items.some(test)).length;
+const countItems = (squad, test) => squad.reduce((n, m) => n + m.items.filter(test).length, 0);
+
+const hasRole = (role) => (item) => item.roles.includes(role);
+
+/* The faction a warning speaks about. Bugs and bots both punish having  */
+/* no answer to armor; squids do not, and the tier data already warns    */
+/* off most dedicated anti-tank on that front.                           */
+const HEAVY_FRONTS = {
+  bugs: "Chargers come in pairs up here, and a Bile Titan will walk straight through this.",
+  bots: "Hulks up here arrive with a Factory Strider behind them.",
+  any: "Chargers and Hulks do not care which front you thought you were on.",
+};
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * builds  the loadouts being compared
+ * context { faction, biome, mission, difficulty } as Drop Bay already has them
+ * returns [{ id, severity, text }], most severe first, empty when there is
+ *         nothing worth saying
+ */
+export function squadWarnings(builds, context = {}) {
+  const squad = builds
+    .filter(Boolean)
+    .map((l) => ({ loadout: l, items: loadoutItems(l) }));
+
+  /* One build is a loadout, not a squad. The builder already warns on    */
+  /* what one person is carrying.                                         */
+  if (squad.length < 2) return [];
+
+  const { faction = "any", biome = "any", mission = "any", difficulty = "any" } = context;
+  const out = [];
+  const add = (id, severity, text) => out.push({ id, severity, text });
+
+  const size = squad.length;
+  const quiet = QUIET_BANDS.includes(difficulty);
+  const heavyFront = faction === "bugs" || faction === "bots" || faction === "any";
+
+  /* ---------------------------------------------------------------- */
+  /* Coverage. Needs the role tags.                                    */
+  /* ---------------------------------------------------------------- */
+
+  const armorMembers = countMembers(squad, hasRole("anti-armor"));
+  const chaffMembers = countMembers(squad, hasRole("chaff"));
+  const objectiveMembers = countMembers(squad, hasRole("objective"));
+  const objectiveItems = countItems(squad, hasRole("objective"));
+
+  /* The bot mirror of the chaff problem. Bugs punish having no volume;   */
+  /* bots punish having no penetration, because a Devastator's armor      */
+  /* eats light fire all day and the only answers are its head or a       */
+  /* bigger gun. Derived from sourced AP rather than a fourth editorial   */
+  /* tag, and limited to what you hold: a sentry cannot pick a weakpoint. */
+  /*                                                                      */
+  /* The threshold is AP 4, the Heavy class, and it was measured rather   */
+  /* than picked. AP 3 is carried by something in all 39 curated builds,  */
+  /* so a check at that level can never fire. AP 5 is missing from 30 of  */
+  /* them and would fire on more than half of all bot pairs, which is     */
+  /* noise. AP 4 is absent from 14 and fires on 6 of 78. That is a real   */
+  /* signal, and it is also the class that actually beats Devastators.    */
+  const PENETRATION_AP = 4;
+  const held = (i) => i.slot === "primary" || i.slot === "secondary"
+    || (i.slot === "stratagem" && i.stratType === "support");
+  const penetrators = countMembers(squad, (i) => held(i) && (i.stats.ap ?? 0) >= PENETRATION_AP);
+
+  if (!quiet && armorMembers === 0) {
+    if (heavyFront) {
+      add("armor-absent", "red", `Nothing between you opens armor. ${HEAVY_FRONTS[faction]}`);
+    } else if (faction === "squids") {
+      add("armor-absent-squids", "grey",
+        "No dedicated anti-tank, which is usually right against squids. The tier data warns off most of it on this front.");
+    }
+  } else if (!quiet && armorMembers === 1 && size >= 2 && faction !== "squids" && difficulty === "extreme") {
+    add("armor-thin", "amber",
+      size === 2
+        ? "One of you is carrying the anti-tank. If he goes down holding it, you are throwing grenades at a Charger."
+        : `One of ${size} is carrying the anti-tank. That is a thin thread at this difficulty.`);
+  }
+
+  /* Bugs come at you in numbers. A squad of slow precise guns kills every */
+  /* single thing it points at and still gets eaten, because the problem   */
+  /* was never whether you could kill one hunter.                          */
+  if (!quiet && chaffMembers === 0 && (faction === "bugs" || faction === "squids")) {
+    add("chaff-absent", "red",
+      faction === "bugs"
+        ? "Nothing here holds off a swarm. Everything you have kills one thing at a time, and bugs do not come one at a time."
+        : "Nothing here holds off a crowd, and Voteless arrive in them.");
+  } else if (!quiet && chaffMembers === 0 && faction === "bots") {
+    add("chaff-absent-bots", "amber",
+      "No sustained chaff clear. Bots come in smaller numbers than bugs, but a trooper patrol still has to die somehow.");
+  } else if (!quiet && chaffMembers === 1 && size >= 3 && faction === "bugs") {
+    add("chaff-thin", "amber",
+      `One of ${size} is carrying the horde clear. On bugs that is one reload away from being overrun.`);
+  }
+
+  if (!quiet && faction === "bots" && penetrators === 0) {
+    add("no-penetration", "amber",
+      "Nothing you hold punches above light armor. You can still headshot every Devastator you meet, but one of you bringing an Autocannon, an Anti-Materiel Rifle, a Laser Cannon or even a Senator turns that from a skill check into a non-issue.");
+  }
+
+  if (!quiet && objectiveMembers === 0 && mission === "nest") {
+    add("objective-absent-nest", "red",
+      "Nothing here closes a hole or a fabricator without spending a stratagem. That is the entire mission.");
+  } else if (!quiet && objectiveItems <= size && biome === "cave") {
+    /* Demo 40 closes a hole from outside. Demo 30 needs the throw to go  */
+    /* in, and a cave rarely gives you that angle.                        */
+    const outside = countItems(squad, (i) => i.roles.includes("objective") && (i.stats.demoForce ?? 0) >= 40);
+    add("objective-thin-cave", "amber",
+      outside === 0
+        ? "Thin on hole closers, and it is a cave map. Nothing you have closes one from outside, and caves do not give you the angle for an inside throw."
+        : "Thin on hole closers for a cave map. Most of what you have needs an inside throw.");
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Overlap. Needs no new data.                                       */
+  /* ---------------------------------------------------------------- */
+
+  const boosters = squad.map((m) => m.loadout.booster).filter(Boolean);
+  const dupeBooster = boosters.find((b, i) => boosters.indexOf(b) !== i);
+  if (dupeBooster) {
+    const name = (getItem(dupeBooster) || {}).name || dupeBooster;
+    add("booster-duplicate", "red", `Two of you brought ${name}. Boosters do not stack, so one of those slots is empty.`);
+  }
+
+  const teamkillers = [
+    ...new Set(squad.flatMap((m) => m.items.filter((i) => TEAMKILL_PRONE.includes(i.id)).map((i) => i.name))),
+  ];
+  if (teamkillers.length >= 2 && size <= 3) {
+    add("teamkill", "amber",
+      `${teamkillers.join(" and ")} in a squad of ${size}. Fewer bodies over the same ground means you share more firing lines than a full squad does.`);
+  }
+
+  /* Each of you has your own back, so this is never a conflict. It is a  */
+  /* note about what the squad gave up: no supply pack, no shield, no dog. */
+  const eatsBack = (i) => i.slot === "stratagem" && i.stratType === "support" && i.usesBackpackSlot === true;
+  const isBackpack = (i) => i.stratType === "backpack";
+  if (countMembers(squad, isBackpack) === 0 && countMembers(squad, eatsBack) === size) {
+    add("no-backpack", "grey",
+      "Every one of you is carrying a support weapon that eats the backpack slot, so nobody has a supply pack, a shield or a dog.");
+  }
+
+  const order = { red: 0, amber: 1, grey: 2 };
+  return out.sort((a, b) => order[a.severity] - order[b.severity]);
+}
