@@ -1,0 +1,235 @@
+[
+  {
+    "version": "1.9.1",
+    "date": "2026-08-20",
+    "title": "A better planet source, and the map coordinates to go with it",
+    "changes": [
+      "Dropped the training manual API, which was the last thing still leaning on a source this project had already caught being twelve planets behind. Planets now come from the helldivers-2 community dataset and its API, which is the same organisation and returns exactly our 281.",
+      "Every planet now carries where it sits on the galaxy map, and 339 supply lines between them are recorded. Fetched once and shipped, so the map that will eventually replace the planet dropdown needs no network call to draw.",
+      "Hazards were losing half their answer. Two sources carry two different fields and neither is a superset: one holds the temperature, the other the headline weather. Widow's Harbor read as extreme cold in one and meteor storms in the other. They are unioned now, which took hazard assignments from 440 to 544.",
+      "Stopped counting normal temperature as a hazard. It is the absence of one.",
+      "Cross-checked our biomes against a second source for the first time. They agree on 274 of 276, and the two that differ hold each other's biome, which looks like a swap rather than a pattern."
+    ]
+  },
+  {
+    "version": "1.9.0",
+    "date": "2026-08-20",
+    "title": "The second column has a number in it, and a mission to read it against",
+    "changes": [
+      "The D.D.S. column is live. Say where you are dropping and every row gets a second rating: what this tool makes of that item on that planet, against that front, next to what the crowd made of it in the abstract.",
+      "It is a delta on the community tier, never a replacement. Both stay on the row so every disagreement is visible rather than laundered, and a brief can move a rating by two tiers at most.",
+      "Every point of movement carries a sentence. Tap a row and it lists exactly which rules fired and what each was worth. A score that cannot explain itself is a score nobody should trust.",
+      "Twenty three rules to start with, and all but three fire on sourced data: the game own heat multipliers, its armour penetration tags, durable damage ratios, ergonomics, magazine depth, and the hazard descriptions the community dataset publishes.",
+      "On a sandstorm planet against Automatons, nineteen of fifty two primaries move. Every marksman rifle drops and every shotgun and SMG rises, which is the opposite of what a static tier list tells you and the entire reason this exists.",
+      "Three rules name six support weapons by hand, because nothing published separates a long range support weapon from a close one. Those rules say so in the data file rather than pretending to be derived.",
+      "Unrated items still collect reasons even though they have no tier to move. That is how something nobody has voted on gets tried on the front it happens to suit.",
+      "Added the mission picker, by the name the game uses. Seventy missions from the wiki, listed per front, because the mission list genuinely differs: Purge Hatcheries is not a thing on the Automaton war.",
+      "Under the name sits the line the name does not tell you. Retrieve Valuable Data reads as: you pick something up and walk it across the map, it occupies a hand, so a one handed weapon lets you shoot while carrying and everything else means putting the objective down first.",
+      "Rules key on what a mission asks of you rather than on its name. Seventy missions, eight traits, so a rule about carrying something does not have to list every mission that involves carrying something.",
+      "Ten more scoring rules, for carrying, escorting, holding ground, eradicating, hunting named heavies and blitzing."
+    ]
+  },
+  {
+    "version": "1.7.0",
+    "date": "2026-08-20",
+    "title": "Difficulty has a slider and a name, not four numbered chips",
+    "changes": [
+      "The difficulty filter in Drop Bay is a slider over all ten levels, and it says the name. Nobody thinks in difficulty 7, they think Suicide Mission.",
+      "Added the ten difficulty icons from the game, painted through the theme so they take the brand colour on any skin.",
+      "The four bands a build declares are unchanged, so nothing saved had to move. The slider works out which band a level falls in.",
+      "Hovering a difficulty band in the builder now names the levels it covers, so 7-9 reads as Suicide Mission to Helldive.",
+      "Added the three sample icons and the XP mark to the art library. Nothing uses them yet.",
+      "Replaced the planet table. It came from the training manual API, which turns out to be missing twelve planets including the one the current Major Order is about. It now comes from the helldivers-2/json community dataset: 281 planets against 269, 32 named biomes against 24 slugs, and 440 hazard assignments against 385. MIT licensed rather than unstated.",
+      "Those hazards now carry what they actually do. Extreme Cold delays heat buildup and cuts rate of fire, Ion Storms intermittently disable stratagems, and the three visibility hazards are graded lightly, moderately and greatly. That is the difference between a scoring rule and a label.",
+      "Credited the helldivers-2 community organisation and DiveHarder on About, alongside the wiki.",
+      "Made item names readable on a phone. The name had 64px of a 343px row and needed 193px, so most of them showed as three characters and an ellipsis. The padlock and star stack instead of sitting side by side, the rating columns are exactly badge width, and the chevron stopped reserving 36px for a 16px arrow. The name column went from 64px to 144px and rows grew by 7px.",
+      "Added the planet picker. Search 281 planets or a sector, choose one, and the biome and its hazards fill themselves in. The holo select in game shows you one image of a surface, and even a veteran cannot always tell a canyon from a mesa from it, let alone whether the place has ion storms.",
+      "Each hazard says what it does to you, not just its name. Klen Dahth II reads as intense heat, extreme cold and sandstorms, and spells out that heat speeds weapon heat buildup while cold delays it and costs you rate of fire.",
+      "Biome and hazards can still be set by hand if you would rather not name a planet. Doing so drops the planet, since the brief would otherwise claim to be somewhere it is not."
+    ]
+  },
+  {
+    "version": "1.6.0",
+    "date": "2026-08-20",
+    "title": "Pick a front first, and the tier list has two rating columns instead of three fronts",
+    "changes": [
+      "The faction is a choice you make above the table now, not a filter inside it. Three buttons, named Automatons, Terminids and Illuminate. Nothing ranks until you pick one, because everything downstream reads differently per front and guessing one would be inventing the most important input.",
+      "Your choice is remembered, so the tool opens on the war you were last fighting.",
+      "The three faction columns are two rating columns: what u.gg voted, and what this tool works out for where you are dropping. The second is empty for now and says so. It fills when the scoring engine lands.",
+      "The other two fronts moved into the expanded row rather than out of the tool. Tap any row to see them.",
+      "A new loadout starts on the front you already picked, instead of always starting on Terminids.",
+      "Removed the Rank by chip row, which the buttons above the table replace.",
+      "Centred the faction buttons above the table and gave them some weight: the in-game faction mark, an accent bar in the front's own colour, and a soft bloom on the one you are on. The chooser and the bar are one control at two sizes now, so they cannot drift apart.",
+      "Gave the faction buttons their key art, muted hard and darkened toward the label so the text keeps its ground. Tall crops on the chooser, wide bands on the bar.",
+      "The bar is full width and shorter now, three equal buttons that stretch with the window rather than three fixed pills.",
+      "A skin can now ship a separate phone masthead as masthead-sm. The header box runs up to 27:1 and the phone row is nearer 10:1, so one cut was losing half of whatever was drawn. Skins without one fall back to the wide cut exactly as before.",
+      "The faction picker is on Drop Bay and the Loadout Builder now, not just the tier list.",
+      "Drop Bay shares the front with the tier list instead of keeping one of its own. Choosing Automatons in one place and finding Terminids in the other was never the intent.",
+      "In the builder the same control sets what the build is for, which is a property of the build rather than the brief. Changing it there marks the build unsaved and leaves the rest of the tool where it was.",
+      "Tier list filters survive leaving the page. A tier floor and a couple of hidden categories used to be thrown away the moment you glanced at Drop Bay. They now persist across navigation and a reload."
+    ]
+  },
+  {
+    "version": "1.5.0",
+    "date": "2026-08-20",
+    "title": "Vehicles, their ratings, and every stratagem's call-in code",
+    "changes": [
+      "Added the eight vehicles and exosuits: the three FRVs, the Patriot, Emancipator, Lumberer and Breakthrough exosuits, and the Bastion tank destroyer. Their art has been sitting in the library since 18 August with nothing to attach it to, because no source this project had listed a single vehicle. The wiki fetch changed that.",
+      "They are unrated, and that is the honest state rather than a gap. No community tier list covers them, so they show a dashed badge, sort last, and survive every tier floor. Their armor penetration, demolition force, cooldown and hull values are real and come from the game data.",
+      "Added Vehicle as a stratagem type, in the blue call-in group next to support weapons and backpacks, where the game puts it.",
+      "Every stratagem now carries its cooldown and its call-in input code. 88 of them, against the 12 that had a cooldown before.",
+      "67 items now carry the game's own tags, including which support weapons are expendable, which reload standing still, and which can be team reloaded.",
+      "The eight vehicle images used to be bundled as unrecognised UI files. They are named properly now, so they attach to their items instead of riding along as dead weight.",
+      "Rated all eight vehicles from u.gg, stamped patch 7.0.0. They are the only weapon ratings in this tool that are actually current with the game; every other u.gg list here is still 6.3.1.",
+      "Corrected two acquisition paths that were assumed. The Lumberer and Breakthrough exosuits come from the Exo Experts warbond, not requisition, so they are warbond gateable now. The Supply and Incinerator FRVs are campaign rewards.",
+      "Fixed a row reading \"3 uses, null upgraded\". Only Eagles carried a use count before, and they always have an upgraded figure, so nothing had ever shown the gap."
+    ]
+  },
+  {
+    "version": "1.4.0",
+    "date": "2026-08-20",
+    "title": "The stats this tool never had, and a hot planet bug it has had all along",
+    "changes": [
+      "Added every weapon stat the reference tables never carried: magazine size, spare magazines, fire rate, recoil, ergonomics, sway, projectile drag and velocity, durable damage, stagger and pushback. 174 of 180 weapons, throwables and stratagems now carry them.",
+      "Fixed the hot planet filter. It removed any build carrying a weapon whose damage type reads heat or arc, which is 26 items. Only ten of them can actually overheat. Three Purifier builds and one Blitzer build were being ruled out of every hot planet over a mechanic those weapons do not have.",
+      "The heat-venting damage filter on the tier list now returns the four laser primaries that vent heat, instead of every plasma weapon as well.",
+      "Cold and hot are real numbers now. A Sickle vents 1.5 times faster on an ice planet and 0.75 times as fast on a hot one, and those figures come from the game rather than from a judgement.",
+      "Curated builds derive their heat flag the same way your own builds do. Drop Bay always claimed it normalised both and only ever did it for yours.",
+      "Added a planet table: 269 planets with their biome and their environmental hazards, 24 biomes and 14 hazards. Nothing reads it yet. It is what the planet picker will run on.",
+      "Added npm run wiki, which re-fetches all of the above and reports what changed before writing anything.",
+      "Credited the Helldivers Wiki on About, with its licence. The data is CC BY-NC-SA, so attribution is a condition rather than a courtesy.",
+      "The validator now checks the fetched data resolves to real items, and fails if the heat set ever comes back empty, since the hot planet filter reads it."
+    ]
+  },
+  {
+    "version": "1.3.0",
+    "date": "2026-08-20",
+    "title": "Chrome heights, a phone that gives its screen back, and the Terminid mark",
+    "changes": [
+      "Halved the chrome on a phone. The header and the tab bar are one 44px row now, holding the menu, the tabs and the theme control, and the masthead art paints behind it at 60% strength so the tabs stay readable. That is 56px of an 812px screen handed back to the list, 12% of the screen down to 5%.",
+      "Where a destination has no tabs, that row shows its name instead, so it is never just a menu button on its own.",
+      "Lined the page header up with the sidebar brand box on a wide screen. They were 61px and 86px, set independently, and the step was visible across the whole top of the app. Both read one number now.",
+      "Fixed the sidebar nav overflowing its own column by 2px, which came from the same two heights disagreeing.",
+      "Fixed the sticky faction column header docking in the wrong place after a window resize. The chrome height was only recalculated on the next navigation, so it could sit 85px too high and slide under the chrome.",
+      "Gave the Bile Titan skin its Terminid mark. It replaces the skull in the sidebar and takes the acid green like every other themed mark.",
+      "Cut that mark from 399KB to 21KB. It arrived at 2304px wide and is painted at 40px.",
+      "Split the locked and favourite filters out of the tier list filter grid into a group of their own, with the padlock and star on them. They are facts about your collection, and everything above them is a fact about the gear.",
+      "Re-specified the masthead cut for the new header: 2560 x 170 with the subject inside the centre 1400 x 90, worked out from the real box on every screen from a 375px phone to a 2560px desktop."
+    ]
+  },
+  {
+    "version": "1.2.0",
+    "date": "2026-08-18",
+    "title": "Attribution, About, Support and this changelog",
+    "changes": [
+      "Added an unofficial community tool subtitle under the Armory wordmark.",
+      "Added a sitewide footer naming Arrowhead and Sony as unaffiliated.",
+      "Moved the patch stamp into the footer and shortened it. The full detail now lives on About.",
+      "Added the About page: what this is, where the numbers come from, and what a stale rating means.",
+      "Rebuilt Support around known issues and how to report one.",
+      "Added this changelog.",
+      "Restored the gear filter in Drop Bay, which was lost when Drop Bay replaced the old picker.",
+      "Put the Castellan's Creed aquila back as the mark. The Astra Militarum crest is colour art and turns to mush at 36 pixels.",
+      "Renamed the tool from Super Earth Armory to Democracy Deployment System. It is a working title, so the name now lives in one file and a future rename is one edit.",
+      "Removed the picker component Drop Bay replaced, about 80 lines that nothing had called since the port.",
+      "Surfaced the per biome notes in Drop Bay. They were written for that old picker and had been unused ever since."
+    ]
+  },
+  {
+    "version": "1.1.0",
+    "date": "2026-08-17",
+    "title": "Warbond skins, ambient effects and the image library",
+    "changes": [
+      "Added ten warbond skins on top of Dark, Light and Neon, each built from its own palette study.",
+      "Added the ambient layer: tracers on the Creek, gas and grain on Entrenched Division, rain on ODST, drips on Bile Titan, stars on Super Destroyer.",
+      "Gave every skin a masthead banner and its own mark.",
+      "Corrected Malevelon Creek from an invented green black to the poster's actual blue night.",
+      "Retoned Viper Commandos to woodland camo, with teal only as a lighting accent.",
+      "Sorted the image library into category folders and cut 22.7MB of art the app never rendered."
+    ]
+  },
+  {
+    "version": "1.0.0",
+    "date": "2026-08-16",
+    "title": "Squad checks, role tags and ownership profiles",
+    "changes": [
+      "Added role tags for anti-armor, chaff and objective, hand assigned on top of a corrected AP derivation.",
+      "Added the squad panel in Drop Bay: put two to four builds side by side and get told what is going to hurt.",
+      "Added named ownership profiles, so a second player's collection can be modelled separately.",
+      "Finished Collection with both ownership axes, warbonds and per item unlocks."
+    ]
+  },
+  {
+    "version": "0.4.0",
+    "date": "2026-08-15",
+    "reconstructed": true,
+    "title": "Stable ids, the Builder and Drop Bay",
+    "changes": [
+      "Moved every item onto a stable id, a slug of its name that never changes when the name does. Done deliberately before the Builder existed, so that user authored loadouts could never be keyed by display name in the first place.",
+      "Rewrote the validator around ids: uniqueness, real slugs, alias collisions, and every stored reference resolving to something that exists.",
+      "Added aliases so state saved under an older name still resolves. Two live there from the 7.0.0 rebuild, SG-225 Trident and AR-23C Liberator Carbine, both verified to migrate.",
+      "Built the Loadout Builder: nine slots, a picker that reuses the tier row so ratings and provenance are in front of you at the moment you choose.",
+      "Built Drop Bay as a plain grid, replacing the artifact's three scored picks.",
+      "Made every row expand, not just armor and flagged ones, carrying art, numbers, what the source does not record, and where the rating came from.",
+      "Wired in the art: 227 of 228 items, 24 warbond covers and 28 generic UI files. Only Electrical Conduit has none, and nothing depends on art existing.",
+      "Set the Vite asset inline limit to 0. The 4KB default was pulling a few hundred KB of stratagem icons into the JS bundle and defeating lazy loading."
+    ]
+  },
+  {
+    "version": "0.3.0",
+    "date": "2026-08-15",
+    "reconstructed": true,
+    "title": "Ported out of the artifact into a real project",
+    "changes": [
+      "Moved from a single Claude artifact into a Vite and React project. Scoped to these changes and no others: behaviour stayed identical to the artifact, and everything wanted beyond that was recorded as deferred rather than slipped in.",
+      "Kept display names as the lookup key, as the artifact had them. Stable ids were deliberately deferred to the next pass.",
+      "Shipped a validator checking name matching and the tier scale, so a rename could not silently orphan lock state.",
+      "Replaced window.storage with localStorage. That was a sandbox constraint of the artifact runtime, not a preference.",
+      "Added ownership.json as the seed for lock state, with the rule that an empty file locks nothing, plus a fillable template listing all 24 warbonds.",
+      "Added export and import mid port, at your request. Persistence became a v1 guarantee rather than a nicety.",
+      "Added the sidebar navigation, with destinations belonging to later releases shown but not reachable.",
+      "Four themes: Dark, Light, Neon, and Castellan's Creed. Castellan's is a theme, dark only, which the token architecture allows on purpose.",
+      "Pinned Tailwind 3 rather than 4, which removed placeholder utilities and changes the default border colour to currentColor.",
+      "Rewrote CLAUDE.md to carry the locked decisions from both source documents, and surfaced the conflicts between them rather than silently picking a side.",
+      "Fixed the id slug that turned Castellan's Creed into castellan-s-creed."
+    ]
+  },
+  {
+    "version": "0.2.0",
+    "date": "2026-08-14",
+    "reconstructed": true,
+    "title": "The 7.0.0 data rebuild",
+    "changes": [
+      "Rebuilt the data layer from the per item tables instead of the summary tier list, which had produced three classes of error.",
+      "Corrected 17 wrong per-faction ratings, almost all from prose clumping. The Liberator family, Adjudicator, Halt and Machete had been written off as B or C across the board.",
+      "Corrected 38 wrong sources. Nine of the eighteen booster sources were wrong.",
+      "Corrected 2 wrong names. SG-225 Trident is LAS-13 Trident, and it is an energy weapon rather than ballistic, so it became hot gated and cold advantaged. That was a behaviour change, not a relabelling. AR-23C Liberator Carbine is AR-23A; the old file used one designation for two weapons.",
+      "Added 29 items that were missing entirely, including True Grit, the only armor passive besides Med-Kit rated S+ on all three fronts.",
+      "Brought coverage to complete: 228 rows matching the source tables row for row.",
+      "Established that two patch stamps coexist. Only the armor passive table is restamped to 7.0.0; everything else is 6.3.1 community consensus applied to a post patch game. This is the defining property of the data layer and the reason stale flags exist at all.",
+      "Flagged 19 items as stale, where a confirmed 7.0.0 change touched that exact item after the vote was cast.",
+      "Dropped all 27 approx flags. The full tables give real per-faction ratings, so the summary fallback was no longer needed.",
+      "Recorded the judgment calls separately from the corrections, as the ones to revisit if better data appears: Breaker Incendiary and Cookout as fire rather than ballistic, the Hot-Shot Lasgun as heat, Meltagun and Meltamine as fire, and Kinetic Displacement Mitigation as fire.",
+      "Corrected the warbond count to 24 as of 12 August 2026, and grouped Righteous Revenants as the third Legendary."
+    ]
+  },
+  {
+    "version": "0.1.0",
+    "date": "2026-07",
+    "estimated": true,
+    "reconstructed": true,
+    "title": "The original artifact",
+    "changes": [
+      "A single file Helldivers 2 tier browser with four tabs: tier lists, curated loadouts, warbonds and favorites.",
+      "Per faction ratings across six browsable categories, merging the five stratagem call-in menus into one, because you pick a stratagem by faction and tier rather than by which menu it sits under.",
+      "Two independent lock sets, per item and per warbond, unioned at read time so clearing one never destroys the other.",
+      "A second favourites axis: starred tier rows, independent of both locks and loadout favourites.",
+      "Biome and difficulty as hard gates rather than soft scoring, after feedback that warning is not enough when the answer is do not bring this.",
+      "The cold biome advantage, added as a correction: heat vents slower on ice, so laser and plasma are genuinely better there. Cryo Beam, Frostline and Frost Lance exist because of it.",
+      "Faction theming through the whole interface rather than just labels, and stratagem colour groups following the in-game call-in menu.",
+      "The name matching invariant, with a legacy name map migrating saved lock state through renames.",
+      "39 curated loadouts, fixed and named rather than generated.",
+      "Patch caveats as a hover explanation rather than a filter chip."
+    ]
+  }
+]

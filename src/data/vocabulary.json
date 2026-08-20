@@ -1,0 +1,170 @@
+{
+  "tiers": [
+    "S+",
+    "S",
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "slots": [
+    "primary",
+    "secondary",
+    "throwable",
+    "stratagem",
+    "armor",
+    "booster"
+  ],
+  "stratTypes": [
+    "support",
+    "backpack",
+    "vehicle",
+    "eagle",
+    "orbital",
+    "sentry",
+    "emplacement",
+    "mines"
+  ],
+  "damageTypes": [
+    "heat",
+    "arc",
+    "fire",
+    "explosive",
+    "ballistic",
+    "gas",
+    "melee",
+    "utility"
+  ],
+  "thermalDamageTypes": [
+    "heat",
+    "arc"
+  ],
+  "flags": [
+    "stale",
+    "new"
+  ],
+  "roles": [
+    "anti-armor",
+    "chaff",
+    "objective"
+  ],
+  "ratingSources": [
+    "ugg",
+    "curator",
+    "community"
+  ],
+  "acquisitionTypes": [
+    "warbond",
+    "requisition",
+    "superstore",
+    "campaign",
+    "starter",
+    "superCitizen",
+    "armorSet"
+  ],
+  "warbondTiers": [
+    "standard",
+    "premium",
+    "legendary"
+  ],
+  "armorTraits": [
+    {
+      "id": "survive",
+      "label": "Survivability"
+    },
+    {
+      "id": "elem",
+      "label": "Elemental resist"
+    },
+    {
+      "id": "blast",
+      "label": "Explosive resist"
+    },
+    {
+      "id": "handling",
+      "label": "Weapon handling"
+    },
+    {
+      "id": "throwing",
+      "label": "Throwables"
+    },
+    {
+      "id": "stealth",
+      "label": "Stealth and recon"
+    },
+    {
+      "id": "melee",
+      "label": "Melee"
+    },
+    {
+      "id": "mobility",
+      "label": "Mobility"
+    }
+  ],
+  "loadoutSlots": [
+    "primary",
+    "secondary",
+    "grenade",
+    "armor",
+    "booster"
+  ],
+  "slotForLoadoutSlot": {
+    "primary": "primary",
+    "secondary": "secondary",
+    "grenade": "throwable",
+    "armor": "armor",
+    "booster": "booster"
+  },
+  "difficulties": [
+    {
+      "level": 1,
+      "name": "Trivial",
+      "band": "low"
+    },
+    {
+      "level": 2,
+      "name": "Easy",
+      "band": "low"
+    },
+    {
+      "level": 3,
+      "name": "Medium",
+      "band": "low"
+    },
+    {
+      "level": 4,
+      "name": "Challenging",
+      "band": "low"
+    },
+    {
+      "level": 5,
+      "name": "Hard",
+      "band": "mid"
+    },
+    {
+      "level": 6,
+      "name": "Extreme",
+      "band": "mid"
+    },
+    {
+      "level": 7,
+      "name": "Suicide Mission",
+      "band": "high"
+    },
+    {
+      "level": 8,
+      "name": "Impossible",
+      "band": "high"
+    },
+    {
+      "level": 9,
+      "name": "Helldive",
+      "band": "high"
+    },
+    {
+      "level": 10,
+      "name": "Super Helldive",
+      "band": "extreme"
+    }
+  ]
+}

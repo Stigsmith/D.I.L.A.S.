@@ -1,0 +1,152 @@
+{
+  "med-kit": {
+    "light": ["CM-21 Trench Paramedic · 64/536/118"],
+    "medium": ["TR-117 Alpha Commander", "CM-09 Bonesnapper", "CM-14 Physician", "CM-10 Clinician"],
+    "heavy": ["CM-17 Butcher"]
+  },
+  "true-grit": {
+    "light": [],
+    "medium": ["TG-8 Sharpshooter"],
+    "heavy": ["TG-122 Demo-Trooper"]
+  },
+  "reduced-signature": {
+    "light": ["RS-100 Sanctioner", "RS-89 Shadow Paragon"],
+    "medium": ["RS-67 Null Cipher"],
+    "heavy": []
+  },
+  "concussive-padding-reinforced": {
+    "light": [],
+    "medium": [],
+    "heavy": ["CPR-80 Bulwark · 180/450/50"]
+  },
+  "concussive-padding-hazmat": {
+    "light": ["CPH-26 Commandant"],
+    "medium": [],
+    "heavy": []
+  },
+  "concussive-padding-grenadier": {
+    "light": [],
+    "medium": ["CPG-48 Sapper"],
+    "heavy": []
+  },
+  "fortified": {
+    "light": ["FS-38 Eradicator"],
+    "medium": ["B-24 Enforcer · 129/471/71", "FS-34 Exterminator"],
+    "heavy": ["FS-05 Marksman", "FS-23 Battle Master", "FS-11 Executioner", "FS-55 Devastator", "CW-22 Kodiak"]
+  },
+  "siege-ready": {
+    "light": ["SR-24 Street Scout"],
+    "medium": ["DP-8 Mountain-Scaled"],
+    "heavy": ["SR-64 Cinderblock", "SR-18 Roadblock"]
+  },
+  "engineering-kit": {
+    "light": ["CE-74 Breaker", "CE-67 Titan · 79/521/111", "CE-07 Demolition Specialist · 64/536/118", "FS-37 Ravager"],
+    "medium": ["SC-15 Drone Master", "CE-35 Trench Engineer", "CE-81 Juggernaut", "CE-27 Ground Breaker"],
+    "heavy": ["CE-64 Grenadier", "CE-101 Guerilla Gorilla"]
+  },
+  "oxygenator": {
+    "light": ["O-3 Free Spirit"],
+    "medium": ["O-44 Bonded Pilot"],
+    "heavy": ["O-2 Heavy Operator"]
+  },
+  "ballistic-padding": {
+    "light": ["BP-32 Jackboot"],
+    "medium": ["BP-20 Correct Officer"],
+    "heavy": ["BP-77 Grand Juror"]
+  },
+  "desert-stormer": {
+    "light": ["DS-10 Big Game Hunter"],
+    "medium": ["DS-191 Scorpion"],
+    "heavy": ["DS-42 Federation's Blade"]
+  },
+  "acclimated": {
+    "light": ["AC-2 Obedient"],
+    "medium": ["AC-1 Dutiful"],
+    "heavy": []
+  },
+  "democracy-protects": {
+    "light": [],
+    "medium": ["TR-9 Cavalier of Democracy", "DP-53 Savior of the Free", "DP-40 Hero of the Federation", "DP-11 Champion of the People", "DP-00 Tactical", "B-22 Model Citizen"],
+    "heavy": []
+  },
+  "unflinching": {
+    "light": ["UF-16 Inspector · 75/550/125"],
+    "medium": ["UF-84 Doubt Killer · 125/500/100", "UF-50 Bloodhound · 125/500/100"],
+    "heavy": []
+  },
+  "peak-physique": {
+    "light": ["PH-9 Predator"],
+    "medium": ["PH-56 Jaguar"],
+    "heavy": ["PH-202 Twigsnapper"]
+  },
+  "kinetic-displacement-mitigation": {
+    "light": [],
+    "medium": [],
+    "heavy": ["KDM-500 Outrider"]
+  },
+  "scout": {
+    "light": ["SC-34 Infiltrator · 70/530/115", "SC-30 Trailblazer Scout", "CW-4 Arctic Ranger"],
+    "medium": ["SA-04 Combat Technician"],
+    "heavy": []
+  },
+  "inflammable": {
+    "light": ["I-09 Heatseeker"],
+    "medium": ["I-92 Fire Fighter", "I-102 Draconaught"],
+    "heavy": ["I-44 Salamander"]
+  },
+  "adreno-defibrillator": {
+    "light": ["AD-11 Livewire"],
+    "medium": ["AD-26 Bleeding Edge"],
+    "heavy": ["AD-49 Apollonian"]
+  },
+  "rock-solid": {
+    "light": ["RS-20 Constrictor"],
+    "medium": ["RS-6 Fiend Destroyer"],
+    "heavy": ["RS-40 Beast of Prey"]
+  },
+  "reinforced-epaulettes": {
+    "light": ["RE-1861 Parade Commander"],
+    "medium": ["RE-2310 Honorary Guard"],
+    "heavy": ["RE-824 Bearer of the Standard"]
+  },
+  "gunslinger": {
+    "light": ["GS-11 Democracy's Deputy"],
+    "medium": ["GS-17 Frontier Marshal"],
+    "heavy": ["GS-66 Lawmaker"]
+  },
+  "extra-padding": {
+    "light": ["B-08 Light Gunner · 100/550/125"],
+    "medium": ["B-01 Tactical · 150/500/100", "TR-7 Ambassador of the Brand · 150/500/100", "CW-9 White Wolf · 150/500/100", "TR-40 Gold Eagle · 150/500/100"],
+    "heavy": ["B-27 Fortified Commando · 200/450/50"]
+  },
+  "supplementary-adrenaline": {
+    "light": [],
+    "medium": ["SA-7 Headfirst · 125/500/100"],
+    "heavy": ["SA-8 Ram · 175/450/50"]
+  },
+  "feet-first": {
+    "light": [],
+    "medium": ["A-9 Helljumper", "A-35 Recon"],
+    "heavy": []
+  },
+  "integrated-explosives": {
+    "light": ["IE-57 Hell-Bent"],
+    "medium": ["IE-3 Martyr", "IE-12 Righteous"],
+    "heavy": []
+  },
+  "advanced-filtration": {
+    "light": ["AF-50 Noxious Ranger"],
+    "medium": ["AF-91 Field Chemist", "AF-02 Haz-Master"],
+    "heavy": ["AF-52 Lockdown"]
+  },
+  "servo-assisted": {
+    "light": ["SC-37 Legionnaire"],
+    "medium": ["SA-25 Steel Trooper", "SA-12 Servo Assisted"],
+    "heavy": ["TR-62 Knight", "SA-32 Dynamo", "FS-61 Dreadnought", "CW-36 Winter Warrior"]
+  },
+  "electrical-conduit": {
+    "light": ["EX-00 Prototype X"],
+    "medium": ["EX-03 Prototype 3", "EX-16 Prototype 16"],
+    "heavy": []
+  }
+}

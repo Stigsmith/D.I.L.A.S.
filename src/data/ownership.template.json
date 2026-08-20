@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 2,
+  "warbonds": {
+    "mobilize-free": false,
+    "steeled-veterans": false,
+    "cutting-edge": false,
+    "democratic-detonation": false,
+    "polar-patriots": false,
+    "viper-commandos": false,
+    "freedoms-flame": false,
+    "chemical-agents": false,
+    "truth-enforcers": false,
+    "servants-of-freedom": false,
+    "borderline-justice": false,
+    "urban-legends": false,
+    "masters-of-ceremony": false,
+    "force-of-law": false,
+    "control-group": false,
+    "dust-devils": false,
+    "redacted-regiment": false,
+    "entrenched-division": false,
+    "exo-experts": false,
+    "python-commandos": false,
+    "siege-breakers": false,
+    "halo-odst": false,
+    "righteous-revenants": false,
+    "castellans-creed": false
+  },
+  "items": {}
+}
