@@ -7,25 +7,27 @@
 /* they work.                                                          */
 /* ================================================================== */
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Layers, Library, Wrench, Rocket, Store, Users, User, Settings as SettingsIcon,
   LifeBuoy, Menu, X, Sun, Moon, Zap, Shield, Star, Lock, Download, Upload, AlertTriangle,
-  Factory, Bug, PackageOpen, Trees, FileText, Crosshair, Radar, Shovel, Info, ScrollText,
+  Factory, Bug, PackageOpen, Trees, FileText, Crosshair, Radar, Shovel, Info, ScrollText, Milestone,
 } from "lucide-react";
 
-import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser } from "./Armory.jsx";
+import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser, ScenarioScreen, ScenarioBar } from "./Tiers.jsx";
 import { SKULL, themeArt } from "./lib/assets.js";
 import Builder from "./Builder.jsx";
 import DropBay from "./DropBay.jsx";
 import Collection, { COLLECTION_TABS } from "./Collection.jsx";
 import Ambient, { Grain, Masthead } from "./Ambient.jsx";
-import { About, Support, Changelog, Footer } from "./Pages.jsx";
+import { About, Support, Changelog, Roadmap, Footer } from "./Pages.jsx";
+import TierBadgePlate, { FINISHES } from "./TierBadgePlate.jsx";
+import { useBadgeStyle } from "./lib/badge.js";
 import { CATEGORIES, warbonds } from "./lib/items.js";
-import { useArmoryState } from "./lib/useArmoryState.js";
+import { useCollectionState } from "./lib/useCollectionState.js";
 import { useTheme, THEMES } from "./lib/theme.js";
 import { useRoute } from "./lib/router.js";
-import { useBrief, useTierFilters } from "./lib/brief.js";
+import { useScenario, useTierFilters, useTierSort } from "./lib/scenario.js";
 import { BRAND } from "./lib/brand.js";
 import LOADOUTS from "./data/loadouts.json";
 
@@ -64,10 +66,23 @@ const NAV_FOOT = [
   { id: "support", label: "Support", Icon: LifeBuoy },
   { id: "about", label: "About", Icon: Info },
   { id: "changelog", label: "Changelog", Icon: ScrollText },
+  { id: "roadmap", label: "Roadmap", Icon: Milestone },
 ];
 
 const ALL_NAV = [...NAV.flatMap((g) => g.items), ...NAV_FOOT];
-const labelFor = (id) => (ALL_NAV.find((d) => d.id === id) || {}).label || BRAND.short;
+
+/* Where the scenario bar belongs: the surfaces that read it. Settings
+   and the changelog have no opinion about where you are dropping, and a
+   reminder on those is chrome for the sake of chrome. */
+const SCENARIO_SURFACES = new Set(["tiers"]);
+
+/* Routable, deliberately absent from the sidebar. */
+const OFF_MENU = new Set(["scenario"]);
+/* Off menu routes are not in ALL_NAV, so they need their title here or
+   the header falls back to the brand name and stops saying where you are. */
+const OFF_MENU_LABEL = { scenario: "Scenario" };
+const labelFor = (id) =>
+  (ALL_NAV.find((d) => d.id === id) || {}).label || OFF_MENU_LABEL[id] || BRAND.short;
 
 /* The Helldivers skull, painted with the current text colour so it     */
 /* takes the brand token and shifts with the theme.                     */
@@ -105,6 +120,11 @@ function Skull({ className = "h-7 w-7", style }) {
 /* wide for the aquila and square for the rest.                         */
 const THEME_MARK = {
   "castellans-creed": { file: "study_aq", label: "Imperial Aquila", lg: "h-7 w-[72px]", sm: "h-5 w-[52px]" },
+  /* The Creek is where the Automatons are remembered, so the wordmark
+     carries their eye rather than the Super Earth skull. The study ships
+     its own cut of it, already on transparency, so it masks and takes the
+     brand token like every other mark here. */
+  "malevelon-creek": { file: "study_auto-mark", label: "Automaton mark", lg: "h-8 w-8", sm: "h-6 w-6" },
   "automaton": { file: "study_glyph", label: "Automaton mark", lg: "h-8 w-8", sm: "h-6 w-6" },
   /* The cutout provided in August 2026 is a clean silhouette on full     */
   /* transparency, so it masks the way the skull does and takes the acid  */
@@ -282,8 +302,36 @@ const THEME_ICON = {
   "viper-commandos": Crosshair,
 };
 
+/* Four real rows, so the finish is chosen against items rather than
+   against a word. Locked to a fixed set: a preview that changes with
+   your filters is a preview you cannot compare against itself. */
+const PREVIEW_ROWS = [
+  { name: "PLAS-101 Purifier", sub: "Polar Patriots", tier: "S+" },
+  { name: "R-63 Diligence", sub: "Free of charge", tier: "S" },
+  { name: "SG-8 Punisher", sub: "Steeled Veterans", tier: "B" },
+  { name: "LAS-7 Dagger", sub: "Cutting Edge", tier: null },
+];
+
+function SurfaceToggle({ on, onClick, label, note }) {
+  return (
+    <button onClick={onClick} aria-pressed={on}
+      className={"flex flex-col items-start rounded border px-2.5 py-1.5 text-left transition-colors " +
+        (on
+          ? "border-brand bg-brand/10 text-base-100"
+          : "border-base-700 bg-base-900 text-base-500 hover:border-base-500 hover:text-base-200")}>
+      <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ fontFamily: "'Oswald', sans-serif" }}>
+        {label}
+      </span>
+      <span className="text-[10px] text-base-600">{note}</span>
+    </button>
+  );
+}
+
 function Settings({ theme, setTheme, state }) {
   const [confirmingReset, setConfirmingReset] = useState(false);
+  const { finish, setFinish, surface, toggleSurface } = useBadgeStyle();
+  const themeNote = (THEMES.find((t) => t.id === theme) || {}).note || "";
+  const finishNote = (FINISHES.find((f) => f.id === finish) || {}).note || "";
 
   return (
     <div className="flex flex-col gap-4">
@@ -294,25 +342,74 @@ function Settings({ theme, setTheme, state }) {
           </h3>
           <p className="text-[11px] text-base-500">
             Three base themes and eight warbond skins. Each skin comes from a palette study that fixes its colours
-            before any of it reaches here. Ministry of Truth is the only other light one.
+            before any of it reaches here.
           </p>
         </div>
-        <div className="flex flex-wrap gap-1.5 p-3">
-          {THEMES.map((t) => {
-            const Icon = THEME_ICON[t.id] || Sun;
-            return (
-              <button key={t.id} onClick={() => setTheme(t.id)} aria-pressed={theme === t.id} title={t.note}
-                className={
-                  "flex items-center gap-1.5 rounded border px-3 py-1.5 text-xs transition-colors " +
-                  (theme === t.id
-                    ? "border-base-200 bg-base-200 text-base-900"
-                    : "border-base-700 bg-base-900 text-base-300 hover:border-base-500 hover:text-base-100")
-                }>
-                <Icon className="w-3.5 h-3.5" />
-                {t.label}
-              </button>
-            );
-          })}
+        <div className="flex flex-wrap items-center gap-3 p-4">
+          <select value={theme} onChange={(e) => setTheme(e.target.value)}
+            className="min-w-[13rem] rounded border border-base-700 bg-base-900 px-2 py-1.5 text-xs text-base-200 outline-none focus:border-base-500">
+            {THEMES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+          </select>
+          <span className="min-w-0 flex-1 text-[11px] leading-relaxed text-base-500">{themeNote}</span>
+        </div>
+      </div>
+
+      {/* Finish is not theme. Separate panel, separate storage, and a       */}
+      {/* theme change never moves it. The design document is emphatic on    */}
+      {/* this and the two words must not be used interchangeably.           */}
+      <div className="rounded-lg border border-base-800 bg-base-900 overflow-hidden">
+        <div className="border-b border-base-800 px-4 py-2.5">
+          <h3 className="text-sm font-bold uppercase tracking-wide text-base-100" style={{ fontFamily: "'Oswald', sans-serif" }}>
+            Tier badge
+          </h3>
+          <p className="text-[11px] text-base-500">
+            How the badge is finished. Purely cosmetic, and separate from the theme: changing skin does not move it.
+          </p>
+        </div>
+        <div className="flex flex-col gap-4 p-4 lg:flex-row">
+          <div className="flex min-w-0 flex-1 flex-col gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <select value={finish} onChange={(e) => setFinish(e.target.value)}
+                className="min-w-[13rem] rounded border border-base-700 bg-base-900 px-2 py-1.5 text-xs text-base-200 outline-none focus:border-base-500">
+                {FINISHES.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
+              </select>
+              <span className="min-w-0 flex-1 text-[11px] leading-relaxed text-base-500">{finishNote}</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <SurfaceToggle on={surface.sheen} onClick={() => toggleSurface("sheen")}
+                label="Sheen" note="A light sweep across the face" />
+              <SurfaceToggle on={surface.glow} onClick={() => toggleSurface("glow")}
+                label="Glow" note="Bleeds the tier colour outward" />
+              <SurfaceToggle on={surface.grain} onClick={() => toggleSurface("grain")}
+                label="Grain" note="Film over the interior" />
+            </div>
+            <p className="text-[10px] leading-relaxed text-base-600">
+              Sheen and glow both ramp with the tier, so S+ carries the most and D the least. Neither ever costs a
+              badge its legibility: a D reads exactly as clearly as an S+, which is why nothing here shrinks or
+              fades a letter.
+            </p>
+          </div>
+
+          <div className="w-full shrink-0 rounded-lg border border-base-800 bg-base-950/60 p-3 lg:w-[19rem]">
+            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-base-500"
+              style={{ fontFamily: "'Oswald', sans-serif" }}>
+              How rows will look
+            </p>
+            <div className="flex flex-col gap-1.5">
+              {PREVIEW_ROWS.map((r) => (
+                <div key={r.name} className="flex items-center gap-2.5 rounded border border-base-800 bg-base-900 px-2.5 py-1.5">
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[11px] text-base-100" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                      {r.name}
+                    </span>
+                    <span className="block truncate text-[10px] text-base-500">{r.sub}</span>
+                  </span>
+                  <TierBadgePlate tier={r.tier} finish={finish}
+                    sheen={surface.sheen} glow={surface.glow} grain={surface.grain} size={36} />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -354,20 +451,24 @@ function Settings({ theme, setTheme, state }) {
 /* ------------------------------------------------------------------ */
 
 export default function App() {
-  const state = useArmoryState();
+  const state = useCollectionState();
   const { theme, setTheme } = useTheme();
   const { destination, param, navigate } = useRoute("tiers/primary");
-  /* Where you are dropping. Faction today, the rest of the brief next. */
-  const { brief, setFaction, setPlanet, setBiome, toggleHazard, setMission, clearEnvironment } = useBrief();
+  /* Where you are dropping. Faction today, the rest of the scenario next. */
+  const { scenario, setFaction, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment } = useScenario();
   /* Owned here so a trip to Drop Bay does not reset them. */
   const { filters, patchFilters } = useTierFilters(BLANK_FILTERS, CATEGORIES.map((c) => c.id));
+  const { sortBy, setSortBy } = useTierSort();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const known = ALL_NAV.some((d) => d.id === destination && !d.release);
+  /* Reachable but not in the menu. The scenario is a sub screen of the   */
+  /* surfaces that read it, not a destination of its own: putting it in   */
+  /* the sidebar would make it look like somewhere you go rather than     */
+  /* something you set.                                                   */
+  const known =
+    ALL_NAV.some((d) => d.id === destination && !d.release) || OFF_MENU.has(destination);
   const dest = known ? destination : "tiers";
 
-  const nextTheme = THEMES[(THEMES.findIndex((t) => t.id === theme) + 1) % THEMES.length];
-  const NextThemeIcon = THEME_ICON[nextTheme.id] || Sun;
 
   /* The title and tabs stay put while a long list scrolls under them.    */
   /* Anything inside a surface that wants to stick too, like the faction  */
@@ -405,6 +506,18 @@ export default function App() {
 
   const favSet = new Set(state.favoriteItems);
   const catId = CATEGORIES.some((c) => c.id === param) ? param : "primary";
+  /* Where "Done" goes back to. Adjusting the scenario from Secondaries  */
+  /* and being returned to Primaries is the kind of small wrong that     */
+  /* makes a round trip feel like a detour.                              */
+  const lastTierCat = useRef("primary");
+  useEffect(() => {
+    if (dest === "tiers") lastTierCat.current = catId;
+  }, [dest, catId]);
+  const openScenario = useCallback(() => navigate("scenario"), [navigate]);
+  const closeScenario = useCallback(
+    () => navigate(`tiers/${lastTierCat.current}`),
+    [navigate]
+  );
   const collectionTab = COLLECTION_TABS.some((t) => t.id === param) ? param : "warbonds";
 
   /* Which tab bar the current destination gets, and what the active tab  */
@@ -437,16 +550,20 @@ export default function App() {
         return (
           <TierBrowser
             catId={catId}
-            faction={brief.faction}
+            faction={scenario.faction}
             setFaction={setFaction}
-            brief={brief}
+            scenario={scenario}
             setPlanet={setPlanet}
             setBiome={setBiome}
             toggleHazard={toggleHazard}
             setMission={setMission}
+            setDifficulty={setDifficulty}
+            setSquad={setSquad}
             clearEnvironment={clearEnvironment}
             filters={filters}
             patchFilters={patchFilters}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
             lockedSet={state.lockedSet}
             warbondLockedSet={state.warbondLockedSet}
             toggleLock={state.toggleLock}
@@ -460,11 +577,11 @@ export default function App() {
       case "collection":
         return <Collection tab={collectionTab} state={state} />;
       case "bay":
-        return <DropBay state={state} navigate={navigate} faction={brief.faction} setFaction={setFaction} />;
+        return <DropBay state={state} navigate={navigate} faction={scenario.faction} setFaction={setFaction} />;
       case "builder":
         /* Browsing happens in Drop Bay. The builder edits one build, so  */
         /* landing on it with nothing chosen starts a fresh one.          */
-        return <Builder key={param || "new"} state={state} loadoutId={param && param !== "new" ? param : null} navigate={navigate} faction={brief.faction} brief={brief} />;
+        return <Builder key={param || "new"} state={state} loadoutId={param && param !== "new" ? param : null} navigate={navigate} faction={scenario.faction} scenario={scenario} />;
       case "settings":
         return <Settings theme={theme} setTheme={setTheme} state={state} />;
       case "support":
@@ -473,6 +590,23 @@ export default function App() {
         return <About />;
       case "changelog":
         return <Changelog />;
+      case "roadmap":
+        return <Roadmap />;
+      case "scenario":
+        return (
+          <ScenarioScreen
+            scenario={scenario}
+            setFaction={setFaction}
+            setPlanet={setPlanet}
+            setBiome={setBiome}
+            toggleHazard={toggleHazard}
+            setMission={setMission}
+            setDifficulty={setDifficulty}
+            setSquad={setSquad}
+            clearEnvironment={clearEnvironment}
+            onDone={closeScenario}
+          />
+        );
       default:
         return null;
     }
@@ -582,15 +716,6 @@ export default function App() {
                   <Lock className="h-3.5 w-3.5" />{state.lockedSet.size} locked
                 </span>
               ) : null}
-              {/* Three themes now, so this cycles rather than flips. The  */}
-              {/* icon is the theme you are about to get, not the one you  */}
-              {/* are in, which is what makes a cycle button readable.     */}
-              <button onClick={() => setTheme(nextTheme.id)}
-                aria-label={`Switch to the ${nextTheme.label} theme`}
-                title={`Switch to the ${nextTheme.label} theme`}
-                className="rounded p-1.5 text-base-400 hover:bg-base-800 hover:text-base-100">
-                <NextThemeIcon className="h-4 w-4" />
-              </button>
             </div>
           </header>
 
@@ -615,18 +740,28 @@ export default function App() {
                 {labelFor(dest)}
               </span>
             )}
-            <button onClick={() => setTheme(nextTheme.id)}
-              aria-label={`Switch to the ${nextTheme.label} theme`}
-              className="shrink-0 px-3 text-base-400 hover:bg-base-800 hover:text-base-100">
-              <NextThemeIcon className="h-4 w-4" />
-            </button>
           </div>
 
           <TopTabs className="hidden sm:flex" tabs={tabs} active={activeTab} onSelect={(id) => navigate(`${dest}/${id}`)} />
+
+          {/* One scenario, said once, in the chrome rather than in the      */}
+          {/* surface. It lived at the top of every tier list tab before,    */}
+          {/* which ate the height the table wanted and told you the choice  */}
+          {/* was per tab. It never was: useScenario is called once here.    */}
+          {/*                                                                */}
+          {/* Sticky with the tabs, so a rating computed from a choice you   */}
+          {/* have forgotten making is never on screen without the choice    */}
+          {/* next to it.                                                    */}
+          {SCENARIO_SURFACES.has(dest) && scenario.faction ? (
+            <ScenarioBar scenario={scenario} onAdjust={openScenario} />
+          ) : null}
           </div>
 
           <main className="p-4 sm:p-6">{surface}</main>
-          <Footer />
+          {/* The scenario is a focused sub screen and the footer is the  */}
+          {/* only thing keeping it off one desktop screen. Every other    */}
+          {/* destination keeps it.                                        */}
+          {OFF_MENU.has(dest) ? null : <Footer />}
         </div>
       </div>
     </div>

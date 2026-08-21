@@ -14,6 +14,7 @@ import { AlertTriangle, Bug } from "lucide-react";
 import { artCounts } from "./lib/assets.js";
 import { items } from "./lib/items.js";
 import CHANGELOG from "./data/changelog.json";
+import ROADMAP from "./data/roadmap.json";
 import { BRAND } from "./lib/brand.js";
 
 /* One patch stamp, written once. The footer shows the short form on    */
@@ -107,7 +108,8 @@ export function About() {
       <Panel title="Weapon stats come from the Helldivers Wiki">
         <p>
           Magazine size, spare magazines, fire rate, recoil, ergonomics, sway, projectile drag, durable damage,
-          stagger and pushback are not in this project's own tables. They are fetched from{" "}
+          stagger and pushback are not in this project's own tables, and neither is the armor value of every body
+          part of every enemy, which is what makes a penetration number mean anything. They are fetched from{" "}
           <a href="https://helldivers.wiki.gg" target="_blank" rel="noreferrer noopener"
             className="text-base-200 underline hover:text-base-100">helldivers.wiki.gg</a>, which the community
           maintains and restamps within days of a patch.
@@ -227,6 +229,130 @@ export function Support() {
 
 /* Reverse chronological, straight off the data file. A new entry is a  */
 /* new object in src/data/changelog.json and nothing else.              */
+/* ================================================================== */
+/* ROADMAP                                                            */
+/*                                                                    */
+/* One spine, one dot per milestone, newest shipped at the top so it   */
+/* reads the same direction as the changelog next to it. The pair is   */
+/* deliberate: Changelog is what landed, this is what is coming, and   */
+/* they sit together in the menu for that reason.                     */
+/*                                                                    */
+/* The data is src/data/roadmap.json, which is the short public        */
+/* version. The working document with the reasoning and the           */
+/* dependency chain is dds-roadmap.md in the repo      */
+/* root, and it is the one that moves first.                          */
+/* ================================================================== */
+
+/* Shipped is settled, so it is quiet. Next is the only thing lit,     */
+/* because exactly one thing can be next and a timeline where          */
+/* everything glows tells you nothing.                                 */
+const STATUS = {
+  shipped: { label: "Shipped", dot: "bg-base-600 border-base-600", text: "text-base-500" },
+  next: { label: "Up next", dot: "bg-brand border-brand", text: "text-base-200" },
+  planned: { label: "Planned", dot: "bg-base-900 border-base-600", text: "text-base-400" },
+  later: { label: "Later", dot: "bg-base-900 border-base-800", text: "text-base-500" },
+};
+
+export function Roadmap() {
+  const shipped = ROADMAP.milestones.filter((m) => m.status === "shipped").reverse();
+  const coming = ROADMAP.milestones.filter((m) => m.status !== "shipped");
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="rounded-lg border border-base-800 bg-base-900/60 p-4 text-xs leading-relaxed text-base-400">
+        Where this is going, in order rather than on a schedule. There are no dates on anything unbuilt: this is a two
+        person project built in bursts, and a date would be a guess wearing a promise. What has shipped carries a
+        version, because that part already happened.
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-base-800 bg-base-900">
+        <div className="border-b border-base-800 px-4 py-2.5">
+          <h3 className="text-sm font-bold uppercase tracking-wide text-base-100" style={{ fontFamily: "'Oswald', sans-serif" }}>
+            Coming
+          </h3>
+        </div>
+        <Spine items={coming} />
+
+        <div className="border-y border-base-800 bg-base-950/40 px-4 py-2.5">
+          <h3 className="text-sm font-bold uppercase tracking-wide text-base-300" style={{ fontFamily: "'Oswald', sans-serif" }}>
+            Shipped
+          </h3>
+          <p className="text-[11px] text-base-600">Newest first, same direction as the changelog.</p>
+        </div>
+        <Spine items={shipped} />
+      </div>
+    </div>
+  );
+}
+
+function Spine({ items }) {
+  return (
+    <ol className="relative flex flex-col">
+      {items.map((m, i) => {
+        const s = STATUS[m.status] || STATUS.later;
+        const last = i === items.length - 1;
+        return (
+          <li key={m.id} className="relative flex gap-3 px-4 py-3">
+            {/* The spine, drawn per row rather than as one absolute line, */}
+            {/* so it stops cleanly at the final dot instead of running    */}
+            {/* past it into the padding.                                   */}
+            {/* Measured, not eyeballed. The row pads 16px, the dot is 10px */}
+            {/* wide with a 4px top margin, so its centre is at x 21 and it  */}
+            {/* ends at y 26. A 1px line therefore starts at x 20.5, and     */}
+            {/* being two pixels out is the difference between a spine and   */}
+            {/* a row of unconnected dots.                                    */}
+            {!last ? (
+              <span aria-hidden="true" className="absolute left-[20.5px] top-[26px] bottom-0 w-px bg-base-700" />
+            ) : null}
+
+            <span aria-hidden="true"
+              className={"relative z-10 mt-1 h-2.5 w-2.5 shrink-0 rounded-full border-2 " + s.dot} />
+
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <h4 className={"text-[13px] font-bold uppercase tracking-wide " +
+                    (m.status === "shipped" ? "text-base-300" : "text-base-100")}
+                  style={{ fontFamily: "'Oswald', sans-serif" }}>
+                  {m.title}
+                </h4>
+                {m.version ? (
+                  <span className="rounded border border-base-800 px-1.5 py-px text-[10px] tabular-nums text-base-500"
+                    style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                    v{m.version}
+                  </span>
+                ) : null}
+                {m.status === "next" ? (
+                  <span className="rounded bg-brand px-1.5 py-px text-[10px] font-bold uppercase tracking-wider text-base-950">
+                    {s.label}
+                  </span>
+                ) : null}
+                {m.release ? (
+                  <span className="rounded border border-base-700 px-1.5 py-px text-[10px] uppercase tracking-wider text-base-500">
+                    {m.release}
+                  </span>
+                ) : null}
+              </div>
+              <p className={"mt-1 text-[12px] leading-relaxed " + s.text}>{m.say}</p>
+              {/* Only where it changes. Four rows each saying "needs        */}
+              {/* nothing new" is four times the ink for none of the         */}
+              {/* information, and printing it once makes the hand-off       */}
+              {/* between the two tracks the thing you actually notice.      */}
+              {m.status !== "shipped" && m.track !== (items[i - 1] || {}).track ? (
+                <p className="mt-1.5 text-[10px] uppercase tracking-wider text-base-600">
+                  {(ROADMAP.tracks[m.track] || {}).label}
+                  <span className="ml-1.5 normal-case tracking-normal text-base-700">
+                    {(ROADMAP.tracks[m.track] || {}).note}
+                  </span>
+                </p>
+              ) : null}
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 export function Changelog() {
   return (
     <div className="flex flex-col gap-4">

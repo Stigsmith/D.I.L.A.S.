@@ -1,5 +1,6 @@
 {
-  "note": "How the brief moves a rating. Read by src/lib/score.js. Every rule here fires on data the tool already holds: the fetched weapon stats, the game's own tags, or fields curated in items.json. Nothing here is a hand written per item list. A rule states a delta in points, where roughly 14 points is one tier, or scales one from a number the game publishes. Every rule must carry a `say`, because a score that cannot explain itself is a score nobody should trust.",
+  "note": "How the scenario moves a rating. Read by src/lib/score.js. Every rule here fires on data the tool already holds: the fetched weapon stats, the game own tags, or fields curated in items.json. Nothing here is a hand written per item list. A rule states a delta in points, where roughly 14 points is one tier, or scales one from a number the game publishes. Every rule must carry a `say`, because a score that cannot explain itself is a score nobody should trust. And every rule must fire on something that actually varies with the scenario, which is the test the armour rules failed.",
+  "whyThereAreNoArmourRules": "There were five, added in 1.10.0 and removed in 1.13.0, and they were the wrong altitude. Measured on the Automaton front, 48 of 51 primaries shared one of two identical armour readings and 42 of them lost a tier for it. A rule that fires the same way on 94% of a population is not telling you anything about any of them. The deeper error: a community tier already prices in what an item is for. Voters know an assault rifle does not open a Hulk, so the Liberator's B on bots is a B given that it is a chaff gun, and penalising it again charges twice for one fact. The test to apply to any replacement is whether the thing it fires on actually varies with the scenario. Armour reach per item does not; it is constant, and only the front and difficulty move it, which moves every primary together. That makes it a loadout property. src/lib/squad.js already had this right, asking whether anyone in the squad carries AP 4 or better rather than judging each weapon alone, and that is the shape armour scoring should come back in.",
   "sourceOfHazardWording": "The hazard mechanics quoted in these sentences come from the helldivers-2/json community dataset, MIT licensed. They are the game's own descriptions, not our guesses.",
   "rules": [
     {
@@ -98,9 +99,8 @@
           "Marksman"
         ]
       },
-      "delta": -14,
-      "ceiling": "B",
-      "say": "Sandstorms greatly reduce visibility. You cannot shoot what you cannot see, and range stops being an advantage."
+      "delta": -8,
+      "say": "Sandstorms greatly reduce visibility while they last, and range stops being an advantage. They are weather rather than climate though: roughly three minutes at a time, so this is a risk you carry rather than a state you are in."
     },
     {
       "id": "sandstorm-blinds-long-support",
@@ -110,19 +110,13 @@
         ]
       },
       "match": {
-        "idIn": [
-          "apw-1-anti-materiel-rifle",
-          "las-98-laser-cannon",
-          "rs-422-railgun",
-          "las-99-quasar-cannon",
-          "faf-14-spear",
-          "s-11-speargun"
+        "tags": [
+          "long-range"
         ]
       },
-      "delta": -14,
-      "say": "Sandstorms greatly reduce visibility. You cannot shoot what you cannot see, and range stops being an advantage.",
-      "judgement": "Our call, not a sourced field. Nothing published separates a long range support weapon from a close one: projectile velocity does not, since laser weapons read 1300 and assault rifles read 820. These six are the ones you aim at something far away.",
-      "ceiling": "B"
+      "delta": -8,
+      "say": "Sandstorms greatly reduce visibility while they last, and range stops being an advantage. They are weather rather than climate though: roughly three minutes at a time, so this is a risk you carry rather than a state you are in.",
+      "judgement": "Our call, not a sourced field. It rides on the long-range tag on the items now rather than being listed again in every rule that wants it, and vocabulary.json records the reasoning. Nothing published separates a long range support weapon from a close one: projectile velocity does not, since laser weapons read 1300 and assault rifles read 820."
     },
     {
       "id": "sandstorm-favours-close",
@@ -152,8 +146,8 @@
           "Marksman"
         ]
       },
-      "delta": -9,
-      "say": "Blizzards moderately reduce visibility, which costs a long range weapon most of what it is for."
+      "delta": -6,
+      "say": "Blizzards moderately reduce visibility while they blow, which costs a long range weapon most of what it is for. They pass, so this is a risk you carry rather than a state you are in."
     },
     {
       "id": "blizzard-blinds-long-support",
@@ -163,18 +157,13 @@
         ]
       },
       "match": {
-        "idIn": [
-          "apw-1-anti-materiel-rifle",
-          "las-98-laser-cannon",
-          "rs-422-railgun",
-          "las-99-quasar-cannon",
-          "faf-14-spear",
-          "s-11-speargun"
+        "tags": [
+          "long-range"
         ]
       },
-      "delta": -9,
-      "say": "Blizzards moderately reduce visibility, which costs a long range weapon most of what it is for.",
-      "judgement": "Our call, not a sourced field. Nothing published separates a long range support weapon from a close one: projectile velocity does not, since laser weapons read 1300 and assault rifles read 820. These six are the ones you aim at something far away."
+      "delta": -6,
+      "say": "Blizzards moderately reduce visibility while they blow, which costs a long range weapon most of what it is for. They pass, so this is a risk you carry rather than a state you are in.",
+      "judgement": "Our call, not a sourced field. It rides on the long-range tag on the items now rather than being listed again in every rule that wants it, and vocabulary.json records the reasoning. Nothing published separates a long range support weapon from a close one: projectile velocity does not, since laser weapons read 1300 and assault rifles read 820."
     },
     {
       "id": "blizzard-favours-close",
@@ -215,18 +204,13 @@
         ]
       },
       "match": {
-        "idIn": [
-          "apw-1-anti-materiel-rifle",
-          "las-98-laser-cannon",
-          "rs-422-railgun",
-          "las-99-quasar-cannon",
-          "faf-14-spear",
-          "s-11-speargun"
+        "tags": [
+          "long-range"
         ]
       },
       "delta": -5,
       "say": "Thick fog lightly reduces visibility. Less punishing than a storm, but a marksman weapon still loses some of its reach.",
-      "judgement": "Our call, not a sourced field. Nothing published separates a long range support weapon from a close one: projectile velocity does not, since laser weapons read 1300 and assault rifles read 820. These six are the ones you aim at something far away."
+      "judgement": "Our call, not a sourced field. It rides on the long-range tag on the items now rather than being listed again in every rule that wants it, and vocabulary.json records the reasoning. Nothing published separates a long range support weapon from a close one: projectile velocity does not, since laser weapons read 1300 and assault rifles read 820."
     },
     {
       "id": "tremors-punish-standing-still",
@@ -236,7 +220,7 @@
         ]
       },
       "match": {
-        "tags": [
+        "gameTags": [
           "STATIONARY RELOAD"
         ]
       },
@@ -343,48 +327,6 @@
       "say": "Poor ergonomics means the barrel lags behind the camera, and Hunters do not wait for you to catch up."
     },
     {
-      "id": "bots-want-penetration",
-      "when": {
-        "faction": [
-          "bots"
-        ]
-      },
-      "match": {
-        "held": true,
-        "tags": [
-          "HEAVY ARMOR PENETRATING",
-          "MEDIUM ARMOR PENETRATING"
-        ]
-      },
-      "delta": 8,
-      "say": "Devastator armor eats light fire all day. The game marks this as opening medium armor or better, which turns a skill check into a non-issue."
-    },
-    {
-      "id": "bots-punish-light-ap",
-      "when": {
-        "faction": [
-          "bots"
-        ]
-      },
-      "match": {
-        "held": true,
-        "notTags": [
-          "HEAVY ARMOR PENETRATING",
-          "MEDIUM ARMOR PENETRATING",
-          "ANTI-TANK",
-          "LIGHT ANTI-TANK"
-        ],
-        "number": [
-          {
-            "path": "stats.ap",
-            "lte": 2
-          }
-        ]
-      },
-      "delta": -7,
-      "say": "This does not get through Automaton armor. You can still headshot everything you meet, but you are relying on doing it every time."
-    },
-    {
       "id": "squids-want-sustained",
       "when": {
         "faction": [
@@ -466,7 +408,7 @@
       },
       "match": {
         "held": true,
-        "tags": [
+        "gameTags": [
           "SUPPORT WEAPON"
         ]
       },
@@ -481,7 +423,7 @@
         ]
       },
       "match": {
-        "tags": [
+        "gameTags": [
           "SMOKE"
         ]
       },
@@ -515,7 +457,7 @@
       },
       "match": {
         "held": true,
-        "tags": [
+        "gameTags": [
           "ANTI-TANK",
           "HEAVY ARMOR PENETRATING"
         ]
@@ -568,10 +510,89 @@
       },
       "delta": 14,
       "say": "You will have an objective in one hand for most of this mission. A one handed weapon lets you shoot while carrying it; everything else means putting it down first. It does not make a bad sidearm good, it makes a good one indispensable."
+    },
+    {
+      "id": "peril-bots-wants-quiet",
+      "when": {
+        "faction": [
+          "bots"
+        ]
+      },
+      "match": {
+        "tags": [
+          "suppressed"
+        ]
+      },
+      "say": "Outnumbered on a bot planet at this level, the fight you win is the one you do not start. A suppressed weapon is audible at 12 metres rather than 100, so a sentry on a perimeter dies without waking the base behind it. This is the difference between walking through an outpost and running from it.",
+      "source": "The five suppressed weapons, and this is sourced rather than judged: the wiki carries Suppressed as a trait in each weapon's infobox and states that a suppressed weapon has an audible range of 12 metres against 100 for everything else. Listed by id here because the fetch does not read weapon article infoboxes yet. Move it into the fetch when it does.",
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 0,
+        "times": 0.64,
+        "clamp": 30
+      },
+      "judgement": "Ours. The size is set by one choice: being unheard is worth about a tier at peril 22, which is solo on Impossible or a duo on Helldive. Everything else follows from the scale. Below zero it inverts on purpose: with four of you on Challenging a silenced weapon is effort spent on a problem you do not have.",
+      "sayInverted": "There are enough of you here that nothing needs to be a secret. Staying unheard costs you rate of fire and stopping power, and at this level you are not being punished for making noise. Bring the louder gun."
+    },
+    {
+      "id": "peril-bots-punishes-loud",
+      "when": {
+        "faction": [
+          "bots"
+        ]
+      },
+      "match": {
+        "held": true,
+        "notTags": [
+          "suppressed"
+        ]
+      },
+      "say": "Every shot from this brings the patrol, and there are not enough of you to hold them while somebody repositions. On paper it may be the better gun. At this level, against this many, the noise is the stat that decides the run.",
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 0,
+        "times": -0.48,
+        "clamp": 20
+      },
+      "judgement": "Ours, and deliberately gentler than the reward it mirrors. This matches almost half of everything you can hold, so it is set at roughly three quarters of a tier at peril 22 rather than a full one. A rule that touches half a list has to argue quietly.",
+      "sayInverted": "Loud is free here. There are enough of you to hold whatever the noise brings, and at this level it does not bring much. This is the situation the community rating already assumes, so nothing about it counts against this."
+    },
+    {
+      "id": "peril-storm-favours-stealth",
+      "when": {
+        "faction": [
+          "bots"
+        ],
+        "hazard": [
+          "sandstorms",
+          "blizzards",
+          "thick_fog"
+        ]
+      },
+      "match": {
+        "tags": [
+          "suppressed"
+        ]
+      },
+      "say": "A storm cuts their sight as much as yours, and outnumbered you are not trying to win the firefight. Reduced visibility plus a weapon nobody hears is the difference between crossing an outpost and being chased out of one.",
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 0,
+        "times": 0.4,
+        "clamp": 15
+      },
+      "judgement": "Ours. Stacks with the plain quiet rule rather than replacing it, so a storm is worth extra on top rather than instead. Sized at about six tenths of a tier at peril 22.",
+      "sayInverted": "A storm cuts your sight as much as theirs, and with this many of you the fight is one you can simply win. Trading reach for silence is the wrong trade here."
     }
   ],
   "knownGaps": [
-    "Three visibility rules carry a companion that names six support weapons by id, because nothing published separates a long range support weapon from a close one. Those rules carry a `judgement` field saying so.",
-    "The visibility rules key on the Marksman category only. Special was tried and dropped: it holds a flamethrower, a stim pistol and a shotgun pistol alongside the Dominator, so it says nothing about range."
+    "Three visibility rules lean on a long-range tag that is our judgement rather than a published field. It lives in vocabulary.json with its reasoning, and the rules that read it carry a `judgement` saying so. It used to be the same six ids written out inside each of those three rules.",
+    "The visibility rules key on the Marksman category only. Special was tried and dropped: it holds a flamethrower, a stim pistol and a shotgun pistol alongside the Dominator, so it says nothing about range.",
+    "Armour penetration moves no rating at all. Enemy armour is held and shown on every expanded row as a fact, and src/lib/enemies.js computes it in full, but nothing here reads it. It belongs to loadout scoring rather than to one item at a time. See whyThereAreNoArmourRules.",
+    "Suppressed is sourced from a wiki article infobox rather than from a module, so it is curated on the items instead of fetched. It is a real published fact, 12 metres of audible range against 100, and it carries no `judgement` field for that reason. Move it into fetch-wiki.mjs when that script learns to read weapon infoboxes.",
+    "The weather rules price a hazard as if it were always happening. A planet listing sandstorms has sandstorms sometimes, roughly three minutes at a time, and nothing in the data says how often. The visibility penalties are set as a risk you carry across a run rather than a state you are in, which is a judgement and not a measurement.",
+    "Peril is 6 * (difficulty - 5) + 4 * (4 - squad), calibrated on the curator's own two zero points: a four stack is comfortable through 5 and solo through 3. Only three rules read it, all on the bot front, so difficulty and squad still move nothing on bugs or squids.",
+    "Peril is a gate and nothing scales off it yet, so solo at 7 and solo at 10 move the same items by the same amount. The curator asked for an increasing scale. scenario.peril is reachable from scaleBy, so the plumbing is there and the magnitudes are the open question.",
+    "The negative half is defined and unused. Four players on Challenging is -12 and nothing yet says that a silenced weapon there is effort spent on a problem you do not have, or that anti tank at difficulty 3 is firepower for an enemy that does not spawn."
   ]
 }

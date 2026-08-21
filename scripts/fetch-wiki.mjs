@@ -19,7 +19,7 @@
 /*                                                                    */
 /* The wiki is CC BY-NC-SA 4.0: attribution is required wherever this */
 /* data is shown, derived data carries the same licence, and          */
-/* commercial use is forbidden. See helldivers-2_data-spike.md.       */
+/* commercial use is forbidden. See dds-data-spike.md.       */
 /* ================================================================== */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
@@ -59,6 +59,14 @@ const HD2JSON = "https://raw.githubusercontent.com/helldivers-2/json/master";
 /* including the one the current Major Order is about.                      */
 const HD2API = "https://api.helldivers2.dev/api/v1/planets";
 
+/* Enemy armour is not in a module. It sits on each enemy's own article as */
+/* {{Anatomy Row}} template calls, one per body part, so this half is an   */
+/* article pull rather than a dataset pull. The API hands back raw         */
+/* wikitext for up to 50 titles at a time, which makes the whole enemy set */
+/* two requests rather than sixty.                                         */
+const API = "https://helldivers.wiki.gg/api.php";
+const CONTENT_BATCH = 50;
+
 const SOURCES = {
   weapons: raw("Module:Decodedata-Attacks/weapons data.json"),
   stratagems: raw("Module:Decodedata-Attacks/stratagems data.json"),
@@ -75,10 +83,10 @@ async function pull(name, url) {
 
   const res = await fetch(url, {
     headers: {
-      "user-agent": "hd2-armory (community loadout tool)",
+      "user-agent": "dds (community loadout tool)",
       /* helldivers2.dev asks callers to identify themselves and refuses  */
       /* the request without it.                                          */
-      "x-super-client": "hd2-armory",
+      "x-super-client": "dds",
       "x-super-contact": "github.com/helldivers-2",
     },
   });
@@ -265,6 +273,301 @@ function extract(pool, wikiName, stratEntry) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Enemies                                                             */
+/*                                                                     */
+/* What your armor penetration is actually up against. The wiki keeps  */
+/* an anatomy table on every enemy article: one row per body part,     */
+/* each with an armor value, a health pool and how much of that pool   */
+/* is durable. A Charger is AV 4 across the front, AV 2 underneath and */
+/* AV 0 on the butt, which is the whole reason a flat "this has        */
+/* medium penetration" tag was never going to be enough.               */
+/*                                                                     */
+/* The rule those numbers feed is on the wiki's Damage page and it is  */
+/* three states, not a curve: penetration above the armor value is     */
+/* full damage, equal to it is 65%, below it is nothing and the round  */
+/* ricochets. src/lib/enemies.js is where that is applied.             */
+/* ------------------------------------------------------------------ */
+
+/* Size is how the wiki groups them and it is the readable axis: a     */
+/* sentence about opening everything up to Large lands, one about      */
+/* opening 71% of body parts does not. Ordered smallest first.         */
+const SIZE_CATEGORIES = [
+  ["Category:Small Enemies", "small"],
+  ["Category:Medium Enemies", "medium"],
+  ["Category:Large Enemies", "large"],
+  ["Category:Massive Enemies", "massive"],
+  ["Category:Superheavy Enemies", "superheavy"],
+  /* Anything the wiki has not sized yet. Kept rather than dropped: it  */
+  /* still has an anatomy table, and the run reports the count so a new */
+  /* enemy sitting here is visible rather than silently missing.        */
+  ["Category:Uncategorized Enemies", null],
+];
+
+const FACTION_CATEGORIES = {
+  "Category:Automatons": "bots",
+  "Category:Terminids": "bugs",
+  "Category:Illuminate": "squids",
+};
+
+/* The special variants. Every one of them is categorised, so this is a  */
+/* membership test rather than a list of name prefixes, which means a    */
+/* variant added later is caught without editing this file.              */
+/*                                                                       */
+/* They are fetched and written like everything else, flagged rather     */
+/* than dropped. The baseline reading skips them, because a Predator     */
+/* Strain Hunter should not drag down what your gun says about a normal  */
+/* bug drop. They only exist while a galactic effect is running on that  */
+/* planet, so when the live war state layer lands and the tool knows     */
+/* which effect is up, switching them on is a filter and not another     */
+/* pull.                                                                 */
+const VARIANT_CATEGORIES = {
+  "Category:Predator Strain Terminids": "Predator Strain",
+  "Category:Rupture Strain Terminids": "Rupture Strain",
+  "Category:Spore Burst Strain Terminids": "Spore Burst Strain",
+  "Category:Jet Brigade": "Jet Brigade",
+  "Category:Incineration Corps": "Incineration Corps",
+  "Category:Cyborg Legion": "Cyborg Legion",
+  /* Missed on the first pass and it is the strongest case of the six.   */
+  /* The others add enemies to a front; this one replaces them. The wiki */
+  /* is explicit that on a Vote Snatchers planet the Overseers,          */
+  /* Harvesters, Watchers and Stingrays are swapped out for Crushers and */
+  /* Wretches, so counting all of them together describes a front that   */
+  /* never exists.                                                       */
+  "Category:Vote Snatchers": "Vote Snatchers",
+};
+
+const api = (params) =>
+  `${API}?${new URLSearchParams({ format: "json", formatversion: "2", ...params })}`;
+
+/* Titles in one category. Enough for every category here, none of which */
+/* comes close to the 500 limit.                                         */
+async function categoryTitles(cacheName, category) {
+  const doc = await pull(
+    cacheName,
+    api({ action: "query", list: "categorymembers", cmtitle: category, cmlimit: "500" })
+  );
+  return ((doc.query && doc.query.categorymembers) || []).map((m) => m.title);
+}
+
+/* Wikitext plus categories for a batch of titles, in one request each.   */
+/* Categories come from the API rather than from the wikitext because a   */
+/* page picks most of them up from its infobox template, so they are not  */
+/* all written on the page itself.                                       */
+async function articles(titles) {
+  const out = new Map();
+  for (let i = 0; i < titles.length; i += CONTENT_BATCH) {
+    const batch = titles.slice(i, i + CONTENT_BATCH);
+    const doc = await pull(
+      `enemy-articles-${i / CONTENT_BATCH}`,
+      api({
+        action: "query",
+        prop: "revisions|categories",
+        rvprop: "content",
+        rvslots: "main",
+        cllimit: "500",
+        titles: batch.join("|"),
+      })
+    );
+    for (const page of (doc.query && doc.query.pages) || []) {
+      const rev = page.revisions && page.revisions[0];
+      const text = rev && rev.slots && rev.slots.main ? rev.slots.main.content : null;
+      if (!text) continue;
+      out.set(page.title, {
+        text,
+        categories: (page.categories || []).map((c) => c.title),
+      });
+    }
+  }
+  return out;
+}
+
+/* The wiki writes health as 1,800, durability as 60%, and a health that  */
+/* changes with difficulty as "250 [Default] 325 at Difficulty 4". So     */
+/* this takes the first number in the string rather than the whole of it, */
+/* and returns null where there is no number at all: a part that feeds    */
+/* the main pool writes the word Main where a number would go, and that   */
+/* must not read as one.                                                  */
+const wikiNumber = (v) => {
+  if (v === undefined || v === null) return null;
+  const m = String(v).replace(/,/g, "").match(/-?\d+(?:\.\d+)?/);
+  return m ? Number(m[0]) : null;
+};
+const wikiPercent = (v) => {
+  const n = wikiNumber(v);
+  return n === null ? null : Math.round((n / 100) * 100) / 100;
+};
+/* part_name carries line breaks and counts: "Front Leg<br>Armor (2)". */
+const flatten = (v) =>
+  String(v).replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+
+/* Template calls nest. A health value carries a Difficulty template,    */
+/* which brings its own braces and its own pipes, so a match to the       */
+/* first closing pair truncates the row and a split on every pipe         */
+/* corrupts what is left. Both cost real enemies: the Terminid Warrior    */
+/* was lost outright to it. So braces are counted, and the nested calls   */
+/* are stripped before the parameters are split.                          */
+function anatomyBlocks(text) {
+  const out = [];
+  const opener = /\{\{\s*Anatomy Row\b/g;
+  let m;
+  while ((m = opener.exec(text))) {
+    let depth = 0;
+    let i = m.index;
+    for (; i < text.length; i++) {
+      if (text.startsWith("{{", i)) { depth += 1; i += 1; continue; }
+      if (text.startsWith("}}", i)) { depth -= 1; i += 1; if (!depth) break; continue; }
+    }
+    /* An unclosed template means the rest of the page cannot be trusted. */
+    if (depth) break;
+    out.push(text.slice(m.index + m[0].length, i - 1));
+    opener.lastIndex = i;
+  }
+  return out;
+}
+
+/* Innermost first, repeatedly, so a nested call is gone before the       */
+/* parameters are split on a pipe that was never a separator.            */
+const stripTemplates = (v) => {
+  let prev;
+  let out = v;
+  do {
+    prev = out;
+    out = out.replace(/\{\{[^{}]*\}\}/g, " ");
+  } while (out !== prev);
+  return out;
+};
+
+/* One row into named parameters. */
+function templateParams(body) {
+  const params = {};
+  for (const chunk of body.split("|").slice(1)) {
+    const eq = chunk.indexOf("=");
+    if (eq === -1) continue;
+    params[chunk.slice(0, eq).trim().toLowerCase()] = chunk.slice(eq + 1).trim();
+  }
+  return params;
+}
+
+function parseAnatomy(text) {
+  const parts = [];
+  for (const raw of anatomyBlocks(text)) {
+    const p = templateParams(`|${stripTemplates(raw)}`);
+    const av = wikiNumber(p.av);
+    if (!p.part_name || av === null) continue;
+    parts.push(
+      clean({
+        name: flatten(p.part_name),
+        av,
+        /* Absent where the part feeds the main pool rather than holding  */
+        /* its own, which the wiki writes as the word Main.               */
+        health: wikiNumber(p.health),
+        /* Some pools grow with difficulty and the row says so. The       */
+        /* number above is the default, and this records that it is not   */
+        /* the only one, so nobody later reads 250 as a fixed figure.     */
+        healthScales: /difficulty/i.test(raw) ? true : null,
+        durability: wikiPercent(p.durability),
+        fatal: p.fatal ? /^yes/i.test(flatten(p.fatal)) : null,
+      })
+    );
+  }
+  /* A page that tabs two variants renders its anatomy table twice, so   */
+  /* the Hive Lord arrives with its crown listed on both. Identical rows  */
+  /* are the same part seen twice and are folded; a row that differs in   */
+  /* any field is a real second part, like a Factory Strider's neck       */
+  /* before and after its head armor comes off.                          */
+  const seen = new Set();
+  return parts.filter((p) => {
+    const key = JSON.stringify(p);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+/* The class the game itself uses, Light through Heavy, which is the     */
+/* word a player says out loud. Kept alongside the wiki's size grouping  */
+/* rather than instead of it: the two do not always agree and neither is */
+/* wrong, they are answering different questions.                        */
+const parseClass = (text) => {
+  const m = text.match(/^\s*\|\s*class\s*=\s*(.+)$/m);
+  return m ? flatten(m[1]) || null : null;
+};
+
+/* The lowest difficulty this enemy shows up at, which is what lets the  */
+/* tool count the roster you will actually meet rather than everything   */
+/* the front can field. A Factory Strider is difficulty 4 and up, so     */
+/* warning about one on a Challenging drop is warning about the wrong    */
+/* thing.                                                                */
+/*                                                                       */
+/* Cross checked against the wiki's own Difficulty table on 52 enemies:  */
+/* 51 agree. The one that does not is the Stingray, whose infobox field  */
+/* is blank while the table has it at 4, so an absent value here means   */
+/* the wiki has not filled it in rather than "appears at level 1".       */
+/* Three infoboxes leave the field empty and two of those are variants,   */
+/* so they never reach a baseline. The Stingray does, and the wiki        */
+/* disagrees with itself about it: the infobox is blank while the         */
+/* Difficulty page's own table lists it at 4. Taking the table, listed by */
+/* hand so a wrong pairing is visible in review rather than fuzzy         */
+/* matched, which is the same call OVERRIDES above makes.                 */
+const MIN_DIFFICULTY_OVERRIDES = {
+  Stingray: 4,
+};
+
+const parseMinDifficulty = (title, text) => {
+  if (MIN_DIFFICULTY_OVERRIDES[title]) return MIN_DIFFICULTY_OVERRIDES[title];
+  const m = text.match(/\|\s*min_difficulty\s*=\s*\{\{\s*Difficulty\s*\|\s*(\d+)/);
+  return m ? Number(m[1]) : null;
+};
+
+async function buildEnemies() {
+  const sizeByTitle = new Map();
+  for (const [category, size] of SIZE_CATEGORIES) {
+    const slug = category.replace("Category:", "").toLowerCase().replace(/\s+/g, "-");
+    for (const title of await categoryTitles(`cat-${slug}`, category)) {
+      if (!sizeByTitle.has(title)) sizeByTitle.set(title, size);
+    }
+  }
+
+  /* Translations and April Fools pages both live under a slash. One rule */
+  /* rather than two lists.                                              */
+  const titles = [...sizeByTitle.keys()].filter((t) => !t.includes("/")).sort();
+  const pages = await articles(titles);
+
+  const report = { noAnatomy: [], noFaction: [] };
+  const enemies = [];
+
+  for (const title of titles) {
+    const page = pages.get(title);
+    if (!page) continue;
+
+    const faction = page.categories.map((c) => FACTION_CATEGORIES[c]).find(Boolean) || null;
+    const variant = page.categories.map((c) => VARIANT_CATEGORIES[c]).find(Boolean) || null;
+    const parts = parseAnatomy(page.text);
+
+    if (!parts.length) {
+      report.noAnatomy.push(title);
+      continue;
+    }
+    if (!faction) {
+      report.noFaction.push(title);
+      continue;
+    }
+
+    enemies.push({
+      name: title,
+      faction,
+      size: sizeByTitle.get(title),
+      class: parseClass(page.text),
+      minDifficulty: parseMinDifficulty(title, page.text),
+      variant,
+      parts,
+    });
+  }
+
+  return { enemies, report };
+}
+
+/* ------------------------------------------------------------------ */
 
 const load = (f) => JSON.parse(readFileSync(join(DATA, f), "utf8"));
 
@@ -427,6 +730,35 @@ async function main() {
     for (const i of wrongly) console.log(`              ${i.name}`);
   }
 
+  /* Enemies. What the armor penetration numbers above are actually up   */
+  /* against, which nothing in this project has ever held.                */
+  const { enemies, report } = await buildEnemies();
+  const baseline = enemies.filter((e) => !e.variant);
+  const byFaction = (list, f) => list.filter((e) => e.faction === f).length;
+  const partCount = (list) => list.reduce((n, e) => n + e.parts.length, 0);
+
+  console.log(`
+  enemies   ${enemies.length} with an anatomy table, ${partCount(enemies)} body parts`);
+  console.log(`            baseline ${baseline.length}: ${byFaction(baseline, "bots")} bots, ${byFaction(baseline, "bugs")} bugs, ${byFaction(baseline, "squids")} squids`);
+  const variants = enemies.filter((e) => e.variant);
+  if (variants.length) {
+    const kinds = [...new Set(variants.map((e) => e.variant))].sort();
+    console.log(`            ${variants.length} flagged as a variant and kept out of the baseline:`);
+    for (const k of kinds) {
+      const names = variants.filter((e) => e.variant === k).map((e) => e.name);
+      console.log(`              ${k}: ${names.join(", ")}`);
+    }
+  }
+  const unsized = enemies.filter((e) => !e.size);
+  if (unsized.length) console.log(`            ${unsized.length} with no size on the wiki: ${unsized.map((e) => e.name).join(", ")}`);
+  const noMin = enemies.filter((e) => e.minDifficulty === null);
+  console.log(`            ${enemies.length - noMin.length} say which difficulty they start at`);
+  if (noMin.length) console.log(`            ${noMin.length} leave that field blank on the wiki: ${noMin.map((e) => e.name).join(", ")}`);
+  const perLevel = [3, 5, 7, 10].map((d) => `${d}: ${baseline.filter((e) => (e.minDifficulty || 1) <= d).length}`);
+  console.log(`            baseline reachable by difficulty  ${perLevel.join(",  ")}`);
+  if (report.noAnatomy.length) console.log(`            ${report.noAnatomy.length} skipped, no anatomy table: ${report.noAnatomy.join(", ")}`);
+  if (report.noFaction.length) console.log(`            ${report.noFaction.length} skipped, no faction: ${report.noFaction.join(", ")}`);
+
   const statsDoc = {
     source: "helldivers.wiki.gg",
     licence: "CC BY-NC-SA 4.0",
@@ -445,16 +777,28 @@ async function main() {
     planets,
   };
 
+  const enemiesDoc = {
+    source: "helldivers.wiki.gg",
+    licence: "CC BY-NC-SA 4.0",
+    licenceUrl: "https://creativecommons.org/licenses/by-nc-sa/4.0",
+    fetchedAt: new Date().toISOString().slice(0, 10),
+    note: "Generated by scripts/fetch-wiki.mjs from the anatomy table on each enemy article. Never edit by hand: a re-fetch overwrites it. An armor value is what your penetration is measured against, and the rule is on the wiki's Damage page: above it is full damage, equal to it is 65%, below it is a ricochet for nothing. Applied in src/lib/enemies.js.",
+    gap: "The wiki does not record which parts are exposed from the start. A Charger's inner flesh is AV 1 and you only reach it once the leg armor is off, and nothing here distinguishes that from a part you can shoot on approach. So a soft part means one exists, not that you can hit it right now.",
+    enemies,
+  };
+
   if (!WRITE) {
     diff("wiki-stats.json", statsDoc, (d) => d.stats);
     diff("planets.json", planetsDoc, (d) => Object.fromEntries(d.planets.map((p) => [p.name, p])));
+    diff("enemies.json", enemiesDoc, (d) => Object.fromEntries(d.enemies.map((e) => [e.name, e])));
     console.log("\n  Report only. Re-run with --write to apply.\n");
     return;
   }
 
   writeFileSync(join(DATA, "wiki-stats.json"), JSON.stringify(statsDoc, null, 2) + "\n");
   writeFileSync(join(DATA, "planets.json"), JSON.stringify(planetsDoc, null, 2) + "\n");
-  console.log("\n  Written: src/data/wiki-stats.json, src/data/planets.json\n");
+  writeFileSync(join(DATA, "enemies.json"), JSON.stringify(enemiesDoc, null, 2) + "\n");
+  console.log("\n  Written: src/data/wiki-stats.json, src/data/planets.json, src/data/enemies.json\n");
 }
 
 /* A diff rather than a silent overwrite. A generated file nobody reads */

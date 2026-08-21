@@ -27,8 +27,13 @@ export const loadoutItems = (l) => loadoutItemIds(l).map(getItem).filter(Boolean
 
 /* Gear you actually hold and manage heat on. A call down does not vent   */
 /* in your hands, so orbitals, eagles, sentries, emplacements and mines   */
-/* are not part of this. Checked against all 39 curated builds: this rule */
-/* reproduces every hand authored heat flag, 39 out of 39.                */
+/* are not part of this.                                                  */
+/*                                                                        */
+/* This used to claim the rule reproduced every hand authored heat flag,  */
+/* 39 of 39. It does not, and the claim was worthless anyway: the flags   */
+/* and the rule were both made from damageType, so they agreed because    */
+/* they shared one wrong premise. Measured against the source it is 35 of */
+/* 39. See deriveHeat below, which has said so since 1.4.0.               */
 export function heldGear(l) {
   const out = [getItem(l.primary), getItem(l.secondary)];
   for (const id of l.strats || []) {

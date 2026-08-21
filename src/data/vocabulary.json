@@ -101,6 +101,20 @@
       "label": "Mobility"
     }
   ],
+  "itemTags": [
+    {
+      "id": "long-range",
+      "label": "Long range",
+      "source": "curator",
+      "note": "Ours, not a sourced field. Nothing published separates a long range support weapon from a close one: projectile velocity does not, since laser weapons read 1300 and assault rifles read 820. These are the ones you aim at something far away."
+    },
+    {
+      "id": "suppressed",
+      "label": "Suppressed",
+      "source": "wiki",
+      "note": "Sourced, not judged. The wiki puts Suppressed in each weapon's infobox and gives the audible range as 12 metres against 100 for everything else. It is curated here rather than fetched because fetch-wiki.mjs reads modules and enemy anatomy tables, not weapon article infoboxes. Move it into the fetch when that changes."
+    }
+  ],
   "loadoutSlots": [
     "primary",
     "secondary",

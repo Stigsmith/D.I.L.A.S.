@@ -4,7 +4,7 @@
 /* that browses every build at once: yours and the curated presets.    */
 /*                                                                    */
 /* Biome and difficulty are hard gates, not soft scoring. A build the  */
-/* brief excludes does not appear. That was explicit feedback on an    */
+/* scenario excludes does not appear. That was explicit feedback on an    */
 /* earlier version that merely warned: if the answer is do not bring   */
 /* this, it should not be on the card.                                 */
 /*                                                                    */
@@ -15,9 +15,9 @@
 import { useMemo, useState } from "react";
 import { Plus, Star, FilterX, Thermometer, Snowflake, Users, X, AlertTriangle, Info, ChevronDown, Lock } from "lucide-react";
 
-import { LoadoutCard, FACTIONS, BIOMES, BIOME_THEME, MISSION_TYPES, FactionBar, FactionChooser, DifficultySlider, bandForLevel } from "./Armory.jsx";
+import { LoadoutCard, FACTIONS, BIOMES, BIOME_THEME, MISSION_TYPES, FactionBar, FactionChooser, DifficultySlider, bandForLevel } from "./Tiers.jsx";
 import { presets, deriveHeat, loadoutItemIds } from "./lib/loadouts.js";
-import { squadWarnings, isQuietBand } from "./lib/squad.js";
+import { squadWarnings, isQuietBand, coverageIsQuiet } from "./lib/squad.js";
 
 const ANY = { id: "any", label: "Any" };
 
@@ -101,7 +101,7 @@ function SquadPanel({ builds, context, onRemove, onClear }) {
         <p className="text-xs text-base-500">
           Add one more build and this starts checking what the two of you are missing.
         </p>
-      ) : isQuietBand(context.difficulty) ? (
+      ) : (coverageIsQuiet(context.level, builds.length) ?? isQuietBand(context.difficulty)) ? (
         /* Never claim coverage here. The checks are switched off at this  */
         /* band, which is not the same as the squad being fine.            */
         <p className="text-xs text-base-500">
@@ -112,7 +112,7 @@ function SquadPanel({ builds, context, onRemove, onClear }) {
         /* Silence is the normal state, but an empty box reads as broken,  */
         /* so it says once that it looked and found nothing.               */
         <p className="text-xs text-base-500">
-          Nothing worth flagging. Anti-tank and hole closing are covered for this brief.
+          Nothing worth flagging. Anti-tank and hole closing are covered for this scenario.
         </p>
       ) : (
         <div className="flex flex-col gap-1.5">
@@ -232,7 +232,7 @@ export default function DropBay({ state, navigate, faction, setFaction }) {
   /* this entirely, which is why it is called out rather than implied.    */
   const coldBonus = biome === "cold" ? shown.filter((l) => l.heat).length : 0;
 
-  /* The front is not one of these. It is the brief, it is shared with   */
+  /* The front is not one of these. It is the scenario, it is shared with   */
   /* the rest of the tool, and clearing the filters must not silently     */
   /* change which war you are looking at.                                 */
   const clearAll = () => {
@@ -243,7 +243,7 @@ export default function DropBay({ state, navigate, faction, setFaction }) {
     || level !== 0 || source !== "all" || favesOnly || gear !== "all";
 
   /* Resolved against everything, not against the filtered grid, so       */
-  /* narrowing the brief never silently drops a member of the squad.      */
+  /* narrowing the scenario never silently drops a member of the squad.      */
   const compared = useMemo(
     () => compare.map((id) => everything.find((l) => l.id === id)).filter(Boolean),
     [compare, everything]
@@ -261,7 +261,7 @@ export default function DropBay({ state, navigate, faction, setFaction }) {
       <FactionBar faction={faction} onChoose={setFaction} />
 
       {compared.length > 0 ? (
-        <SquadPanel builds={compared} context={{ faction, biome, mission, difficulty }}
+        <SquadPanel builds={compared} context={{ faction, biome, mission, difficulty, level }}
           onRemove={toggleCompare} onClear={() => setCompare([])} />
       ) : null}
 
@@ -338,11 +338,11 @@ export default function DropBay({ state, navigate, faction, setFaction }) {
 
       {shown.length === 0 ? (
         <div className="rounded-lg border border-dashed border-base-700 px-4 py-10 text-center">
-          <p className="text-sm text-base-400">Nothing survives that brief.</p>
+          <p className="text-sm text-base-400">Nothing survives that scenario.</p>
           <p className="mx-auto mt-1 max-w-md text-xs text-base-600">
             {removedByHeat > 0
               ? "Every build that fit was heat venting, and hot planets rule those out. Try a different biome, or build something ballistic."
-              : "Drop the difficulty band or widen the biome. Or start a new loadout for this brief."}
+              : "Drop the difficulty band or widen the biome. Or start a new loadout for this scenario."}
           </p>
         </div>
       ) : (

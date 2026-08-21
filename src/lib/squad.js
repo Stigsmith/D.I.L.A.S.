@@ -23,6 +23,7 @@
 
 import { getItem } from "./items.js";
 import { loadoutItems } from "./loadouts.js";
+import { peril } from "./score.js";
 
 /* Stratagems that put shells, arcs or fire through your own squad. A    */
 /* hand listed set, because nothing in the source data records it.       */
@@ -42,11 +43,34 @@ export const TEAMKILL_PRONE = [
 /* default, which is worse than firing on a drop that turned out easy.   */
 const QUIET_BANDS = ["low", "mid"];
 
+/* Below this the coverage checks stay quiet. It is peril rather than a    */
+/* band because a band cannot see how many of you there are, and that was  */
+/* the whole problem: four players on Suicide and one player on Extreme    */
+/* are not the same drop, and the band called them both live.              */
+/*                                                                        */
+/* 12 is four players at 7, which is where these checks were already       */
+/* switched on. Reading it as peril keeps that case and adds the ones the  */
+/* band could not see: solo at 6 is 16 and now warns, solo at 5 is 10 and  */
+/* still does not.                                                         */
+const COVERAGE_PERIL = 12;
+
+/* Where one person carrying the only anti-tank stops being a structure    */
+/* and starts being a single point of failure. Solo on Impossible and a    */
+/* duo on Helldive both sit here.                                          */
+const THIN_THREAD_PERIL = 22;
+
 /* Exported because the panel has to say "these are switched off" rather  */
 /* than "you are covered". A squad with no anti-tank at difficulty 3 is   */
 /* still a squad with no anti-tank; we are choosing not to care, which is */
 /* not the same as it being fine. An admitted gap beats a hedged guess.   */
 export const isQuietBand = (difficulty) => QUIET_BANDS.includes(difficulty);
+
+/* What the panel asks so it can say "these are switched off" rather than
+   "you are covered". Same rule the warnings use, so the two cannot drift. */
+export const coverageIsQuiet = (level, size) => {
+  const p = peril({ difficulty: level, squad: size });
+  return p === null ? null : p < COVERAGE_PERIL;
+};
 
 const countMembers = (squad, test) => squad.filter((m) => m.items.some(test)).length;
 const countItems = (squad, test) => squad.reduce((n, m) => n + m.items.filter(test).length, 0);
@@ -79,12 +103,17 @@ export function squadWarnings(builds, context = {}) {
   /* what one person is carrying.                                         */
   if (squad.length < 2) return [];
 
-  const { faction = "any", biome = "any", mission = "any", difficulty = "any" } = context;
+  const { faction = "any", biome = "any", mission = "any", difficulty = "any", level = 0 } = context;
   const out = [];
   const add = (id, severity, text) => out.push({ id, severity, text });
 
   const size = squad.length;
-  const quiet = QUIET_BANDS.includes(difficulty);
+  /* The squad is however many builds are being compared, so peril can be
+     read straight off the panel without asking for it separately. With no
+     level set peril is null and the band is all there is to go on, which
+     is the old behaviour and the right fallback. */
+  const p = peril({ difficulty: level, squad: size });
+  const quiet = p === null ? QUIET_BANDS.includes(difficulty) : p < COVERAGE_PERIL;
   const heavyFront = faction === "bugs" || faction === "bots" || faction === "any";
 
   /* ---------------------------------------------------------------- */
@@ -108,6 +137,16 @@ export function squadWarnings(builds, context = {}) {
   /* them and would fire on more than half of all bot pairs, which is     */
   /* noise. AP 4 is absent from 14 and fires on 6 of 78. That is a real   */
   /* signal, and it is also the class that actually beats Devastators.    */
+  /*                                                                      */
+  /* Re-measured against enemy armor when that landed, and it holds for   */
+  /* a second and better reason. A Devastator's plate is AV 3, and        */
+  /* penetration equal to an armor value is 65% damage rather than full,  */
+  /* so AP 3 only ties a Devastator and AP 4 is the first clean answer to */
+  /* one. It is not a clean answer to everything: at AP 4 five of the 22  */
+  /* Automaton enemies still take damage in one spot only, and the        */
+  /* Dropship at AV 5 all over takes none at all. AP 5 is where the front */
+  /* stops needing a weak point entirely, and nothing in the curated set  */
+  /* would fire a check there. See src/lib/enemies.js.                    */
   const PENETRATION_AP = 4;
   const held = (i) => i.slot === "primary" || i.slot === "secondary"
     || (i.slot === "stratagem" && i.stratType === "support");
@@ -120,7 +159,8 @@ export function squadWarnings(builds, context = {}) {
       add("armor-absent-squids", "grey",
         "No dedicated anti-tank, which is usually right against squids. The tier data warns off most of it on this front.");
     }
-  } else if (!quiet && armorMembers === 1 && size >= 2 && faction !== "squids" && difficulty === "extreme") {
+  } else if (!quiet && armorMembers === 1 && size >= 2 && faction !== "squids"
+             && (p === null ? difficulty === "extreme" : p >= THIN_THREAD_PERIL)) {
     add("armor-thin", "amber",
       size === 2
         ? "One of you is carrying the anti-tank. If he goes down holding it, you are throwing grenades at a Charger."
@@ -145,7 +185,7 @@ export function squadWarnings(builds, context = {}) {
 
   if (!quiet && faction === "bots" && penetrators === 0) {
     add("no-penetration", "amber",
-      "Nothing you hold punches above light armor. You can still headshot every Devastator you meet, but one of you bringing an Autocannon, an Anti-Materiel Rifle, a Laser Cannon or even a Senator turns that from a skill check into a non-issue.");
+      "Nothing you hold punches above light armor. You can still headshot every Devastator you meet, but one of you bringing an Autocannon, an Anti-Materiel Rifle, a Laser Cannon or even a Senator stops the plate being the problem. All four are AP 4, and a Devastator is armored to 3.");
   }
 
   if (!quiet && objectiveMembers === 0 && mission === "nest") {

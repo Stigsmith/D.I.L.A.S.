@@ -1,7 +1,7 @@
 {
-  "name": "hd2-armory",
+  "name": "dds",
   "private": true,
-  "version": "1.9.1",
+  "version": "1.19.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "wiki": "node scripts/fetch-wiki.mjs",
-    "vehicles": "node scripts/add-vehicles.mjs"
+    "vehicles": "node scripts/add-vehicles.mjs",
+    "rules": "node scripts/check-rules.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.454.0",

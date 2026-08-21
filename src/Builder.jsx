@@ -16,7 +16,7 @@ import {
 import {
   TierRow, TierBadge, ItemArt, sourceLabelFor, itemStatSummary,
   FACTIONS, FACTION_THEME, BIOMES, MISSION_TYPES, DIFFICULTIES, CAT_META, STRAT_GROUP, FactionBar,
-} from "./Armory.jsx";
+} from "./Tiers.jsx";
 import { CATEGORIES, getItem, itemName, judgedTier, TIER_RANK, averageRank, rank, eatsBackpack } from "./lib/items.js";
 import {
   presets, SLOTS, STRAT_SLOTS, emptyLoadout, forkPreset,
@@ -27,7 +27,7 @@ import {
 /* Picker overlay                                                      */
 /* ------------------------------------------------------------------ */
 
-function Picker({ slot, stratSlot, current, faction, brief, takenBackpack, taken = [], lockedSet, favoriteItems, onPick, onClear, onClose }) {
+function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, taken = [], lockedSet, favoriteItems, onPick, onClear, onClose }) {
   const [query, setQuery] = useState("");
   /* Unavailable gear is hidden by default. You are choosing what to    */
   /* actually drop with, and a list full of things you do not own is    */
@@ -168,7 +168,7 @@ function Picker({ slot, stratSlot, current, faction, brief, takenBackpack, taken
                       ) : null}
                     </div>
                   ) : null}
-                  <TierRow item={it} factionFilter={faction} brief={brief}
+                  <TierRow item={it} factionFilter={faction} scenario={scenario}
                     isLocked={lockedSet.has(it.id)} lockedByWarbond={false}
                     toggleLock={() => {}} isFav={favSet.has(it.id)} toggleFav={() => {}}
                     open={false} onToggleOpen={() => {}}
@@ -273,7 +273,7 @@ const MultiToggle = ({ label, hint, options, value, onChange }) => (
   </div>
 );
 
-export default function Builder({ state, loadoutId, navigate, faction, brief }) {
+export default function Builder({ state, loadoutId, navigate, faction, scenario }) {
   const stored = state.loadouts.find((l) => l.id === loadoutId);
   const preset = presets.find((p) => p.id === loadoutId);
 
@@ -320,7 +320,7 @@ export default function Builder({ state, loadoutId, navigate, faction, brief }) 
   return (
     <div className="flex flex-col gap-4">
       {/* The same control the tier list and Drop Bay carry, but bound to  */}
-      {/* the build rather than to the brief. A build is for a front and   */}
+      {/* the build rather than to the scenario. A build is for a front and   */}
       {/* keeps that when you save it, so changing it here changes what    */}
       {/* you are making, not where the rest of the tool is looking. The   */}
       {/* picker below already ranks by it.                                */}
@@ -338,7 +338,7 @@ export default function Builder({ state, loadoutId, navigate, faction, brief }) 
           stratSlot={picking.stratSlot}
           current={picking.stratSlot != null ? draft.strats[picking.stratSlot] : draft[picking.key]}
           faction={draft.faction}
-          brief={brief}
+          scenario={scenario}
           takenBackpack={
             picking.stratSlot == null
               ? null

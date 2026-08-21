@@ -27,6 +27,8 @@ const ownership = load("ownership.json");
 const ownershipTemplate = load("ownership.template.json");
 const vocab = load("vocabulary.json");
 const wikiStats = load("wiki-stats.json");
+const enemies = load("enemies.json");
+const contextRules = load("context-rules.json");
 
 const problems = [];
 const fail = (msg, list) => {
@@ -43,6 +45,14 @@ const SOURCES = set(vocab.ratingSources);
 const ACQUISITION = set(vocab.acquisitionTypes);
 const TRAITS = set(vocab.armorTraits.map((t) => t.id));
 const ROLES = set(vocab.roles);
+/* Ours, plus the sourced facts the fetch does not reach yet. Each one     */
+/* declares its own provenance in vocabulary.json, so a judgement and a    */
+/* published fact never sit in the rules looking equally weighed.          */
+const ITEM_TAGS = set(vocab.itemTags.map((t) => t.id));
+/* The three fronts, which items.json keys its ratings by and           */
+/* enemies.json keys its rows by. The same three or the two files       */
+/* cannot be joined.                                                     */
+const FACTIONS = set(["bots", "bugs", "squids"]);
 
 /* ------------------------------------------------------------------ */
 /* Ids                                                                 */
@@ -131,6 +141,17 @@ for (const it of items) {
       if (!ROLES.has(r)) at("role", r);
     }
     if (new Set(it.roles).size !== it.roles.length) at("duplicate role", it.roles);
+  }
+
+  /* A tag a rule spells wrong fails the same silent way an unresolvable   */
+  /* id does: the rule simply never fires and the column looks fine.       */
+  if (!Array.isArray(it.tags)) {
+    at("tags", it.tags);
+  } else {
+    for (const t of it.tags) {
+      if (!ITEM_TAGS.has(t)) at("tag", t);
+    }
+    if (new Set(it.tags).size !== it.tags.length) at("duplicate tag", it.tags);
   }
 
   if (!ACQUISITION.has(it.acquisition.type)) at("acquisition.type", it.acquisition.type);
@@ -251,6 +272,143 @@ if (statEntries.length && ventCount === 0) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Context rules                                                       */
+/*                                                                     */
+/* The scoring engine reads these. A rule naming a tag nothing carries, */
+/* or an id matching no item, does not throw: it quietly never fires    */
+/* and the second rating column goes on looking like it worked. That is */
+/* the same failure as an unresolvable loadout slot and it earns the    */
+/* same check. Nothing here referenced an id at all after 1.19.0, but   */
+/* the escape hatch is still in the matcher, so the guard stays.        */
+/* ------------------------------------------------------------------ */
+
+const GAME_TAGS = new Set();
+for (const s of Object.values(wikiStats.stats || {})) {
+  for (const t of (s && s.tags) || []) GAME_TAGS.add(t);
+}
+
+/* Walks a rule for the named keys wherever they sit, so a matcher that  */
+/* gains a nested shape later is still checked without editing this.     */
+const collect = (node, out, keys) => {
+  if (Array.isArray(node)) { node.forEach((n) => collect(n, out, keys)); return; }
+  if (!node || typeof node !== "object") return;
+  for (const [k, v] of Object.entries(node)) {
+    if (keys.includes(k)) for (const x of Array.isArray(v) ? v : [v]) out.push(x);
+    else collect(v, out, keys);
+  }
+};
+
+/* Every scenario key applies() knows how to test. */
+const WHEN_KEYS = set(["faction", "hazard", "biome", "mission", "difficulty", "squad", "peril"]);
+
+const ruleProblems = [];
+const seenRule = new Set();
+for (const rule of contextRules.rules) {
+  if (!rule.id) { ruleProblems.push("a rule with no id"); continue; }
+  if (seenRule.has(rule.id)) ruleProblems.push(`duplicate rule id ${rule.id}`);
+  seenRule.add(rule.id);
+  /* A score that cannot explain itself is a score nobody should trust. */
+  if (!rule.say) ruleProblems.push(`${rule.id} carries no say`);
+  /* A rule scaling off the scenario crosses zero and runs both ways. Its
+     say was written for one direction, so without a sayInverted the tool
+     explains a penalty using the sentence meant for a bonus. */
+  if (rule.scaleBy && String(rule.scaleBy.path).startsWith("scenario.") && !rule.sayInverted) {
+    ruleProblems.push(`${rule.id} scales off the scenario so it can invert, but carries no sayInverted`);
+  }
+
+  const refIds = []; collect(rule, refIds, ["idIn", "notIdIn"]);
+  for (const id of refIds) {
+    if (!byId.has(id)) ruleProblems.push(`${rule.id} names item id ${id}, which matches no item`);
+  }
+
+  const refTags = []; collect(rule, refTags, ["tags", "notTags"]);
+  for (const t of refTags) {
+    if (!ITEM_TAGS.has(t)) ruleProblems.push(`${rule.id} matches tag "${t}", which vocabulary.json does not declare`);
+    else if (!items.some((i) => i.tags.includes(t))) ruleProblems.push(`${rule.id} matches tag "${t}", which no item carries, so it can never fire`);
+  }
+
+  const refGame = []; collect(rule, refGame, ["gameTags", "notGameTags"]);
+  for (const t of refGame) {
+    if (!GAME_TAGS.has(t)) ruleProblems.push(`${rule.id} matches game tag "${t}", which nothing in wiki-stats.json carries`);
+  }
+
+  /* A when key the engine does not know is not an error anywhere: the
+     clause is simply skipped and the rule fires wider than its author
+     meant. Same silent shape as everything else checked here. */
+  for (const k of Object.keys(rule.when || {})) {
+    if (!WHEN_KEYS.has(k)) ruleProblems.push(`${rule.id} gates on "${k}", which the engine does not read`);
+  }
+
+  const refRoles = []; collect(rule, refRoles, ["roles"]);
+  for (const r of refRoles) {
+    if (!ROLES.has(r)) ruleProblems.push(`${rule.id} matches role "${r}", which is not in the vocabulary`);
+  }
+}
+if (ruleProblems.length) fail(`${ruleProblems.length} problem(s) in context-rules.json:`, ruleProblems);
+
+/* Every declared tag has to record where it came from, because the whole */
+/* point of the layer is that a judgement and a sourced fact are telling  */
+/* apart at a glance.                                                     */
+const TAG_SOURCES = set(["curator", "wiki"]);
+const badTag = [];
+for (const t of vocab.itemTags) {
+  if (!t.id || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(t.id)) badTag.push(`tag id ${JSON.stringify(t.id)} is not a slug`);
+  if (!t.label) badTag.push(`${t.id} has no label`);
+  if (!TAG_SOURCES.has(t.source)) badTag.push(`${t.id} has source ${JSON.stringify(t.source)}, which is not curator or wiki`);
+  if (!t.note) badTag.push(`${t.id} has no note saying why it exists`);
+}
+if (badTag.length) fail(`vocabulary.json itemTags has ${badTag.length} problem(s):`, badTag);
+
+/* ------------------------------------------------------------------ */
+/* Enemy armour                                                        */
+/*                                                                     */
+/* What every armor penetration figure in the tool is measured         */
+/* against. A break here does not throw: the scoring rules read        */
+/* through it, find nothing, and quietly stop firing, so the second    */
+/* rating column would go back to ignoring armor with no sign that     */
+/* anything was wrong.                                                 */
+/* ------------------------------------------------------------------ */
+
+const SIZES = set(["small", "medium", "large", "massive", "superheavy"]);
+const badEnemy = [];
+
+for (const e of enemies.enemies) {
+  const where = e.name || "(unnamed)";
+  if (!FACTIONS.has(e.faction)) badEnemy.push(`${where}: faction ${e.faction}`);
+  if (e.size !== null && !SIZES.has(e.size)) badEnemy.push(`${where}: size ${e.size}`);
+  /* Null is allowed: two wiki infoboxes leave it blank and the reading   */
+  /* treats an unknown as level 1, which keeps an enemy in rather than    */
+  /* hiding one. A number outside the game's ten levels is a parse error. */
+  if (e.minDifficulty !== null && !(Number.isInteger(e.minDifficulty) && e.minDifficulty >= 1 && e.minDifficulty <= 10)) {
+    badEnemy.push(`${where}: min difficulty ${e.minDifficulty} is outside the game's ten levels`);
+  }
+  if (!Array.isArray(e.parts) || !e.parts.length) {
+    badEnemy.push(`${where}: no body parts, so nothing can be measured against it`);
+    continue;
+  }
+  for (const p of e.parts) {
+    if (!p.name) badEnemy.push(`${where}: a part with no name`);
+    /* AV 10 is real, the Hive Lord's crown and an Overship's hull. */
+    if (!Number.isInteger(p.av) || p.av < 0 || p.av > 12) {
+      badEnemy.push(`${where} / ${p.name}: armor value ${p.av} is outside 0 to 12`);
+    }
+  }
+}
+if (badEnemy.length) {
+  fail(`${badEnemy.length} problem(s) in enemies.json. Re-run node scripts/fetch-wiki.mjs:`, badEnemy);
+}
+if (!enemies.licence || !enemies.source) {
+  fail("enemies.json is missing its source or licence stamp. The data is CC BY-NC-SA and attribution is not optional.");
+}
+
+/* Every front needs enemies or the rules that read it stop firing on   */
+/* that front alone, which is the failure that hides best.              */
+for (const f of FACTIONS) {
+  const n = enemies.enemies.filter((e) => e.faction === f && !e.variant).length;
+  if (n < 5) fail(`enemies.json carries only ${n} baseline enemies for ${f}. The armour rules read this and would go quiet on that front.`);
+}
+
+/* ------------------------------------------------------------------ */
 
 if (problems.length) {
   console.error("\n  Data is broken. The build is stopped.\n");
@@ -264,5 +422,6 @@ for (const it of items) bySlot[it.slot] = (bySlot[it.slot] || 0) + 1;
 console.log(
   `  Data checks out. ${items.length} items (${Object.entries(bySlot).map(([k, v]) => `${v} ${k}`).join(", ")}), ` +
     `${loadouts.length} loadouts, ${warbonds.length} warbonds, ` +
-    `${statEntries.length} with fetched stats, ${ventCount} that vent heat.`
+    `${statEntries.length} with fetched stats, ${ventCount} that vent heat, ` +
+    `${enemies.enemies.filter((e) => !e.variant).length} enemies to measure penetration against.`
 );
