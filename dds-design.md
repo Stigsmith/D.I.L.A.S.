@@ -1,6 +1,6 @@
-# **HD2 Armory: Design Notes**
+# **D.D.S.: Design Notes**
 
-> Decisions, data conventions, and known gaps for `helldivers-2_armory.jsx`, the Helldivers 2 tier browser and loadout picker built in this project. Exists so a fresh chat can extend the tool without relitigating choices already settled with stigly.
+> Decisions, data conventions, and known gaps for `original-artifact.jsx`, the Helldivers 2 tier browser and loadout picker built in this project. Exists so a fresh chat can extend the tool without relitigating choices already settled with stigly.
 
 ---
 

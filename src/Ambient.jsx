@@ -30,7 +30,12 @@ import { themeArt } from "./lib/assets.js";
 export const FX = {
   "malevelon-creek": {
     masthead: { file: "masthead", fit: "cover", opacity: 0.38, position: "center" },
-    /* Blue night, not jungle green. Tracer fire under a poster sky. */
+    /* Blue night, not jungle green. Tracer fire under a poster sky.
+       Searchlights were tried here on 21 August and reverted: three wide
+       beams crossing the width washed the whole page red every time one
+       passed behind the list, which is atmosphere winning an argument
+       with the data. The tracers are longer and about a third slower
+       than they were, which is as ominous as this layer should get. */
     streaks: { count: 5, color: "#FF3B22", glow: "255, 59, 34" },
     embers: { count: 14, color: "#FFB08A", glow: "255, 59, 34" },
     firelight: [
@@ -121,8 +126,8 @@ function Streaks({ count, color, glow, seed }) {
   const bits = useMemo(() => build(count, seed, 7.3, (r) => ({
     left: `${Math.round(r(1) * 96)}%`, top: `${Math.round(r(2) * 88)}%`,
     dx: `${Math.round(420 + r(3) * 320)}px`, dy: `${-Math.round(240 + r(4) * 220)}px`,
-    dur: `${(2.6 + r(5) * 3.4).toFixed(2)}s`, delay: `${(r(6) * 14).toFixed(2)}s`,
-    h: `${Math.round(120 + r(7) * 70)}px`,
+    dur: `${(3.4 + r(5) * 4.4).toFixed(2)}s`, delay: `${(r(6) * 14).toFixed(2)}s`,
+    h: `${Math.round(160 + r(7) * 90)}px`,
   })), [count, seed]);
 
   return bits.map((b, i) => (

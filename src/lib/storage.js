@@ -49,7 +49,7 @@ export function writeList(key, value) {
 /* off to decide whether it has run yet.                                  */
 export function readDoc(key) {
   try {
-    const raw = localStorage.getItem(key);
+    const raw = localStorage.getItem(key) ?? inherit(key);
     if (raw === null) return null;
     const parsed = JSON.parse(raw);
     return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : null;
@@ -73,17 +73,53 @@ export const SETTINGS = {
   filterView: "hd2-filter-view",
   /* Which front you are dropping on. A display preference rather than    */
   /* collection data, so it stays out of the export like the theme does.  */
-  brief: "hd2-brief-faction",
+  scenario: "hd2-scenario-faction",
   /* The tier list filter bag, per category. Survives navigation and a   */
   /* reload. Same reasoning as the two above: this browser, not you.     */
   tierFilters: "hd2-tier-filters",
   /* Planet, biome and hazards. Where you are dropping, not what you own. */
-  briefEnv: "hd2-brief-env",
+  scenarioEnv: "hd2-scenario-env",
+  /* Which rating column the tier list sorts by. Global rather than per
+     category, because you do not change your mind about whose opinion
+     you are ranking by between primaries and boosters. */
+  tierSort: "hd2-tier-sort",
+  /* How the tier badge is finished, and its three surface toggles.
+     Deliberately not part of the theme key: picking a warbond skin must
+     not move somebody's badge finish. See src/lib/badge.js. */
+  badgeFinish: "hd2-badge-finish",
+  badgeSurface: "hd2-badge-surface",
 };
+
+/* Both scenario keys were spelled hd2-brief-* until 21 August 2026. A    */
+/* browser that has been here before still holds those, and a rename      */
+/* with no path back would silently forget which front and planet you     */
+/* were on. Read once from the old name when the new one is empty, then   */
+/* write the new one.                                                     */
+/*                                                                        */
+/* The old keys are left in place rather than deleted, which is the same  */
+/* call the profiles migration made: nothing writes them again, and a     */
+/* hand written recovery path stays open.                                 */
+const RENAMED = {
+  "hd2-scenario-faction": "hd2-brief-faction",
+  "hd2-scenario-env": "hd2-brief-env",
+};
+
+function inherit(key) {
+  const was = RENAMED[key];
+  if (!was) return null;
+  try {
+    const old = localStorage.getItem(was);
+    if (old === null) return null;
+    localStorage.setItem(key, old);
+    return old;
+  } catch (e) {
+    return null;
+  }
+}
 
 export function readSetting(key, allowed, fallback) {
   try {
-    const raw = localStorage.getItem(key);
+    const raw = localStorage.getItem(key) ?? inherit(key);
     return allowed.includes(raw) ? raw : fallback;
   } catch (e) {
     return fallback;

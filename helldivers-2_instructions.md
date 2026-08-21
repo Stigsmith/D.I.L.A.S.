@@ -42,11 +42,11 @@ Read only what the task needs.
 |---|---|
 | "What is this weapon rated" | `helldivers-2_tables.md`. Do not use the tier list, it summarises and clumps. |
 | "What should I bring against X" | `helldivers-2_tier-list.md`. Drop into the tables only when a specific number is needed. |
-| Anything touching the armory tool | `helldivers-2_armory-design.md` **first**, then the tables, then the .jsx. |
+| Anything touching the tool | `dds-design.md` **first**, then the tables, then the .jsx. |
 | Current patch, meta, or anything that may have moved | Search the web. These files go stale. |
 
-> [!danger] Never edit the armory blind
-> `helldivers-2_armory.jsx` is not loaded in project knowledge, because it is 98KB and needed in a minority of conversations. Ask stigly to upload it before any change to the tool, and read the design notes before touching it. The locked decisions in that file came from his direct feedback; a fresh instance "improving" them undoes work he already asked for.
+> [!danger] Never edit the tool blind
+> `original-artifact.jsx` is not loaded in project knowledge, because it is 98KB and needed in a minority of conversations. Ask stigly to upload it before any change to the tool, and read the design notes before touching it. The locked decisions in that file came from his direct feedback; a fresh instance "improving" them undoes work he already asked for.
 
 ---
 
@@ -58,9 +58,9 @@ Read only what the task needs.
 
 **Accuracy beats confidence.** He catches errors and corrects them. When something might have changed, search rather than recall. When a rating is a subjective vote aggregate, say so.
 
-**Name matching is load-bearing.** In the armory, loadout item names and `STRAT_CATEGORY` keys must match tier row names character for character. Rename one and lock state silently breaks. See the design notes for the migration mechanism.
+**Name matching is load-bearing.** In the tool, loadout item names and `STRAT_CATEGORY` keys must match tier row names character for character. Rename one and lock state silently breaks. See the design notes for the migration mechanism.
 
-**Warbond ownership is never assumed.** The canonical home is the armory's Warbonds tab lock state. Ask rather than guess.
+**Warbond ownership is never assumed.** The canonical home is the tool's Warbonds tab lock state. Ask rather than guess.
 
 **No em dashes** in any output, including code comments and UI copy. No ASCII substitutes either.
 
@@ -80,7 +80,7 @@ Read only what the task needs.
 - `helldivers-2_stigly_profile.md`: who he is as a Helldivers player. Career stats, faction exposure, co-op setup, spending. Apply from message one.
 - `helldivers-2_tier-list.md`: the decision layer. What to bring per faction, plus co-op doctrine for both even-skill and mixed-skill sessions.
 - `helldivers-2_tables.md`: the data source. Every item, per-faction ratings, AP class, DPS, demo force, capacity, unlock source, armor passive lookup. Nothing clumped.
-- `helldivers-2_armory-design.md`: why the armory is built the way it is. Locked decisions, data conventions, known gaps. Not optional before touching the tool.
-- `helldivers-2_armory.jsx`: the React tool. Vault only, not project knowledge. Request an upload when needed.
+- `dds-design.md`: why the tool is built the way it is. Locked decisions, data conventions, known gaps. Not optional before touching the tool.
+- `original-artifact.jsx`: the React tool. Vault only, not project knowledge. Request an upload when needed.
 
 File creation and restyling in this project uses the **obsidian-markdown-style** skill.

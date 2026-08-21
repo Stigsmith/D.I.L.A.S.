@@ -84,24 +84,73 @@
 /* in inline styles and some of them want their own alpha.              */
 /* ------------------------------------------------------------------ */
 :root {
-  --tier-splus-bg: #fbbf24;
-  --tier-splus-fg: #451a03;
+  /* THE TIER RAMP. Settled 21 August 2026 and this is the final one.
+     It is the badge study's palette rotated down one rank, with the
+     brown replaced by a grey.
+
+       S+  red      was the study's D
+       S   yellow   was the study's S+
+       A   purple   was the study's S
+       B   blue     was the study's A
+       C   green    was the study's B
+       D   grey     replaces the study's brown
+
+     The rotation is the point. Heat at the top, cooling downward, and a
+     grey at D so the ladder reads as falling off toward unrated rather
+     than as six unrelated hues. Unrated is unchanged: a dashed rim and a
+     question mark in base-600.
+
+     The grey is 8b9096 rather than a neutral. It sits at luminance 0.276
+     against the brown's 0.270, so it carries the same weight in the
+     ladder, and the slight cool cast keeps it from reading as a missing
+     value next to five saturated hues.
+
+     Two earlier candidate ramps are gone: the app's original v1 set and
+     the one drawn in the v2 warbond palette studies. The three way
+     disagreement CLAUDE.md used to record is closed. */
+
+  /* The plate. What the SVG badge draws with. */
+  --tier-splus-plate: #d14b3c;
+  --tier-s-plate: #ffc220;
+  --tier-a-plate: #b57bff;
+  --tier-b-plate: #4cc9f0;
+  --tier-c-plate: #74c947;
+  --tier-d-plate: #8b9096;
+
+  /* The filter chips. Same six values, because a chip and a badge
+     showing the same tier that disagree about its colour is worse than
+     either choice on its own. One ink across all six, the same one the
+     paint finish knocks the letter out in, so there is a single colour
+     language for tiers. Worst contrast is the red at 4.5 to 1, which
+     clears the bar for large bold text. */
+  --tier-splus-bg: #d14b3c;
+  --tier-splus-fg: #0a0d07;
   --tier-splus-border: transparent;
-  --tier-s-bg: #c084fc;
-  --tier-s-fg: #3b0764;
+  --tier-s-bg: #ffc220;
+  --tier-s-fg: #0a0d07;
   --tier-s-border: transparent;
-  --tier-a-bg: #2dd4bf;
-  --tier-a-fg: #042f2e;
+  --tier-a-bg: #b57bff;
+  --tier-a-fg: #0a0d07;
   --tier-a-border: transparent;
-  --tier-b-bg: #4ade80;
-  --tier-b-fg: #052e16;
+  --tier-b-bg: #4cc9f0;
+  --tier-b-fg: #0a0d07;
   --tier-b-border: transparent;
-  --tier-c-bg: #71717a;
-  --tier-c-fg: #09090b;
+  --tier-c-bg: #74c947;
+  --tier-c-fg: #0a0d07;
   --tier-c-border: transparent;
-  --tier-d-bg: #dc2626;
-  --tier-d-fg: #fef2f2;
+  --tier-d-bg: #8b9096;
+  --tier-d-fg: #0a0d07;
   --tier-d-border: transparent;
+
+  /* The plate interiors. The design document hardcodes these as near
+     black greens, which is right on nine of the eleven themes and a
+     decision nobody has made on the two light ones. Tokens so a light
+     theme can answer it later without touching the component. */
+  --tier-plate-void: #0b0e08;
+  --tier-plate-steel: #272e1f;
+  --tier-plate-grad-top: #2e3626;
+  --tier-plate-grad-base: #12170d;
+  --tier-plate-ink: #0a0d07;
 }
 
 [data-theme="light"] {
@@ -499,7 +548,10 @@
   --fx-strike: 0px;
 }
 
-[data-theme="malevelon-creek"] { --fx-glow: 255 59 34; --fx-glow-strength: 0.10; --fx-strike: 3px; }
+/* The Creek runs hotter than the rest. Its red is the thing the front
+   is remembered for, so a hovered row and a lit panel both bleed more of
+   it than any other skin does. */
+[data-theme="malevelon-creek"] { --fx-glow: 255 59 34; --fx-glow-strength: 0.26; --fx-strike: 6px; }
 [data-theme="automaton"] { --fx-glow: 255 45 24; --fx-glow-strength: 0.14; --fx-strike: 4px; }
 [data-theme="bile-titan"] { --fx-glow: 199 222 31; --fx-glow-strength: 0.10; --fx-strike: 3px; }
 [data-theme="hellpod-drop-bay"] { --fx-glow: 255 210 0; --fx-glow-strength: 0.09; --fx-strike: 3px; }

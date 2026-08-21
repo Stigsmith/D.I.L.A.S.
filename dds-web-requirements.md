@@ -1,6 +1,6 @@
-# **HD2 Armory Web: Requirements**
+# **D.D.S. Web: Requirements**
 
-> Build spec for the web app rebuild of the Helldivers 2 armory, moving from a single React artifact to a hosted multi-user tool. Written for a fresh Claude Code session picking this up after the port. Covers product framing, data model, information architecture, per-surface requirements, and release sequencing. The artifact's settled decisions are carried forward in the Inherited Decisions section; read that before changing behavior that looks arbitrary.
+> Build spec for the web app rebuild of D.D.S., moving from a single React artifact to a hosted multi-user tool. Written for a fresh Claude Code session picking this up after the port. Covers product framing, data model, information architecture, per-surface requirements, and release sequencing. The artifact's settled decisions are carried forward in the Inherited Decisions section; read that before changing behavior that looks arbitrary.
 
 ---
 
@@ -10,7 +10,7 @@
 > **`window.storage` and the localStorage ban were sandbox constraints, not preferences.** The Claude.ai artifact runtime forbids browser storage, which is why the artifact used a custom shim. In a real web app, use `localStorage` or IndexedDB freely. Do not reimplement the shim.
 > **Name-as-primary-key is being replaced.** The artifact keyed lock state, loadouts and three lookup maps by display string, and `LEGACY_NAMES` exists because that broke twice. See Data Model. Every stored reference uses a stable id from day one.
 
-Everything else in `helldivers-2_armory-design.md` still applies unless contradicted here.
+Everything else in `dds-design.md` still applies unless contradicted here.
 
 Source files that carry over as data authority:
 
@@ -18,9 +18,9 @@ Source files that carry over as data authority:
 |---|---|
 | `helldivers-2_tables.md` | Per item ratings, AP, DPS, demo force, capacity, armor sets, sources |
 | `helldivers-2_tier-list.md` | Decision layer, co-op doctrine, per faction picks |
-| `helldivers-2_armory-design.md` | Why the artifact works the way it does. Locked decisions |
+| `dds-design.md` | Why the artifact works the way it does. Locked decisions |
 | `helldivers-2_stigly_profile.md` | Who the curator is. Relevant to tone and default assumptions |
-| `hd2-armory.jsx` | The artifact. Reference implementation for tier browsing, filters, biome gating |
+| `original-artifact.jsx` | The artifact. Reference implementation for tier browsing, filters, biome gating |
 
 ---
 
@@ -39,7 +39,7 @@ Two things are genuinely unserved:
 **Squad composition.** Every existing tool builds one loadout for one player. The tier list doc has a whole section on splitting anti-tank and generalist across a duo, coordinating boosters, and cutting teamkill-prone stratagems when your partner cannot read them. Nobody builds the two to four player version. This is the v2 headline.
 
 > [!info] Naming
-> Product is **Armory**. Surfaces are **Tier Lists**, **Collection**, **Loadout Builder**, **Drop Bay**, **Exchange**. Navigation labels stay plain because they are search terms and people should not have to relearn them. The Helldivers voice goes in headers, empty states and flavour copy, not in nav.
+> Product is **D.D.S.**. Surfaces are **Tier Lists**, **Collection**, **Loadout Builder**, **Drop Bay**, **Exchange**. Navigation labels stay plain because they are search terms and people should not have to relearn them. The Helldivers voice goes in headers, empty states and flavour copy, not in nav.
 > Avoid the word "marketplace". Nothing is sold, and that phrasing attached to someone else's IP invites attention nobody wants.
 
 ---

@@ -1,4 +1,9 @@
-# **HD2 Armory: Claude Instructions**
+# **D.D.S.: Claude Instructions**
+
+> [!warning] The repo lives at `C:\Dev\dds` and nothing is called armory any more
+> Renamed 21 August 2026, folder included. `Armory.jsx` is `Tiers.jsx`, `useArmoryState.js` is `useCollectionState.js`, and the four `helldivers-2_armory-*.md` documents are `dds-*.md`. The original Claude.ai artifact is `original-artifact.jsx`.
+>
+> **The product name still lives in exactly one file.** `src/lib/brand.js`, unchanged. Renaming the repo did not change that, and it must not: the folder is a path, the brand is a value.
 
 > Everything a fresh session needs before touching this repo. What the tool is, which decisions are settled and must not be quietly reversed, the one invariant that has broken twice, how ownership and lock state work, and how to run the thing. Read this before the code.
 
@@ -19,6 +24,7 @@ A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai a
 | **Drop Bay** | `#/bay` | Built. The grid, and the only place that browses every build at once |
 | **Settings** | `#/settings` | Built. Theme, export, import, reset |
 | **Support** | `#/support` | Built. Where the numbers come from |
+| **Roadmap** | `#/roadmap` | Built. One timeline, what is next and what it waits on |
 | **Exchange, Squad, Account** | | v2 and v3. Shown in the sidebar, deliberately not reachable |
 
 > [!info] Routing is hand rolled
@@ -28,9 +34,9 @@ A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai a
 > [!info] Who this is for
 > stigly, a returning power user whose game knowledge stops around December 2024. He curates the data and decides what the tool does. He did not write this code and does not read it. Describe changes in terms of what they do for the tool, not by identifier.
 
-What is agreed but not built lives in `helldivers-2_armory-roadmap.md`: the accounts, Exchange and live squad dependency chain, the wider warning set, and the offline build authoring plan. Read it before starting anything that sounds like new scope.
+What is agreed but not built lives in `dds-roadmap.md`: the accounts, Exchange and live squad dependency chain, the wider warning set, and the offline build authoring plan. Read it before starting anything that sounds like new scope.
 
-Data authority lives outside this repo, in the Helldivers 2 project files: `helldivers-2_tables.md` for every rating and number, `helldivers-2_tier-list.md` for the decision layer, `helldivers-2_armory-design.md` and `helldivers-2_armory-web-requirements.md` for why the tool works the way it does. The original artifact is kept at `hd2-armory.jsx` in the repo root as a reference implementation. It is not built and not imported.
+Data authority lives outside this repo, in the Helldivers 2 project files: `helldivers-2_tables.md` for every rating and number, `helldivers-2_tier-list.md` for the decision layer, `dds-design.md` and `dds-web-requirements.md` for why the tool works the way it does. The original artifact is kept at `original-artifact.jsx` in the repo root as a reference implementation. It is not built and not imported.
 
 ---
 
@@ -41,15 +47,105 @@ Data authority lives outside this repo, in the Helldivers 2 project files: `hell
 >
 > | Landed | |
 > |---|---|
-> | **The Brief** | Faction, planet, biome, hazards, mission. One object, persisted, read by the tier list, Drop Bay and the builder |
+> | **The Scenario** | Faction, planet, biome, hazards, mission, difficulty. One object, persisted, read by the tier list, Drop Bay and the builder. Called the brief until 1.10.1 |
 > | **Faction gates rather than filters** | Three buttons above the table, no table until one is picked, two rating columns instead of three faction columns |
 > | **Fetched stats** | 182 items now carry magazine, fire rate, recoil, ergonomics, sway, durable damage, stagger, pushback, projectile drag, call-in codes and the game's own tags. `npm run wiki` |
 > | **281 planets** | Biome and hazards, with the mechanic each hazard applies. MIT licensed, shipped as a table, no runtime network |
 > | **70 missions** | The real names, per front, each with the line the name does not tell you |
-> | **The scoring engine** | `src/lib/score.js`, 33 rules in `src/data/context-rules.json` |
+> | **The scoring engine** | `src/lib/score.js`, 31 rules in `src/data/context-rules.json`. `npm run rules` checks they still discriminate |
+> | **Enemy armour** | 80 enemies, 594 body parts. Shown on every row as a fact, moves no rating, waits for loadout scoring |
 > | **Vehicles** | All eight, rated |
 >
-> **What is left**, in order: enemy armour for the penetration rule, three judgement tags, loadout and squad scoring, then Drop Bay becoming the drop screen. The plan lives in `helldivers-2_armory-roadmap.md`, which also explains how the phases relate to the v2 and v3 labels in the sidebar.
+> **What is left**, in order: three judgement tags, loadout and squad scoring, then Drop Bay becoming the drop screen. The plan lives in `dds-roadmap.md`, which also explains how the phases relate to the v2 and v3 labels in the sidebar.
+
+> [!danger] Armour is held and shown, and it moves no rating. Do not wire it back into scoring
+> Five armour rules shipped in 1.10.0 and came out in 1.13.0. They were the wrong altitude and the measurement is blunt: **48 of 51 primaries on the Automaton front share one of two identical armour readings**, and the rules took a tier off 42 of them. Only the Eruptor, the Double-Edge Sickle and the Torcher differ.
+>
+> **A community tier already prices in what an item is for.** Voters know an assault rifle does not open a Hulk, so the Liberator's B on bots is a B *given* that it is a chaff gun. Penalising it again charges twice for one fact.
+>
+> The curator found it within minutes of the feature shipping, and the second half of his argument is the one that settles it: even the item that **is** good at armour is not straightforwardly better, because bringing an Eruptor on bugs forces a Stalwart to cover chaff. That trade is invisible to per item scoring. **Armour is a loadout property.**
+>
+> `src/lib/squad.js` already had this right, asking whether *anyone in the squad* carries AP 4 or better rather than judging each weapon alone. That is the shape it comes back in, at Phase 5.
+>
+> **The test any replacement must pass:** a scenario rule has to fire on something that varies with the scenario. Armour reach per item does not. `npm run rules` measures this for every rule and flags any firing on 60% or more of its pool.
+
+> [!success] Enemy armour landed in 1.10.0, 21 August 2026
+> The tool showed an armor penetration number for months with nothing to measure it against, so every judgement about it was a threshold somebody picked. `src/data/enemies.json` is the other half: **80 enemies, 594 body parts**, each with its armor value, health and durable share.
+>
+> The rule is the game's own and it is three states rather than a scale. **Above the armor value is full damage, exactly equal is 65%, below it the round bounces for nothing.** It is written down in exactly one place, `src/lib/enemies.js`.
+>
+> That middle case earns its keep. A Devastator is armored to 3, so an AP 3 weapon only ties it and **AP 4 is the first clean answer to one**, which is the second and better reason the squad threshold sits where it does.
+
+> [!success] Rules can read difficulty and squad size. 1.16.0
+> `when` now takes `difficulty` and `squad` as number tests, the same shape an item stat takes: `{ "difficulty": { "gte": 7 }, "squad": { "lte": 1 } }`.
+>
+> **Neither fires on an unset value.** Zero means not said, and a rule asking about either is skipped rather than guessing. Assuming somebody is solo because they have not told you is how a list confidently ranks for a game nobody is playing.
+>
+> **Squad size is the sharper of the two.** Solo on Impossible and a four stack on Impossible are different games, and the first rules to use it prove the tool can say something the crowd structurally cannot: the community vote gives six S+ primaries on bots and none is suppressed, because a vote has no idea whether you are alone. Drop solo at 8 and the Censor is the only S+ left, with the AR-59 Suppressor and the M7S SMG climbing out of B and C.
+>
+> **At a full squad the same list goes back to agreeing with u.gg.** That was written up as the correct output rather than a failure. **It is not. It is a gap, and it was measured on 21 August 2026.**
+>
+> Only **3 of 34 rules read squad** and **2 read difficulty**, and every one of them is `faction: bots` with `squad: {lte: 1}`. The consequences:
+>
+> | Front | 24 combinations of difficulty and squad produce |
+> |---|---|
+> | bugs | **1 distinct list** |
+> | squids | **1 distinct list** |
+> | bots | 2 distinct lists, solo against everything else |
+>
+> Difficulty on bugs at 1, 4, 7 and 10 gives the same 37 moved items every time. **The ten level slider moves nothing on its own, on any front.** Squad on bots goes 78 moved at solo, then 25 at two, three and four alike: one cliff, no gradient.
+>
+> **And agreement with u.gg is not a meaningful baseline to return to.** A u.gg rating is an unweighted blur over Super Helldive veterans and new players soloing at difficulty 3, over every planet and every condition, with faction as its only axis. It is not the four player rating. Comparing a four stack at 9 in a sandstorm against it and calling the match "nothing to add" compares a situation against an average of situations that never happen in isolation.
+>
+> The curator made this argument on 21 August 2026 and it is the right one. **Do not quote the old line as a principle.** What is actually true is that the rule set has no non solo squad rules and no difficulty gradient yet. See `dds-roadmap.md`, "Warning logic, a wider set", which already asks whether difficulty should scale thresholds rather than gate them, and is now a measured question rather than an open one.
+>
+> `notIdIn` was added alongside, symmetric with `notTags`, so a rule can say "everything except these". It is what lets the loud half of a list fall at the same moment the quiet half rises.
+
+> [!warning] Suppressed is the one trait read from a wiki article rather than a module
+> Five weapons carry it: the R-72 Censor, AR-59 Suppressor, P-35 Re-Educator, M6C-SOCOM and M7S SMG. **It is sourced, not judged**: the wiki puts Suppressed in each weapon's infobox and states the audible range as 12 metres against 100 for everything else.
+>
+> It lives as a list of ids inside the rule because `fetch-wiki.mjs` reads modules and enemy anatomy tables, not weapon article infoboxes. **Move it into the fetch when that changes**, the same way enemy armour moved out of a guess and into data.
+
+> [!success] The scenario is a screen, and the bar is the only copy of it. 1.15.0
+> `#/scenario`, reachable from a one line bar in the sticky chrome and **deliberately absent from the sidebar**: it is a sub screen of the surfaces that read it, not a destination. `OFF_MENU` in `App.jsx` is what makes a route reachable without a menu entry.
+>
+> It used to be a panel repeated at the top of every tier list tab. Two problems in one coat: it ate the height the table wanted, and **repeating a control on every tab says that control is scoped to the tab**. It never was. `useScenario` is called once in `App.jsx` and the value is shared, so the UI was lying about its own behaviour.
+>
+> **The gate and the screen are the same component.** No front chosen renders `ScenarioScreen` with `onDone` null, because there is nothing to go back to yet. Once chosen it collapses to `ScenarioBar` and the full screen is one click away.
+>
+> **Done returns you to the tab you left**, tracked by a ref in `App.jsx`. Adjusting from Stratagems and landing on Primaries is the kind of small wrong that makes a round trip feel like a detour.
+>
+> **It fits one desktop screen and the banners are what gives.** Their height is twice their width, so the cap is on width: `clamp(7rem, calc((100vh - 34rem) / 2), 13rem)`. Everything else on the screen is a fixed 34rem including the chrome. The 7rem floor is the width at which ILLUMINATE still fits; below about an 800px window it scrolls a little rather than clipping the names, which is the better of the two failures. The site footer is dropped on this screen and no other.
+
+> [!danger] The difficulty marks are the one UI art set that is not masked
+> Every other single colour mark in this project is painted with `currentColor` through a CSS mask so it takes the theme. **The difficulty marks are drawn as images instead**, because they carry the game's own colour ramp: grey `#4a494a` at 1, bronze `#ad7529` at 5, red `#8c0c10` at 7, near black `#310c10` at 10, with the white skull and chevrons over the top. Masking them collapsed ten distinct marks into one flat brand colour. The white sits on a coloured backing, so they read on the light themes too.
+
+> [!info] Both rating columns are sort buttons, and the solid one is the live one
+> Ours is the default. The faction tint runs the height of the sorted column, on the header **and** on every row's cell, so the two cannot disagree about which column you are reading. The other column drops to 50%.
+>
+> This replaced marking *agreement* between the two columns, which was the wrong thing to spend contrast on: about half of any list agrees, so half the column sat faded and read as a rendering fault. Only one column at a time is the one you are actually reading.
+>
+> `tierStyle` in `src/Tiers.jsx` carries the badge gloss, so the row badges and the filter chips cannot drift. It is white and black at low alpha over the tier colour rather than a second token per tier, which is what lets it work on all six tiers, every skin and both light themes with nothing new to keep in step.
+
+> [!info] It is the scenario, not the brief. Renamed 21 August 2026
+> The five answers about where you are dropping, front, planet, biome, hazards and mission, are **the scenario**. The code called it the brief for a week and the word had started leaking into on screen copy without ever being defined, which is exactly how a reader ends up staring at a term the tool never explains.
+>
+> The curator's word is better and the reasoning is his: a brief is a document somebody hands you, and this is the situation you are walking into. `src/lib/scenario.js`, `useScenario`, `scenarioIsSet`, and the storage keys `hd2-scenario-faction` and `hd2-scenario-env`.
+>
+> **The two old storage keys are inherited, not abandoned.** A browser that was here before the rename reads `hd2-brief-*` once, copies it across, and keeps its front and planet. The old keys are left in place rather than deleted, the same call the profiles migration made.
+>
+> **Difficulty is the sixth field and it landed in 1.11.0**, which that file's header had been predicting since the day it was written.
+
+> [!success] Difficulty is a scenario field, and it decides which enemies are counted
+> Every enemy carries `minDifficulty`. The armour reading counts **the roster you can actually meet at your level**, not everything the front can field: 33 of the 54 baseline enemies at difficulty 3, 46 at 5, 50 at 7, all 54 at 10. A Factory Strider is difficulty 4 and up, and warning about one on a Challenging drop is warning about the wrong thing.
+>
+> **Zero means not set**, which is the absence of a difficulty rather than a low one, and it is what the slider already spelled. With it unset the whole front is judged and the panel says so.
+>
+> **The slider is `DifficultySlider`, the one Drop Bay already used**, not a second control. It sits in the open half of the scenario panel rather than behind the fold with biome and hazards, because it changes which enemies are counted and a hidden control that narrows what you are reading is the folded filter mistake in a new place.
+>
+> **It does not clear with the environment.** Changing planet does not mean you stopped playing at the level you play at.
+>
+> Two wiki infoboxes leave the field blank and both are variants, so no baseline is affected. **An unknown is treated as level 1**, which keeps an enemy in the reckoning rather than quietly hiding one you might meet.
 
 > [!success] v1 is done
 > Sidebar IA, local persistence, export and import, two themes (four, in fact), full row expansion, the Loadout Builder, Drop Bay and Collection are all built and verified. The art is wired in. The data model is on stable ids with structured stats.
@@ -134,6 +230,7 @@ It runs automatically before `npm run build`, so a break stops the build. It che
 - Every item's warbond resolves to a real warbond
 - Ratings inside the tier scale, known damage types, slots, stratagem types, traits and roles
 - A patch note behind every `stale` flag, and provenance on every rating that has a tier
+- **Every scoring rule in `context-rules.json`**: that it carries a `say`, that its id is unique, and that every item id, tag, game tag and role it names actually resolves. A rule asking for a tag nothing carries is caught too, since that rule can never fire
 
 ### Renames
 
@@ -173,15 +270,33 @@ Rename freely. Put the old name in that item's `aliases` array and nothing break
 >
 > The reasoning is the curator's and it is sound. You have already chosen a front before you open this tool, the mission and biome lists differ per front, and there is no useful reading of "how good is this against Terminids" during an Illuminate run.
 
-**The front is shared, and it is the same control everywhere.** The tier list and Drop Bay read one value from `src/lib/brief.js`, so choosing a war in one place is choosing it in the other. The Loadout Builder carries the same bar but bound to `draft.faction`, because a build is *for* a front and keeps that when saved. Changing it there marks the build unsaved and does not move the brief.
+**The front is shared, and it is the same control everywhere.** The tier list and Drop Bay read one value from `src/lib/scenario.js`, so choosing a war in one place is choosing it in the other. The Loadout Builder carries the same bar but bound to `draft.faction`, because a build is *for* a front and keeps that when saved. Changing it there marks the build unsaved and does not move the scenario.
 
 **Difficulty is a slider with the game's names on it.** Ten levels, Trivial through Super Helldive, with the game's own icons painted through the theme. The four bands a build declares are unchanged underneath and the slider derives one, so nothing saved had to migrate. The names live in `vocabulary.json` under `difficulties`, which is also where the band mapping is.
 
 **Tier list filters live in the shell, not in `TierBrowser`.** Held in the component they were discarded every time you looked at Drop Bay. They are per category, persisted under `hd2-tier-filters`, and merged over a blank on read so a filter added later does not come back undefined.
 
-**Two rating columns replace three faction columns.** The community vote, then ours for the current brief. That is the comparison worth putting side by side, and it is what pays for the width the third faction column used to take. **Nothing is lost:** the other two fronts moved into the expanded row.
+**Two rating columns replace three faction columns.** The community vote, then ours for the current scenario. That is the comparison worth putting side by side, and it is what pays for the width the third faction column used to take. **Nothing is lost:** the other two fronts moved into the expanded row.
 
-The second column is a dashed placeholder until the scoring engine exists. Deliberately not a `?` badge, which already means "nobody has rated this" on the first column. Two different absences wearing one glyph is worse than an empty box that says what it is waiting for.
+The second column was a dashed placeholder until the scoring engine existed. It still is for an item nobody has rated, and that is deliberately not a `?` badge, which already means "nobody has rated this" on the first column. Two different absences wearing one glyph is worse than an empty box that says what it is waiting for.
+
+> [!danger] The column renders as soon as a front is chosen. It used to demand an environment too
+> `scenarioIsSet` required a biome, hazard or mission on top of the faction, on the reasoning that a
+> faction alone moves almost nothing. **Measured on 21 August 2026, that is false.** On bugs a front
+> alone already puts **37 rated items at a different tier** and 74 carry a reason. A front with
+> difficulty and squad set moves **93 on bots**.
+>
+> All of it was hidden, which meant everything 1.16.0 added was unreachable unless you also picked a
+> planet, and `scenario.js` says most sessions never do. The tool's headline feature was invisible by
+> default.
+>
+> **A column that agrees is not an empty column.** Agreeing with the crowd is a real answer, the same
+> answer where it is genuinely true. The copy for it, "Nothing about where you are dropping changes
+> where this sits", was already written and had never once rendered.
+>
+> **Rendering it also stops the tool hiding its own gaps.** With the column blank you could not see
+> that difficulty moves nothing on two of three fronts. Now you can, which is the first step to
+> fixing it.
 
 ### Presentation
 
@@ -238,6 +353,7 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 | `ownership.template.json` | Every warbond listed as not owned, ready to fill in |
 | `wiki-stats.json` | **Generated.** The stats the tables never had, for 174 items. Never edit by hand |
 | `planets.json` | **Generated.** 269 planets, their biome and their hazards. Nothing reads it yet |
+| `enemies.json` | **Generated.** 80 enemies, 594 body parts, each with an armor value, plus the difficulty each enemy starts appearing at. What every penetration figure is measured against. Never edit by hand |
 
 ### Item shape
 
@@ -255,6 +371,7 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
   "stats": { "ap": 3, "apClass": null, "dps": 2916, "...": null },
   "ratings": { "bots": { "tier": "S+", "source": "ugg", "patch": "6.3.1" } },
   "roles": ["anti-armor"],
+  "tags": [],
   "traits": [],
   "flag": null,
   "patchNote": null,
@@ -269,10 +386,11 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 - **`slot`** is one of `primary`, `secondary`, `throwable`, `stratagem`, `armor`, `booster`. The six browsable lists derive from it, so the five stratagem call-in menus become one list. You pick a stratagem by faction and tier, not by which menu it sits under.
 - **A tier of `null`** means no rating exists. Those rows render a dashed `?` badge and sort last. This is a first class state, not missing data, and a rating with a tier always carries its source and patch.
 - **`damageType`** drives the damage type filter and the row icon. **`heat` and `arc` are the thermally affected ones**, which is what the hot exclusion and the cold advantage key off.
-- **`roles`** is the editorial layer, and the only field in this project that is not sourced. Two values, `anti-armor` and `objective`. An empty array is the normal case: 185 of the 224 rated rows carry nothing, and there is deliberately no validator rule demanding otherwise.
+- **`roles`** is the editorial layer. Three values, `anti-armor`, `chaff` and `objective`, and `chaff` is the most used of the three. An empty array is the normal case: 135 rated rows carry nothing, and there is deliberately no validator rule demanding otherwise.
+- **`tags`** is the other curated layer and it is not the same thing as `roles`. A role says what job an item does for a squad. A tag says something a scoring rule needs to ask about that no fetched field answers. Two exist, `long-range` and `suppressed`, and **each declares its own provenance in `vocabulary.json`**: `long-range` is `curator`, `suppressed` is `wiki`. See The Tag Layer.
 - **`flag`** is `"stale"` when the rating predates a 7.0.0 change to that exact item, which requires a `patchNote`, or `"new"` when the item is in the game with no rating yet.
 - **`effect` versus `note`.** Armor passives and boosters carry an `effect`, which is what the thing actually does. Everything else carries a `note`, which is opinion. They never both appear.
-- **`stats` are sparse, and that is now a gap rather than a principle.** AP, DPS, capacity, demo force, cooldown, uses and medal cost came out of the source tables. Magazine size, spare magazines, fire rate, recoil, reload time, projectile count and stagger were recorded here as **not in any source this project has**. The data spike on 20 August 2026 found all of them published, plus ergonomics, sway, durable damage, stagger, pushback and projectile drag. See `helldivers-2_data-spike.md`. Still leave them absent rather than guessing, but the answer now is to fetch them rather than to shrug.
+- **`stats` are sparse, and that is now a gap rather than a principle.** AP, DPS, capacity, demo force, cooldown, uses and medal cost came out of the source tables. Magazine size, spare magazines, fire rate, recoil, reload time, projectile count and stagger were recorded here as **not in any source this project has**. The data spike on 20 August 2026 found all of them published, plus ergonomics, sway, durable damage, stagger, pushback and projectile drag. See `dds-data-spike.md`. Still leave them absent rather than guessing, but the answer now is to fetch them rather than to shrug.
 
 > [!success] The hot biome gate was firing on weapons with no heat mechanic. Fixed in 1.4.0
 > `damageType` of `heat` or `arc` marked 26 items as thermally affected, and a hot biome removed any build carrying one. Only ten of them can overheat: the LAS laser family, the Quasar and the Rover's drone. Every plasma weapon feeds from magazines. Three Purifier builds and one Blitzer build were ruled out of every hot planet over a mechanic they do not have.
@@ -379,12 +497,155 @@ An expanded row carries the item's art at full size, its numbers, what the sourc
 > [!success] Provenance is shown, not implied
 > Every expanded row states the rating source and its patch stamp, and says plainly when that is behind the game. Armor passives read "patch 7.0.0" with no caveat; everything else reads "patch 6.3.1, the game is on 7.0.0, so this is one patch behind". The two stamps are real and the UI should keep admitting it.
 
-> [!warning] The stats gap is stated on the row, not hidden
-> Weapons carry a line naming exactly what is missing: magazine size, spare magazines, fire rate, reload time, recoil, projectile count and stagger. Saying so stops anyone reading the absence as zero. Delete that line only when the wiki pass actually fills those fields.
+> [!success] The stats gap closed, and the row now shows the numbers. 1.14.0
+> The row used to name seven fields as missing from every source. **The wiki pass filled five of them**, in 1.8.0, and the line went on apologising for their absence for another week. That is worse than never claiming a gap: it tells a reader the tool does not know something it is holding.
+>
+> Weapons now carry a **Handling and ammo** section reading straight off the fetched block: magazine and spares, resupply count, rate of fire, ergonomics, recoil climb, sway, durable damage share, stagger and pushback, and pellet count where it is above one.
+>
+> **The admission survives, narrowed to what is actually still absent:** reload time and projectile count. Do not delete it. Restate it if a later fetch fills either.
+>
+> The six melee weapons have no data page on the wiki at all, so they get a different line saying those figures are genuinely unknown rather than merely unlisted. That is the only case where the section does not render.
 
 `usesBackpackSlot: null` renders as "not recorded in the source yet", never as "leaves your backpack free". Only the 40-K Meltagun is in that state. Never guess false here.
 
 The picker in the builder reuses the same row but selects instead of expanding, so it shows no chevron and never opens a detail panel.
+
+---
+
+# **Peril**
+
+Difficulty and squad size, collapsed into one number the rules scale off.
+
+```
+peril = 6 * (difficulty - 5) + SQUAD_PRESSURE[squad]
+SQUAD_PRESSURE = [10, 4, 1, 0]
+```
+
+|  | d1 | d3 | d5 | d7 | d8 | d10 |
+|---|---|---|---|---|---|---|
+| **solo** | -14 | **-2** | 10 | **22** | 28 | **40** |
+| **duo** | -20 | -8 | 4 | 16 | **22** | 34 |
+| **trio** | -23 | -11 | 1 | 13 | 19 | 31 |
+| **four** | **-24** | -12 | **0** | 12 | 18 | 30 |
+
+> [!warning] The squad half is measured for two of its four points, and one source disagrees
+> `helldivers.wiki.gg` publishes patrol spawn intervals and the player count multipliers on them: a
+> second player takes the interval to **0.8333** of solo and a third to **0.75**. More players means
+> more patrols overall and far fewer per gun. Danger per player comes out at **solo 1.0, duo 0.60,
+> trio 0.44, four 0.375**.
+>
+> **The shape matters more than the values: it is not linear.** Most of the relief is in the second
+> player, and a fourth adds little the third did not. `SQUAD_PRESSURE` is that curve rounded against
+> a difficulty step worth 6, which puts solo at 7 and a duo at 8 on the same 22.
+>
+> **Two caveats, and they are not small.** The wiki says plainly it never tested a fourth player, so
+> the four player figure is an extrapolation of a two point trend. And a secondary source claims solo
+> takes a quarter of the patrol count a four stack does, which would flatten this curve to nothing or
+> invert it. That reading is hard to square with the measured 0.8333 and 0.75, so it was not followed,
+> but it has not been ruled out either. **Treat the shape as good and the fourth column as a guess.**
+>
+> The difficulty half is the curator's calibration from play: a four stack is comfortable through 5,
+> solo through 3. **Enemy composition by difficulty is not published**, so anything claiming that a
+> given difficulty demands a given armour penetration is judgement and has to say so.
+
+> [!danger] There are no floors and there must not be new ones
+> The rule set carried exactly one and it is gone. **A floor flattens every item sharing a tag into
+> the same tier**, which destroys the ordering the tag is sitting on top of. At solo Super Helldive
+> the five suppressed weapons now land on S+, S+, S, S and A, ordered by what they already were. The
+> floor made them all S.
+>
+> Everything is points, and points preserve order. If a rule needs to reach further, that is a bigger
+> coefficient, not a new instrument.
+
+> [!info] How a coefficient is chosen
+> One question: **at what peril should this be worth one tier?** A tier is about 14 points, so
+> `times = 14 / thatPeril`. Being unheard is worth a tier at peril 22, so 0.64. The loud rule mirrors
+> it at 0.48 rather than 0.64 because it matches nearly half of everything you can hold, and **a rule
+> touching half a list has to argue quietly.**
+>
+> Scaling off `scenario.peril` also gets the negative half for free: the same rule that rewards a
+> silenced weapon at peril 22 penalises it at -24, where four of you on Trivial are carrying an
+> answer to a problem you do not have.
+
+> [!info] The clamp grows past peril 22
+> `swingFor` runs `28 + max(0, peril - 22) * 0.5`, reaching 37 at solo Super Helldive. Two tiers is
+> the standing licence a scenario has to argue with a vote; past the point where things are dire it
+> earns a little more, because a community average taken across every difficulty and squad size is at
+> its least applicable exactly there.
+>
+> **The clamp is permission, not force.** It allows a B to reach S+ at extreme peril; whether one
+> actually does is decided by the rule's own coefficient.
+
+> [!danger] A rule that can invert must carry sayInverted, and the validator checks it
+> A scenario scaled rule crosses zero and runs both ways, but its `say` was written for one
+> direction. Without a second sentence the tool explains a penalty using the wording meant for a
+> bonus. Both directions were caught doing exactly that during 1.19.0.
+>
+> **Inverted means the delta came out opposite to the rule's own direction, not simply negative.**
+> `peril-bots-punishes-loud` has a negative coefficient, so below zero peril it hands out a bonus,
+> and that is its inverted case even though the number is positive. The engine compares the sign of
+> the delta against the sign of `scaleBy.times`. Testing `delta < 0` gets one of the two rules
+> backwards, which is the bug that shipped for about ten minutes.
+
+> [!danger] Peril does not fire on an unset value
+> `peril()` returns null unless **both** difficulty and squad are answered, and a rule scaling off it
+> then does not fire at all. Zero means not said. Assuming a squad size is how a list confidently
+> ranks for a game nobody is playing.
+
+> [!success] The squad panel reads it too, so one number gates both surfaces
+> `squad.js` used to switch its coverage checks off by difficulty **band**, which cannot see how many
+> of you there are. Four players on Suicide and one player on Extreme were both called live.
+>
+> Coverage now runs at **peril 12 and up**, which keeps the old four-at-7 case and adds the ones the
+> band could not see. The "one of you is carrying the only anti-tank" warning moved from
+> `difficulty === "extreme"` to **peril 22**, the same figure the tier rules anchor on.
+>
+> **Both fall back to the band when no level is set**, so nothing regressed for a squad that has not
+> said where it is dropping.
+
+> [!info] It only reaches three tier rules, all on the bot front
+> Difficulty and squad still move nothing on bugs or squids in the tier list. The squad panel is
+> front agnostic and reads peril on every front.
+
+---
+
+# **The Tag Layer**
+
+Two tags on items, read by the scoring rules. They exist because six rules used to spell out the same
+lists of item ids, and a concept written down six times is a concept that drifts.
+
+| Tag | Provenance | Carried by | What it means |
+|---|---|---|---|
+| `long-range` | `curator` | 6 support weapons | The ones you aim at something far away |
+| `suppressed` | `wiki` | 5 weapons | Audible at 12 metres rather than 100 |
+
+> [!danger] A tag declares where it came from, and that is the whole point
+> `vocabulary.json` carries an `itemTags` entry per tag with an `id`, a `label`, a `source` and a `note`
+> saying why it exists. **`source` is `curator` or `wiki`, and the validator rejects anything else.**
+>
+> `long-range` is ours: nothing published separates a long range support weapon from a close one, and
+> projectile velocity does not, since laser weapons read 1300 and assault rifles read 820. The three
+> rules that read it carry a `judgement` field saying so.
+>
+> `suppressed` is **sourced**, not judged. The wiki puts it in each weapon's infobox and gives the
+> audible range. It is curated here only because `fetch-wiki.mjs` reads modules and enemy anatomy
+> tables rather than weapon article infoboxes. **Move it into the fetch when that changes**, and it
+> carries no `judgement` field because it has nothing to apologise for.
+
+> [!warning] `tags` is ours, `gameTags` is the game's, and a rule must never confuse them
+> A rule matching `{ "tags": ["suppressed"] }` reads `item.tags`. A rule matching
+> `{ "gameTags": ["ANTI-TANK"] }` reads the fetched `wiki.tags`, which arrive in screaming caps and
+> keep them. Both have a `not` form. The game's matcher was called `tags` until 1.19.0, which made a
+> rule's provenance a thing you had to already know.
+
+> [!success] The refactor moved no rating, and that was the test
+> All 34 rules fire on exactly the same items in exactly the same scenarios as before. `npm run rules`
+> was the before and after, and every fired count and tier move is unchanged. **A refactor of a
+> scoring engine that changes a score is not a refactor.**
+
+> [!info] `idIn` and `notIdIn` still exist and there are no uses left
+> The escape hatch stays in the matcher for the case where a concept genuinely fits one item, but
+> nothing uses it now. The validator checks it anyway, because the next use is the one that breaks.
 
 ---
 
@@ -411,7 +672,9 @@ Three tags, `anti-armor`, `chaff` and `objective`, and a panel in Drop Bay that 
 > Untagged is correct and common. An earlier draft wanted six tags across every rated row with the build failing on an empty one, which forced boosters and armor passives into a taxonomy with no room for them.
 
 > [!success] The bot penetration check needs no tag at all
-> "Nothing you hold gets through Devastator armor" derives from sourced `ap` on held weapons, so it stays out of the editorial layer entirely. The threshold is **AP 4**, and it was measured rather than picked: AP 3 is carried by something in all 39 curated builds so a check there can never fire, AP 5 is missing from 30 of them and would fire on more than half of all bot pairs, and AP 4 is absent from 14 and fires on 6 of 78. Re-measure before moving it.
+> "Nothing you hold gets through Devastator armor" derives from sourced `ap` on held weapons, so it stays out of the editorial layer entirely. The threshold is **AP 4**, and it was measured rather than picked: AP 3 is carried by something in all 39 curated builds so a check there can never fire, AP 5 is missing from 30 of them and would fire on more than half of all bot pairs, and AP 4 is absent from 14 and fires on 6 of 78.
+>
+> **Re-measured against enemy armour in 1.10.0 and it holds, for a better reason than the first one.** A Devastator's plate is AV 3 and penetration equal to an armor value is 65% rather than full, so AP 3 only ties a Devastator and AP 4 is the first clean answer to one. It is not a clean answer to the front: at AP 4 five of the 22 Automaton enemies still take damage in one spot only, and the Dropship at AV 5 all over takes none at all. **AP 5 is where bots stop needing a weak point entirely.** Re-measure again before moving it.
 
 ### The squad panel
 
@@ -562,8 +825,48 @@ Surface glow rides on hover states that already exist, through three variables: 
 > [!question] The studies disagree with the accent rule
 > Several drafts paint their signature colour on the stale chip and the lock, treating the theme as having one colour rather than two roles. That is a real disagreement and it is recorded rather than applied, because a static mockup has no lock state to confuse. Worth settling if the skins ever get redrawn.
 
-> [!failure] Castellan's Creed no longer fades the tier ramp
-> The first study restyled the whole ladder so it read as one material. The v2 study relabels the ramp **invariant**, with the note "tier badges and faction hues are the same values in every theme", so the override is gone and every skin now shows the same badge. The v2 studies also draw that ramp at slightly different values than the app uses, S+ `#F59E0B` against the app's `#fbbf24` and A blue against the app's teal. **The app's ramp was left alone**, because changing it would repaint Dark, Light and Neon too. Unresolved.
+> [!success] Castellan's Creed no longer fades the tier ramp, and the ramp itself is settled
+> The first study restyled the whole ladder so it read as one material. The v2 study relabels the ramp **invariant**, with the note "tier badges and faction hues are the same values in every theme", so the override is gone and every skin now shows the same badge.
+>
+> **The three way disagreement is closed as of 1.17.0.** Three ramps used to be in play: the app's original v1 set, the one the v2 warbond studies draw, and the one in the tier badge design document. The curator settled it by taking the badge study's palette, rotating it down one rank and replacing the brown with a grey. Both losing sets are gone from the code.
+
+> [!danger] A floor and a ceiling that contradict cancel each other
+> A floor says **at least this tier**, a ceiling says **at most this**, and when a floor sits above a ceiling the two cannot both hold. Until 1.18.0 the ceiling silently won, because its line ran second in `src/lib/score.js`.
+>
+> That produced a demonstrable absurdity on the curator's own scenario: the R-72 Censor at **86 points landing at B** while an M7S SMG at **64 points landed at S**. Same rule set, and the higher score three tiers lower.
+>
+> **Neither applies now and the points stand.** Both rules already had their say in the points, so neither has earned the right to overrule the other. `scoreItem` returns `contradiction: true` when it happens, and `npm run rules` sweeps every item and scenario pair for it.
+>
+> There are currently no ceilings in the rule set at all, so that sweep passes vacuously. It is a guard for the next one.
+
+> [!warning] The weather rules price a risk, not a state
+> A planet listing sandstorms has sandstorms **sometimes**. The curator's figure is roughly three minutes at a time, a quarter of a Blitz and under a tenth of a full operation, and nothing in the source data says how often.
+>
+> The visibility penalties are set as a risk you carry across a run rather than a state you are in, and the storms lost their tier caps entirely. Pricing an episodic hazard as a permanent one told you never to bring a marksman somewhere on account of something that is not happening most of the time.
+>
+> **Reduced visibility also cuts both ways.** Solo, a storm is partly a gift: it blinds them as much as you, and alone you are not trying to win the firefight. That is its own rule rather than a smaller penalty.
+>
+> **Extreme cold and intense heat are climate, not weather.** Do not soften those the same way.
+
+> [!danger] Finish is not theme, and the two words are not interchangeable
+> The app has a theme picker carrying eleven warbond skins. **Badge finish is a separate, narrower setting that touches only the tier badge.** Different file, different storage keys, different panel, and a theme change must never move a finish. That is tested: set a finish, cycle every theme, it survives.
+>
+> The design document is emphatic about this and names the prop `finish` for exactly that reason. Do not fold the two pickers together and do not name anything here `theme`.
+
+> [!danger] The tier badge, and the things already tried and cut
+> `src/TierBadgePlate.jsx`, ported from `Image Library/UI/Tier Badges/hd2-tier-badge-component.html`. **Read that document before touching the component.** It carries the geometry, the token values and the reasoning.
+>
+> **The rule that overrides the rest: rank is never carried by degrading legibility.** A D reads exactly as clearly as an S+. Rank is hue, and optionally sheen and glow intensity. Never size, never fade, never damage. Every earlier pass that dimmed the low tiers was rejected for this.
+>
+> **Built, evaluated and cut. Do not rebuild:** rivets, base bands, cap bands and double rims, because geometry inside the plate competes with the letter. The bevel edge, invisible at 44px. Scratches and wear, which crossed the letter band and implied low tiers are more damaged. The filled versus outline split at the A boundary, which encoded doctrine into cosmetics.
+>
+> **Grain is seeded at 7 on every badge**, deliberately. A per instance seed makes the grain differ between tiers, which reintroduces exactly the degradation the top rule forbids.
+>
+> **Delta markers, padlocks and stale flags are DOM siblings**, positioned over the badge, never drawn inside the SVG. The marker sits **top left**: that corner of the plate is square and the top right is the chamfer, so a round marker there reads as damage.
+>
+> **The row badge is smaller than the document ships at**, 32px on a phone and 36px from `sm` up against the document's 44. At full size it filled the row edge to edge, which left the delta marker nowhere to sit and got it clipped by the row's `overflow-hidden`. Rows stayed at 61px either way.
+>
+> **Performance was measured, not assumed.** 103 badges and 204 SVG filters on screen give a median scroll frame of 6.9ms. The document's fallback, one shared grain filter at the app root, is not needed.
 
 > [!danger] Faction colours are not tokens, ever
 > Bots red, bugs orange, squids purple are a locked decision and stay literal in every theme, warbond skins included.
@@ -652,7 +955,7 @@ Re-fetches the weapon stats and the planet table, and **reports what would chang
 > Verified 18 August 2026: a fresh PowerShell resolves `node` to `C:\Program Files\nodejs\node.exe` and `npm` works with no setup. This used to need prepending, because a shell opened before the install could not see it. That is no longer true.
 
 > [!tip] How stigly actually builds it
-> File Explorer into `C:\Dev\hd2-armory`, click the address bar, type `powershell`, Enter. That opens a terminal already in the folder. Then `npm run build`, and drag `dist` onto Netlify. He does not use a terminal habitually, so give the path and the clicks, not just the command.
+> File Explorer into `C:\Dev\dds`, click the address bar, type `powershell`, Enter. That opens a terminal already in the folder. Then `npm run build`, and drag `dist` onto Netlify. He does not use a terminal habitually, so give the path and the clicks, not just the command.
 
 > [!bug] PowerShell refuses to run npm
 > `npm : File C:\Program Files\nodejs\npm.ps1 cannot be loaded because running scripts is disabled on this system.` PowerShell blocks the npm script wrapper by default. **Use `cmd` in the address bar instead of `powershell`**, where plain `npm run build` works. From an already open PowerShell, `npm.cmd run build` skips the wrapper and works too. Neither needs a system change. `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` is the permanent fix but is not required, so do not run it on his behalf.
@@ -671,6 +974,13 @@ Re-fetches the weapon stats and the planet table, and **reports what would chang
 
 > [!danger] Three places have to agree, and two of them are automatic
 > Add the entry to `changelog.json` with a new `version`, then set the same string in `package.json`. The footer and the Changelog page both read `CHANGELOG[0].version`, so they cannot drift. **Nothing else hardcodes a version.**
+
+> [!danger] Two roadmap files, and the markdown one moves first
+> `dds-roadmap.md` in the repo root is the **working document**: the reasoning, the dependency chain, the open questions, everything a session needs. `src/data/roadmap.json` is the **public summary** shown on the Roadmap page, one sentence per milestone.
+>
+> They will drift, and the drift is one directional. **Change the markdown first, then check whether the summary still reads true.** A milestone that moved status, or a new one worth a person knowing about, belongs in both. Anything that is reasoning rather than intent belongs only in the markdown, or the page stops being concise, which is the whole reason it exists.
+>
+> Keep every `say` to one sentence. The moment an entry needs two, it belongs in the working document instead.
 
 > [!tip] Write the entry as the work lands, not at the end
 > Adding a line to the top entry costs nothing. Reconstructing a week of small changes from memory is how a changelog quietly becomes fiction.

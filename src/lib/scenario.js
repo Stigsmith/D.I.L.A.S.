@@ -1,8 +1,14 @@
 /* ================================================================== */
-/* THE BRIEF                                                          */
+/* THE SCENARIO                                                       */
 /*                                                                    */
 /* Where you are dropping. One object, owned by the shell, read by    */
 /* every surface that has an opinion about context.                   */
+/*                                                                    */
+/* It was called the brief until 21 August 2026. The curator's word    */
+/* is scenario and it is the better one: a brief is a document you     */
+/* are handed, and this is the situation you are walking into. The     */
+/* word had also been leaking into on screen copy without ever being   */
+/* defined anywhere, which is why nobody could tell what it meant.     */
 /*                                                                    */
 /* Faction is first and it is deliberately not a filter. You have     */
 /* already chosen a front before you open this tool, the mission and  */
@@ -30,7 +36,18 @@ export const FACTION_IDS = ["bots", "bugs", "squids"];
 /* will. Picking a planet fills biome and hazards in one move, and     */
 /* both stay editable afterwards, so the picker is a shortcut rather   */
 /* than a mode.                                                        */
-export const EMPTY_BRIEF = { faction: null, planet: null, biome: null, hazards: [], mission: null };
+export const EMPTY_SCENARIO = { faction: null, planet: null, biome: null, hazards: [], mission: null, difficulty: 0, squad: 0 };
+
+/* Zero is not a difficulty, it is the absence of one, and the slider    */
+/* spells it that way already. Kept as 0 rather than null so the control */
+/* and the value agree without a translation step between them.          */
+export const NO_DIFFICULTY = 0;
+
+/* Same convention for how many of you are dropping. Zero is not a squad
+   of nobody, it is not having said. Solo and a full four are different
+   games at the same difficulty: alone, a loud gun brings the whole base
+   down on you and there is nobody to hold the line while you run. */
+export const NO_SQUAD = 0;
 
 const isFaction = (v) => FACTION_IDS.includes(v);
 
@@ -63,37 +80,48 @@ export const traitsOf = (name) => {
   return m ? m.traits : [];
 };
 
-export function useBrief() {
-  const [brief, setBrief] = useState(EMPTY_BRIEF);
+export function useScenario() {
+  const [scenario, setScenario] = useState(EMPTY_SCENARIO);
 
   /* Read after mount rather than in the initialiser, the same shape    */
   /* the rest of this app's persistence uses, so nothing touches        */
   /* localStorage during render.                                        */
   useEffect(() => {
-    const saved = readSetting(SETTINGS.brief, FACTION_IDS, null);
-    if (isFaction(saved)) setBrief((b) => ({ ...b, faction: saved }));
+    const saved = readSetting(SETTINGS.scenario, FACTION_IDS, null);
+    if (isFaction(saved)) setScenario((b) => ({ ...b, faction: saved }));
   }, []);
 
   useEffect(() => {
-    const saved = readDoc(SETTINGS.briefEnv);
+    const saved = readDoc(SETTINGS.scenarioEnv);
     if (!saved || typeof saved !== "object") return;
-    setBrief((b) => ({
+    setScenario((b) => ({
       ...b,
       planet: typeof saved.planet === "string" ? saved.planet : null,
       mission: typeof saved.mission === "string" ? saved.mission : null,
       biome: typeof saved.biome === "string" ? saved.biome : null,
       hazards: Array.isArray(saved.hazards) ? saved.hazards.filter((h) => typeof h === "string") : [],
+      difficulty: Number.isInteger(saved.difficulty) && saved.difficulty >= 0 && saved.difficulty <= 10
+        ? saved.difficulty
+        : NO_DIFFICULTY,
+      squad: Number.isInteger(saved.squad) && saved.squad >= 0 && saved.squad <= 4 ? saved.squad : NO_SQUAD,
     }));
   }, []);
 
   const setFaction = useCallback((id) => {
     const next = isFaction(id) ? id : null;
-    setBrief((b) => ({ ...b, faction: next }));
-    writeSetting(SETTINGS.brief, next === null ? "" : next);
+    setScenario((b) => ({ ...b, faction: next }));
+    writeSetting(SETTINGS.scenario, next === null ? "" : next);
   }, []);
 
   const saveEnv = (next) => {
-    writeDoc(SETTINGS.briefEnv, { planet: next.planet, biome: next.biome, hazards: next.hazards, mission: next.mission });
+    writeDoc(SETTINGS.scenarioEnv, {
+      planet: next.planet,
+      biome: next.biome,
+      hazards: next.hazards,
+      mission: next.mission,
+      difficulty: next.difficulty,
+      squad: next.squad,
+    });
     return next;
   };
 
@@ -101,7 +129,7 @@ export function useBrief() {
   /* environment alone rather than wiping it, because you may have set    */
   /* biome and hazards by hand and only used the planet to get there.     */
   const setPlanet = useCallback((name) => {
-    setBrief((b) => {
+    setScenario((b) => {
       if (!name) return saveEnv({ ...b, planet: null });
       const p = planetByName.get(name);
       if (!p) return b;
@@ -109,14 +137,14 @@ export function useBrief() {
     });
   }, []);
 
-  /* Setting either by hand drops the planet, because the brief would     */
+  /* Setting either by hand drops the planet, because the scenario would     */
   /* otherwise claim to be somewhere it is not.                           */
   const setBiome = useCallback((slug) => {
-    setBrief((b) => saveEnv({ ...b, biome: slug || null, planet: null }));
+    setScenario((b) => saveEnv({ ...b, biome: slug || null, planet: null }));
   }, []);
 
   const toggleHazard = useCallback((slug) => {
-    setBrief((b) => {
+    setScenario((b) => {
       const on = b.hazards.includes(slug);
       return saveEnv({
         ...b,
@@ -127,14 +155,29 @@ export function useBrief() {
   }, []);
 
   const setMission = useCallback((name) => {
-    setBrief((b) => saveEnv({ ...b, mission: missionByName.has(name) ? name : null }));
+    setScenario((b) => saveEnv({ ...b, mission: missionByName.has(name) ? name : null }));
+  }, []);
+
+  /* Difficulty is the sixth answer and the only one that is not about    */
+  /* the place. It does not clear with the environment: swapping planet    */
+  /* does not mean you have stopped playing at the level you play at.      */
+  const setDifficulty = useCallback((level) => {
+    const n = Number(level);
+    const next = Number.isInteger(n) && n >= 0 && n <= 10 ? n : NO_DIFFICULTY;
+    setScenario((b) => saveEnv({ ...b, difficulty: next }));
+  }, []);
+
+  const setSquad = useCallback((n) => {
+    const v = Number(n);
+    const next = Number.isInteger(v) && v >= 0 && v <= 4 ? v : NO_SQUAD;
+    setScenario((b) => saveEnv({ ...b, squad: next }));
   }, []);
 
   const clearEnvironment = useCallback(() => {
-    setBrief((b) => saveEnv({ ...b, planet: null, biome: null, hazards: [], mission: null }));
+    setScenario((b) => saveEnv({ ...b, planet: null, biome: null, hazards: [], mission: null }));
   }, []);
 
-  return { brief, setFaction, setPlanet, setBiome, toggleHazard, setMission, clearEnvironment };
+  return { scenario, setFaction, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment };
 }
 
 /* ------------------------------------------------------------------ */
@@ -146,15 +189,38 @@ export function useBrief() {
 /* glance at your builds is the kind of small rudeness that makes a    */
 /* tool feel careless.                                                  */
 /*                                                                     */
-/* Lifted here rather than into useArmoryState because this is not     */
+/* Lifted here rather than into useCollectionState because this is not     */
 /* collection data. It describes what you are looking at, the same as  */
-/* the brief and the theme, so it stays out of the export for the same */
+/* the scenario and the theme, so it stays out of the export for the same */
 /* reason those do.                                                     */
 /*                                                                     */
 /* Per category, because a damage type filter that made sense on       */
 /* primaries produces an empty list on boosters. That was already true */
 /* and is kept.                                                         */
 /* ------------------------------------------------------------------ */
+
+/* Which of the two rating columns the list is ordered by. Defaults to
+   ours: the community vote is the reference, but the whole point of the
+   second column is that it knows where you are dropping, so that is the
+   one worth ranking by until you say otherwise. */
+export const SORT_COLUMNS = ["dds", "ugg"];
+
+export function useTierSort() {
+  const [sortBy, setSortBy] = useState("dds");
+
+  useEffect(() => {
+    const saved = readSetting(SETTINGS.tierSort, SORT_COLUMNS, null);
+    if (saved) setSortBy(saved);
+  }, []);
+
+  const choose = useCallback((id) => {
+    if (!SORT_COLUMNS.includes(id)) return;
+    setSortBy(id);
+    writeSetting(SETTINGS.tierSort, id);
+  }, []);
+
+  return { sortBy, setSortBy: choose };
+}
 
 export function useTierFilters(blank, categoryIds) {
   const fresh = () => Object.fromEntries(categoryIds.map((id) => [id, { ...blank }]));

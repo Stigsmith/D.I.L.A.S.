@@ -1,6 +1,6 @@
-# **HD2 Armory: Squad Requirements**
+# **D.D.S.: Squad Requirements**
 
-> Feature requirements for planning a drop with a second player: named unlock profiles, a side by side build comparison, overlap checks that need no new data, a two tag role layer, and the coverage warnings that layer feeds. Replaces an earlier draft that specced hosted squad rooms and a six tag synergy dashboard. Depends on decisions in `helldivers-2_armory-design.md`, the web requirements document and `CLAUDE.md`; conflicts between this file and those must be surfaced, not silently resolved.
+> Feature requirements for planning a drop with a second player: named unlock profiles, a side by side build comparison, overlap checks that need no new data, a two tag role layer, and the coverage warnings that layer feeds. Replaces an earlier draft that specced hosted squad rooms and a six tag synergy dashboard. Depends on decisions in `dds-design.md`, the web requirements document and `CLAUDE.md`; conflicts between this file and those must be surfaced, not silently resolved.
 
 ---
 
@@ -290,7 +290,7 @@ The draft specced both its manual override list and its validator check by item 
 
 ### Stale identifiers
 
-The draft described the reference artifact rather than the application. `kind` is `damageType`. `STRAT_CATEGORY` exists only in `hd2-armory.jsx`, which is kept as a reference implementation and is neither built nor imported; the live equivalents are `usesBackpackSlot` on the item and `stratType`.
+The draft described the reference artifact rather than the application. `kind` is `damageType`. `STRAT_CATEGORY` exists only in `original-artifact.jsx`, which is kept as a reference implementation and is neither built nor imported; the live equivalents are `usesBackpackSlot` on the item and `stratType`.
 
 ### Keep the show unavailable toggle
 

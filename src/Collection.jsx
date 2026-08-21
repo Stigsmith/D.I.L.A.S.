@@ -24,7 +24,7 @@ import { useState, useMemo } from "react";
 import { Search, Lock, Unlock, FilterX, CheckCheck, X, User, Plus, Pencil, Trash2, AlertTriangle } from "lucide-react";
 
 import { warbondArt } from "./lib/assets.js";
-import { Chips, ItemArt, sourceLabelFor } from "./Armory.jsx";
+import { Chips, ItemArt, sourceLabelFor } from "./Tiers.jsx";
 import {
   items, warbonds, acquisitionLabels, itemCountByWarbond, itemCountByAcquisition,
   itemIdsByWarbond, SLOT_LABEL,

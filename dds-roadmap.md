@@ -1,4 +1,4 @@
-# **HD2 Armory: Roadmap**
+# **D.D.S.: Roadmap**
 
 > What is agreed but not built, what is blocked and on what, and the questions that must be answered rather than guessed when each session opens. Decisions that affect how the code works live in `CLAUDE.md`; this file is what comes next. The tool is now called Democracy Deployment System, D.D.S., a working title.
 
@@ -57,21 +57,100 @@ Everything shipped in 1.3.0 through 1.9.0 sits in the first track. **None of it 
 
 ### The order that now makes sense
 
-1. **Phase 2.5**, enemy armour. One pull, unlocks the armour penetration rule the engine already has a slot for
+1. ~~**Phase 2.5**, enemy armour~~. **Done, 1.10.0, 21 August 2026.** See below
 2. **Phase 4**, the three judgement tags. Small, and it closes the gaps `context-rules.json` currently admits to
 3. **Phase 5**, loadout and squad scoring. The biggest remaining piece, and the one both Exchange and the drop screen wait on
 4. **Phase 6a**, Drop Bay becomes the drop screen. Local, no infrastructure
 5. **v2**, auth and shared storage. The infrastructure step, unchanged
 6. **v3**, Exchange inherits the grid, and live party fills the drop screen's slots
 
-**The starmap is part of step 4, not a later phase.** It is the drop screen's entry point: you click the planet where you clicked it in the game and the brief fills itself. It draws from shipped data and needs no network call. The live colouring layer is optional, needs no account, and can arrive whenever. See the section below.
+### Phase 2.5 as built
+
+> [!success] It was one pull, and it carried more than the spike expected
+> The spike scoped this as armor values off roughly forty enemy pages. The anatomy tables carry **health and durable share per body part as well**, and the wiki's own API returns raw wikitext for 50 titles at a time, so the whole set is two requests rather than sixty.
+
+| | |
+|---|---|
+| Enemies | **80**, 594 body parts |
+| Baseline | 54, being 22 Automaton, 21 Terminid and 11 Illuminate |
+| Held back as variants | 26, across seven galactic effects |
+| Rules that read armour | **0.** Five shipped, all five came out. See below |
+| Say which difficulty they start at | 78 of 80 |
+
+> [!success] Vote Snatchers was missed on the first pass and corrected on 21 August
+> The curator's own play experience flagged it: Crushers and Wretches on difficulty 8 in the Void, on a planet where "every horrible effect applies half the time". The wiki confirms it and it is the strongest case of the seven. The other six **add** enemies to a front; Vote Snatchers **replaces** them, swapping out Overseers, Harvesters, Watchers and Stingrays. Counting all of them together described an Illuminate front that never exists.
+
+> [!success] Difficulty scoping landed with it, 1.11.0
+> A Factory Strider is difficulty 4 and up. Counting one against a Challenging drop is warning about the wrong thing, and until now every reading was a Super Helldive statement no matter where you said you were going.
+>
+> `min_difficulty` was already sitting in the enemy infoboxes on pages the first pass had fetched and cached. It just was not read. Cross checked against the wiki's own Difficulty table on 52 enemies: **51 agree**, and the one that does not is the Stingray, whose infobox is blank while the table has it at 4. That value is now a one line override.
+>
+> The reachable roster: **33 of 54 at difficulty 3, 46 at 5, 50 at 7, all 54 at 10.**
+
+**The rule is the game's own**, from the wiki's Damage page: above the armor value is full damage, exactly equal is 65%, below it is a ricochet for nothing. That middle case is why the squad threshold survives re-measurement. A Devastator is AV 3, so AP 3 only ties one and AP 4 is the first clean answer.
+
+**The variants are fetched and flagged, not dropped.** Predator, Rupture and Spore Burst Strain, Jet Brigade, Incineration Corps and Cyborg Legion each carry their own wiki category, so the exclusion is a membership test rather than a list of name prefixes. They sit in `enemies.json` waiting for the live war state layer to say which effect is running, at which point switching them on is a filter and not another pull. **That is the first thing in this project built specifically for the live layer to turn on.**
+
+> [!warning] One gap is admitted rather than modelled
+> The source does not record which body parts are exposed from the start. A Charger's inner flesh is AV 1 and you only reach it once the leg armor is off. So a weak point means one exists, not that you can hit it on approach, and the row says so.
+
+> [!failure] The five scoring rules came straight back out, 1.13.0
+> The curator found it within minutes of the feature shipping: **51 of 52 primaries were being downgraded for not opening armour they were never meant to open.** He is right, and the measurement is worse than his estimate. On the Automaton front 42 of 51 primaries lost a tier, and 48 of those 51 share one of two **identical** armour readings. Only the Eruptor, the Double-Edge Sickle and the Torcher differ.
+>
+> **A rule that fires the same way on 94% of a population is describing the pool, not the item.** And it was double charging: a community tier already prices in what an item is for, so the Liberator's B on bots is a B given that it is a chaff gun.
+>
+> His second argument is the one that settles the direction. Even the item that **is** good at armour is not straightforwardly better: bring the Eruptor on bugs and you have to bring a Stalwart to cover chaff. Per item scoring cannot see that trade. **Armour is a loadout property**, and `src/lib/squad.js` already had it right, asking whether anyone in the squad carries AP 4 or better rather than judging each weapon alone.
+>
+> **What was kept.** All of it, as a fact. Every expanded row still says exactly what your penetration opens and bounces off, with the difficulty scoping that makes it true, and it says plainly that it does not move the rating. `src/lib/enemies.js` computes the whole thing and `score.js` keeps `armour` as a reach root. Only the five rules went.
+
+> [!tip] `npm run rules` exists because of this
+> A health check over every scoring rule: the pool it can fire on, how much of that pool it hits, and how often it moves a tier. Anything firing on 60% or more gets flagged, which is the shape the armour rules had. All 31 remaining rules pass, the loudest being ion storms at 41% and that one is correct.
+>
+> **Run it after adding a rule.** The armour bug was visible in one line of output and shipped anyway because nothing was looking.
+
+**The starmap is part of step 4, not a later phase.** It is the drop screen's entry point: you click the planet where you clicked it in the game and the scenario fills itself. It draws from shipped data and needs no network call. The live colouring layer is optional, needs no account, and can arrive whenever. See the section below.
 
 > [!tip] The useful property to protect
 > Nothing in phases 0 to 6a needs a network call at runtime. The planet table, the weapon stats and the mission list are all fetched once by a script and shipped as JSON. Keeping that true for as long as possible is what lets the whole first track ship without ever standing up a server.
 
 ### One loose end from this session
 
-Drop Bay still filters on the five original internal mission ids while the brief now carries seventy real mission names. Neither is broken and they do not read each other, but they should become one thing when Drop Bay is rebuilt in Phase 6a.
+Drop Bay still filters on the five original internal mission ids while the scenario now carries seventy real mission names. Neither is broken and they do not read each other, but they should become one thing when Drop Bay is rebuilt in Phase 6a.
+
+---
+
+## Surfaces and flows, and why that is not a choice
+
+> [!success] Settled 21 August 2026. This is the answer to the question that keeps coming back
+> The recurring worry is a fork: does the tool have **separate screens** you visit, or **one Drop Bay flow** with everything folded into it. Map, tier list, builder, exchange, squad. It reads like a choice and it is not.
+>
+> **Every component stands alone and embeds. The scenario is the wire between them.**
+
+The tool already does this in two places and neither was hard:
+
+- The tier row is a surface **and** the picker inside the builder. `CLAUDE.md`: *"The picker in the builder reuses the same row but selects instead of expanding."*
+- The front is one control that lives in two places and means one thing. *"Choosing a war in one place is choosing it in the other."*
+
+So the answer to "should the tier list have a difficulty slider, or should difficulty come from the drop flow" is **both, and it is the same control.** Set it on the tier list while everyone is offline and you are pre building. Set it by clicking a planet thirty seconds before you drop. One value, one object, every surface reading it.
+
+| Component | On its own | Embedded in the drop flow |
+|---|---|---|
+| **Tier list** | Browse and compare, no drop planned | The picker when you tap a slot |
+| **Builder** | Author builds while friends are offline | Adjust a loadout in place, save as new |
+| **Map** | Its own surface, with history behind it | The front door, one click fills the scenario |
+| **Exchange** | Browse everyone's builds | Load a squadmate's build into your slot |
+| **Social** | Friends and LFG | A panel, without leaving the flow |
+
+> [!tip] The test to apply to anything new
+> Build the component so it works alone, then compose it. A thing that only exists inside Drop Bay cannot be pre used, and a thing that cannot be embedded forces you out of the flow at the worst moment. Anything failing either half is not finished.
+
+### Three things this framing adds
+
+Raised by the curator on 21 August 2026, none of them previously written down.
+
+1. **The map as its own surface**, not only Drop Bay's front door. Same component, but reachable directly, with **historical data** behind it: what this planet has been, who has held it, what has run here. The drop flow wants the map to be fast and one click; a standalone map can afford depth the flow would not want in the way.
+2. **A social surface.** Friends list and **LFG**, reachable on its own and as a panel inside the drop flow. Sits under the sidebar entry currently labelled Squad. Behind the auth and shared storage step like everything social, but the surface itself should be designed as a component from the start so it can appear in both places.
+3. **Saving a squadmate's build straight from the squad screen.** You see what someone is running, you keep it. Distinct from Exchange, which is browsing a library: this is grabbing the thing in front of you. Needs the same shared storage, and it wants Exchange's write path rather than a second one.
 
 ---
 
@@ -93,7 +172,7 @@ A staging screen with two stages, because picking a loadout and reading the squa
 
 **Stage one, the main screen.** Everything about the drop, nothing about choosing:
 
-- The brief across the top: planet, biome and hazards, faction, mission, difficulty
+- The scenario across the top: planet, biome and hazards, faction, mission, difficulty
 - One slot per squad member, each showing that member's confirmed gear
 - Squad level warnings and coverage, which is what `src/lib/squad.js` already produces
 - Mission information and tips for the team, keyed to the selected mission
@@ -124,7 +203,7 @@ Today's Drop Bay, kept: the grid, the cards, the filters, the favourites. `Loado
 ## The live starmap, and when a runtime API call is justified
 
 > [!success] Revised 20 August 2026. The map is the entry to the drop screen, not a feature bolted beside it
-> The curator's framing, and it is better than the one this section held first: **you open Drop Bay onto the galaxy map, click the planet in the same place you clicked it in the game less than a minute ago, and the whole brief fills itself.** Faction, biome, hazards, and eventually the live effects. One click instead of four dropdowns.
+> The curator's framing, and it is better than the one this section held first: **you open Drop Bay onto the galaxy map, click the planet in the same place you clicked it in the game less than a minute ago, and the whole scenario fills itself.** Faction, biome, hazards, and eventually the live effects. One click instead of four dropdowns.
 >
 > The reasoning is spatial recall. Finding a planet again in the same shape of map is instant. Finding it in an alphabetical list of 281 is not, and it is a worse experience than the one the game already gave you.
 
@@ -142,14 +221,14 @@ Deciding this once, in writing, is what stops the tool acquiring a network depen
 >
 > A planet does not move, so this is patch data. `npm run wiki` fetches it at build time and discards the live half of the response. **274 of 281 planets now carry coordinates and 339 supply lines are recorded**, all shipped, no runtime call.
 >
-> That means **the map is static first**. It draws, pans, and fills the brief with no network call at all. The live API only ever colours in who currently holds what.
+> That means **the map is static first**. It draws, pans, and fills the scenario with no network call at all. The live API only ever colours in who currently holds what.
 
 ### The rule to build it under
 
 > [!danger] The API decorates, it never carries
 > The **shipped table is the source of truth for identity and layout**: planet names, sectors, biomes, permanent hazards, and where each planet sits on the map.
 >
-> The API adds ownership, active campaigns and current effects on top. If it is unreachable you lose the colouring, not the map, not the picker, and not your brief. No spinner on the critical path.
+> The API adds ownership, active campaigns and current effects on top. If it is unreachable you lose the colouring, not the map, not the picker, and not your scenario. No spinner on the critical path.
 >
 > **Never ship ownership.** It rotates, and a stale territory map is worse than an uncoloured one.
 
@@ -286,9 +365,19 @@ They also stopped being dead weight in the bundle. The eight images were being f
 
 ---
 
+## The rest of the Difficulty page, deliberately not pulled
+
+`helldivers.wiki.gg/wiki/Difficulty` carries more than the enemy list: **missions per operation, medal rewards, objective counts, outpost counts and their light, medium, heavy and giant composition, map size, operation modifiers, sample types, and a reward multiplier from 0% to 300%.**
+
+None of it is anywhere in this project and all of it is one page parse away. It was left out on purpose: **nothing reads it yet.** Outposts and samples describe a mission you are about to run, which is the drop screen's business, and the drop screen does not exist. Pull it in Phase 6a when there is a surface with somewhere to put it, not before.
+
+Two pieces of it are worth remembering when that happens. **Operation modifiers start at difficulty 5 and a second one is added at 8**, and the data spike recorded modifiers as being in none of its sources. This page is the source. And **the enemy footnote markers on that table are not explained in what was pasted**, so whatever 1, 2 and 3 mean is still unknown; marker 1 broadly tracks the variant strains but is wider than our exclusion list, so do not assume they are the same thing.
+
+---
+
 ## Open questions carried forward
 
 - **Fallback when a party member has not picked.** See above.
 - **Do profiles survive accounts.** See above.
-- **Does the tier ramp move.** The v2 palette studies draw the invariant ramp at different values than the app uses, S+ `#F59E0B` against the app's `#fbbf24`, and A blue against the app's teal. The app's ramp was deliberately left alone because changing it repaints Dark, Light and Neon too.
+- ~~**Does the tier ramp move.**~~ **Settled 21 August 2026, 1.17.0.** Three candidate ramps were in play and the curator picked a fourth: the badge study's palette rotated down one rank, with the brown replaced by a grey. Red at the top cooling to grey at D, so the ladder reads as falling off toward unrated. Both losing sets are out of the code.
 - **The accent disagreement.** Several studies paint their signature colour on the lock and the stale chip. `CLAUDE.md` says the accent is never the brand colour, and that rule won. Worth settling if the skins are redrawn.

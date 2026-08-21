@@ -135,7 +135,7 @@ export const statsFor = (id) => WIKI.stats[id] || null;
 /* Three states, not two. An item the fetch covers gives a real yes or  */
 /* no. An item it does not cover, which is the call-ins and the melee   */
 /* weapons, falls back to the old guess rather than silently reading as */
-/* no. See helldivers-2_data-spike.md.                                  */
+/* no. See dds-data-spike.md.                                  */
 export function ventsHeat(item) {
   const s = WIKI.stats[item.id];
   if (s) return Boolean(s.heat);

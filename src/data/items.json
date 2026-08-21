@@ -43,6 +43,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -93,6 +94,7 @@
     "roles": [
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -141,6 +143,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -189,6 +192,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -237,6 +241,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -287,6 +292,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -337,6 +343,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -387,6 +394,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -437,6 +445,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -487,6 +496,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Short mag spare 10 to 13, starting 6 to 7, reload 2.8s down to 2.3s.",
@@ -535,6 +545,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -583,6 +594,9 @@
       }
     },
     "roles": [],
+    "tags": [
+      "suppressed"
+    ],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -631,6 +645,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -679,6 +694,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -731,6 +747,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -781,6 +798,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -829,6 +847,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -879,6 +898,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -927,6 +947,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -975,6 +996,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1023,6 +1045,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1073,6 +1096,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1123,6 +1147,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1173,6 +1198,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Short mag spare 12 to 16, starting 7 to 9.",
@@ -1225,6 +1251,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Short mag spare 12 to 16, starting 7 to 9.",
@@ -1275,6 +1302,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1325,6 +1353,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1375,6 +1404,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Short mag spare 12 to 16, starting 7 to 9.",
@@ -1425,6 +1455,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1475,6 +1506,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1525,6 +1557,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1574,6 +1607,9 @@
     },
     "roles": [
       "chaff"
+    ],
+    "tags": [
+      "suppressed"
     ],
     "traits": [],
     "flag": "stale",
@@ -1625,6 +1661,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1675,6 +1712,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Short mag spare 9 to 11, starting 6 to 7.",
@@ -1725,6 +1763,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Short mag spare 9 to 11, starting 6 to 7.",
@@ -1775,6 +1814,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1823,6 +1863,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1873,6 +1914,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1923,6 +1965,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1973,6 +2016,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2023,6 +2067,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2072,6 +2117,9 @@
     },
     "roles": [
       "chaff"
+    ],
+    "tags": [
+      "suppressed"
     ],
     "traits": [],
     "flag": null,
@@ -2123,6 +2171,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Short mag spare 9 to 12, starting 6 to 8.",
@@ -2175,6 +2224,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Short mag spare 16 to 20, starting 11 to 12.",
@@ -2223,6 +2273,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2273,6 +2324,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2323,6 +2375,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2371,6 +2424,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2421,6 +2475,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Short mag spare 9 to 12, starting 6 to 8.",
@@ -2471,6 +2526,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Short mag spare 12 to 16, starting 7 to 9.",
@@ -2519,6 +2575,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Full stripper clip reload when the magazine is empty. Expect this D/D/D to move.",
@@ -2567,6 +2624,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": "new",
     "patchNote": null,
@@ -2618,6 +2676,7 @@
       "anti-armor",
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2668,6 +2727,7 @@
     "roles": [
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2716,6 +2776,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2764,6 +2825,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2812,6 +2874,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2860,6 +2923,9 @@
       }
     },
     "roles": [],
+    "tags": [
+      "suppressed"
+    ],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2908,6 +2974,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2956,6 +3023,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3004,6 +3072,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Max spare mags 8 to 10, starting 4 to 6.",
@@ -3052,6 +3121,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Bug fix removed an extra round the Siege-Ready passive was granting. Slight nerf in that pairing.",
@@ -3100,6 +3170,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3150,6 +3221,7 @@
     "roles": [
       "anti-armor"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3198,6 +3270,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Spare mags 4 to 6.",
@@ -3246,6 +3319,9 @@
       }
     },
     "roles": [],
+    "tags": [
+      "suppressed"
+    ],
     "traits": [],
     "flag": "stale",
     "patchNote": "Max spare mags 8 to 10, starting 5 to 6.",
@@ -3294,6 +3370,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3342,6 +3419,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3390,6 +3468,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3438,6 +3517,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3486,6 +3566,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3534,6 +3615,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3582,6 +3664,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3630,6 +3713,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3678,6 +3762,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3726,6 +3811,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": "new",
     "patchNote": null,
@@ -3777,6 +3863,7 @@
       "anti-armor",
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3828,6 +3915,7 @@
       "anti-armor",
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3879,6 +3967,7 @@
       "anti-armor",
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3929,6 +4018,7 @@
     "roles": [
       "anti-armor"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3979,6 +4069,7 @@
     "roles": [
       "anti-armor"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4028,6 +4119,9 @@
     },
     "roles": [
       "anti-armor"
+    ],
+    "tags": [
+      "long-range"
     ],
     "traits": [],
     "flag": null,
@@ -4080,6 +4174,7 @@
       "chaff",
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4130,6 +4225,7 @@
     "roles": [
       "anti-armor"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4178,6 +4274,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4229,6 +4326,7 @@
       "anti-armor",
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4279,6 +4377,9 @@
     "roles": [
       "anti-armor",
       "objective"
+    ],
+    "tags": [
+      "long-range"
     ],
     "traits": [],
     "flag": null,
@@ -4331,6 +4432,7 @@
       "anti-armor",
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4381,6 +4483,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4429,6 +4532,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4479,6 +4583,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4529,6 +4634,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4579,6 +4685,7 @@
     "roles": [
       "anti-armor"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4630,6 +4737,7 @@
       "anti-armor",
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4680,6 +4788,7 @@
     "roles": [
       "anti-armor"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4729,6 +4838,9 @@
     },
     "roles": [
       "anti-armor"
+    ],
+    "tags": [
+      "long-range"
     ],
     "traits": [],
     "flag": null,
@@ -4780,6 +4892,9 @@
     "roles": [
       "anti-armor"
     ],
+    "tags": [
+      "long-range"
+    ],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4829,6 +4944,9 @@
     },
     "roles": [
       "anti-armor"
+    ],
+    "tags": [
+      "long-range"
     ],
     "traits": [],
     "flag": null,
@@ -4880,6 +4998,7 @@
     "roles": [
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4931,6 +5050,7 @@
       "anti-armor",
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4979,6 +5099,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5029,6 +5150,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5079,6 +5201,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5129,6 +5252,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5179,6 +5303,9 @@
     "roles": [
       "anti-armor"
     ],
+    "tags": [
+      "long-range"
+    ],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5227,6 +5354,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5275,6 +5403,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5323,6 +5452,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5371,6 +5501,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": "new",
     "patchNote": null,
@@ -5422,6 +5553,7 @@
       "anti-armor",
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5472,6 +5604,7 @@
     "roles": [
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5522,6 +5655,7 @@
     "roles": [
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5572,6 +5706,7 @@
     "roles": [
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5620,6 +5755,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5668,6 +5804,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5718,6 +5855,7 @@
     "roles": [
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5769,6 +5907,7 @@
       "anti-armor",
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5817,6 +5956,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5867,6 +6007,7 @@
     "roles": [
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5917,6 +6058,7 @@
     "roles": [
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5967,6 +6109,7 @@
     "roles": [
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6018,6 +6161,7 @@
       "anti-armor",
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6068,6 +6212,7 @@
     "roles": [
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6116,6 +6261,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6164,6 +6310,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6212,6 +6359,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6260,6 +6408,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6308,6 +6457,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6356,6 +6506,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6404,6 +6555,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": "new",
     "patchNote": null,
@@ -6454,6 +6606,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6502,6 +6655,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6550,6 +6704,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6600,6 +6755,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6650,6 +6806,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Explosion radius 8m to 10m and a wider bomb pattern. Rating is pre-buff.",
@@ -6698,6 +6855,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6746,6 +6904,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6794,6 +6953,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6844,6 +7004,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6894,6 +7055,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6942,6 +7104,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6990,6 +7153,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7040,6 +7204,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7088,6 +7253,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7136,6 +7302,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7184,6 +7351,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7232,6 +7400,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7280,6 +7449,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7328,6 +7498,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7376,6 +7547,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7424,6 +7596,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7472,6 +7645,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7520,6 +7694,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7568,6 +7743,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7616,6 +7792,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7664,6 +7841,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7712,6 +7890,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7760,6 +7939,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7808,6 +7988,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7856,6 +8037,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7904,6 +8086,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Illuminate Veracitor melee force 25 to 40 and conformed to Anti-Tank. Blocking ragdolls you, shield breaks after roughly 15 direct hits.",
@@ -7952,6 +8135,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8002,6 +8186,7 @@
     "roles": [
       "anti-armor"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8050,6 +8235,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8100,6 +8286,7 @@
     "roles": [
       "anti-armor"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8150,6 +8337,7 @@
     "roles": [
       "anti-armor"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8200,6 +8388,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8248,6 +8437,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8296,6 +8486,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8346,6 +8537,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8396,6 +8588,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8446,6 +8639,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8494,6 +8688,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8545,6 +8740,7 @@
       "anti-armor",
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": "stale",
     "patchNote": "Demolition 30 to 40. Now closes bug holes and fabricators from outside, and qualifies for Bile Titan holes. Most likely rating to move up.",
@@ -8593,6 +8789,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8641,6 +8838,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8689,6 +8887,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8737,6 +8936,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8787,6 +8987,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8835,6 +9036,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8883,6 +9085,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "survive"
     ],
@@ -8933,6 +9136,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "handling"
     ],
@@ -8983,6 +9187,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "stealth"
     ],
@@ -9033,6 +9238,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "blast",
       "survive"
@@ -9084,6 +9290,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "blast",
       "elem",
@@ -9136,6 +9343,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "blast",
       "throwing"
@@ -9187,6 +9395,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "blast",
       "handling"
@@ -9238,6 +9447,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "handling"
     ],
@@ -9288,6 +9498,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "handling",
       "throwing"
@@ -9339,6 +9550,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "mobility"
     ],
@@ -9389,6 +9601,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "survive",
       "blast"
@@ -9440,6 +9653,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "elem",
       "throwing"
@@ -9491,6 +9705,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "elem"
     ],
@@ -9541,6 +9756,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "survive"
     ],
@@ -9591,6 +9807,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "survive",
       "stealth"
@@ -9642,6 +9859,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "melee",
       "handling"
@@ -9693,6 +9911,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "elem",
       "survive"
@@ -9744,6 +9963,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "stealth"
     ],
@@ -9794,6 +10014,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "elem"
     ],
@@ -9844,6 +10065,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "survive",
       "elem"
@@ -9895,6 +10117,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "survive",
       "melee"
@@ -9946,6 +10169,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "handling",
       "melee"
@@ -9997,6 +10221,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "handling"
     ],
@@ -10047,6 +10272,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "survive"
     ],
@@ -10097,6 +10323,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "survive",
       "mobility"
@@ -10148,6 +10375,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "stealth"
     ],
@@ -10198,6 +10426,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "throwing"
     ],
@@ -10248,6 +10477,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "elem"
     ],
@@ -10298,6 +10528,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "throwing",
       "survive"
@@ -10349,6 +10580,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [
       "elem"
     ],
@@ -10399,6 +10631,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10447,6 +10680,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10495,6 +10729,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10543,6 +10778,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10591,6 +10827,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10639,6 +10876,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10687,6 +10925,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10735,6 +10974,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10783,6 +11023,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10831,6 +11072,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10879,6 +11121,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10927,6 +11170,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10975,6 +11219,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11023,6 +11268,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11071,6 +11317,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11119,6 +11366,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11167,6 +11415,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11215,6 +11464,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11265,6 +11515,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11313,6 +11564,7 @@
       }
     },
     "roles": [],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11363,6 +11615,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11414,6 +11667,7 @@
       "anti-armor",
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11464,6 +11718,7 @@
     "roles": [
       "anti-armor"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11515,6 +11770,7 @@
       "anti-armor",
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11565,6 +11821,7 @@
     "roles": [
       "chaff"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11616,6 +11873,7 @@
       "anti-armor",
       "objective"
     ],
+    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,

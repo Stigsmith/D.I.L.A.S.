@@ -3,7 +3,7 @@ import {
   Star, Bot, Bug, Eye, Flame, Info, Crosshair, Backpack, Plane, Satellite, Car,
   RadioTower, Users, Bomb, CircleDot, FilterX, Thermometer, Zap, Wind, Sword,
   Search, Lock, Unlock, HelpCircle, ChevronDown, AlertTriangle, Download, Upload,
-  Pencil, Trash2, Globe2, ArrowUp, ArrowDown,
+  Pencil, Trash2, Globe2, ArrowUp, ArrowDown, ChevronLeft, SlidersHorizontal,
 } from "lucide-react";
 
 /* ================================================================== */
@@ -26,8 +26,11 @@ import { BRAND } from "./lib/brand.js";
 import {
   planets, biomeInfo, hazardInfo, biomeName, hazardName, hazardEffect,
   missionsFor, missionTraits, missionByName, traitsOf,
-} from "./lib/brief.js";
-import { scoreItem, briefIsSet } from "./lib/score.js";
+} from "./lib/scenario.js";
+import { scoreItem, scenarioIsSet } from "./lib/score.js";
+import { describeArmour, enemiesUpTo, arrivalsLine, EXPOSURE_GAP, enemySource } from "./lib/enemies.js";
+import TierBadgePlate from "./TierBadgePlate.jsx";
+import { useBadgeStyle } from "./lib/badge.js";
 import {
   CATEGORIES, vocabulary, acquisitionLabels,
   getItem, itemName, warbondById, ventsHeat, statsFor,
@@ -75,9 +78,17 @@ const tierStyle = (tier) => {
     backgroundColor: `var(--tier-${k}-bg)`,
     color: `var(--tier-${k}-fg)`,
     borderColor: `var(--tier-${k}-border)`,
+    /* Lighter at the top, darker at the bottom, both of the tier's own  */
+    /* colour because they are transparent over it. The break just past  */
+    /* the middle is what reads as a curved face catching the light      */
+    /* rather than as a flat wash.                                       */
+    backgroundImage:
+      "linear-gradient(180deg, rgb(255 255 255 / 0.26) 0%, rgb(255 255 255 / 0.06) 46%, rgb(0 0 0 / 0.04) 54%, rgb(0 0 0 / 0.20) 100%)",
+    /* A hairline on the top edge and a shadow under the bottom one,     */
+    /* both inside the shape, which is what gives it a thickness.        */
+    boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.34), inset 0 -1px 0 rgb(0 0 0 / 0.22)",
   };
 };
-
 /* Icon is null for ballistic and utility on purpose. Those two are the    */
 /* "nothing special happens" defaults, so a glyph there is decoration      */
 /* rather than information. The kinds that keep an icon are the ones that  */
@@ -113,7 +124,7 @@ const ARMOR_TRAIT_FILTERS = vocabulary.armorTraits;
 /* ================================================================== */
 /* LOADOUT FILTER VOCABULARY                                          */
 /* What the curated builds are filtered by. Biome and difficulty are  */
-/* hard gates, not soft scoring: a build the brief excludes does not  */
+/* hard gates, not soft scoring: a build the scenario excludes does not  */
 /* appear at all.                                                     */
 /* ================================================================== */
 
@@ -314,20 +325,30 @@ function ItemArt({ item, className = "h-9 w-9", dim }) {
 
 export { TierBadge, TierRow, sourceLabelFor, statSummary as itemStatSummary, ItemArt, Chips, KIND_META, FACTIONS, FACTION_THEME, BIOMES, BIOME_THEME, MISSION_TYPES, DIFFICULTIES, CAT_META, STRAT_GROUP, tierStyle, FactionBar, FactionChooser };
 
-function TierBadge({ tier, dim }) {
-  if (!tier) {
-    return (
-      <span className={"w-11 h-8 rounded flex items-center justify-center text-sm font-bold border border-dashed border-base-600 text-base-600 " + (dim ? "opacity-30" : "")}
-        style={{ fontFamily: "'Oswald', sans-serif" }}>?</span>
-    );
-  }
+/**
+ * quiet steps a badge back because its column is not the one the list
+ * is sorted by. It is not a disabled state and it says nothing about
+ * the rating itself: the solid column is simply the one you are
+ * reading, and the other is still there to compare against.
+ */
+/* The badge itself lives in src/TierBadgePlate.jsx, ported from the      */
+/* design document. This wrapper is only here to hand it the finish and   */
+/* the surface toggles, so no call site has to know they exist: they are  */
+/* chosen once in Settings, not decided per row.                          */
+function TierBadge({ tier, quiet, size, className }) {
+  const { finish, surface } = useBadgeStyle();
   return (
-    <span className={"w-11 h-8 rounded border flex items-center justify-center text-sm font-bold " + (dim ? "opacity-30" : "")}
-      style={{ ...tierStyle(tier), fontFamily: "'Oswald', sans-serif" }}>
-      {tier}
-    </span>
+    <TierBadgePlate tier={tier} quiet={quiet} size={size} className={className}
+      finish={finish} sheen={surface.sheen} glow={surface.glow} grain={surface.grain} />
   );
 }
+
+/* The badge in a table row. Smaller than the 44px the design document   */
+/* ships at, and deliberately: at full size it filled the row edge to    */
+/* edge, which left the delta marker nowhere to sit and got it clipped   */
+/* by the row's own overflow-hidden. 32 on a phone, 36 from sm up, with  */
+/* the cell padding giving it air above and below.                       */
+const ROW_BADGE = "w-8 h-auto sm:w-9";
 
 /* The tier floor chips wear the same colours as the badges they filter */
 /* against, so the ladder reads at a glance and there is only one       */
@@ -335,26 +356,34 @@ function TierBadge({ tier, dim }) {
 /* full strength and everything else is dimmed, which keeps the         */
 /* selection obvious without inventing a second highlight style.        */
 function TierChips({ label, value, onChange }) {
+  const { finish, surface } = useBadgeStyle();
   return (
     <div>
       <span className="mb-1.5 block font-semibold uppercase tracking-wider text-[10px] text-base-500"
         style={{ fontFamily: "'Oswald', sans-serif" }}>
         {label}
       </span>
-      <div className="flex flex-wrap gap-1.5">
+      {/* The floor chips wear the badge itself rather than a flat copy of  */}
+      {/* its colour. One shape for a tier everywhere, including whatever   */}
+      {/* finish is set, so the thing you are filtering to looks like the   */}
+      {/* thing you will see in the list.                                    */}
+      {/*                                                                    */}
+      {/* Selection is a ring around the plate, never a change to the plate  */}
+      {/* itself: the badge already spends its rim, its glow and its fill on */}
+      {/* saying which tier this is, and there is nothing left to spend on   */}
+      {/* saying which one is chosen.                                        */}
+      <div className="flex flex-wrap gap-2">
         {TIER_ORDER.map((t) => {
           const active = t === value;
           return (
             <button key={t} onClick={() => onChange(t)} aria-pressed={active}
               title={active ? `Showing ${t} and above` : `Drop the floor to ${t}`}
-              className={"w-10 rounded border-2 py-1.5 text-sm font-bold transition-all " +
-                (active ? "border-base-100 opacity-100" : "opacity-45 hover:opacity-80")}
-              style={{
-                ...tierStyle(t),
-                ...(active ? { borderColor: "rgb(var(--base-100))" } : {}),
-                fontFamily: "'Oswald', sans-serif",
-              }}>
-              {t}
+              className={"rounded p-0.5 transition-all " +
+                (active
+                  ? "opacity-100 ring-2 ring-base-100"
+                  : "opacity-45 hover:opacity-90")}>
+              <TierBadgePlate tier={t} size={30} finish={finish}
+                sheen={surface.sheen} glow={surface.glow} grain={surface.grain} />
             </button>
           );
         })}
@@ -373,22 +402,46 @@ function TierChips({ label, value, onChange }) {
 /* alone whether the place has ion storms.                            */
 /*                                                                    */
 /* Everything stays editable afterwards. Setting a biome or a hazard   */
-/* by hand drops the planet, because the brief would otherwise claim   */
+/* by hand drops the planet, because the scenario would otherwise claim   */
 /* to be somewhere it is not.                                         */
 /*                                                                    */
 /* 281 planets ship as a table. Biome and permanent hazards do not     */
 /* change, so this needs no network at runtime.                       */
 /* ================================================================== */
 
-function PlanetBar({ brief, setPlanet, setBiome, toggleHazard, setMission, clearEnvironment }) {
-  const [open, setOpen] = useState(false);
+/* Planet and mission sit side by side and share one fold out pane, so
+   only one is ever open. Two stacked rows each with their own pane cost
+   the height twice and let you open both, which made the screen taller
+   than the thing it was picking. */
+function PlanetBar({ scenario, setPlanet, setBiome, toggleHazard, setMission, clearEnvironment }) {
+  /* null, "planet" or "mission". One value rather than two booleans is
+     what makes opening one close the other, for free. */
+  const [open, setOpen] = useState(null);
   const [query, setQuery] = useState("");
 
-  const matches = useMemo(() => {
+  const show = (which) => {
+    setQuery("");
+    setOpen((cur) => (cur === which ? null : which));
+  };
+
+  const planetHits = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return planets.slice(0, 40);
-    return planets.filter((p) => p.name.toLowerCase().includes(q) || (p.sector || "").toLowerCase().includes(q)).slice(0, 40);
+    if (!q) return planets.slice(0, 60);
+    return planets
+      .filter((p) => p.name.toLowerCase().includes(q) || (p.sector || "").toLowerCase().includes(q))
+      .slice(0, 60);
   }, [query]);
+
+  const missionHits = useMemo(() => {
+    const all = missionsFor(scenario.faction);
+    const q = query.trim().toLowerCase();
+    if (!q) return all;
+    return all.filter(
+      (m) =>
+        m.name.toLowerCase().includes(q) ||
+        m.traits.some((t) => ((missionTraits[t] || {}).name || t).toLowerCase().includes(q))
+    );
+  }, [query, scenario.faction]);
 
   const biomes = useMemo(
     () => Object.entries(biomeInfo).map(([slug, v]) => ({ slug, ...v })).sort((a, b) => a.name.localeCompare(b.name)),
@@ -402,141 +455,69 @@ function PlanetBar({ brief, setPlanet, setBiome, toggleHazard, setMission, clear
     []
   );
 
-  const set = brief.biome || brief.hazards.length;
+  const byHand = scenario.biome || scenario.hazards.length;
+  const placeLabel = scenario.planet || (byHand ? biomeName(scenario.biome) || "Set by hand" : "Choose a planet");
+  const placeSub = scenario.planet
+    ? [biomeName(scenario.biome), scenario.hazards.length ? scenario.hazards.length + " hazards" : null]
+        .filter(Boolean).join(" · ")
+    : byHand ? "set by hand" : planets.length + " to choose from";
+  const missionSub = scenario.mission
+    ? traitsOf(scenario.mission).map((t) => (missionTraits[t] || {}).name || t).join(" · ") || "no special demands"
+    : missionsFor(scenario.faction).length + " on this front";
 
   return (
     <div className="rounded-lg border border-base-800 bg-base-900/60 p-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500"
-          style={{ fontFamily: "'Oswald', sans-serif" }}>
-          Dropping on
-        </span>
-
-        <button onClick={() => { setOpen((v) => !v); setQuery(""); }} aria-expanded={open}
-          className="flex items-center gap-1.5 rounded border border-base-700 bg-base-900 px-2.5 py-1.5 text-xs text-base-200 hover:border-base-500">
-          <Globe2 className="h-3.5 w-3.5 text-base-500" />
-          <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-            {brief.planet || (set ? "Set by hand" : "Choose a planet")}
-          </span>
-          <ChevronDown className={"h-3.5 w-3.5 text-base-500 transition-transform " + (open ? "rotate-180" : "")} />
-        </button>
-
-        {brief.biome ? (
-          <span className="rounded border border-base-700 bg-base-800/60 px-2 py-1 text-[11px] text-base-300">
-            {biomeName(brief.biome)}
-          </span>
-        ) : null}
-
-        {brief.hazards.map((h) => (
-          <span key={h} title={hazardEffect(h)}
-            className="rounded border border-accent-800/60 bg-accent-950/40 px-2 py-1 text-[11px] text-accent-300">
-            {hazardName(h)}
-          </span>
-        ))}
-
-        {brief.planet || set ? (
-          <button onClick={clearEnvironment} className="text-[11px] text-base-500 underline hover:text-base-200">clear</button>
-        ) : (
-          <span className="text-[11px] text-base-600">or set the biome and hazards yourself below</span>
-        )}
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <Picker label="Dropping on" icon={Globe2} open={open === "planet"}
+          value={placeLabel} sub={placeSub} chosen={Boolean(scenario.planet || byHand)}
+          onToggle={() => show("planet")} />
+        <Picker label="Mission" icon={Crosshair} open={open === "mission"}
+          value={scenario.mission || "Not set"} sub={missionSub} chosen={Boolean(scenario.mission)}
+          onToggle={() => show("mission")} />
       </div>
 
-      {/* The mission, by the name the game uses. The list is per front,   */}
-      {/* because it genuinely differs: Purge Hatcheries is not a thing on */}
-      {/* the Automaton war.                                               */}
-      <div className="mt-2 flex flex-wrap items-center gap-2 border-t border-base-800 pt-2">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500"
-          style={{ fontFamily: "'Oswald', sans-serif" }}>
-          Mission
-        </span>
-        <select value={brief.mission || ""} onChange={(e) => setMission(e.target.value)}
-          className="min-w-[15rem] rounded border border-base-700 bg-base-900 px-2 py-1.5 text-xs text-base-200 outline-none focus:border-base-500">
-          <option value="">Not set</option>
-          {missionsFor(brief.faction).map((m) => (
-            <option key={m.name} value={m.name}>{m.name}</option>
-          ))}
-        </select>
-        {brief.mission ? (
-          <span className="flex flex-wrap gap-1">
-            {traitsOf(brief.mission).map((t) => (
-              <span key={t} className="rounded border border-base-700 bg-base-800/60 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-base-400">
-                {(missionTraits[t] || {}).name || t}
-              </span>
-            ))}
-          </span>
-        ) : null}
-      </div>
-
-      {/* The line under the name is the whole point of naming the mission */}
-      {/* the way the game names it. Retrieve Valuable Data tells a new    */}
-      {/* player nothing about carrying something one handed.              */}
-      {brief.mission ? (
-        <div className="mt-2 flex flex-col gap-1">
-          {(missionByName.get(brief.mission) || {}).note ? (
-            <p className="text-[11px] leading-relaxed text-base-300">
-              {missionByName.get(brief.mission).note}
-            </p>
-          ) : null}
-          {traitsOf(brief.mission).map((t) => (
+      {/* What the place and the mission actually do to you. The half worth
+          reading, and the half the scoring engine reads too. Hidden while
+          a pane is open, because the pane is what you are looking at. */}
+      {!open && (scenario.hazards.length || scenario.mission) ? (
+        <div className="mt-2.5 flex flex-col gap-1 border-t border-base-800 pt-2.5 text-left">
+          {scenario.mission ? traitsOf(scenario.mission).map((t) => (
             <p key={t} className="text-[11px] leading-relaxed text-base-400">
               <span className="text-base-200">{(missionTraits[t] || {}).name || t}.</span>{" "}
               {(missionTraits[t] || {}).line}
             </p>
-          ))}
-        </div>
-      ) : null}
-
-      {/* What the hazards actually do. This is the half worth reading, and */}
-      {/* the half the scoring engine will read too.                        */}
-      {brief.hazards.length ? (
-        <div className="mt-2 flex flex-col gap-1 border-t border-base-800 pt-2">
-          {brief.hazards.map((h) => (
+          )) : null}
+          {scenario.hazards.map((h) => (
             <p key={h} className="text-[11px] leading-relaxed text-base-400">
-              <span className="text-base-200">{hazardName(h)}</span> {hazardEffect(h)}
+              <span className="text-accent-300">{hazardName(h)}</span> {hazardEffect(h)}
             </p>
           ))}
+          {scenario.planet || byHand ? (
+            <button onClick={clearEnvironment}
+              className="self-start text-[10px] text-base-600 underline hover:text-base-300">
+              clear the planet
+            </button>
+          ) : null}
         </div>
       ) : null}
 
-      {open ? (
-        <div className="mt-3 flex flex-col gap-3 border-t border-base-800 pt-3">
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-base-500" />
-            <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)}
-              placeholder={`Search ${planets.length} planets or a sector`}
-              className="w-full rounded border border-base-700 bg-base-900 py-1.5 pl-7 pr-2 text-xs text-base-100 placeholder-base-600 outline-none focus:border-base-500" />
-          </div>
-
-          <div className="flex max-h-56 flex-col gap-1 overflow-y-auto">
-            {matches.length === 0 ? (
-              <p className="py-4 text-center text-xs text-base-500">
-                No planet by that name. Try a sector, or set the biome by hand below.
-              </p>
-            ) : matches.map((p) => (
-              <button key={p.name} onClick={() => { setPlanet(p.name); setOpen(false); }}
-                className="flex items-center justify-between gap-3 rounded border border-transparent px-2 py-1.5 text-left hover:border-base-700 hover:bg-base-800/60">
-                <span className="min-w-0">
-                  <span className="block truncate text-xs text-base-100" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                    {p.name}
-                  </span>
-                  <span className="block truncate text-[10px] text-base-500">
-                    {p.sector ? `${p.sector} sector · ` : ""}{biomeName(p.biome)}
-                  </span>
-                </span>
-                <span className="flex shrink-0 flex-wrap justify-end gap-1">
-                  {(p.hazards || []).map((h) => (
-                    <span key={h} className="rounded bg-base-800 px-1.5 py-px text-[9px] text-base-400">{hazardName(h)}</span>
-                  ))}
-                </span>
-              </button>
-            ))}
-          </div>
+      {open === "planet" ? (
+        <Pane placeholder={"Search " + planets.length + " planets or a sector"} query={query} setQuery={setQuery}>
+          {planetHits.length === 0 ? (
+            <Empty>No planet by that name. Try a sector, or set the biome by hand below.</Empty>
+          ) : planetHits.map((p) => (
+            <PickRow key={p.name} on={p.name === scenario.planet}
+              onClick={() => { setPlanet(p.name); setOpen(null); }}
+              title={p.name}
+              sub={(p.sector ? p.sector + " sector · " : "") + biomeName(p.biome)}
+              tags={(p.hazards || []).map((h) => ({ key: h, label: hazardName(h), warn: true }))} />
+          ))}
 
           <div className="grid grid-cols-1 gap-3 border-t border-base-800 pt-3 sm:grid-cols-2">
             <div>
               <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-base-500"
-                style={{ fontFamily: "'Oswald', sans-serif" }}>Biome</span>
-              <select value={brief.biome || ""} onChange={(e) => setBiome(e.target.value)}
+                style={{ fontFamily: "'Oswald', sans-serif" }}>Or set the biome</span>
+              <select value={scenario.biome || ""} onChange={(e) => setBiome(e.target.value)}
                 className="w-full rounded border border-base-700 bg-base-900 px-2 py-1.5 text-xs text-base-200 outline-none focus:border-base-500">
                 <option value="">Not set</option>
                 {biomes.map((b) => <option key={b.slug} value={b.slug}>{b.name}</option>)}
@@ -544,10 +525,10 @@ function PlanetBar({ brief, setPlanet, setBiome, toggleHazard, setMission, clear
             </div>
             <div>
               <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-base-500"
-                style={{ fontFamily: "'Oswald', sans-serif" }}>Hazards</span>
+                style={{ fontFamily: "'Oswald', sans-serif" }}>And the hazards</span>
               <div className="flex flex-wrap gap-1.5">
                 {hazards.map((h) => {
-                  const on = brief.hazards.includes(h.slug);
+                  const on = scenario.hazards.includes(h.slug);
                   return (
                     <button key={h.slug} onClick={() => toggleHazard(h.slug)} aria-pressed={on} title={h.description}
                       className={"rounded border px-2 py-1 text-[11px] transition-colors " +
@@ -560,9 +541,88 @@ function PlanetBar({ brief, setPlanet, setBiome, toggleHazard, setMission, clear
               </div>
             </div>
           </div>
-        </div>
+        </Pane>
+      ) : null}
+
+      {open === "mission" ? (
+        <Pane placeholder={"Search " + missionsFor(scenario.faction).length + " missions on this front"}
+          query={query} setQuery={setQuery}>
+          <PickRow on={!scenario.mission} onClick={() => { setMission(""); setOpen(null); }}
+            title="Not set" sub="judge everything without a mission in mind" tags={[]} />
+          {missionHits.length === 0 ? (
+            <Empty>No mission by that name on this front. The list genuinely differs per war.</Empty>
+          ) : missionHits.map((m) => (
+            <PickRow key={m.name} on={m.name === scenario.mission}
+              onClick={() => { setMission(m.name); setOpen(null); }}
+              title={m.name}
+              sub={((missionTraits[m.traits[0]] || {}).line || "").slice(0, 88)}
+              tags={m.traits.map((t) => ({ key: t, label: (missionTraits[t] || {}).name || t }))} />
+          ))}
+        </Pane>
       ) : null}
     </div>
+  );
+}
+
+/* One of the two side by side buttons. */
+function Picker({ label, icon: Icon, value, sub, open, chosen, onToggle }) {
+  return (
+    <button onClick={onToggle} aria-expanded={open}
+      className={"flex w-full items-center gap-2.5 rounded border px-3 py-2 text-left transition-colors " +
+        (open ? "border-base-500 bg-base-800/60" : "border-base-700 bg-base-900 hover:border-base-500")}>
+      <Icon className={"h-4 w-4 shrink-0 " + (chosen ? "text-base-300" : "text-base-600")} />
+      <span className="min-w-0 flex-1">
+        <span className="block text-[9px] font-semibold uppercase tracking-wider text-base-500"
+          style={{ fontFamily: "'Oswald', sans-serif" }}>{label}</span>
+        <span className={"block truncate text-xs " + (chosen ? "text-base-100" : "text-base-500")}
+          style={{ fontFamily: "'JetBrains Mono', monospace" }}>{value}</span>
+        <span className="block truncate text-[10px] text-base-600">{sub}</span>
+      </span>
+      <ChevronDown className={"h-3.5 w-3.5 shrink-0 text-base-500 transition-transform " + (open ? "rotate-180" : "")} />
+    </button>
+  );
+}
+
+/* The shared fold out. Same search box and the same scroll box whichever
+   of the two opened it, so the two cannot drift into different shapes. */
+function Pane({ placeholder, query, setQuery, children }) {
+  return (
+    <div className="mt-2.5 flex flex-col gap-2.5 border-t border-base-800 pt-2.5">
+      <div className="relative">
+        <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-base-500" />
+        <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder={placeholder}
+          className="w-full rounded border border-base-700 bg-base-900 py-1.5 pl-7 pr-2 text-xs text-base-100 placeholder-base-600 outline-none focus:border-base-500" />
+      </div>
+      <div className="flex max-h-56 flex-col gap-1 overflow-y-auto text-left">{children}</div>
+    </div>
+  );
+}
+
+function Empty({ children }) {
+  return <p className="py-4 text-center text-xs text-base-500">{children}</p>;
+}
+
+function PickRow({ on, onClick, title, sub, tags }) {
+  return (
+    <button onClick={onClick}
+      className={"flex items-center justify-between gap-3 rounded border px-2 py-1.5 text-left transition-colors " +
+        (on ? "border-base-600 bg-base-800/70" : "border-transparent hover:border-base-700 hover:bg-base-800/60")}>
+      <span className="min-w-0">
+        <span className="block truncate text-xs text-base-100" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+          {title}
+        </span>
+        <span className="block truncate text-[10px] text-base-500">{sub}</span>
+      </span>
+      <span className="flex shrink-0 flex-wrap justify-end gap-1">
+        {tags.map((t) => (
+          <span key={t.key}
+            className={"rounded px-1.5 py-px text-[9px] " +
+              (t.warn ? "bg-accent-950/60 text-accent-300" : "bg-base-800 text-base-400")}>
+            {t.label}
+          </span>
+        ))}
+      </span>
+    </button>
   );
 }
 
@@ -596,7 +656,13 @@ export const bandForLevel = (level) => {
 function DifficultyIcon({ level, className, style }) {
   const art = uiArt(`ui_difficulty_${level}`);
   if (!art) return null;
-  return <MaskIcon url={art} className={className} style={style} />;
+  /* Drawn, not masked. These are the only UI marks in the project that  */
+  /* carry more than one colour, and the colours are the game's own      */
+  /* difficulty ramp: grey, bronze, red, near black, with white over the */
+  /* top. Painting them through the theme collapsed ten marks into one.  */
+  /* The white sits on a coloured backing, so they read on a light       */
+  /* ground as well as a dark one.                                       */
+  return <img src={art} alt="" aria-hidden="true" className={className} style={{ objectFit: "contain", ...style }} />;
 }
 
 export { DifficultyIcon };
@@ -638,7 +704,7 @@ function DifficultySlider({ value, onChange, label = "Difficulty", hint }) {
         {/* not jump as the name length changes.                           */}
         <div className="flex w-[8.5rem] shrink-0 items-center gap-2 rounded border border-base-800 bg-base-900 px-2 py-1.5">
           {d ? (
-            <DifficultyIcon level={d.level} className="h-4 w-8 shrink-0 text-brand" />
+            <DifficultyIcon level={d.level} className="h-4 w-8 shrink-0" />
           ) : (
             <span className="h-4 w-8 shrink-0" />
           )}
@@ -740,10 +806,22 @@ function Section({ title, children }) {
 /* What the source tables do not carry. Saying so is the point: an       */
 /* admitted gap beats a hedged guess, and it stops anyone assuming the   */
 /* absence means zero.                                                   */
-const MISSING_WEAPON_STATS =
-  "Magazine size, spare magazines, fire rate, reload time, recoil, projectile count and stagger are not in any source this project has yet. They would come from helldivers.wiki.gg.";
+/* This used to name seven fields as missing from every source. The wiki  */
+/* fetch filled all but two of them and the line kept apologising for     */
+/* their absence anyway, which is worse than never claiming the gap: it   */
+/* tells you the tool does not know something it is holding.              */
+/*                                                                        */
+/* What is genuinely still absent is two fields, and saying so keeps the  */
+/* admission honest rather than deleting it wholesale.                    */
+const STILL_MISSING =
+  "Reload time and projectile count are still not in any source this project has. Everything above is fetched from helldivers.wiki.gg.";
 
-function RowDetail({ item, faction, scored }) {
+/* The nine melee weapons have no data page on the wiki at all, so they   */
+/* get the admission rather than an empty section.                        */
+const NO_FETCHED_STATS =
+  "No handling or ammo figures for this one. The wiki has no data page for the melee weapons, so magazine, rate of fire, recoil and ergonomics are all genuinely unknown rather than merely unlisted.";
+
+function RowDetail({ item, faction, scored, difficulty }) {
   const sets = item.slot === "armor" ? ARMOR_SETS[item.id] : null;
   const art = itemArt(item.id);
   const s = item.stats;
@@ -751,6 +829,14 @@ function RowDetail({ item, faction, scored }) {
   const strat = item.slot === "stratagem" ? CAT_META[item.stratType] : null;
   const isWeapon = item.slot === "primary" || item.slot === "secondary"
     || (item.slot === "stratagem" && item.stratType === "support");
+  /* The fetched half, joined on read by id. Null for the nine melee      */
+  /* weapons, which have no data page on the wiki, and for armor passives */
+  /* and boosters, which the fetch does not cover.                        */
+  const wiki = statsFor(item.id);
+  /* Null for anything with no penetration recorded, which is every armor */
+  /* passive and every booster, so the section simply does not appear     */
+  /* rather than rendering an empty one.                                  */
+  const armour = describeArmour(s.ap, faction, difficulty);
 
   /* Provenance, which the build spec calls the product rather than an   */
   /* implementation detail. Every rating says where it came from and     */
@@ -826,7 +912,80 @@ function RowDetail({ item, faction, scored }) {
             </Fact>
           </Section>
 
-          {isWeapon ? <p className="text-[10px] leading-relaxed text-base-600">{MISSING_WEAPON_STATS}</p> : null}
+          {/* The numbers the source tables never had, fetched from the    */}
+          {/* wiki and joined on read. This row apologised for their        */}
+          {/* absence for a week after the fetch had already filled them.   */}
+          {wiki ? (
+            <Section title="Handling and ammo">
+              <Fact label="Magazine">
+                {wiki.ammo && wiki.ammo.magazine !== undefined
+                  ? `${wiki.ammo.magazine}${wiki.ammo.spareMagazines !== undefined ? `, ${wiki.ammo.spareMagazines} spare` : ""}`
+                  : null}
+              </Fact>
+              <Fact label="From a resupply">
+                {wiki.ammo && wiki.ammo.fromSupply !== undefined ? `${wiki.ammo.fromSupply} magazines` : null}
+              </Fact>
+              <Fact label="Rate of fire">
+                {wiki.handling && wiki.handling.rpm !== undefined ? `${wiki.handling.rpm} rpm` : null}
+              </Fact>
+              <Fact label="Ergonomics">
+                {wiki.handling && wiki.handling.ergonomics !== undefined
+                  ? <>{wiki.handling.ergonomics}<span className="text-base-500"> · how fast the barrel follows the camera</span></>
+                  : null}
+              </Fact>
+              <Fact label="Recoil">
+                {wiki.handling && wiki.handling.recoilClimb !== undefined ? `${wiki.handling.recoilClimb} climb` : null}
+              </Fact>
+              <Fact label="Sway">
+                {wiki.handling && wiki.handling.sway !== undefined ? `${wiki.handling.sway}` : null}
+              </Fact>
+              <Fact label="Durable damage">
+                {wiki.primary && wiki.primary.durableRatio !== undefined
+                  ? <>{Math.round(wiki.primary.durableRatio * 100)}%<span className="text-base-500"> of its damage survives against the big fleshy parts</span></>
+                  : null}
+              </Fact>
+              <Fact label="Stagger">
+                {wiki.primary && wiki.primary.stun !== undefined
+                  ? `${wiki.primary.stun}${wiki.primary.push !== undefined ? `, ${wiki.primary.push} pushback` : ""}`
+                  : null}
+              </Fact>
+              <Fact label="Pellets">
+                {wiki.projectile && wiki.projectile.pellets !== undefined && wiki.projectile.pellets > 1
+                  ? `${wiki.projectile.pellets}` : null}
+              </Fact>
+              <p className="text-[10px] leading-relaxed text-base-600">{STILL_MISSING}</p>
+            </Section>
+          ) : isWeapon ? (
+            <p className="text-[10px] leading-relaxed text-base-600">{NO_FETCHED_STATS}</p>
+          ) : null}
+
+          {/* What the penetration number in Numbers is actually up        */}
+          {/* against. On its own AP is a figure with nothing to measure   */}
+          {/* it by, which is what this row showed from the day it first   */}
+          {/* had an armor pen line. Now it has the other half.            */}
+          {armour ? (
+            <Section title={armour.title}>
+              {armour.lines.map((l) => (
+                <p key={l.say}
+                  className={"text-[11px] leading-relaxed " +
+                    (l.tone === "good" ? "text-emerald-400" : l.tone === "bad" ? "text-red-400" : "text-base-300")}>
+                  {l.say}
+                </p>
+              ))}
+              <p className="text-[10px] leading-relaxed text-base-600">
+                <span className="text-base-500">This does not move the rating.</span> Almost every primary reads the
+                same here, so charging one for it would be charging it for being a primary, which the community tier
+                has already accounted for. You bring an assault rifle knowing something else in your kit opens armor.
+                Whether your kit actually does is a question about the whole loadout, and that is where this comes
+                back.
+              </p>
+              <p className="text-[10px] leading-relaxed text-base-600">
+                Armor values per body part come from {enemySource.source}, counted over the {armour.reading.total}{" "}
+                enemies that front always fields. The special strains and brigades are left out: they only exist while
+                a galactic effect is running, and the tool has no way to know whether one is. {EXPOSURE_GAP}
+              </p>
+            </Section>
+          ) : null}
 
           {/* The editorial layer, kept in its own block with its own      */}
           {/* provenance line rather than mixed into Numbers, so it never  */}
@@ -846,7 +1005,7 @@ function RowDetail({ item, faction, scored }) {
           {/* score that cannot explain itself is a score nobody should       */}
           {/* trust, so this is the product rather than a detail.             */}
           {scored && scored.reasons.length ? (
-            <Section title={scored.delta === 0 ? "This brief, and why it does not move" : "Why this brief moves it"}>
+            <Section title={scored.delta === 0 ? "Why this scenario does not move it" : "Why this scenario moves it"}>
               {scored.reasons.map((r) => (
                 <div key={r.id} className="flex items-start gap-2 text-[11px] leading-relaxed">
                   <span className={"mt-px shrink-0 rounded px-1 py-px text-[10px] font-bold tabular-nums " +
@@ -857,8 +1016,9 @@ function RowDetail({ item, faction, scored }) {
                 </div>
               ))}
               <p className="text-[10px] leading-relaxed text-base-600">
-                Ours, not a community vote. The first column is the u.gg tier and this is what we make of it where you
-                said you were dropping. Roughly 14 points is one tier, and a brief can move a rating by two at most.
+                Ours, not a community vote. The first column is the u.gg tier and this is what we make of it for your
+                scenario, meaning the front, planet, biome, hazards and mission you picked above. Roughly 14 points is
+                one tier, and no scenario can move a rating by more than two.
               </p>
             </Section>
           ) : null}
@@ -938,10 +1098,10 @@ function RowDetail({ item, faction, scored }) {
 /* --shell-chrome carries.                                              */
 const RATING_COLUMNS = [
   { id: "ugg", label: "u.gg", title: "u.gg community vote" },
-  { id: "dds", label: BRAND.short, title: "Our rating for this brief. Not built yet" },
+  { id: "dds", label: BRAND.short, title: "Our rating for the scenario you set" },
 ];
 
-function RatingHeader({ faction, left }) {
+function RatingHeader({ faction, left, sortBy, setSortBy }) {
   const f = FACTIONS.find((x) => x.id === faction) || FACTIONS[0];
   return (
     <div className="sticky z-10 flex items-stretch border border-transparent bg-base-950"
@@ -952,19 +1112,30 @@ function RatingHeader({ faction, left }) {
         </span>
       </div>
       <div className="flex items-stretch shrink-0">
-        {RATING_COLUMNS.map((c) => (
-          <div key={c.id} title={c.title}
-            className="w-11 sm:w-16 flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-t border-l"
-            style={{
-              backgroundColor: c.id === "ugg" ? f.hex + "26" : "transparent",
-              borderColor: f.hex + "33",
-            }}>
-            <span className="text-[9px] uppercase tracking-wider font-bold"
-              style={{ fontFamily: "'Oswald', sans-serif", color: c.id === "ugg" ? f.hex : "rgb(var(--base-600))" }}>
-              {c.label}
-            </span>
-          </div>
-        ))}
+        {/* Both columns are the sort control. The lit one is the one   */}
+        {/* the list is ordered by, which used to be hardcoded to the     */}
+        {/* vote and is now whichever you picked.                          */}
+        {RATING_COLUMNS.map((c) => {
+          const on = c.id === sortBy;
+          return (
+            <button key={c.id} onClick={() => setSortBy(c.id)} aria-pressed={on}
+              title={on ? `Sorted by ${c.label}` : `Sort by ${c.label}. ${c.title}`}
+              className="w-11 sm:w-16 flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-t border-l transition-colors"
+              style={{
+                backgroundColor: on ? f.hex + "26" : "transparent",
+                borderColor: f.hex + "33",
+              }}>
+              <span className="text-[9px] uppercase tracking-wider font-bold"
+                style={{ fontFamily: "'Oswald', sans-serif", color: on ? f.hex : "rgb(var(--base-600))" }}>
+                {c.label}
+              </span>
+              {/* A rule under the lit one, so which is active survives a  */}
+              {/* theme where the tint is subtle.                          */}
+              <span aria-hidden="true" className="h-[2px] w-4 rounded-full transition-opacity"
+                style={{ backgroundColor: f.hex, opacity: on ? 1 : 0 }} />
+            </button>
+          );
+        })}
       </div>
       <span className="w-6 shrink-0 sm:w-9" />
     </div>
@@ -975,9 +1146,14 @@ function RatingHeader({ faction, left }) {
 /* badge: that already means "nobody has rated this" on the first        */
 /* column, and two different absences wearing one glyph is worse than    */
 /* an empty box that says what it is waiting for.                        */
+/* Not the same thing as an unrated item. This is the second column      */
+/* waiting for a scenario, so it is a dash rather than a question mark,   */
+/* and it takes the plate's proportions so the column does not change     */
+/* shape the moment you set a front.                                      */
 function PendingBadge() {
   return (
-    <span className="w-11 h-8 rounded flex items-center justify-center border border-dashed border-base-800"
+    <span className="flex w-8 items-center justify-center rounded border border-dashed border-base-800 sm:w-9"
+      style={{ aspectRatio: "44 / 58" }}
       title="Say where you are dropping and this fills in">
       <span className="h-1 w-3 rounded-full bg-base-800" />
     </span>
@@ -1014,17 +1190,17 @@ export function statSummary(item) {
 /* onSelect turns the row into a picker entry. The lock, favorite and    */
 /* expand controls inside it stop propagation so tapping them does not   */
 /* also choose the item.                                                 */
-function TierRow({ item, factionFilter, brief, isLocked, lockedByWarbond, toggleLock, isFav, toggleFav, open, onToggleOpen, onSelect }) {
+function TierRow({ item, factionFilter, scenario, sortBy = "dds", isLocked, lockedByWarbond, toggleLock, isFav, toggleFav, open, onToggleOpen, onSelect }) {
   const stop = (fn) => (e) => { e.stopPropagation(); fn(); };
   const { id, name, flag } = item;
   /* factionFilter is a real front now, never "all": the table does not   */
   /* render at all until one is chosen.                                   */
   const factionMeta = FACTIONS.find((x) => x.id === factionFilter) || FACTIONS[0];
   const tier = item.ratings[factionMeta.id].tier;
-  /* Null until the brief says enough for a rule to have anything to work */
+  /* Null until the scenario says enough for a rule to have anything to work */
   /* with. A column of unchanged badges is worse than an empty one that   */
   /* says what it wants.                                                  */
-  const scored = brief && briefIsSet(brief) ? scoreItem(item, brief) : null;
+  const scored = scenario && scenarioIsSet(scenario) ? scoreItem(item, scenario) : null;
   const meta = KIND_META[item.damageType] || KIND_META.ballistic;
   const KindIcon = meta.Icon;
   const isArmor = item.slot === "armor";
@@ -1122,24 +1298,35 @@ function TierRow({ item, factionFilter, brief, isLocked, lockedByWarbond, toggle
 
         <div className="flex items-stretch shrink-0">
           {/* What the crowd said, then what we say about where you are    */}
-          {/* going. The second is empty until the engine exists.          */}
+          {/* going. The faction tint marks the column the list is sorted   */}
+          {/* by, so it follows the lit header rather than sitting on the   */}
+          {/* vote whatever you picked.                                     */}
           <div title={`${factionMeta.label}: ${tier || "no rating yet"}`}
-            className="w-11 sm:w-16 flex items-center justify-center border-l"
-            style={{ backgroundColor: factionMeta.hex + "14", borderColor: factionMeta.hex + "33" }}>
-            <TierBadge tier={tier} />
+            className="w-12 sm:w-16 flex items-center justify-center border-l px-1 py-1.5"
+            style={{
+              backgroundColor: sortBy === "ugg" ? factionMeta.hex + "14" : "transparent",
+              borderColor: factionMeta.hex + "33",
+            }}>
+            <TierBadge tier={tier} quiet={sortBy !== "ugg"} className={ROW_BADGE} />
           </div>
-          <div className="w-11 sm:w-16 flex items-center justify-center border-l"
-            style={{ borderColor: factionMeta.hex + "33" }}
+          <div className="w-12 sm:w-16 flex items-center justify-center border-l px-1 py-1.5"
+            style={{
+              backgroundColor: sortBy === "dds" ? factionMeta.hex + "14" : "transparent",
+              borderColor: factionMeta.hex + "33",
+            }}
             title={scored && scored.reasons.length
               ? scored.reasons.map((r) => r.say).join(" ")
-              : scored ? "Nothing about this brief changes where this sits" : undefined}>
+              : scored ? "Nothing about where you are dropping changes where this sits" : undefined}>
             {!scored || !scored.tier ? (
               <PendingBadge />
             ) : (
               <span className="relative flex items-center">
-                <TierBadge tier={scored.tier} dim={scored.delta === 0} />
+                <TierBadge tier={scored.tier} quiet={sortBy !== "dds"} className={ROW_BADGE} />
+                {/* Top left, because that corner of the plate is square  */}
+                {/* and the top right is the chamfer. A round marker over  */}
+                {/* a cut corner reads as damage rather than as a badge.   */}
                 {scored.delta !== 0 ? (
-                  <span className={"absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full " +
+                  <span className={"absolute -left-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full ring-2 ring-base-900 " +
                     (scored.delta > 0 ? "bg-emerald-500 text-emerald-950" : "bg-red-500 text-red-950")}>
                     {scored.delta > 0
                       ? <ArrowUp className="h-2.5 w-2.5" strokeWidth={3} />
@@ -1160,7 +1347,8 @@ function TierRow({ item, factionFilter, brief, isLocked, lockedByWarbond, toggle
           )}
         </div>
       </div>
-      {open && !onSelect ? <RowDetail item={item} faction={factionMeta.id} scored={scored} /> : null}
+      {open && !onSelect ? <RowDetail item={item} faction={factionMeta.id} scored={scored}
+          difficulty={scenario ? scenario.difficulty : 0} /> : null}
     </div>
   );
 }
@@ -1199,10 +1387,15 @@ export const BLANK_FILTERS = {
 
 const factionArt = (id, shape) => uiArt(`faction_picker_${shape}_${id}`);
 
-function FactionPick({ faction: f, on, hero, onChoose }) {
+function FactionPick({ faction: f, on, hero, dimmed, onChoose }) {
   /* The chooser has no chosen one, so dimming all three there would be  */
   /* three greyed out buttons asking to be pressed. Hero is always lit;  */
   /* the bar lights only the front you are on.                           */
+  /*                                                                     */
+  /* dimmed is the third state and it only exists once something is      */
+  /* picked: the two you did not pick step back so the one you did reads */
+  /* at a glance. With nothing picked none of them dim, which is what    */
+  /* keeps the first visit an invitation rather than a rejection.        */
   const lit = on || hero;
   const art = factionArt(f.id, hero ? "tall" : "wide");
 
@@ -1212,15 +1405,22 @@ function FactionPick({ faction: f, on, hero, onChoose }) {
       className={
         "group relative flex flex-1 overflow-hidden rounded-lg border-2 transition-all duration-200 " +
         (hero
-          ? "aspect-[1/2] max-w-[9rem] flex-col items-center justify-end gap-1.5 px-3 pb-4 hover:-translate-y-1 sm:max-w-[13rem] sm:gap-2"
+          ? "aspect-[1/2] max-w-[9rem] flex-col items-center justify-end gap-1.5 px-3 pb-4 hover:-translate-y-1 sm:max-w-[clamp(7rem,calc((100vh-34rem)/2),13rem)] sm:gap-2"
           : "min-h-[3.25rem] flex-col items-center justify-center gap-1 px-2 py-2 sm:min-h-[3.5rem] sm:flex-row sm:gap-2.5") +
         (on ? " -translate-y-0.5" : "") +
+        (dimmed ? " opacity-60 saturate-50 hover:opacity-100 hover:saturate-100" : "") +
         (lit ? "" : " border-base-800 hover:-translate-y-0.5 hover:border-base-600")
       }
       style={lit
         ? {
-            borderColor: on ? f.hex : f.hex + "66",
-            boxShadow: on ? `0 0 22px ${f.hex}2e, 0 4px 14px rgb(0 0 0 / 0.25)` : undefined,
+            borderColor: on ? f.hex : dimmed ? f.hex + "2b" : f.hex + "66",
+            /* Picked glows harder and sits on a wider, softer pool. The  */
+            /* two numbers are the same shape as the unpicked shadow, so  */
+            /* the difference reads as more of the same thing rather      */
+            /* than as a different treatment.                             */
+            boxShadow: on
+              ? `0 0 34px ${f.hex}4a, 0 0 12px ${f.hex}33, 0 6px 18px rgb(0 0 0 / 0.35)`
+              : undefined,
           }
         : undefined}>
 
@@ -1230,7 +1430,7 @@ function FactionPick({ faction: f, on, hero, onChoose }) {
         <span aria-hidden="true"
           className={"pointer-events-none absolute inset-0 bg-cover bg-center transition-opacity duration-300 " +
             (hero
-              ? "opacity-45 group-hover:opacity-75"
+              ? (on ? "opacity-65 group-hover:opacity-80" : dimmed ? "opacity-25 group-hover:opacity-60" : "opacity-45 group-hover:opacity-75")
               : on ? "opacity-40" : "opacity-[0.16] group-hover:opacity-35")}
           style={{ backgroundImage: `url(${art})` }} />
       ) : null}
@@ -1276,6 +1476,225 @@ function FactionPick({ faction: f, on, hero, onChoose }) {
 /* this tool, and everything downstream reads differently per front: the  */
 /* mission list, the biomes, and eventually the whole contextual rating.  */
 /* Guessing one for you would be inventing the most important input.      */
+/* ================================================================== */
+/* THE SCENARIO SCREEN                                                */
+/*                                                                    */
+/* A trial, 21 August 2026. The scenario used to be a panel repeated  */
+/* at the top of every tier list tab, which was two problems wearing  */
+/* one coat: it ate the height the table wanted, and repeating a      */
+/* control on every tab says that control is scoped to the tab. It    */
+/* never was. useScenario is called once in App and the value is      */
+/* shared, so the UI was lying about its own behaviour.               */
+/*                                                                    */
+/* So it becomes one screen you visit and a one line bar you read.    */
+/* Same component either way: full when nothing is chosen or when you */
+/* ask for it, collapsed to the bar the rest of the time.             */
+/* ================================================================== */
+
+/* Ten levels and an off switch. The game puts the icon first and so  */
+/* does this: nobody thinks "difficulty 7", they think of the mark    */
+/* and the name. The slider underneath is for dragging through them,  */
+/* which is faster than eleven clicks when you are hunting.           */
+function DifficultyPicker({ value, onChange, faction }) {
+  const level = Number(value) || 0;
+  const d = difficultyAt(level);
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      {/* The mark you are on, large, the way the game shows it. It is  */}
+      {/* the only one drawn: eleven in a row was prominence by         */}
+      {/* repetition, and it read as a filter rather than a dial.        */}
+      {/* Fixed heights on both halves so the block does not jump as you */}
+      {/* drag: Any has no mark, and Super Helldive is a longer word than */}
+      {/* Hard. A dial that shifts under the cursor is a dial you stop     */}
+      {/* trusting.                                                        */}
+      <div className="flex h-9 items-end justify-center">
+        {d ? <DifficultyIcon level={d.level} className="h-9 w-20" /> : null}
+      </div>
+      <div className="flex h-9 flex-col items-center justify-start">
+        <span className="text-base font-bold uppercase leading-none tracking-wide text-base-100"
+          style={{ fontFamily: "'Oswald', sans-serif" }}>
+          {d ? d.name : "Any difficulty"}
+        </span>
+        <span className="mt-1.5 text-[10px] leading-none text-base-500">
+          {d ? `Level ${d.level}` : "not set"}
+        </span>
+      </div>
+
+      <input type="range" min="0" max="10" step="1" value={level}
+        onChange={(e) => onChange(Number(e.target.value))}
+        aria-label="Difficulty"
+        aria-valuetext={d ? `${d.level}, ${d.name}` : "Any difficulty"}
+        className="dds-range w-full max-w-xl" style={{ "--fill": `${(level / 10) * 100}%` }} />
+      <div className="flex w-full max-w-xl justify-between text-[9px] uppercase tracking-wider text-base-600">
+        <span>Any</span>
+        <span>Super Helldive</span>
+      </div>
+
+      <p className="max-w-xl text-[10px] leading-relaxed text-base-600">
+        {d
+          ? `Judged against the ${enemiesUpTo(faction, level)} enemies this front fields at level ${level}.` +
+            arrivalsLine(faction, level)
+          : "Ratings count every enemy the front can field. Set a level and the tool stops warning you about things that do not spawn there."}
+      </p>
+    </div>
+  );
+}
+
+/* How many of you are dropping. It sits under the difficulty because it
+   is the same kind of question, how hard is this going to be, rather
+   than a question about the place. Four small buttons: there are only
+   five answers and a slider for five answers is a slider too many. */
+function SquadPicker({ value, onChange }) {
+  const n = Number(value) || 0;
+  return (
+    <div className="mt-2 flex flex-wrap items-center justify-center gap-2 border-t border-base-800 pt-2">
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500"
+        style={{ fontFamily: "'Oswald', sans-serif" }}>
+        Dropping with
+      </span>
+      <div className="flex gap-1.5">
+        <button onClick={() => onChange(0)} aria-pressed={n === 0}
+          title="Not said. Nothing that depends on squad size will fire"
+          className={"rounded border px-2.5 py-1 text-[11px] transition-colors " +
+            (n === 0
+              ? "border-base-500 bg-base-800 text-base-100"
+              : "border-base-700 bg-base-900 text-base-500 hover:border-base-500 hover:text-base-200")}>
+          Any
+        </button>
+        {[1, 2, 3, 4].map((k) => (
+          <button key={k} onClick={() => onChange(k)} aria-pressed={n === k}
+            title={k === 1 ? "Solo. Nobody to hold the line while you reload" : `${k} of you`}
+            className={"w-9 rounded border py-1 text-[11px] tabular-nums transition-colors " +
+              (n === k
+                ? "border-brand bg-brand/10 text-base-100"
+                : "border-base-700 bg-base-900 text-base-500 hover:border-base-500 hover:text-base-200")}>
+            {k}
+          </button>
+        ))}
+      </div>
+      <span className="text-[10px] text-base-600">
+        {n === 1
+          ? "Solo. Nobody covers your reload and a loud gun wakes the whole map."
+          : n
+            ? `${n} of you. Someone else can carry what you did not.`
+            : "Not said, so nothing that depends on it will fire."}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * The full picker. `onDone` is null when this is standing in as the
+ * gate, because there is nothing to go back to until a front is chosen.
+ */
+export function ScenarioScreen({ scenario, setFaction, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment, onDone }) {
+  const chosen = Boolean(scenario.faction);
+
+  return (
+    /* Centred and capped. The whole point is that a desktop sees the      */
+    /* entire scenario at once: three banners, a difficulty, a place and   */
+    /* a mission, with nothing below the fold to go hunting for.           */
+    <div className="mx-auto flex max-w-3xl flex-col items-center gap-3 text-center">
+      <div className="relative flex w-full flex-col items-center">
+        {onDone ? (
+          <button onClick={onDone} title="Back to the list"
+            className="absolute left-0 top-0 rounded border border-base-800 p-1.5 text-base-400 hover:border-base-600 hover:text-base-100">
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+        ) : null}
+        <p className="text-lg font-bold text-base-200" style={{ fontFamily: "'Oswald', sans-serif" }}>
+          {chosen ? "Where are you dropping" : "Which front are you dropping on"}
+        </p>
+        <p className="mt-1 max-w-xl text-[13px] leading-relaxed text-base-500">
+          {chosen
+            ? "One scenario for the whole tool. Change it here and every list and every rating follows, on every tab."
+            : "Every rating here is per front, and so is everything after it. Pick one and the list ranks for that war."}
+        </p>
+      </div>
+
+      {/* The banners keep their shape and stop growing once the window is  */}
+      {/* short, because they are the tallest thing here and the screen is  */}
+      {/* supposed to fit. Height is twice the width, so capping the width  */}
+      {/* in viewport height units is what caps the height.                 */}
+      <div className="flex w-full items-stretch justify-center gap-3 sm:gap-5">
+        {FACTIONS.map((f) => (
+          <FactionPick key={f.id} faction={f} hero
+            on={f.id === scenario.faction}
+            dimmed={chosen && f.id !== scenario.faction}
+            onChoose={(id) => setFaction(id === scenario.faction ? null : id)} />
+        ))}
+      </div>
+
+      {chosen ? (
+        <>
+          <div className="w-full rounded-lg border border-base-800 bg-base-900/60 px-4 py-3">
+            <DifficultyPicker value={scenario.difficulty} onChange={setDifficulty} faction={scenario.faction} />
+            <SquadPicker value={scenario.squad} onChange={setSquad} />
+          </div>
+
+          <div className="w-full">
+            <PlanetBar scenario={scenario} setPlanet={setPlanet} setBiome={setBiome}
+              toggleHazard={toggleHazard} setMission={setMission} clearEnvironment={clearEnvironment} />
+          </div>
+
+          {onDone ? (
+            <button onClick={onDone}
+              className="rounded border border-base-700 bg-base-900 px-6 py-2 text-sm font-bold uppercase tracking-wide text-base-200 hover:border-base-500 hover:text-base-100"
+              style={{ fontFamily: "'Oswald', sans-serif" }}>
+              Done
+            </button>
+          ) : null}
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * The one line reminder. Always on screen wherever the scenario is
+ * being read, because a rating computed from a choice you have
+ * forgotten making is worse than no rating at all.
+ */
+export function ScenarioBar({ scenario, onAdjust }) {
+  const f = FACTIONS.find((x) => x.id === scenario.faction);
+  if (!f) return null;
+  const d = difficultyAt(scenario.difficulty);
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b px-4 py-2 sm:px-6"
+      style={{ backgroundColor: f.hex + "0f", borderColor: f.hex + "33" }}>
+      <span className="flex items-center gap-1.5">
+        <f.Icon className="h-4 w-4 shrink-0" style={{ color: f.hex }} />
+        <span className="text-[11px] font-bold uppercase tracking-wider" style={{ fontFamily: "'Oswald', sans-serif", color: f.hex }}>
+          {f.label}
+        </span>
+      </span>
+
+      <Chip>{scenario.planet || (scenario.biome ? biomeName(scenario.biome) : "any planet")}</Chip>
+      <Chip>{scenario.mission || "any mission"}</Chip>
+      <Chip icon={d ? <DifficultyIcon level={d.level} className="h-3.5 w-6" /> : null}>
+        {d ? d.name : "any difficulty"}
+      </Chip>
+
+      <button onClick={onAdjust}
+        className="ml-auto flex shrink-0 items-center gap-1.5 rounded border border-base-700 bg-base-900 px-2 py-1 text-[11px] text-base-300 hover:border-base-500 hover:text-base-100">
+        <SlidersHorizontal className="h-3.5 w-3.5" />
+        Adjust scenario
+      </button>
+    </div>
+  );
+}
+
+function Chip({ icon, children }) {
+  return (
+    <span className="flex items-center gap-1.5 text-[11px] text-base-400">
+      {icon}
+      <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>{children}</span>
+    </span>
+  );
+}
+
 function FactionChooser({ onChoose }) {
   return (
     <div className="flex flex-col items-center gap-6 rounded-lg border border-dashed border-base-700 px-4 py-10">
@@ -1310,7 +1729,7 @@ function FactionBar({ faction, onChoose }) {
   );
 }
 
-export function TierBrowser({ catId, faction, setFaction, brief, setPlanet, setBiome, toggleHazard, setMission, clearEnvironment, filters, patchFilters, lockedSet, warbondLockedSet, toggleLock, clearItemLocks, itemLockCount, favoriteItems, toggleFavItem, clearFavItems }) {
+export function TierBrowser({ catId, faction, setFaction, scenario, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment, sortBy, setSortBy, filters, patchFilters, lockedSet, warbondLockedSet, toggleLock, clearItemLocks, itemLockCount, favoriteItems, toggleFavItem, clearFavItems }) {
   const [openRow, setOpenRow] = useState(null);
   /* Switching category is a route change now, so the open row is closed  */
   /* when the category under it changes rather than by the tab handler.   */
@@ -1388,12 +1807,20 @@ export function TierBrowser({ catId, faction, setFaction, brief, setPlanet, setB
         const aNew = judged(a) ? 0 : 1;
         const bNew = judged(b) ? 0 : 1;
         if (aNew !== bNew) return aNew - bNew;
-        const av = sortFaction ? rank(a.ratings[sortFaction].tier) : averageRank(a);
-        const bv = sortFaction ? rank(b.ratings[sortFaction].tier) : averageRank(b);
+        /* Whichever column the header says it is ordered by. Ours is  */
+        /* the default. With no scenario set the engine returns the base */
+        /* untouched, so sorting by ours quietly becomes sorting by the  */
+        /* vote rather than sorting by nothing.                          */
+        const value = (it) =>
+          sortBy === "ugg"
+            ? (sortFaction ? rank(it.ratings[sortFaction].tier) : averageRank(it))
+            : rank(scoreItem(it, scenario || {}).tier);
+        const av = value(a);
+        const bv = value(b);
         if (bv !== av) return bv - av;
         return a.name.localeCompare(b.name);
       });
-  }, [category, shape, f, faction, lockedSet, favSet]);
+  }, [category, shape, f, faction, lockedSet, favSet, sortBy, scenario]);
 
   /* Anything narrowing the list that Simple view does not show. Hiding a */
   /* control while it is still filtering is how you end up staring at an  */
@@ -1422,23 +1849,19 @@ export function TierBrowser({ catId, faction, setFaction, brief, setPlanet, setB
   const unratedInCategory = category.items.filter((it) => judgedTier(it, null) === null).length;
   const backpackHere = catId === "strat" ? category.items.filter(eatsBackpack).length : 0;
 
+  /* No front, no table. Unchanged as a decision; what changed is that   */
+  /* the gate now asks the whole question rather than only the first     */
+  /* fifth of it, because it is the same screen you come back to later.  */
   if (!faction) {
     return (
-      <div className="flex flex-col gap-4">
-        <FactionChooser onChoose={setFaction} />
-      </div>
+      <ScenarioScreen scenario={scenario} setFaction={setFaction} setPlanet={setPlanet} setBiome={setBiome}
+        toggleHazard={toggleHazard} setMission={setMission} setDifficulty={setDifficulty} setSquad={setSquad}
+        clearEnvironment={clearEnvironment} onDone={null} />
     );
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <FactionBar faction={faction} onChoose={setFaction} />
-      {/* Where you are dropping. Nothing reads it yet beyond showing what */}
-      {/* the hazards do; the scoring engine is what it is here for.       */}
-      {brief ? (
-        <PlanetBar brief={brief} setPlanet={setPlanet} setBiome={setBiome}
-          toggleHazard={toggleHazard} setMission={setMission} clearEnvironment={clearEnvironment} />
-      ) : null}
       <div className="fx-panel rounded-lg border border-base-800 bg-base-900/60">
         <div className="p-4 flex flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1537,7 +1960,7 @@ export function TierBrowser({ catId, faction, setFaction, brief, setPlanet, setB
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <RatingHeader faction={faction} left={category.label} />
+        <RatingHeader faction={faction} left={category.label} sortBy={sortBy} setSortBy={setSortBy} />
         {rows.length === 0 ? (
           <div className="rounded-lg border border-dashed border-base-700 py-8 text-center text-sm text-base-400">
             {f.fav === "only" && favInCategory === 0
@@ -1546,7 +1969,7 @@ export function TierBrowser({ catId, faction, setFaction, brief, setPlanet, setB
           </div>
         ) : (
           rows.map((it) => (
-            <TierRow key={it.id} item={it} factionFilter={faction} brief={brief}
+            <TierRow key={it.id} item={it} factionFilter={faction} scenario={scenario} sortBy={sortBy}
               isLocked={lockedSet.has(it.id)} lockedByWarbond={warbondLockedSet.has(it.id)}
               toggleLock={toggleLock} isFav={favSet.has(it.id)} toggleFav={toggleFavItem}
               open={openRow === it.id} onToggleOpen={toggleOpen} />

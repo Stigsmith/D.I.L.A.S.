@@ -31,7 +31,7 @@ const oneProfile = (lockedItems, lockedWarbonds) => ({
   profiles: [{ id: DEFAULT_PROFILE_ID, name: "Default", lockedItems, lockedWarbonds }],
 });
 
-export function useArmoryState() {
+export function useCollectionState() {
   const [favorites, setFavorites] = useState([]);
   const [favoriteItems, setFavoriteItems] = useState([]);
   const [loadouts, setLoadouts] = useState([]);
@@ -270,7 +270,7 @@ export function useArmoryState() {
     const url = URL.createObjectURL(new Blob([JSON.stringify(doc, null, 2)], { type: "application/json" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `hd2-armory-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `dds-${new Date().toISOString().slice(0, 10)}.json`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -283,7 +283,7 @@ export function useArmoryState() {
   /* because they use different key names.                                */
   const importState = useCallback((doc) => {
     if (!doc || typeof doc !== "object") {
-      return { ok: false, text: "That file is not an armory export or an ownership list." };
+      return { ok: false, text: "That file is not a D.D.S. export or an ownership list." };
     }
 
     /* An ownership file describes one player, so it lands in the profile */
@@ -326,7 +326,7 @@ export function useArmoryState() {
     const wbs = list(doc.lockedWarbonds);
 
     if (!fav && !favItems && !builds && !hasProfiles && !items && !wbs) {
-      return { ok: false, text: "That file is not an armory export or an ownership list." };
+      return { ok: false, text: "That file is not a D.D.S. export or an ownership list." };
     }
     if (builds) { setLoadouts(builds); persist(KEYS.loadouts, builds); }
 

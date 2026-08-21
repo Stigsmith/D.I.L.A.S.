@@ -8,7 +8,7 @@
 
 Handle **stigly**, one G. PC gamer, treated as a power user by default. He catches factual errors and corrects them, so accuracy beats confidence, and a hedged guess is worse than an admitted gap.
 
-The depth signals: 3,000+ hours in Star Citizen, 962 hours in Total War: Warhammer III running 100+ mod stacks with a mod loader he built himself, and enough vibe coding to have produced the armory tool in this project. He does not need mechanics explained.
+The depth signals: 3,000+ hours in Star Citizen, 962 hours in Total War: Warhammer III running 100+ mod stacks with a mod loader he built himself, and enough vibe coding to have produced the tool in this project. He does not need mechanics explained.
 
 Helldivers 2 sits at roughly 167 Steam hours as of the May 2026 library snapshot, and it is his stated **gold standard** for the feeling he wants out of a game: the turning-point moment where he single-handedly changes the fight.
 
@@ -72,7 +72,7 @@ Read the table as competence, not as interest. Bug advice can assume familiarity
 Level 38, with 1,557 career samples collected, so his own ship module progression is well underway. Warbond ownership is the volatile figure and the one worth never assuming.
 
 > [!warning] Do not hardcode warbond ownership
-> He described the number as one credit card swipe from being wrong. The canonical home for what he owns is the **Warbonds tab lock state in the armory tool**, not a markdown file. Ask or check the tool rather than assuming.
+> He described the number as one credit card swipe from being wrong. The canonical home for what he owns is the **Warbonds tab lock state in the tool**, not a markdown file. Ask or check the tool rather than assuming.
 
 ---
 
@@ -106,7 +106,7 @@ The 88 career friendly kills are worth remembering here. Teamkill-prone stratage
 > [!warning] His playstyle is in flux and should not be modelled
 > He played the first era blind and is now making picks off the tier data in this project. What he ran last month, and what he runs this month, both predict very little. Ask rather than assume, and do not steer away from a good recommendation because it looks unlike his history.
 
-- **He prefers evaluating weapons himself over accepting curated loadouts**, because he may dislike half the S tiers and enjoy some A tiers. This is why the armory tool leads with tier browsing rather than the loadout picker.
+- **He prefers evaluating weapons himself over accepting curated loadouts**, because he may dislike half the S tiers and enjoy some A tiers. This is why the tool leads with tier browsing rather than the loadout picker.
 - **Stated preferences shift after firsthand play.** Treat anything he says before trying something as a starting hypothesis, not a fixed spec, and check back once he has hands on it.
 - Tier lists are subjective vote aggregates, and he knows it. Where credible sources disagree by a full tier, that disagreement is more useful to him than an averaged number.
 

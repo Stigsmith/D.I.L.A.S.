@@ -1,4 +1,4 @@
-# **HD2 Armory: Data Spike**
+# **D.D.S.: Data Spike**
 
 > Run 20 August 2026, to answer four questions before the contextual scoring engine gets designed around guesses. Every finding below was measured against a live source, not recalled. The raw pulls are reproducible from the URLs in the last section.
 
@@ -218,7 +218,10 @@ The real list, with real names, and it is genuinely faction specific. 159 entrie
 
 - **The tag layer shrinks hard.** Roughly fifteen hand authored tag lists across 180 items becomes: fetch, join, and hand author only what genuinely is a judgement. `quiet`, `disposable` and the vertical versus angled call-in split still have no source and stay ours.
 - **The scoring engine gets better inputs.** Rules can read `ergonomics`, `dmg2` against `dmg`, `stun`, `push`, `drag` and `demo` rather than a binary that approximates them.
-- **The armor penetration rule needs one more pull.** `ap1` to `ap4` are on the weapon side. Enemy armor values live on individual enemy pages as template arguments, including per difficulty values, so that is a page parse rather than a module fetch. Roughly forty pages, still cheap.
+- ~~**The armor penetration rule needs one more pull.**~~ **Pulled, 21 August 2026, and it was cheaper and richer than this line predicted.** The anatomy tables carry **health and durable share per body part** as well as the armor value, and the wiki API returns raw wikitext for 50 titles per request, so the whole set was two requests rather than forty page fetches. 80 enemies, 594 body parts, shipped as `src/data/enemies.json`.
+  - **The rule to apply them is published too**, on the wiki's Damage page, and it is three states rather than a curve: above the armor value is full damage, exactly equal is 65%, below it the round bounces for nothing.
+  - **`ap1` needed no interpretation after all.** Sampled across eight weapons, the curated `stats.ap` already in `items.json` equals `ap1` every time, so the app kept the number it had. What `ap2` to `ap4` mean is still unknown and is still not needed.
+  - **The enemy pages nest templates**, which is worth knowing before writing another parser against them: a health value carries a `Difficulty` call with its own braces and its own pipes. A parser that matches to the first closing pair truncates the row, and one that splits on every pipe corrupts what is left. Both cost the Terminid Warrior entirely on the first run.
 - **The patch cycle answer holds and improves.** Re-run the fetch, diff, review. Because the numbers now come from a maintained source rather than our own hand lists, a patch is a diff to read instead of a re-derivation.
 
 ---

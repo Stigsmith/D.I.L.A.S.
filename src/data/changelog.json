@@ -1,5 +1,158 @@
 [
   {
+    "version": "1.19.0",
+    "date": "2026-08-21",
+    "title": "The second rating column stopped hiding, and six rules stopped spelling out the same lists of weapons",
+    "changes": [
+      "Difficulty and squad size now feed one number the tool calls peril, and the stealth advice scales smoothly along it instead of switching on at a cutoff. Being outnumbered and being deep are the same problem by different routes: solo on Impossible and a pair on Helldive now read the same.",
+      "How much a squad changes things is taken from the game rather than guessed. The wiki publishes how patrol timing shifts with player count, and most of the relief comes from the second player, with a fourth adding little the third did not.",
+      "Ratings are no longer forced to a tier by any rule. Everything is points now, so five silenced weapons in the same situation land on five different tiers in the order they already stood, rather than being flattened together at the top.",
+      "The advice runs both ways. Four of you on Challenging will see silenced weapons marked down and loud ones marked up, because quiet is effort spent on a problem you do not have there.",
+      "Difficulty and squad size are now one number the tool calls peril, and the stealth advice follows it instead of a hard cutoff. It used to appear only if you were solo at difficulty 7 or above, which meant a pair on Impossible got nothing and a full squad on Super Helldive got nothing.",
+      "The advice also stopped claiming you are alone when you are not. Those explanations were written when the rule only fired for solo players.",
+      "Our rating column now appears as soon as you pick a front. It used to stay blank until you also chose a planet, a biome, a hazard or a mission, and most sessions never do. On the Terminid front that was hiding 37 weapons already sitting at a different tier than the community vote puts them.",
+      "It was hiding more than that. Everything the tool learned to say about difficulty and squad size was unreachable unless you happened to also set where you were dropping. Drop solo at 8 on bots and 93 ratings move, and none of them used to show.",
+      "A column that agrees with the community is not an empty column. Where nothing about your drop changes a weapon's rating, the tool now says exactly that instead of showing you a blank box.",
+      "Two ideas the scoring rules kept repeating are now properties of the weapons themselves. Six rules used to name the same handful of weapons over and over: three said which support weapons you aim at something far away, three said which weapons are quiet. Change your mind about one of them and you had to remember every rule that mentioned it.",
+      "Those weapons now carry a tag, and the rules ask for the tag. Nothing about any rating changed, which was the point: all thirty four rules fire on exactly the same weapons in exactly the same scenarios as before.",
+      "Each tag records where it came from. Long range is our judgement and says so. Suppressed is a published fact, twelve metres of audible range against a hundred, and says that instead. The tool has always kept our opinions and the game's facts visibly apart, and the tags follow the same rule.",
+      "The rules the tool scores with are now checked before every build. A rule that named a weapon that no longer existed, or asked for a tag spelled wrong, used to fail silently: it simply never fired, and the rating column went on looking like it had worked. Five ways of getting that wrong are now caught and stop the build.",
+      "Advice that can run both ways now has wording for both ways. A weapon marked down for being quiet in a situation that does not need quiet used to be explained with the sentence written for the opposite case.",
+      "The squad panel's coverage checks now know how many of you there are. They used to switch on at difficulty 7 no matter the squad size, so a pair on Extreme got nothing while four players on Suicide got everything. Both now read the same peril figure the tier list uses."
+    ]
+  },
+  {
+    "version": "1.18.0",
+    "date": "2026-08-21",
+    "title": "A sandstorm is weather, not a climate, and one rule was quietly beating another",
+    "changes": [
+      "Fixed a rule that could silently overrule another one. A rule saying a weapon is at least S and a rule saying it is at most B cannot both be true, and the tool was letting whichever ran second win. That is how the Censor scored twenty two points higher than a silenced SMG and landed three tiers below it.",
+      "When two rules make opposite absolute claims neither applies now, and the points decide. Both rules already had their say in the points; neither has earned the right to overrule the other.",
+      "Sandstorms and blizzards no longer cap a weapon tier outright, and they cost less. They are weather rather than climate: a sandstorm runs for about three minutes, a quarter of a Blitz and under a tenth of a full operation. Pricing it as a permanent state said never bring a marksman here about something that is not happening most of the time.",
+      "And the other half of that, which the old rule missed entirely: alone, a storm is partly a gift. It cuts their sight as much as yours, and solo you are not trying to win the firefight. A suppressed weapon in a storm now goes up rather than down.",
+      "On Automatons at Impossible, solo, in a sandstorm, the R-72 Censor is now the top primary in the list. It used to sit at B.",
+      "The rule health check gained a sweep for the same class of bug, so a floor and a ceiling that can fire together get named rather than quietly resolved.",
+      "The minimum tier filter now wears the badge itself rather than a flat copy of its colour, finish and all. One shape for a tier everywhere, so the thing you are filtering to looks like the thing you will see in the list. Which floor is picked is a ring around the plate, because the badge already spends its rim, its glow and its fill on saying which tier it is."
+    ]
+  },
+  {
+    "version": "1.17.0",
+    "date": "2026-08-21",
+    "title": "The tier badge is a stamped plate now, and the ladder finally reads as a ladder",
+    "changes": [
+      "Every tier rating is drawn rather than filled: a stamped plate with two clipped corners, a stencil letter, and the tier colour running the rim, the glow and the fill. Seven interior finishes and three surface toggles, all of them cosmetic and none of them meaning anything.",
+      "A new palette, and the order is the point. S+ red, S yellow, A purple, B blue, C green, D grey. Heat at the top cooling downward, so D reads as already falling off toward unrated rather than as one more colour in a rainbow.",
+      "The grey at D is a hair cool rather than neutral, and it sits at the same weight as the colour it replaced, so the bottom of the ladder does not suddenly go light or heavy.",
+      "Three competing palettes had been in the code and the notes for weeks. Two are now gone.",
+      "Pick your finish in Settings, with four real rows beside the dropdown so you are choosing against items rather than against a word. It is separate from the theme on purpose: changing to a warbond skin will never move it.",
+      "The theme picker became a dropdown too, with a line saying what each skin is based on. It used to be a row of thirteen chips, plus a cycle button in the top bar that did the same job less clearly. The button is gone and each setting now lives in exactly one place.",
+      "The up and down markers moved to the top left of the badge. That corner is square and the top right is the chamfer, so a round marker there was sitting on a cut edge.",
+      "Nothing here ever costs a badge its legibility. A D reads exactly as clearly as an S+, which is why nothing shrinks, fades or damages a letter to say a rating is low."
+    ]
+  },
+  {
+    "version": "1.16.0",
+    "date": "2026-08-21",
+    "title": "How many of you are dropping, and the first rule that cares",
+    "changes": [
+      "Squad size joins the scenario, under the difficulty. Solo on Impossible and a four stack on Impossible are not the same game, and until now the tool could not tell them apart.",
+      "Rules can finally read the difficulty and the squad size. Difficulty has been in the scenario since 1.11.0 and no rule could see it, so it changed which enemies got counted and nothing else.",
+      "Alone on a bot planet at 7 and up, suppressed weapons take over. A suppressed weapon is audible at 12 metres against 100 for everything else, so a perimeter sentry dies without waking the base behind it. Solo, that is the difference between walking through an outpost and running from it.",
+      "The effect is what a tier list cannot say on its own. The community vote gives you six S+ primaries on bots and not one is suppressed. Drop solo at 8 and the R-72 Censor is the only S+ left, while the AR-59 Suppressor and the M7S SMG climb out of B and C to sit near the top.",
+      "Bring three friends and the same list goes straight back to agreeing with the crowd, because at a full squad we have nothing to add that they did not already know. Saying nothing is the right answer more often than it looks.",
+      "A rule can now also say what it does not want: everything except a named handful, which is what lets the loud half of the list fall at the same time as the quiet half rises."
+    ]
+  },
+  {
+    "version": "1.15.0",
+    "date": "2026-08-21",
+    "title": "The scenario is a screen, not a panel on top of every tab",
+    "changes": [
+      "Where you are dropping is its own screen now, reached from a one line bar above the table. It used to be a panel repeated at the top of every tier list tab, which ate the height the table wanted and made one shared choice look like six separate ones.",
+      "It was always one choice. The tool just kept showing it six times.",
+      "The screen is the three front banners at full size, difficulty, then planet and mission, and it fits a desktop window without scrolling. Picking a front dims the other two and lights the one you chose; clicking it again unpicks it and all three come back.",
+      "Difficulty shows the game's own mark for the level you are on, in the game's own colours. They were being repainted in the theme colour, which flattened ten distinct marks into one.",
+      "Planet and mission sit side by side and share one search pane, so opening one closes the other. The mission list finally says what each mission asks of you rather than only its name, and searching carry finds all five carry missions, none of which have the word in their title.",
+      "Both rating columns are now sort buttons. Click either to order the list by it. Ours is the default, and the column you are sorting by is the solid one while the other steps back.",
+      "Tier badges caught some light. Same six colours, with a lighter top edge and a darker bottom, so a badge reads as a thing rather than a rectangle."
+    ]
+  },
+  {
+    "version": "1.14.0",
+    "date": "2026-08-21",
+    "title": "The row shows the numbers instead of apologising for not having them",
+    "changes": [
+      "Every weapon row carried a line saying magazine size, fire rate, recoil and stagger were in no source this project had. That stopped being true a week ago and the line kept saying it, which is worse than never claiming a gap: it tells you the tool does not know something it is holding.",
+      "Weapons now show what was fetched. Magazine and spares, how much a resupply gives you back, rate of fire, ergonomics, recoil climb, sway, stagger and pushback, and how much of the damage survives against durable parts.",
+      "Ergonomics and durable damage get a plain English line each, because 65 and 24% mean nothing on their own. One is how fast the barrel follows the camera, the other is how much of the listed damage still lands on the big fleshy parts.",
+      "The admission survives, narrowed to what is genuinely still missing: reload time and projectile count.",
+      "The six melee weapons say something different, because the wiki has no data page for them at all. Those figures are unknown rather than merely unlisted, and the row says which."
+    ]
+  },
+  {
+    "version": "1.13.0",
+    "date": "2026-08-21",
+    "title": "Armour stops downgrading half the tier list for no reason",
+    "changes": [
+      "Enemy armour no longer moves any rating. It was taking a tier off 42 of the 51 primaries on the Automaton front, which is not a finding, it is a rule describing the pool it is looking at.",
+      "The reason is simple once you see it: 48 of those 51 primaries have an identical armour reading. Only the Eruptor, the Double-Edge Sickle and the Torcher differ. Charging the other 48 was charging them for being primaries.",
+      "And it was charging twice. The community tier already knows an assault rifle does not open a Hulk. You bring one knowing your support weapon handles that, which is a fact about your whole loadout and not about the rifle.",
+      "Everything armour told you is still on the row, in full, as a fact rather than a verdict. Your Liberator bouncing off six of twenty two Automatons is worth knowing. It is just not news about the Liberator.",
+      "Armour comes back when the tool can score a whole loadout, which is where the real question lives: does anything in your four slots open heavy armour, and what did you give up to carry it.",
+      "Added a rule health check that would have caught this before it shipped. It measures every scoring rule against the pool it can fire on and flags any that fire on most of it. All 31 remaining rules pass."
+    ]
+  },
+  {
+    "version": "1.12.0",
+    "date": "2026-08-21",
+    "title": "A roadmap in the menu",
+    "changes": [
+      "Added Roadmap, next to Changelog. One says what landed, the other says what is coming, and they are only really useful as a pair.",
+      "A single timeline, one line per milestone, with the one thing that is actually next lit and everything else quiet. A roadmap where everything glows tells you nothing.",
+      "Every unbuilt item says what it waits on. Most of it waits on nothing and runs in your browser; everything social waits on there being somewhere to keep data that is not one browser on one machine, which is why that is one item and not four.",
+      "No dates on anything unbuilt. This is a two person project built in bursts and a date would be a guess wearing a promise. Shipped items carry their version instead, because that part already happened."
+    ]
+  },
+  {
+    "version": "1.11.0",
+    "date": "2026-08-21",
+    "title": "Say what difficulty you play at, and stop being warned about things that do not spawn there",
+    "changes": [
+      "Difficulty is part of the scenario now, sat next to planet and mission, on the same slider Drop Bay already used. It is remembered, and changing planet does not reset it: swapping where you are going does not mean you stopped playing at the level you play at.",
+      "Every enemy knows which difficulty it starts appearing at, so ratings are judged against the roster you can actually meet. Thirty three of the fifty four on a Challenging drop, all fifty four on Super Helldive.",
+      "A Factory Strider is difficulty 4 and up. Until now the tool counted one no matter where you said you were dropping, which made every reading a Super Helldive statement in disguise.",
+      "The reading says which level it counted, in its own heading, so you can check it. Leave the slider at Any and it judges the whole front and says that instead of implying the top.",
+      "Fixed an Illuminate roster that never exists. Crushers and Wretches are Vote Snatchers, and on a planet where those show up they replace the Overseers, Harvesters, Watchers and Stingrays rather than joining them. Counting both sets together described a front nobody drops onto.",
+      "The Stingray had no difficulty on its own wiki page while the wiki's difficulty table listed it at 4. Taken from the table, and written down as a deliberate exception rather than a silent guess."
+    ]
+  },
+  {
+    "version": "1.10.1",
+    "date": "2026-08-21",
+    "title": "It is a scenario, not a brief",
+    "changes": [
+      "The five answers about where you are dropping, front, planet, biome, hazards and mission, are now called the scenario. The tool had been calling it a brief in a couple of places without ever saying what one was, which is a good way to make someone read a word twice and learn nothing.",
+      "A brief is a document somebody hands you. This is the situation you are walking into. Earlier entries below still say brief, because they were true when they were written and a changelog that edits its own past is not much of a record.",
+      "Where the second rating comes from now says so in full: your scenario, meaning the front, planet, biome, hazards and mission you picked above. It no longer assumes you know what it is talking about.",
+      "Nothing you had set is lost. A browser that was already here keeps the front and planet it was on."
+    ]
+  },
+  {
+    "version": "1.10.0",
+    "date": "2026-08-21",
+    "title": "Armor penetration finally has something to be measured against",
+    "changes": [
+      "The tool has always shown an armor penetration number and never had anything to compare it to, so every judgement about it was a threshold somebody picked. It now holds the other half: the armor value of every body part of all 80 enemies, straight off the wiki.",
+      "Expand any weapon and it says what that penetration actually opens on the front you picked, and what it does not. An AR-23 Liberator against Automatons gets through seven of the twenty two wherever you hit them, needs a weak point on nine, and bounces off six completely, Dropships and tanks among them.",
+      "The rule is the game's own and it is three states rather than a scale. Above the armor value is full damage. Exactly equal is 65%, which is a hit and a slow one. Below it the round bounces and does nothing at all.",
+      "That 65% case turns out to matter more than expected. A Devastator is armored to 3, so an AP 3 weapon only ties it, and AP 4 is the first clean answer to one. The squad warning about bot penetration now says that rather than claiming an Autocannon makes Devastators a non-issue.",
+      "Five scoring rules replace the two that guessed from the game's penetrating tag. They cover all three fronts, where the old pair only ever fired on Automatons, and every one of them reads the armor values rather than a label.",
+      "Weapons that cannot aim are judged differently from weapons that can. A sentry, an eagle or an orbital picks its own line and cannot pick a weak point, so a front full of armor costs it more than it costs something in your hands.",
+      "The special strains and brigades are fetched and kept out of the reckoning. A Predator Strain Hunter should not change what your gun says about a normal bug drop, since it only exists while a galactic effect is running. They are flagged in the data, ready for when the tool can tell which effect is up.",
+      "The gap in this data is stated rather than hidden. A Charger's inner flesh is soft and you only reach it once the leg armor is off, and nothing published marks which parts are exposed from the start. So a weak point means one exists, not that you can hit it on approach."
+    ]
+  },
+  {
     "version": "1.9.1",
     "date": "2026-08-20",
     "title": "A better planet source, and the map coordinates to go with it",
@@ -122,7 +275,7 @@
     "date": "2026-08-18",
     "title": "Attribution, About, Support and this changelog",
     "changes": [
-      "Added an unofficial community tool subtitle under the Armory wordmark.",
+      "Added an unofficial community tool subtitle under the tool wordmark.",
       "Added a sitewide footer naming Arrowhead and Sony as unaffiliated.",
       "Moved the patch stamp into the footer and shortened it. The full detail now lives on About.",
       "Added the About page: what this is, where the numbers come from, and what a stale rating means.",

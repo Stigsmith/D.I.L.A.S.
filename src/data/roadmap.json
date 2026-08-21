@@ -1,0 +1,115 @@
+{
+  "note": "The public summary of where this tool is going. The working document is dds-roadmap.md in the repo root, which carries the reasoning, the dependency chain and the open questions. This file is the short version for the person using the tool, so keep every entry to one sentence and update it when the working document moves.",
+  "tracks": {
+    "solo": {
+      "label": "Needs nothing new",
+      "note": "Runs in your browser with no account, no server and no network call."
+    },
+    "social": {
+      "label": "Needs an account",
+      "note": "Waits on somewhere to keep data that is not one browser on one machine."
+    }
+  },
+  "milestones": [
+    {
+      "id": "v1",
+      "title": "The tool itself",
+      "status": "shipped",
+      "version": "1.0.0",
+      "track": "solo",
+      "say": "Tier lists for all six slots, your collection, the loadout builder and Drop Bay. Everything kept in this browser."
+    },
+    {
+      "id": "themes",
+      "title": "Eleven themes",
+      "status": "shipped",
+      "version": "1.2.0",
+      "track": "solo",
+      "say": "Three base skins and eight warbond ones, each with its own atmosphere behind the panels."
+    },
+    {
+      "id": "scenario",
+      "title": "A second opinion, for where you are dropping",
+      "status": "shipped",
+      "version": "1.9.0",
+      "track": "solo",
+      "say": "Say the front, planet and mission and every row gets a second rating next to the community vote, with a sentence for every point of difference."
+    },
+    {
+      "id": "armour",
+      "title": "Enemy armour",
+      "status": "shipped",
+      "version": "1.10.0",
+      "track": "solo",
+      "say": "What your penetration actually opens on this front, and what it bounces off, measured against every body part of all 80 enemies."
+    },
+    {
+      "id": "difficulty",
+      "title": "Difficulty",
+      "status": "shipped",
+      "version": "1.11.0",
+      "track": "solo",
+      "say": "Ratings judged against the enemies you can meet at the level you play at, rather than everything the front can field."
+    },
+    {
+      "id": "tags",
+      "title": "The last judgement calls",
+      "status": "next",
+      "track": "solo",
+      "say": "A handful of things no source records, like which support weapons are the ones you aim at something far away, currently named by hand and admitted to."
+    },
+    {
+      "id": "loadout-scoring",
+      "title": "Scoring a whole build",
+      "status": "planned",
+      "track": "solo",
+      "say": "Rate a loadout rather than one item at a time, and a squad rather than one loadout. This is where armour penetration finally means something: the question was never whether your rifle opens a Hulk, it is whether anything you brought does."
+    },
+    {
+      "id": "drop-screen",
+      "title": "Drop Bay becomes the drop screen",
+      "status": "planned",
+      "track": "solo",
+      "say": "The thirty seconds before you dive: who is bringing what, where you are going, and what is going to hurt."
+    },
+    {
+      "id": "map",
+      "title": "The galaxy map",
+      "status": "planned",
+      "track": "solo",
+      "say": "Click the planet where you clicked it in the game and the whole scenario fills itself. Its own screen too, with history behind it."
+    },
+    {
+      "id": "accounts",
+      "title": "Accounts",
+      "status": "later",
+      "track": "social",
+      "say": "Log in somewhere else and your collection is there. Nothing social can happen before this and everything social waits on it.",
+      "release": "v2"
+    },
+    {
+      "id": "exchange",
+      "title": "Exchange",
+      "status": "later",
+      "track": "social",
+      "say": "Browse other people's builds, and keep the ones worth keeping.",
+      "release": "v3"
+    },
+    {
+      "id": "squad",
+      "title": "Live squad",
+      "status": "later",
+      "track": "social",
+      "say": "Your squadmates' slots fill themselves, you save a build straight off someone else's card, and the warnings read the real four of you.",
+      "release": "v3"
+    },
+    {
+      "id": "social",
+      "title": "Friends and finding a group",
+      "status": "later",
+      "track": "social",
+      "say": "A friends list and an LFG board, on their own screen and as a panel inside the drop screen so joining up never means leaving it.",
+      "release": "v3"
+    }
+  ]
+}
