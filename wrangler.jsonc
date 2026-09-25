@@ -1,0 +1,64 @@
+{
+  // How D.D.S. is served. Replaces dragging dist/ onto Netlify.
+  //
+  // Stage 0 of dds-cloudflare-handover.md: static assets only, no Worker
+  // script, no database. Everything the tool does still happens in the
+  // browser. Stage 1 adds `main`, a D1 database and `vars` for an API under
+  // /api/*, on this same origin, which is what lets the Content-Security-
+  // Policy in public/_headers keep saying connect-src 'self' unchanged.
+  //
+  // Deploy with `npm run deploy`, which builds first. Cache rules and security
+  // headers are in public/_headers, which Vite copies into dist/.
+  //
+  // Modelled on Enodia's wrangler.jsonc in C:\Dev\Hades 2, which carries the
+  // longer reasoning behind every key here. Read it before changing one.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dds",
+
+  // The newest date the installed runtime supports, so wrangler dev and
+  // production behave the same. Past 2025-04-01 is also what makes
+  // not_found_handling below behave as described.
+  "compatibility_date": "2026-09-23",
+
+  // The address until stigly buys a domain. When he does, add
+  //   "routes": [{ "pattern": "<the domain>", "custom_domain": true }]
+  // and Cloudflare creates the DNS record and the certificate itself.
+  "workers_dev": true,
+
+  // 8788, never wrangler's default 8787, because Enodia's wrangler dev uses
+  // 8787 and the two run on the same machine.
+  //
+  // Found on 25 September 2026, the hard way: with Enodia already running,
+  // D.D.S.'s wrangler dev bound the same port on Windows and printed "Ready
+  // on 8787" while Enodia's server kept answering. Every header read back
+  // was Enodia's policy, served over an app that did not have D.D.S.'s
+  // files. Nothing errored. Only reading the responses showed it.
+  //
+  // Set here rather than as a flag so the port belongs to the project, not
+  // to whoever types the command.
+  "dev": { "port": 8788 },
+
+  "assets": {
+    "directory": "./dist",
+
+    // Every route in D.D.S. is a hash, #/tiers/primary, which never reaches
+    // the server, so today this only decides what a mistyped path shows: the
+    // app, with a 200. It becomes load bearing the day short links like
+    // /b/<id> exist, which is Stage 4.
+    //
+    // Enodia measured the side effect: a missing file also answers with the
+    // page and a 200 rather than a 404. Fixing that needs a Worker script in
+    // front of every request, which would make every request billable. Not
+    // worth it to improve one error message.
+    "not_found_handling": "single-page-application"
+
+    // Stage 1 MUST add this alongside `main`, and never set it to `true`:
+    //
+    //   "run_worker_first": ["/api/*"]
+    //
+    // Static asset requests are free and unlimited. Worker invocations are
+    // 100k a day on the free plan. Assets are served first by default, and
+    // this names the only paths that should ever reach the script. Set it to
+    // `true` and every icon on every tier row becomes a billable call.
+  }
+}

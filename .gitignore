@@ -16,3 +16,19 @@ public/favicon.svg
 
 # Raw wiki pulls. Cache only, re-fetchable with npm run wiki -- --refresh
 .wiki-cache/
+
+# wrangler dev's local state and asset cache. Regenerated on every run.
+.wrangler/
+
+# wrangler dev secrets. Production uses `wrangler secret put`. Named before
+# Stage 1 needs them, so no secret can ever be committed by accident.
+.dev.vars
+.dev.vars.*
+
+# Claude Code's per machine settings and its throwaway worktrees.
+.claude/settings.local.json
+.claude/worktrees/
+
+# Collection exports from Settings, named dds-YYYY-MM-DD.json. Personal
+# state, never project data, and the move to Cloudflare means more of them.
+dds-20*.json

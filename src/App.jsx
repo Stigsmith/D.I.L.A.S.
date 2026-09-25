@@ -31,9 +31,6 @@ import { useScenario, useTierFilters, useTierSort } from "./lib/scenario.js";
 import { BRAND } from "./lib/brand.js";
 import LOADOUTS from "./data/loadouts.json";
 
-const FONT_IMPORT =
-  "@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');";
-
 /* ------------------------------------------------------------------ */
 /* Destinations                                                        */
 /* ------------------------------------------------------------------ */
@@ -620,8 +617,6 @@ export default function App() {
     /* ambient layer paint over the ground and under every surface. Give    */
     /* this a colour again and the layer disappears behind it.              */
     <div className="min-h-screen text-base-100" style={{ fontFamily: "system-ui, sans-serif" }}>
-      <style>{FONT_IMPORT}</style>
-
       <Ambient theme={theme} />
       {/* Above everything, including the sticky chrome, because grain is  */}
       {/* a property of the lens rather than of any one surface.           */}
