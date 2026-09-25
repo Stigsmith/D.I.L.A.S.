@@ -1,0 +1,61 @@
+# How D.D.S. is served. Cache rules and security headers, with their reasons.
+#
+# Vite copies this out of public/ into dist/, which is the assets directory
+# Cloudflare reads it from. It is parsed at deploy time and never served.
+#
+# Ported from Enodia's assets/_headers in C:\Dev\Hades 2, which found every
+# trap below the hard way. Read it before changing anything here.
+#
+# TWO THINGS THAT WILL BITE WHOEVER EDITS THIS NEXT.
+#
+# 1. A header set twice is JOINED WITH A COMMA, not overridden. So
+#    Cache-Control lives only on patterns that cannot both match one file.
+#    Put one on /* and every image gets two conflicting values.
+# 2. Netlify never applied any of this. D.D.S. shipped for its whole life
+#    there with no security headers at all, so nothing below was tested by
+#    the old host. Every rule is verified by reading a real response under
+#    wrangler dev and again after deploying, never by trusting the file.
+
+# Vite fingerprints everything it emits, and D.D.S. item and theme art is
+# imported from src/assets rather than served from public/, so all of it
+# lands here with a content hash in the name and can never go stale.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Google's font filenames are content hashes, same argument.
+# scripts/fonts.mjs.
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The page names the fingerprinted bundle, so it must never be the stale
+# thing that pins everything else to an old build. This matches what
+# Cloudflare sends by default, and is stated so the intent survives a change
+# of default.
+#
+# favicon.svg is the only other unhashed file and gets that same default:
+# revalidate every visit, answered with a 304 almost every time.
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Everything, and deliberately no Cache-Control here. See note 1 above.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Without `preload`, which is a one way commitment and the domain is not
+  # bought yet.
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  # Nothing from anybody else: no fonts, no analytics, no CDN. The page
+  # fetches only itself, so the policy can say exactly that.
+  #
+  # 'unsafe-inline' on style-src is for React's style attributes, which
+  # D.D.S. uses throughout for faction colours and the theme tokens. It does
+  # not reach scripts.
+  #
+  # img-src is 'self' with no data:, tighter than Enodia's, because nothing in
+  # D.D.S. draws a data URI: Vite's assetsInlineLimit is 0 and the theme art
+  # is extracted to real files by npm run images. If a data URI ever becomes
+  # necessary, add it here deliberately rather than discovering the breakage.
+  #
+  # connect-src 'self' is what lets Stage 1's /api/* work without touching a
+  # character of this. That is the whole reason the API is same origin.
+  Content-Security-Policy: default-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
