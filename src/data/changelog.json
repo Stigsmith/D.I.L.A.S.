@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.21.0",
+    "date": "2026-09-25",
+    "title": "A new home on Cloudflare, and the page stops talking to anybody else",
+    "changes": [
+      "The tool can now be served from Cloudflare, the same place Enodia runs. It is the same tool with the same screens. This is the first step toward accounts, which need a server to exist somewhere, and nothing about how you use it changes today.",
+      "The two typefaces now come from the tool itself rather than from Google. Nothing looks different, but opening the page no longer tells Google that you visited, and the first screen no longer waits on somebody else's server to draw its headings.",
+      "The page now tells your browser to refuse anything it did not arrive with: no scripts, styles, fonts or images from any other address. It has never loaded any, but until now nothing said so, and the old host sent no security instructions at all. Accounts will need this in place before they open.",
+      "Art and fonts are now cached for a year, because every file has its own fingerprint in its name and a changed file always gets a new one. The page itself is checked on every visit, so an update reaches you the next time you open the tool rather than whenever your browser gets round to it."
+    ]
+  },
+  {
     "version": "1.20.0",
     "date": "2026-08-22",
     "title": "A build is now scored as a build, and armour is back where it belongs",
