@@ -25,7 +25,8 @@ A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai a
 | **Settings** | `#/settings` | Built. Theme, export, import, reset |
 | **Support** | `#/support` | Built. Where the numbers come from |
 | **Roadmap** | `#/roadmap` | Built. One timeline, what is next and what it waits on |
-| **Exchange, Squad, Account** | | v2 and v3. Shown in the sidebar, deliberately not reachable |
+| **Exchange, Squad** | | v2 and v3. Shown in the sidebar, deliberately not reachable |
+| **Account** | `#/account` | **Built and switched off.** Locked in the sidebar until `ACCOUNTS_LIVE` in `src/lib/account.js` is true. See Accounts |
 
 > [!info] Routing is hand rolled
 > `src/lib/router.js` is a hash router in about thirty lines, not a dependency. The route table is a handful of destinations with at most one parameter, and hash routing needs no server rewrite rules. Swap in a real router the moment that stops being true.
@@ -1041,6 +1042,12 @@ npm run builds
 The two rule health reports. `rules` measures every item rule against the pool it can fire on, and `builds` measures every loadout rule against the 39 curated builds **and** 300 random legal ones. Both flag anything firing on 60% or more, which is the shape the armour rules had. **Run them after adding a rule.** The armour bug was visible in one line of output and shipped anyway, because nothing was looking.
 
 ```bash
+npm run test:worker
+```
+
+The backend's tests, inside the Workers runtime against a real local database. See Accounts for the rest of the backend commands.
+
+```bash
 npm run wiki
 ```
 
@@ -1087,7 +1094,7 @@ Re-fetches the weapon stats and the planet table, and **reports what would chang
 # **Hosting**
 
 > [!success] Served from Cloudflare since 1.21.0, 25 September 2026
-> **https://dds.stigly-official.workers.dev**, on the same Cloudflare account as Enodia. Stage 0 of `dds-cloudflare-handover.md`: `dist/` served as static assets, **no Worker script and no database yet**, so everything the tool does still happens in the browser. Read that handover before Stage 1; it carries eighteen pitfalls Enodia paid for.
+> **https://dds.stigly-official.workers.dev**, on the same Cloudflare account as Enodia. Stage 0 of `dds-cloudflare-handover.md` moved `dist/` here as static assets, and **Stage 1 added a Worker on `/api/*` and a D1 database for accounts**, switched off in the UI. See Accounts. Everything the tool does for somebody using it still happens in the browser. Read that handover before Stage 1; it carries eighteen pitfalls Enodia paid for.
 
 | File | What it does |
 |---|---|
@@ -1149,14 +1156,95 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 >
 > So Netlify stays the address people use until the domain exists. Then: one last Netlify build carrying a notice with the new address and "Export here, Import there", and Netlify left up for a while rather than deleted the same day. Both calls are stigly's. `_headers` travels in `dist/`, and Netlify reads the same file format, so that last Netlify build gets the security headers too.
 
-> [!warning] Retire the "no server" sentence when Stage 1 lands
-> Support says "There is no account and no server behind this tool" (`Pages.jsx`, "Your data stays yours"), and `roadmap.json` says the solo track runs "with no account, no server and no network call". **Both are still true at Stage 0**, which serves files and holds nothing of yours. Both become false the day a Worker script and D1 exist. Enodia shipped the same kind of sentence past its expiry: "Nothing is tracked about you" outlived the day stats existed.
+> [!success] The "no server" sentence was retired in 1.22.0, when Stage 1 landed
+> Support said "There is no account and no server behind this tool" (`Pages.jsx`, "Your data stays yours"). It went false the day the Worker deployed, so it now says **"Nothing you do here is sent anywhere, and there are no accounts yet"**, which is exactly true while `ACCOUNTS_LIVE` is off. **That sentence goes false in turn the day accounts open**, and must change with the switch. `roadmap.json` still says the solo track runs "with no account, no server and no network call", which describes that track's features and stays true. Enodia shipped the same kind of sentence past its expiry: "Nothing is tracked about you" outlived the day stats existed.
 
 > [!danger] Only `study_*` art is bundled
 > `src/lib/assets.js` globs `../assets/themes/*/study_*`, not the whole folder. A theme folder also holds its palette study, a preview render and the loose reference art the skin was drawn from, none of which the app renders. Globbing everything shipped **22.7MB of dead weight, 60% of the built output**. If a skin needs a new file at runtime, name it `study_*` or it will not be bundled.
 
 > [!warning] The art is extracted from shipped games
 > Item art comes from Helldivers 2, and the crossover skins carry Games Workshop and Halo material. The asset layer is deliberately swappable and every lookup returns null with a text fallback, so the tool runs art free if any of it ever has to come out. Worth keeping the URL unlisted rather than indexed.
+
+---
+
+# **Accounts**
+
+> [!success] Stage 1 built, 1.22.0, 25 September 2026. **Switched off**
+> A Cloudflare Worker answers `/api/*` and nothing else, a D1 database named `dds` holds the accounts, and better-auth runs email and password sign in. Ported from Enodia's backend in `C:\Dev\Hades 2`, which built all of this first; `dds-cloudflare-handover.md` is the plan and its eighteen pitfalls.
+>
+> **Nobody using the tool can see any of it.** `ACCOUNTS_LIVE` in `src/lib/account.js` is `false`, so the sidebar keeps "Account v2" locked and `#/account` falls back to the tier list, exactly as before.
+
+| | |
+|---|---|
+| `worker/index.ts` | The three routes: `/api/auth/*` to better-auth, `/api/capabilities`, `/api/me`. Everything else is a JSON 404 |
+| `worker/auth.ts` | Every better-auth option, each with the reason. Nearly verbatim from Enodia |
+| `worker/email.ts` | The mail swap point. **Inert until Stage 2**: no domain, so no sender, so no reset |
+| `worker/schema.ts` | **Generated** by `npm run db:schema`. Never edit |
+| `worker/schema-app.ts` | Ours, and empty until Stage 3 |
+| `migrations/` | Generated by `npm run db:generate`. Applied locally by `npm run db:migrate` |
+| `src/lib/account.js`, `src/Account.jsx` | The browser half and the screen |
+
+> [!danger] The switch is a UI gate and only a UI gate
+> `/api/auth/*` is deployed and reachable whatever `ACCOUNTS_LIVE` says: somebody reading the JavaScript can post to it by hand. What protects it is the rate limiting in `worker/auth.ts`, **never the switch**. If accounts ever have to be closed for real, the place is the Worker.
+>
+> **When to flip it is stigly's call, with one hard floor.** Not before Stage 2, because an account with no password reset is one you can be locked out of permanently. And arguably not before Stage 3 either: until sync exists an account does nothing, and the Account screen says so in as many words.
+
+> [!danger] `npm run db:schema` runs the CLI at the installed better-auth version, never `@latest`
+> Found on 25 September 2026, and it is **the handover's own pitfall 6 reached from the other direction.** The handover and Enodia's script both say `npx auth@latest`, because the old `@better-auth/cli` lagged behind and dropped the NOT NULL `issuer` column. By today `auth@latest` is **1.7.6** while the installed better-auth is **1.7.2**, and the CLI generates from its own bundled core, not the project's. 1.7.6 dropped `issuer`; 1.7.2 requires it and writes it on every sign up.
+>
+> `scripts/db-schema.mjs` reads the installed version and runs that CLI. The schema it produced is **byte identical to Enodia's**, which is proven in production. A schema missing `issuer` fails five tests in `auth.test.ts`, checked by simulating it.
+>
+> **Enodia's `db:schema` script has the same latent problem** and will break the same way the next time it is run.
+
+> [!danger] `public/_headers` does not reach the API, so the Worker hardens its own answers
+> `_headers` applies to static assets only. Until `harden()` in `worker/index.ts`, every `/api/*` response went out with no `nosniff` and no cache instruction, including `/api/me`, which carries a name and an email. Every Worker response now carries `x-content-type-options: nosniff` and `cache-control: no-store`, better-auth's own answers included. Measured by reading the response; tested; **Enodia's Worker has the same gap.**
+
+### Commands
+
+```bash
+npm run test:worker
+```
+
+Fifteen tests, run **inside workerd against a real local D1**, never in node, where none of what matters is true. Each protection was seen failing before it was trusted: rate limiting left to the library default (two fail, and it reproduces Enodia's finding that better-auth does not limit on Workers by default), the address read from `x-forwarded-for` (two fail), the schema missing `issuer` (five fail), and the response hardening removed (one fails).
+
+```bash
+npm run typecheck
+```
+
+The Worker only. `tsconfig.worker.json` stands alone, because D.D.S. has no root tsconfig to extend.
+
+| Script | Does |
+|---|---|
+| `db:schema` | better-auth's options into `worker/schema.ts`, version matched |
+| `db:generate` | the schema into a numbered SQL file in `migrations/` |
+| `db:migrate` | apply them to the **local** database |
+| `types` | `worker-configuration.d.ts` from `wrangler.jsonc`. Re-run after editing the config |
+
+**Production migrations run before the code that needs them:** `npx wrangler d1 migrations apply dds --remote`, then `npm run deploy`.
+
+### Secrets
+
+`BETTER_AUTH_SECRET` signs every session cookie. Locally it is in `.dev.vars`, generated at random and gitignored. In production it is set with `npx wrangler secret put BETTER_AUTH_SECRET` and is a **different** random value. Rotating it signs everybody out, which is the right behaviour if it ever leaks.
+
+> [!warning] With no `.dev.vars`, every `/api/*` answers 500
+> That is the secret guard at the top of `worker/index.ts` doing its job: without it every cookie would be signed with `undefined`, which is an authentication bypass rather than an error. A fresh clone needs a `.dev.vars` before `wrangler dev` will do anything useful.
+
+> [!info] `RESEND_API_KEY` and `MAIL_FROM` are typed optional in `worker/optional-env.d.ts`
+> They are absent until Stage 2, so `npm run types` does not know them. Declared optional rather than faked into `.dev.vars` as empty strings, which would type them as always present. The generated file on this wrangler makes the global `Env` and `Cloudflare.Env` siblings, so the augmentation names both. Delete the file once Stage 2 configures them.
+
+### Local testing, and two traps found doing it
+
+> [!bug] Rebuilding while `wrangler dev` runs can silently stop it serving the site
+> Vite empties `dist/` at the start of a build. On Windows that crashed wrangler's asset watcher with `EPERM`, it disabled itself with one warning line, and from then on every page load fell through to the Worker and answered `{"error":"no such route"}`. **Restart `wrangler dev` after every `npm run build`.** Production is unaffected; this is the local watcher only.
+
+> [!tip] Driving the account screen locally means flipping the switch in a local build
+> Set `ACCOUNTS_LIVE` to `true`, `npm run build`, restart `wrangler dev`, drive it, then set it back and rebuild. **Grep the built bundle afterwards** to prove the test build is gone. All of that was done on 25 September 2026: sign up, reload with the session intact, sign out, a wrong password getting the plain sentence as an alert, sign in, the session cookie invisible to page scripts, and no policy violations.
+
+### What is deliberately not here yet
+
+- **`worker/limit.ts`**, Enodia's counter for routes better-auth cannot see. Every Stage 1 route is better-auth's own or a session read. It arrives with Stage 3, the first route of ours that writes anything, with its table in `schema-app.ts`
+- **Password reset**, Stage 2, which needs the domain
+- **The account doing anything.** The "What an account does" panel says "Nothing yet". **It must change the day Stage 3 sync lands**, or it becomes a sentence that outlived its truth
 
 ---
 

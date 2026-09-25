@@ -1,11 +1,10 @@
 {
   // How D.D.S. is served. Replaces dragging dist/ onto Netlify.
   //
-  // Stage 0 of dds-cloudflare-handover.md: static assets only, no Worker
-  // script, no database. Everything the tool does still happens in the
-  // browser. Stage 1 adds `main`, a D1 database and `vars` for an API under
-  // /api/*, on this same origin, which is what lets the Content-Security-
-  // Policy in public/_headers keep saying connect-src 'self' unchanged.
+  // Stage 1 of dds-cloudflare-handover.md: the static site, plus a Worker
+  // script answering /api/* and nothing else, plus a D1 database for
+  // accounts. Same origin, which is what lets the Content-Security-Policy in
+  // public/_headers keep saying connect-src 'self' unchanged.
   //
   // Deploy with `npm run deploy`, which builds first. Cache rules and security
   // headers are in public/_headers, which Vite copies into dist/.
@@ -15,10 +14,19 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "dds",
 
+  // The API, and nothing else, on this origin under /api/*. See
+  // run_worker_first below for why "nothing else" is enforced rather than
+  // hoped for.
+  "main": "worker/index.ts",
+
   // The newest date the installed runtime supports, so wrangler dev and
   // production behave the same. Past 2025-04-01 is also what makes
   // not_found_handling below behave as described.
   "compatibility_date": "2026-09-23",
+
+  // better-auth reaches for a few node builtins. Without this the Worker fails
+  // to start rather than failing at a request, so it is not subtle.
+  "compatibility_flags": ["nodejs_compat"],
 
   // The address until stigly buys a domain. When he does, add
   //   "routes": [{ "pattern": "<the domain>", "custom_domain": true }]
@@ -50,15 +58,41 @@
     // page and a 200 rather than a 404. Fixing that needs a Worker script in
     // front of every request, which would make every request billable. Not
     // worth it to improve one error message.
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
 
-    // Stage 1 MUST add this alongside `main`, and never set it to `true`:
-    //
-    //   "run_worker_first": ["/api/*"]
+    // THE LINE THAT KEEPS THIS FREE. Never set it to `true`.
     //
     // Static asset requests are free and unlimited. Worker invocations are
     // 100k a day on the free plan. Assets are served first by default, and
     // this names the only paths that should ever reach the script. Set it to
     // `true` and every icon on every tier row becomes a billable call.
-  }
+    "run_worker_first": ["/api/*"]
+  },
+
+  // Accounts. worker/auth.ts explains the shape.
+  //
+  // `wrangler dev` ignores `database_id` and runs on a local SQLite file under
+  // .wrangler/, so all of this builds and tests with no network at all. Only
+  // `--remote` commands and deploys use the id. Created 25 September 2026,
+  // region WEUR, beside Enodia's.
+  //
+  // **The binding is DB, not dds.** `wrangler d1 create` suggests naming the
+  // binding after the database, and it did. The code says `env.DB`.
+  //
+  // **Changing the id orphans the local database.** wrangler dev keys its
+  // local file by id, so a new id is a fresh empty database, and the only
+  // symptom is a 500 on any request with a session cookie: no such table:
+  // session. Re-run `npm run db:migrate` after touching it.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dds",
+      "database_id": "be6b81cb-3738-4d05-9950-375cf9ba6245",
+      "migrations_dir": "migrations"
+    }
+  ]
+
+  // No `vars` yet. MAIL_FROM needs an address on a domain stigly owns, which
+  // is Stage 2; SUPER_CLIENT and SUPER_CONTACT belong to the war state fetch in
+  // Stage 6.
 }

@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.22.0",
+    "date": "2026-09-25",
+    "title": "The groundwork for accounts, switched off",
+    "changes": [
+      "Nothing you can see has changed. Behind the tool there is now a small server that can hold accounts, and it is switched off from where you sit: Account in the menu is still locked, and the tool never asks who you are.",
+      "It stays off until a forgotten password can be recovered, because an account you can be locked out of for good is worse than no account. That needs a domain the tool can send email from, which is the next step.",
+      "Once it opens, an account will be how your locks, favorites, profiles and builds follow you to another device. None of it will ever be needed to use the tool, and everything will keep living in your browser either way.",
+      "Support no longer says there is no server behind the tool, because as of this version there is one. What it says now is still exactly true: nothing you do here is sent anywhere, and there are no accounts yet."
+    ]
+  },
+  {
     "version": "1.21.0",
     "date": "2026-09-25",
     "title": "A new home on Cloudflare, and the page stops talking to anybody else",

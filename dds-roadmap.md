@@ -17,8 +17,8 @@ Everything below rests on one primitive: **data living somewhere that is not one
 > | Stage | | Status |
 > |---|---|---|
 > | 0 | Hosting on Cloudflare, security headers, fonts vendored | **Done, 1.21.0.** Live at `dds.stigly-official.workers.dev` |
-> | 1 | Worker, D1 and accounts | Next, or Stage 6. **stigly's call** |
-> | 2 | Mail and password reset | Accounts stay shut until a forgotten password has a way back |
+> | 1 | Worker, D1 and accounts | **Built, 1.22.0, and switched off in the UI.** The backend is live; nobody can see it until `ACCOUNTS_LIVE` flips |
+> | 2 | Mail and password reset | **Blocked on the domain.** Resend only sends from a domain you own. `dds.me` was taken. Accounts stay shut until this works |
 > | 3 | Sync between devices | Needs the profiles question answered |
 > | 4 | Publishing and short links | |
 > | 5 | Exchange, friends, leaderboards | Needs "what is a run and what is a clear" answered |

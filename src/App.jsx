@@ -21,6 +21,8 @@ import DropBay from "./DropBay.jsx";
 import Collection, { COLLECTION_TABS } from "./Collection.jsx";
 import Ambient, { Grain, Masthead } from "./Ambient.jsx";
 import { About, Support, Changelog, Roadmap, Footer } from "./Pages.jsx";
+import Account from "./Account.jsx";
+import { ACCOUNTS_LIVE } from "./lib/account.js";
 import TierBadgePlate, { FINISHES } from "./TierBadgePlate.jsx";
 import { useBadgeStyle } from "./lib/badge.js";
 import { CATEGORIES, warbonds } from "./lib/items.js";
@@ -58,7 +60,9 @@ const NAV = [
 ];
 
 const NAV_FOOT = [
-  { id: "account", label: "Account", Icon: User, release: "v2" },
+  /* Tagged, and therefore locked and unroutable, until ACCOUNTS_LIVE in
+     src/lib/account.js says otherwise. The tag is the switch's only effect. */
+  { id: "account", label: "Account", Icon: User, ...(ACCOUNTS_LIVE ? {} : { release: "v2" }) },
   { id: "settings", label: "Settings", Icon: SettingsIcon },
   { id: "support", label: "Support", Icon: LifeBuoy },
   { id: "about", label: "About", Icon: Info },
@@ -592,6 +596,8 @@ export default function App() {
         return <Changelog />;
       case "roadmap":
         return <Roadmap />;
+      case "account":
+        return <Account />;
       case "scenario":
         return (
           <ScenarioScreen

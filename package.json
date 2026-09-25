@@ -1,7 +1,7 @@
 {
   "name": "dds",
   "private": true,
-  "version": "1.21.0",
+  "version": "1.22.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,19 +16,31 @@
     "rules": "node scripts/check-rules.mjs",
     "builds": "node scripts/check-builds.mjs",
     "fonts": "node scripts/fonts.mjs",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "db:schema": "node scripts/db-schema.mjs",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "wrangler d1 migrations apply dds --local",
+    "types": "wrangler types",
+    "typecheck": "tsc --noEmit -p tsconfig.worker.json",
+    "test:worker": "vitest run --config vitest.worker.config.ts"
   },
   "dependencies": {
+    "better-auth": "^1.7.2",
+    "drizzle-orm": "^0.45.2",
     "lucide-react": "^0.454.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.22.0",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "drizzle-kit": "^0.31.10",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
+    "typescript": "^7.0.2",
     "vite": "^6.0.0",
+    "vitest": "^4.1.11",
     "wrangler": "^4.140.0"
   }
 }

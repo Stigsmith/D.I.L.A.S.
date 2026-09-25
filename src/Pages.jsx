@@ -31,7 +31,7 @@ export const VERSION = CHANGELOG[0].version;
 
 export const PATCH_SHORT = `Patch ${PATCH.game} · ratings ${PATCH.ratings} (armor ${PATCH.armor})`;
 
-function Panel({ title, note, children }) {
+export function Panel({ title, note, children }) {
   return (
     <div className="overflow-hidden rounded-lg border border-base-800 bg-base-900">
       <div className="border-b border-base-800 px-4 py-2.5">
@@ -216,9 +216,9 @@ export function Support() {
 
       <Panel title="Your data stays yours">
         <p>
-          Locks, favorites, profiles and your own builds live in this browser and nowhere else. There is no account
-          and no server behind this tool. Clearing your browser data clears them, which is what Export in Settings is
-          for.
+          Locks, favorites, profiles and your own builds live in this browser and nowhere else. Nothing you do here
+          is sent anywhere, and there are no accounts yet. Clearing your browser data clears them, which is what Export
+          in Settings is for.
         </p>
       </Panel>
     </div>
