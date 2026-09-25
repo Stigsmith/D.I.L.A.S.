@@ -20,53 +20,11 @@
 /* scenario. This is the cheap way to notice when one does not.       */
 /* ================================================================== */
 
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { score, items, readJson, read, FACTIONS } from "./lib/app.mjs";
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const read = (p) => readFileSync(join(ROOT, p), "utf8");
-
-/* The app's libs import JSON the way Vite resolves it, which plain Node */
-/* rejects. Inlining those imports lets this run the real scoring code   */
-/* rather than a copy of it that can drift.                             */
-const asModule = (src) => "data:text/javascript;base64," + Buffer.from(src).toString("base64");
-
-const enemiesUrl = asModule(
-  read("src/lib/enemies.js").replace(
-    'import ENEMIES from "../data/enemies.json";',
-    "const ENEMIES = " + read("src/data/enemies.json") + ";"
-  )
-);
-const itemsUrl = asModule(
-  read("src/lib/items.js")
-    .replace('import ITEMS from "../data/items.json";', "const ITEMS = " + read("src/data/items.json") + ";")
-    .replace('import WARBONDS from "../data/warbonds.json";', "const WARBONDS = " + read("src/data/warbonds.json") + ";")
-    .replace('import VOCABULARY from "../data/vocabulary.json";', "const VOCABULARY = " + read("src/data/vocabulary.json") + ";")
-    .replace('import WIKI from "../data/wiki-stats.json";', "const WIKI = " + read("src/data/wiki-stats.json") + ";")
-);
-/* Only traitsOf is reached, and mission rules are reported separately    */
-/* against real traits rather than through this stub.                     */
-const MISSIONS = JSON.parse(read("src/data/missions.json"));
-const scenarioUrl = asModule(
-  "const MISSIONS = " + read("src/data/missions.json") + ";\n" +
-    "const byName = new Map(MISSIONS.missions.map((m) => [m.name, m]));\n" +
-    "export const traitsOf = (n) => (byName.get(n) || { traits: [] }).traits;"
-);
-
-const score = await import(
-  asModule(
-    read("src/lib/score.js")
-      .replace('import RULES from "../data/context-rules.json";', "const RULES = " + read("src/data/context-rules.json") + ";")
-      .replace('from "./items.js"', 'from "' + itemsUrl + '"')
-      .replace('from "./scenario.js"', 'from "' + scenarioUrl + '"')
-      .replace('from "./enemies.js"', 'from "' + enemiesUrl + '"')
-  )
-);
-
-const ITEMS = JSON.parse(read("src/data/items.json"));
-const RULES = JSON.parse(read("src/data/context-rules.json")).rules;
-const FACTIONS = ["bots", "bugs", "squids"];
+const MISSIONS = readJson("src/data/missions.json");
+const ITEMS = items.items;
+const RULES = readJson("src/data/context-rules.json").rules;
 const RANK = { "S+": 6, S: 5, A: 4, B: 3, C: 2, D: 1 };
 
 /* A rule's own `when` is used to build the scenario it would fire in, so */
@@ -102,17 +60,21 @@ function scenariosFor(rule) {
   let difficulty = satisfy(when.difficulty, 0);
   let squad = satisfy(when.squad, 0);
 
-  /* Peril is 4 * (difficulty - squad - 1), so a rule gating on it needs a
-     difficulty and a squad size that reach the figure it asks for. Solve
-     for the gentlest pair that satisfies it: the largest squad that can
-     get there, so the sample is the easiest situation the rule fires in
-     rather than an extreme that flatters it. */
+  /* A rule gating on peril needs a difficulty and a squad size that reach
+     the figure it asks for. Solve for the gentlest pair that satisfies it:
+     the largest squad that can get there, so the sample is the easiest
+     situation the rule fires in rather than an extreme that flatters it.
+
+     It calls score.peril rather than restating the arithmetic. The first
+     version restated it, and kept saying 4 * (difficulty - squad - 1) for
+     two versions after the real formula changed, so every peril rule was
+     being measured in a scenario the engine no longer produces. */
   if (when.peril) {
     const want = satisfy(when.peril, 0);
     let found = null;
     for (let sq = 4; sq >= 1 && !found; sq -= 1) {
       for (let d = 1; d <= 10; d += 1) {
-        const p = 4 * (d - sq - 1);
+        const p = score.peril({ difficulty: d, squad: sq });
         const ok =
           (when.peril.gte === undefined || p >= when.peril.gte) &&
           (when.peril.gt === undefined || p > when.peril.gt) &&

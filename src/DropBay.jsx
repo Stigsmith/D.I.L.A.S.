@@ -162,7 +162,7 @@ function Row({ label, options, value, onChange, hint }) {
   );
 }
 
-export default function DropBay({ state, navigate, faction, setFaction }) {
+export default function DropBay({ state, navigate, faction, setFaction, scenario }) {
   const [biome, setBiome] = useState("any");
   const [mission, setMission] = useState("any");
   /* A level from 1 to 10, or 0 for any. The four bands are what a build */
@@ -353,6 +353,7 @@ export default function DropBay({ state, navigate, faction, setFaction }) {
               onToggleFavorite={state.toggleFavorite}
               rankLabel={l.preset ? "Curated preset" : "Yours"}
               biome={biome}
+              scenario={scenario}
               lockedSet={state.lockedSet}
               onOpen={() => navigate(`builder/${l.id}`)}
               onDelete={l.preset ? undefined : () => setConfirmDelete(l)}

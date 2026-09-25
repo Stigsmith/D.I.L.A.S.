@@ -29,6 +29,7 @@ const vocab = load("vocabulary.json");
 const wikiStats = load("wiki-stats.json");
 const enemies = load("enemies.json");
 const contextRules = load("context-rules.json");
+const buildRules = load("build-rules.json");
 
 const problems = [];
 const fail = (msg, list) => {
@@ -301,9 +302,13 @@ const collect = (node, out, keys) => {
 /* Every scenario key applies() knows how to test. */
 const WHEN_KEYS = set(["faction", "hazard", "biome", "mission", "difficulty", "squad", "peril"]);
 
-const ruleProblems = [];
+/* Both rule files. context-rules.json judges one item and build-rules.json
+   judges nine of them together, and the two share this much: an id, a
+   sentence, resolvable references, and a when clause the engine reads. The
+   differences go in the caller. */
+function checkRules(rules, ruleProblems) {
 const seenRule = new Set();
-for (const rule of contextRules.rules) {
+for (const rule of rules) {
   if (!rule.id) { ruleProblems.push("a rule with no id"); continue; }
   if (seenRule.has(rule.id)) ruleProblems.push(`duplicate rule id ${rule.id}`);
   seenRule.add(rule.id);
@@ -344,7 +349,64 @@ for (const rule of contextRules.rules) {
     if (!ROLES.has(r)) ruleProblems.push(`${rule.id} matches role "${r}", which is not in the vocabulary`);
   }
 }
+}
+
+const ruleProblems = [];
+checkRules(contextRules.rules, ruleProblems);
 if (ruleProblems.length) fail(`${ruleProblems.length} problem(s) in context-rules.json:`, ruleProblems);
+
+/* ------------------------------------------------------------------ */
+/* Loadout rules                                                       */
+/*                                                                     */
+/* A build clause is not an item clause and the engine throws on a key  */
+/* it does not know, which is the right behaviour at runtime and a      */
+/* terrible way to find out. So the keys are checked here, where the    */
+/* build already stops.                                                 */
+/* ------------------------------------------------------------------ */
+
+const MATCH_KEYS = set(["covers", "notCovers", "count", "number", "has", "notHas"]);
+/* Everything look() in build.js can reach. A path it cannot read is not  */
+/* an error at runtime: numberTest sees undefined, returns false, and the */
+/* rule silently never fires. That is the failure this catches.          */
+const PATH_ROOTS = set(["facts", "reach", "scenario"]);
+const FACTS_FIELDS = set(["heldAp", "anyAp", "holeClosers", "backpacks", "filled"]);
+const REACH_FIELDS = set(["ap", "total", "anywhere", "weakpoint", "bounces", "grazing",
+  "openShare", "weakpointShare", "bounceShare", "grazingShare", "difficulty"]);
+const SCENARIO_FIELDS = set(["peril", "difficulty", "squad"]);
+const SEVERITIES = set(["red", "amber", "grey"]);
+
+const buildProblems = [];
+checkRules(buildRules.rules, buildProblems);
+for (const rule of buildRules.rules) {
+  for (const k of Object.keys(rule.match || {})) {
+    if (!MATCH_KEYS.has(k)) buildProblems.push(`${rule.id} matches on "${k}", which build.js does not read`);
+  }
+  const refCovers = []; collect(rule.match || {}, refCovers, ["covers", "notCovers"]);
+  for (const r of refCovers) {
+    if (!ROLES.has(r)) buildProblems.push(`${rule.id} covers role "${r}", which is not in the vocabulary`);
+  }
+  if (rule.severity && !SEVERITIES.has(rule.severity)) {
+    buildProblems.push(`${rule.id} has severity ${JSON.stringify(rule.severity)}, which is not red, amber or grey`);
+  }
+  /* A rule with neither a delta nor a severity moves nothing and says
+     nothing, so the engine skips it and the sentence never renders. */
+  if (!rule.delta && !rule.scaleBy && !rule.severity) {
+    buildProblems.push(`${rule.id} has no delta, no scaleBy and no severity, so it can never be seen`);
+  }
+  const paths = []; collect(rule, paths, ["path"]);
+  for (const path of paths) {
+    const [root, field] = String(path).split(".");
+    if (!PATH_ROOTS.has(root)) { buildProblems.push(`${rule.id} reads "${path}", and ${root} is not a root build.js knows`); continue; }
+    const known = root === "facts" ? FACTS_FIELDS : root === "reach" ? REACH_FIELDS : SCENARIO_FIELDS;
+    if (!known.has(field)) buildProblems.push(`${rule.id} reads "${path}", which build.js cannot produce, so it never fires`);
+  }
+  /* Same contract the context rules have. A rule that scales off the
+     scenario crosses zero and needs a sentence for each direction. */
+  if (rule.scaleBy && String(rule.scaleBy.path).startsWith("scenario.") && !rule.sayInverted) {
+    buildProblems.push(`${rule.id} scales off the scenario so it can invert, but carries no sayInverted`);
+  }
+}
+if (buildProblems.length) fail(`${buildProblems.length} problem(s) in build-rules.json:`, buildProblems);
 
 /* Every declared tag has to record where it came from, because the whole */
 /* point of the layer is that a judgement and a sourced fact are telling  */

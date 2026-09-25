@@ -74,7 +74,10 @@ const ALL_NAV = [...NAV.flatMap((g) => g.items), ...NAV_FOOT];
 /* Where the scenario bar belongs: the surfaces that read it. Settings
    and the changelog have no opinion about where you are dropping, and a
    reminder on those is chrome for the sake of chrome. */
-const SCENARIO_SURFACES = new Set(["tiers"]);
+/* Drop Bay joined on 22 August 2026, when loadout scoring landed and the
+   cards started reading the scenario. A control that changes what is on
+   screen has to be on screen: the same rule the folded filter pane keeps. */
+const SCENARIO_SURFACES = new Set(["tiers", "bay"]);
 
 /* Routable, deliberately absent from the sidebar. */
 const OFF_MENU = new Set(["scenario"]);
@@ -577,7 +580,7 @@ export default function App() {
       case "collection":
         return <Collection tab={collectionTab} state={state} />;
       case "bay":
-        return <DropBay state={state} navigate={navigate} faction={scenario.faction} setFaction={setFaction} />;
+        return <DropBay state={state} navigate={navigate} faction={scenario.faction} setFaction={setFaction} scenario={scenario} />;
       case "builder":
         /* Browsing happens in Drop Bay. The builder edits one build, so  */
         /* landing on it with nothing chosen starts a fresh one.          */

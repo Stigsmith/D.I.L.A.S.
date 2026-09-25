@@ -21,6 +21,7 @@
 
 import RULES from "../data/context-rules.json";
 import { statsFor, ventsHeat, TIER_ORDER } from "./items.js";
+import { isHeldWeapon } from "./loadouts.js";
 import { traitsOf } from "./scenario.js";
 import { frontReading } from "./enemies.js";
 
@@ -72,7 +73,7 @@ const swingFor = (peril) => (peril === null ? MAX_SWING : MAX_SWING + Math.max(0
 /* How much trouble you are actually in, as one number, from the two   */
 /* scenario answers that decide it.                                    */
 /*                                                                     */
-/*   peril = 6 * (difficulty - 5) + 4 * (4 - squad)                    */
+/*   peril = 6 * (difficulty - 5) + SQUAD_PRESSURE[squad]              */
 /*                                                                     */
 /* **It is not points and nothing adds it to a score.** Rules gate on  */
 /* it, and may one day scale off it. Its magnitude changes no rating   */
@@ -134,7 +135,7 @@ const asArray = (v) => (v === undefined || v === null ? [] : Array.isArray(v) ? 
 /* Anything not named here is a field on the item itself.                 */
 const ROOTS = ["wiki", "armour", "scenario"];
 
-function reach(ctx, path) {
+export function reach(ctx, path) {
   const parts = String(path).split(".");
   const rooted = ROOTS.includes(parts[0]);
   let cur = rooted ? ctx[parts[0]] : ctx.item;
@@ -145,7 +146,7 @@ function reach(ctx, path) {
   return cur;
 }
 
-function numberTest(value, test) {
+export function numberTest(value, test) {
   if (typeof value !== "number" || !Number.isFinite(value)) return false;
   if (test.gte !== undefined && !(value >= test.gte)) return false;
   if (test.gt !== undefined && !(value > test.gt)) return false;
@@ -158,7 +159,7 @@ function numberTest(value, test) {
 /* A rule fires when every clause in `match` holds. Clauses are ANDed;  */
 /* the values inside one clause are ORed, which is what makes           */
 /* "category: [Marksman, Special]" read the way it looks.               */
-function matches(ctx, match) {
+export function matches(ctx, match) {
   if (!match) return true;
   const { item, wiki } = ctx;
 
@@ -169,12 +170,9 @@ function matches(ctx, match) {
     }
     /* Gear you carry and aim yourself. A sentry cannot pick a weakpoint, */
     /* which is the same reason the squad penetration check is limited to   */
-    /* held weapons. Mirrors heldGear in loadouts.js.                       */
+    /* held weapons. One definition, in loadouts.js, read by all three.     */
     if (key === "held") {
-      const isHeld =
-        item.slot === "primary" || item.slot === "secondary" ||
-        (item.slot === "stratagem" && item.stratType === "support");
-      if (isHeld !== Boolean(want)) return false;
+      if (isHeldWeapon(item) !== Boolean(want)) return false;
       continue;
     }
     /* A named list, keyed by id because nothing in this project may     */
@@ -244,7 +242,7 @@ function matches(ctx, match) {
  * either does not fire on an unset value: guessing that somebody is solo
  * because they have not told you is how a list ends up confidently
  * ranking for a game nobody is playing. */
-function applies(scenario, when) {
+export function applies(scenario, when) {
   if (!when) return true;
   for (const [key, want] of Object.entries(when)) {
     if (key === "difficulty" || key === "squad") {
