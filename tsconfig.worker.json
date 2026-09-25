@@ -1,0 +1,34 @@
+{
+  // The Worker is TypeScript while the app is JavaScript, and that is on
+  // purpose: wrangler bundles TS itself, the Workers types are generated from
+  // wrangler.jsonc by `npm run types`, and a typecheck is the cheapest guard on
+  // code that handles passwords.
+  //
+  // Standalone rather than extending a root tsconfig, because D.D.S. has none.
+  // Enodia's extends its app config; the options below are that config's,
+  // minus the DOM, JSX and node types, which would redeclare Workers globals
+  // with different shapes and produce dozens of errors that mean nothing.
+  //
+  // `npm run typecheck` runs it.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": [],
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "noEmit": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    // Relative imports in worker/ carry their .ts suffix, as Enodia's do.
+    "allowImportingTsExtensions": true
+  },
+  "include": ["worker", "worker-configuration.d.ts", "drizzle.config.ts"]
+}
