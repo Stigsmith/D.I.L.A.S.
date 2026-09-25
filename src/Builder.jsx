@@ -9,15 +9,17 @@
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import {
-  X, Search, Plus, Save, Copy, Trash2, Star, Lock, AlertTriangle,
+  X, Search, Plus, Save, Copy, Trash2, Star, Lock, AlertTriangle, ArrowUp, ArrowDown,
   Thermometer, Flame, ChevronLeft, Backpack,
 } from "lucide-react";
 
 import {
   TierRow, TierBadge, ItemArt, sourceLabelFor, itemStatSummary,
-  FACTIONS, FACTION_THEME, BIOMES, MISSION_TYPES, DIFFICULTIES, CAT_META, STRAT_GROUP, FactionBar,
+  FACTIONS, FACTION_THEME, BIOMES, MISSION_TYPES, DIFFICULTIES, CAT_META, STRAT_GROUP, FactionBar, LoadoutReading,
 } from "./Tiers.jsx";
 import { CATEGORIES, getItem, itemName, judgedTier, TIER_RANK, averageRank, rank, eatsBackpack } from "./lib/items.js";
+import { readBuild } from "./lib/build.js";
+import { scoreItem } from "./lib/score.js";
 import {
   presets, SLOTS, STRAT_SLOTS, emptyLoadout, forkPreset,
   deriveHeat, heatSources, deriveFire, backpackUsers, hasBackpackConflict, loadoutItemIds,
@@ -187,9 +189,27 @@ function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, ta
 /* Slot                                                                */
 /* ------------------------------------------------------------------ */
 
-function Slot({ label, itemId, locked, onOpen, warn }) {
+function Slot({ label, itemId, locked, onOpen, warn, faction, scenario }) {
   const item = itemId ? getItem(itemId) : null;
   const stratMeta = item && item.slot === "stratagem" ? CAT_META[item.stratType] : null;
+
+  /* One badge, for the front this build is for.
+   *
+   * It used to render all three, unlabelled, so you could not tell which
+   * was which and two of them answered a question nobody asked: a build
+   * declares a front and keeps it when saved. The picker below already
+   * ranks by that front and says so in its header, and the tier list
+   * dropped its three faction columns for the same reason back in 1.9.0.
+   * This row was the last place they survived.
+   *
+   * It shows our reading rather than the vote, because that is what the
+   * loadout reading above is made of: the gear badge is the mean of these
+   * nine, so a slot showing a different number would be the two halves of
+   * one screen disagreeing. The vote is not hidden, it is the marker: the
+   * same top left dot the tier row uses whenever the two differ, and the
+   * whole community rating is one tap away in the picker. */
+  const scored = item && faction ? scoreItem(item, { ...scenario, faction }) : null;
+  const shown = scored ? scored.tier : null;
 
   return (
     <button onClick={onOpen}
@@ -235,9 +255,23 @@ function Slot({ label, itemId, locked, onOpen, warn }) {
           {stratMeta ? (
             <stratMeta.Icon className="h-4 w-4" style={{ color: STRAT_GROUP[stratMeta.group].hex }} />
           ) : null}
-          {FACTIONS.map((f) => (
-            <TierBadge key={f.id} tier={item.ratings[f.id].tier} />
-          ))}
+          {scored ? (
+            <span className="relative flex items-center"
+              title={scored.reasons.length
+                ? `${scored.base || "unrated"} on the vote. ${scored.reasons.map((r) => r.say).join(" ")}`
+                : "Nothing about where you are dropping changes where this sits"}>
+              <TierBadge tier={shown} />
+              {/* Top left, the square corner. The top right is the chamfer
+                  and a round marker over a cut corner reads as damage. */}
+              {scored.delta ? (
+                <span className={"absolute -left-0.5 -top-0.5 flex h-3 w-3 items-center justify-center rounded-full ring-2 ring-base-900 " +
+                  (scored.delta > 0 ? "bg-emerald-500 text-emerald-950" : "bg-red-500 text-red-950")}>
+                  {scored.delta > 0 ? <ArrowUp className="h-2 w-2" strokeWidth={3} />
+                    : <ArrowDown className="h-2 w-2" strokeWidth={3} />}
+                </span>
+              ) : null}
+            </span>
+          ) : null}
         </span>
       ) : null}
     </button>
@@ -301,6 +335,14 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario 
     setDirty(true);
     setJustSaved(false);
   }, []);
+
+  /* Against the front the build declares, not the one the scenario names.
+     Changing the front above changes what this says, immediately, which is
+     the whole reason the two controls are separate. */
+  const reading = useMemo(
+    () => (draft.faction ? readBuild(draft, { ...scenario, faction: draft.faction }) : null),
+    [draft, scenario]
+  );
 
   const heat = deriveHeat(draft);
   const heatFrom = heatSources(draft);
@@ -417,6 +459,13 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario 
         ) : null}
       </div>
 
+      {/* What the nine of them are worth together, and where the holes are. */}
+      {reading && reading.score !== null ? (
+        <div className="rounded-lg border border-base-800 bg-base-900/60 px-4 pb-3">
+          <LoadoutReading reading={reading} />
+        </div>
+      ) : null}
+
       {/* Warnings */}
       {conflict || lockedHere.length > 0 ? (
         <div className="flex flex-col gap-2">
@@ -448,6 +497,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario 
           {SLOTS.map((s) => (
             <Slot key={s.key} label={s.label} itemId={draft[s.key]}
               locked={state.lockedSet.has(draft[s.key])}
+              faction={draft.faction} scenario={scenario}
               onOpen={() => setPicking({ key: s.key, slot: s.slot, stratSlot: null })} />
           ))}
         </div>
@@ -456,6 +506,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario 
             <Slot key={i} label={`Stratagem ${i + 1}`} itemId={draft.strats[i]}
               locked={state.lockedSet.has(draft.strats[i])}
               warn={conflict && draft.strats[i] && packs.some((p) => p.id === draft.strats[i])}
+              faction={draft.faction} scenario={scenario}
               onOpen={() => setPicking({ key: null, slot: "stratagem", stratSlot: i })} />
           ))}
           <div className="rounded-lg border border-base-800 bg-base-900/40 px-3 py-2 text-[11px] text-base-500">

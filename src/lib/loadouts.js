@@ -25,9 +25,27 @@ export const loadoutItemIds = (l) =>
 
 export const loadoutItems = (l) => loadoutItemIds(l).map(getItem).filter(Boolean);
 
+/* Gear you aim yourself. A sentry cannot pick a weak point and an        */
+/* orbital does not care where the armor is thin, which is why every      */
+/* penetration question in this project is limited to this set.           */
+/*                                                                        */
+/* It lived in three places at once: here inside heldGear, in squad.js    */
+/* for the bot penetration check, and inside score.js as the `held` match */
+/* key, whose comment read "mirrors heldGear in loadouts.js". Three        */
+/* copies of one definition is two chances to drift.                      */
+export const isHeldWeapon = (item) =>
+  item.slot === "primary" ||
+  item.slot === "secondary" ||
+  (item.slot === "stratagem" && item.stratType === "support");
+
 /* Gear you actually hold and manage heat on. A call down does not vent   */
 /* in your hands, so orbitals, eagles, sentries, emplacements and mines   */
 /* are not part of this.                                                  */
+/*                                                                        */
+/* Wider than isHeldWeapon by exactly one thing, a backpack, and the      */
+/* difference is deliberate. A pack rides on your person so it vents      */
+/* with you; it is not something you aim, so it answers no armor          */
+/* question.                                                              */
 /*                                                                        */
 /* This used to claim the rule reproduced every hand authored heat flag,  */
 /* 39 of 39. It does not, and the claim was worthless anyway: the flags   */

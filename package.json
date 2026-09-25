@@ -1,7 +1,7 @@
 {
   "name": "dds",
   "private": true,
-  "version": "1.19.0",
+  "version": "1.20.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "wiki": "node scripts/fetch-wiki.mjs",
     "vehicles": "node scripts/add-vehicles.mjs",
-    "rules": "node scripts/check-rules.mjs"
+    "rules": "node scripts/check-rules.mjs",
+    "builds": "node scripts/check-builds.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.454.0",

@@ -523,7 +523,7 @@
           "suppressed"
         ]
       },
-      "say": "Outnumbered on a bot planet at this level, the fight you win is the one you do not start. A suppressed weapon is audible at 12 metres rather than 100, so a sentry on a perimeter dies without waking the base behind it. This is the difference between walking through an outpost and running from it.",
+      "say": "Under this much pressure on a bot planet, the fight you win is the one you do not start. A suppressed weapon is audible at 12 metres rather than 100, so a sentry on a perimeter dies without waking the base behind it. This is the difference between walking through an outpost and running from it.",
       "source": "The five suppressed weapons, and this is sourced rather than judged: the wiki carries Suppressed as a trait in each weapon's infobox and states that a suppressed weapon has an audible range of 12 metres against 100 for everything else. Listed by id here because the fetch does not read weapon article infoboxes yet. Move it into the fetch when it does.",
       "scaleBy": {
         "path": "scenario.peril",
@@ -532,7 +532,7 @@
         "clamp": 30
       },
       "judgement": "Ours. The size is set by one choice: being unheard is worth about a tier at peril 22, which is solo on Impossible or a duo on Helldive. Everything else follows from the scale. Below zero it inverts on purpose: with four of you on Challenging a silenced weapon is effort spent on a problem you do not have.",
-      "sayInverted": "There are enough of you here that nothing needs to be a secret. Staying unheard costs you rate of fire and stopping power, and at this level you are not being punished for making noise. Bring the louder gun."
+      "sayInverted": "There is enough slack in this drop that nothing needs to be a secret. Staying unheard costs you rate of fire and stopping power, and at this level you are not being punished for making noise. Bring the louder gun."
     },
     {
       "id": "peril-bots-punishes-loud",
@@ -547,7 +547,7 @@
           "suppressed"
         ]
       },
-      "say": "Every shot from this brings the patrol, and there are not enough of you to hold them while somebody repositions. On paper it may be the better gun. At this level, against this many, the noise is the stat that decides the run.",
+      "say": "Every shot from this brings the patrol, and at this level there is not enough slack to absorb one more fight. On paper it may be the better gun. Here the noise is the stat that decides the run.",
       "scaleBy": {
         "path": "scenario.peril",
         "from": 0,
@@ -555,7 +555,7 @@
         "clamp": 20
       },
       "judgement": "Ours, and deliberately gentler than the reward it mirrors. This matches almost half of everything you can hold, so it is set at roughly three quarters of a tier at peril 22 rather than a full one. A rule that touches half a list has to argue quietly.",
-      "sayInverted": "Loud is free here. There are enough of you to hold whatever the noise brings, and at this level it does not bring much. This is the situation the community rating already assumes, so nothing about it counts against this."
+      "sayInverted": "Loud is free here. Whatever the noise brings, this drop has the slack to hold it, and at this level it does not bring much. This is the situation the community rating already assumes, so nothing about it counts against this."
     },
     {
       "id": "peril-storm-favours-stealth",
@@ -574,7 +574,7 @@
           "suppressed"
         ]
       },
-      "say": "A storm cuts their sight as much as yours, and outnumbered you are not trying to win the firefight. Reduced visibility plus a weapon nobody hears is the difference between crossing an outpost and being chased out of one.",
+      "say": "A storm cuts their sight as much as yours, and under this much pressure you are not trying to win the firefight. Reduced visibility plus a weapon nobody hears is the difference between crossing an outpost and being chased out of one.",
       "scaleBy": {
         "path": "scenario.peril",
         "from": 0,
@@ -582,17 +582,18 @@
         "clamp": 15
       },
       "judgement": "Ours. Stacks with the plain quiet rule rather than replacing it, so a storm is worth extra on top rather than instead. Sized at about six tenths of a tier at peril 22.",
-      "sayInverted": "A storm cuts your sight as much as theirs, and with this many of you the fight is one you can simply win. Trading reach for silence is the wrong trade here."
+      "sayInverted": "A storm cuts your sight as much as theirs, and this drop is comfortable enough that the fight is one you can simply win. Trading reach for silence is the wrong trade here."
     }
   ],
   "knownGaps": [
     "Three visibility rules lean on a long-range tag that is our judgement rather than a published field. It lives in vocabulary.json with its reasoning, and the rules that read it carry a `judgement` saying so. It used to be the same six ids written out inside each of those three rules.",
     "The visibility rules key on the Marksman category only. Special was tried and dropped: it holds a flamethrower, a stim pistol and a shotgun pistol alongside the Dominator, so it says nothing about range.",
-    "Armour penetration moves no rating at all. Enemy armour is held and shown on every expanded row as a fact, and src/lib/enemies.js computes it in full, but nothing here reads it. It belongs to loadout scoring rather than to one item at a time. See whyThereAreNoArmourRules.",
+    "Armour penetration moves no rating at the item level and it must not. It moves one at the loadout level as of 1.20.0: build-rules.json reads the best thing a build holds against the front, which splits the 39 curated builds 36 / 41 / 23 where the per item reading split 51 primaries 48 to 3. Enemy armour is still shown on every expanded row as a fact. See whyThereAreNoArmourRules, which is about this file and stays true.",
     "Suppressed is sourced from a wiki article infobox rather than from a module, so it is curated on the items instead of fetched. It is a real published fact, 12 metres of audible range against 100, and it carries no `judgement` field for that reason. Move it into fetch-wiki.mjs when that script learns to read weapon infoboxes.",
     "The weather rules price a hazard as if it were always happening. A planet listing sandstorms has sandstorms sometimes, roughly three minutes at a time, and nothing in the data says how often. The visibility penalties are set as a risk you carry across a run rather than a state you are in, which is a judgement and not a measurement.",
-    "Peril is 6 * (difficulty - 5) + 4 * (4 - squad), calibrated on the curator's own two zero points: a four stack is comfortable through 5 and solo through 3. Only three rules read it, all on the bot front, so difficulty and squad still move nothing on bugs or squids.",
-    "Peril is a gate and nothing scales off it yet, so solo at 7 and solo at 10 move the same items by the same amount. The curator asked for an increasing scale. scenario.peril is reachable from scaleBy, so the plumbing is there and the magnitudes are the open question.",
-    "The negative half is defined and unused. Four players on Challenging is -12 and nothing yet says that a silenced weapon there is effort spent on a problem you do not have, or that anti tank at difficulty 3 is firepower for an enemy that does not spawn."
+    "Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad], where the squad curve is [10, 4, 1, 0] taken from the wiki patrol interval multipliers. The two zero points are the curator's calibration from play: a four stack is comfortable through 5 and solo through 3. Only three rules read it, all on the bot front, so difficulty and squad still move nothing on bugs or squids.",
+    "Three rules scale off peril rather than gating on it as of 1.19.0, so solo at 7 and solo at 10 no longer move the same items by the same amount. All three are on the bot front. Nothing on bugs or squids scales off it, and that is where the gradient is still missing.",
+    "The negative half is defined and barely used. peril-bots-punishes-loud hands out a bonus below zero peril and explains it with its sayInverted, and it is the only rule doing anything down there. Nothing yet says that anti tank at difficulty 3 is firepower for an enemy that does not spawn.",
+    "A rule scaling off peril must not name a squad size in its say. Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] and depth reaches it as readily as being alone does, so four players on Super Helldive sit at 30. All three bot peril rules shipped in 1.19.0 asserting the reader was outnumbered, and their inverted halves asserted the reader was not, both on a figure that says neither. Fixed on 22 August 2026 by describing the pressure instead. Nothing about how a squad size might get its own wording is solved here; the rule simply may not claim one it did not check."
   ]
 }

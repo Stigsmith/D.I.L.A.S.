@@ -1,5 +1,25 @@
 [
   {
+    "version": "1.20.0",
+    "date": "2026-08-22",
+    "title": "A build is now scored as a build, and armour is back where it belongs",
+    "changes": [
+      "Every loadout now carries two readings instead of none: what the gear is worth where you are dropping, and what the nine pieces are worth together. The difference between them is the point. A kit whose parts average an A and which fits together like a B is the interesting case, and showing only the B would make it a verdict you cannot argue with.",
+      "Armour penetration moves a rating again, for the first time since it was pulled out in August. It judges the whole build rather than one weapon, which is the whole reason it works this time. Judged per weapon, 48 of 51 primaries on the bot front share one of two identical readings, so the old rules were charging an assault rifle for being an assault rifle. Judged per build, the same reading splits the curated set 36, 41 and 23 percent three ways.",
+      "It only counts what you aim. A sentry cannot pick a weak point and an orbital does not care where the plate is thin, so a build whose only heavy penetration is a Railcannon has not answered the question of what to do about the thing walking at you. What the Railcannon does answer is counted separately.",
+      "The Eruptor and Stalwart trade is now something the tool can see. Bringing a weapon built for armour means bringing something else for the crowd, and a build where everything you hold is built for armour is told so. That trade is invisible one weapon at a time and obvious across a build.",
+      "A build that leaves a hole is told which hole. Nothing for opening armour, nothing that holds off a crowd, nothing that closes a fabricator on a mission that is entirely fabricators. Each one carries the sentence explaining it, and each is conditioned on where you are dropping, so none of them fire on a quiet drop where the gap does not matter.",
+      "A build with no holes says nothing and keeps exactly what its gear is worth. Silence is the normal state here, the same call the squad panel already made: not being congratulated for having no gaps is different from being told you are fine.",
+      "The builder shows the same reading, live. Change a slot or change the front the build is for and it recomputes, so you can watch a gap close instead of saving and going to look.",
+      "Drop Bay now shows the scenario bar. The cards read where you are dropping, so the control that changes what they say belongs on the same screen.",
+      "Every loadout rule is measured against 300 random legal builds before it ships, not just against the 39 curated ones. Two rules were written, measured and cut for describing the pool rather than the build: one asked for a demolition 40 hole closer that 86 percent of builds do not carry, and one fired on 45 percent of builds and only ever on the bot front. Both facts are true and neither told you anything.",
+      "The rules are checked before every build the same way the weapon rules are. A loadout rule that reads a field the engine cannot produce, or names a role that does not exist, used to fail silently by never firing. Seven ways of getting that wrong now stop the build.",
+      "A stale formula came out of the rule health report. It had been calculating peril the old way for two versions after the real one changed, so every rule that depends on difficulty and squad size was being measured in a situation the tool no longer produces.",
+      "A slot in the builder shows one rating instead of three. It used to show all three fronts side by side with nothing saying which was which, and a build is for one front, so two of them were answering a question nobody asked. The one it shows is ours for where you are dropping, matching the reading above it, with the community vote in the tooltip and a marker whenever the two disagree.",
+      "Three pieces of advice stopped telling a full squad it was outnumbered. They scale off how much trouble you are in, which rises with difficulty as well as with being alone, so four players on Super Helldive were being told there were not enough of them. No rating moved; only the wording was wrong."
+    ]
+  },
+  {
     "version": "1.19.0",
     "date": "2026-08-21",
     "title": "The second rating column stopped hiding, and six rules stopped spelling out the same lists of weapons",

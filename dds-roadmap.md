@@ -41,8 +41,8 @@ Everything shipped in 1.3.0 through 1.9.0 sits in the first track. **None of it 
 | Item | Label | Status after the overhaul |
 |---|---|---|
 | **Auth and shared storage** | v2 | **Unchanged.** Still the only genuinely new infrastructure, still first in its own chain, still nothing else can land before it |
-| **Exchange** | v3 | **Dependency unchanged, contents now defined.** It is today's Drop Bay grid, plus the 39 curated builds, plus other people's. And it gained a practical prerequisite: an Exchange full of strangers' builds is unbrowsable without **Phase 5 loadout scoring** to rank and filter it |
-| **Squad** | v2 | **Split in two.** The warning engine half is local and lands in Phase 5 with no infrastructure at all, because `squad.js` already runs over a list of builds and does not care where they came from. The live party half still needs the chain |
+| **Exchange** | v3 | **Dependency unchanged, contents now defined.** It is today's Drop Bay grid, plus the 39 curated builds, plus other people's. And its practical prerequisite is met: **Phase 5 loadout scoring landed in 1.20.0**, so an Exchange full of strangers' builds now has a number to rank and filter on. `byReading` in `build.js` is that sort, exported and unused |
+| **Squad** | v2 | **Split in two, and the local half was already built.** `squad.js` runs over a list of builds and does not care where they came from, so nothing about it waited on Phase 5. The live party half still needs the chain |
 | **Profiles** | shipped | **Unchanged.** Still separate from accounts, still possibly redundant once accounts exist. See the section above |
 | **Account page, login art** | v2 | **Unchanged.** Behind auth, as it always was |
 | **Monetised theme packs** | was aspirational | **Dead.** Two independent blockers: extracted game art, and the wiki data being CC BY-NC-SA, which forbids commercial use outright |
@@ -53,13 +53,13 @@ Everything shipped in 1.3.0 through 1.9.0 sits in the first track. **None of it 
 
 - The Drop Bay half works **locally, for one player**, with no infrastructure. It can be built at any time.
 - The Exchange half **cannot ship until v3**, because there is nowhere for other people's builds to live.
-- So Phase 6 splits: build the drop screen when Phase 5 lands, and let Exchange inherit the grid whenever storage arrives.
+- So Phase 6 splits: build the drop screen when Phase 5 lands, and let Exchange inherit the grid whenever storage arrives. **Phase 5 landed on 22 August 2026, so the drop screen is unblocked and Exchange is not.**
 
 ### The order that now makes sense
 
 1. ~~**Phase 2.5**, enemy armour~~. **Done, 1.10.0, 21 August 2026.** See below
 2. **Phase 4**, the three judgement tags. Small, and it closes the gaps `context-rules.json` currently admits to
-3. **Phase 5**, loadout and squad scoring. The biggest remaining piece, and the one both Exchange and the drop screen wait on
+3. ~~**Phase 5**, loadout and squad scoring~~. **Done, 1.20.0, 22 August 2026.** See below
 4. **Phase 6a**, Drop Bay becomes the drop screen. Local, no infrastructure
 5. **v2**, auth and shared storage. The infrastructure step, unchanged
 6. **v3**, Exchange inherits the grid, and live party fills the drop screen's slots
@@ -107,6 +107,34 @@ Everything shipped in 1.3.0 through 1.9.0 sits in the first track. **None of it 
 > A health check over every scoring rule: the pool it can fire on, how much of that pool it hits, and how often it moves a tier. Anything firing on 60% or more gets flagged, which is the shape the armour rules had. All 31 remaining rules pass, the loudest being ion storms at 41% and that one is correct.
 >
 > **Run it after adding a rule.** The armour bug was visible in one line of output and shipped anyway because nothing was looking.
+
+### Phase 5 as built
+
+> [!success] Loadout scoring shipped, 1.20.0, 22 August 2026
+> `src/lib/build.js`, 9 rules in `src/data/build-rules.json`, `npm run builds`. The full write up is in `CLAUDE.md` under The Loadout Reading; this is what it means for the plan.
+
+| | |
+|---|---|
+| Rules | **9**, all discriminating against 300 random builds, loudest at 39% |
+| Written, measured and cut before shipping | **2** |
+| Rules that read armour | **1**, and it is the one this phase existed to get right |
+| Surfaces | The Drop Bay card and the Builder, live on every edit |
+| Squad half | **Was already built.** `squad.js` never depended on this |
+
+**Armour came back and it works this time.** The 1.13.0 post mortem said it would return as a loadout property and it has. The measurement that settles it: held penetration splits the 39 curated builds **36 / 41 / 23** three ways, where the per item version had 48 of 51 primaries sharing one of two identical readings. Same data, different altitude, opposite result.
+
+> [!danger] The 39 curated builds are no longer the denominator, and that was the curator's call
+> Asked whether the layer should be softened because it mostly marks the curated set down, his answer on 22 August 2026 was that **the curated sets are legacy AI generations, and using DDS tiering and warnings would likely net better builds**. So they are not ground truth and nothing is calibrated against them.
+>
+> `npm run builds` now measures every rule against **300 random legal builds** as well, 100 per front, seeded. That change immediately paid for itself: two rules that looked healthy against the curated 39 were describing the pool against a random sample, and both were cut before they shipped rather than after somebody noticed in the app.
+
+> [!warning] Three things Phase 5 did not do, and none of them were meant to be
+> - **The wider warning set.** Still a separate non code design session, still the section below. The nine existing squad checks are unchanged.
+> - **Ranking Drop Bay.** The score exists and `byReading` is exported, but Drop Bay is still a plain grid by explicit earlier decision. Turning it into a ranked list is a product call nobody has made.
+> - **Reading one build and the squad together.** `readBuild` judges a loadout and `squad.js` judges the combination, and neither knows the other ran. A build thin on armour is not thin if the other three brought Recoilless rifles. **There is nowhere both readings appear together until the drop screen exists**, which makes this a Phase 6a job rather than an omission here.
+
+> [!tip] The generator got closer without anyone building it
+> This file already said it: a coverage engine over one loadout is a build validator, and a validator plus a search over the item pool is a generator. `readBuild` is that validator, and `check-builds.mjs` already generates 300 random legal builds and scores every one of them. **The roll the dice generator is now a sort over code that exists** rather than a thing to write from scratch.
 
 **The starmap is part of step 4, not a later phase.** It is the drop screen's entry point: you click the planet where you clicked it in the game and the scenario fills itself. It draws from shipped data and needs no network call. The live colouring layer is optional, needs no account, and can arrive whenever. See the section below.
 
@@ -195,7 +223,7 @@ Today's Drop Bay, kept: the grid, the cards, the filters, the favourites. `Loado
 ### What this changes about the earlier sections
 
 - **Party auto-fill** stops being a feature bolted onto compare slots. A squad member's slot on the drop screen *is* the compare slot, so the auto-fill question becomes the natural behaviour of the screen rather than an addition to it. The open question about what an unpicked slot shows is answered by the confirm step: an unconfirmed slot reads as still deciding.
-- **Better base loadouts, authored offline** was scoped as "author better ones". The intent has changed to "get them out of the default view". That is cheaper, and it removes the pressure to hand author 39 replacements before the generator is good enough to roll them.
+- **The curated builds** were scoped as "author better ones", then as "get them out of the default view". **Both are dead as of 22 August 2026: they get binned and a new set is built from scratch.** So Exchange inherits the grid and whatever the new set turns out to be, and the question of where to put 39 builds nobody wants in front of a new player stops needing an answer.
 - **The squad panel** stops being a sticky bar above a grid and becomes the screen. That is a better home for it than the one it has.
 
 ---
@@ -306,7 +334,7 @@ Planned as a **separate non-code session**, because it is a design problem rathe
 
 ---
 
-## Better base loadouts, authored offline
+## The curated builds get binned and rebuilt from scratch
 
 > [!bug] The 39 curated builds are tier maximised and it shows
 > Measured, not guessed.
@@ -323,10 +351,31 @@ Planned as a **separate non-code session**, because it is a design problem rathe
 
 The last row is the whole problem in one line. An A tier marksman rifle against bots is a better fit for how some people play than the S+ Coyote, and the current set never offers the trade.
 
-> [!warning] The intent changed on 20 August 2026
-> This was scoped as "author 39 better ones". It is now "get them out of the default view and into Exchange". The numbers below are still the evidence for why the current set is weak, but replacing them by hand is no longer the answer: the scoring engine plus the roll the dice generator is, and neither needs 39 hand written replacements first.
+> [!danger] The intent has moved twice, and the current answer is to bin them
+> **22 August 2026, the curator: "i think we will bin all the curated ones at some point and make a curated list from scratch."** That supersedes both earlier positions. The 39 are legacy AI generations made before this project had stats or scoring behind it, and they are not being fixed, promoted, demoted or moved. They are being replaced.
+>
+> The two dead positions, recorded so neither gets picked back up:
+>
+> | Dropped | Was |
+> |---|---|
+> | 14 August | "Author 39 better ones by hand" |
+> | 20 August | "Leave them and get them out of the default view into Exchange" |
+>
+> **What this changes about Exchange.** The curated set moving there was the 20 August answer to a set nobody wanted in front of a new player. If they are binned instead, Exchange inherits the grid and whatever the new set turns out to be, and the migration question disappears rather than being solved.
 
 **The plan:** a separate tool or Claude project that reads this project's data plus a logic document and writes `loadouts.json`. Not an in-app feature.
+
+> [!success] Phase 5 built most of the tooling this needs, on 22 August 2026
+> This section has always said the generator and the warning engine are the same work done twice if they are not planned together. They were, and here is what already exists:
+>
+> - **`readBuild` is the validator.** It scores any loadout against a scenario and names every hole, so a candidate build can be judged without a person reading it.
+> - **`check-builds.mjs` already generates legal builds and scores them**, 300 of them, seeded and reproducible: every slot filled, no stratagem twice. That loop plus a keep-the-best pass is the generator.
+> - **`npm run builds` is the acceptance test for a new set.** Its two columns are random builds against the curated ones, and a good new set should look **less** like a random sample than these 39 do, not more.
+>
+> What is still missing is the steering: playstyle options, and the variety constraint below expressed as something the search optimises rather than something a person checks afterwards.
+
+> [!warning] The rules cite the 39 by number, and those citations expire with them
+> Several `measured` fields in `build-rules.json` are anchored on the curated set: 17 of 39 carry no anti-armor, 3 of 39 carry no chaff, held penetration splits 36 / 41 / 23. **Re-run `npm run builds` and rewrite those citations when the set is replaced.** The random column is unaffected and is the one the coefficients were actually set against, so no rule should need retuning, but a citation that names a set which no longer exists is worse than no citation.
 
 > [!danger] This is not the auto-calibration that was declined
 > That was a live picker that re-adjusted your other slots as you chose, and it stays declined. Authoring better curated builds offline and shipping them as data is curation with better tooling.

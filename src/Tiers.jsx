@@ -28,6 +28,7 @@ import {
   missionsFor, missionTraits, missionByName, traitsOf,
 } from "./lib/scenario.js";
 import { scoreItem, scenarioIsSet } from "./lib/score.js";
+import { readBuild, explainScore } from "./lib/build.js";
 import { describeArmour, enemiesUpTo, arrivalsLine, EXPOSURE_GAP, enemySource } from "./lib/enemies.js";
 import TierBadgePlate from "./TierBadgePlate.jsx";
 import { useBadgeStyle } from "./lib/badge.js";
@@ -2066,8 +2067,120 @@ function StratChip({ id, isLocked }) {
   );
 }
 
-export function LoadoutCard({ loadout, isFavorite, onToggleFavorite, rankLabel, biome, lockedSet, onOpen, onDelete, inCompare, onToggleCompare, compareFull }) {
+/* ================================================================== */
+/* THE LOADOUT READING                                                */
+/*                                                                    */
+/* Two badges, deliberately the same two column pattern the tier list */
+/* uses, and for the same reason: the difference between them is the  */
+/* thing worth putting on screen.                                     */
+/*                                                                    */
+/* On a tier row the pair is a community vote and what we make of it. */
+/* There is no community vote on a loadout, so here it is what the    */
+/* gear is worth where you are dropping, and what the nine pieces are */
+/* worth together. A kit whose parts average an A and which fits      */
+/* together like a B is the interesting case, and showing only the B  */
+/* makes it a verdict you cannot argue with.                          */
+/*                                                                    */
+/* Every point of movement carries its sentence, same contract the    */
+/* expanded tier row keeps. A build that moved and will not say why   */
+/* is worse than a build with no reading at all.                      */
+/* ================================================================== */
+
+/* The severity words and colours the squad panel already uses, because a
+   critical on a card and a critical in the squad panel are the same claim
+   about the same kind of gap. */
+const NOTE_TONE = {
+  red: "bg-red-500/15 text-red-400",
+  amber: "bg-accent-500/15 text-accent-400",
+  grey: "bg-base-700/50 text-base-400",
+};
+
+function ReadingBadge({ label, tier, quiet, delta }) {
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <span className="text-[9px] font-semibold uppercase tracking-wider text-base-500"
+        style={{ fontFamily: "'Oswald', sans-serif" }}>{label}</span>
+      <span className="relative flex items-center">
+        <TierBadge tier={tier} quiet={quiet} className="w-8 h-auto" />
+        {/* Top left, the same corner the tier row puts it on: that corner
+            of the plate is square and the top right is the chamfer. */}
+        {delta ? (
+          <span className={"absolute -left-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full ring-2 ring-base-900 " +
+            (delta > 0 ? "bg-emerald-500 text-emerald-950" : "bg-red-500 text-red-950")}>
+            {delta > 0 ? <ArrowUp className="h-2.5 w-2.5" strokeWidth={3} />
+              : <ArrowDown className="h-2.5 w-2.5" strokeWidth={3} />}
+          </span>
+        ) : null}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * reading  what readBuild returned, or null when no front is chosen
+ * compact  the card wants the badges and the sentences and nothing else.
+ *          The builder has room for the arithmetic underneath.
+ */
+export function LoadoutReading({ reading, compact }) {
+  if (!reading || reading.score === null) return null;
+
+  const moved = TIER_RANK[reading.tier] - TIER_RANK[reading.partsTier];
+
+  return (
+    <div className="border-t border-base-800 pt-2.5">
+      <div className="flex items-start gap-4">
+        <ReadingBadge label="Gear" tier={reading.partsTier} quiet={Boolean(moved)} />
+        <ReadingBadge label="Build" tier={reading.tier} delta={moved} />
+        <p className="flex-1 pt-3 text-[10px] leading-relaxed text-base-500">
+          {reading.adjust === 0
+            /* Agreeing is a real answer, the same call the second tier
+               column makes. An empty box would read as a rendering fault.
+               It keys on the points rather than on the badge: a build can
+               gain eight without crossing a band, and saying nothing
+               changed directly above a green +8 is the tool contradicting
+               itself in two lines. */
+            ? "Nothing about how this fits together changes what the gear is worth."
+            : explainScore(reading)}
+        </p>
+      </div>
+
+      {reading.notes.length ? (
+        <div className="mt-2 flex flex-col gap-1">
+          {reading.notes.map((n) => (
+            <div key={n.id} className="flex items-start gap-2 text-[11px] leading-relaxed">
+              <span className={"mt-px shrink-0 rounded px-1 py-px text-[10px] font-bold tabular-nums " +
+                (n.delta > 0 ? "bg-emerald-500/15 text-emerald-400"
+                  : n.delta < 0 ? "bg-red-500/15 text-red-400"
+                    : NOTE_TONE[n.severity] || NOTE_TONE.grey)}>
+                {n.delta > 0 ? "+" : ""}{Math.round(n.delta)}
+              </span>
+              <span className="text-base-300">{n.say}</span>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      {compact ? null : (
+        <p className="mt-2 text-[10px] leading-relaxed text-base-600">
+          Ours, and there is no community vote on a loadout to set it against. The left badge is what these nine items
+          are worth where you are dropping, each scored by the same rules the tier list shows. The right one is what
+          they are worth together. Roughly 14 points is one tier, and nothing about the combination can move it by more
+          than two.
+        </p>
+      )}
+    </div>
+  );
+}
+
+export function LoadoutCard({ loadout, isFavorite, onToggleFavorite, rankLabel, biome, scenario, lockedSet, onOpen, onDelete, inCompare, onToggleCompare, compareFull }) {
   const theme = FACTION_THEME[loadout.faction];
+  /* Scored against the front the build is for rather than the one the
+     scenario names. A bugs build never appears on a bot screen, and
+     reading it against bots would be answering a question nobody asked. */
+  const reading = useMemo(
+    () => (scenario && scenario.faction ? readBuild(loadout, { ...scenario, faction: loadout.faction }) : null),
+    [loadout, scenario]
+  );
   const biomeMatch = biome !== "any" && loadout.biomes.includes(biome);
   const fireNote = biome === "hot" && loadout.fire;
   const lockedHere = loadoutItems(loadout).filter((id) => lockedSet.has(id));
@@ -2146,6 +2259,8 @@ export function LoadoutCard({ loadout, isFavorite, onToggleFavorite, rankLabel, 
             <Flame className="w-3.5 h-3.5 shrink-0 mt-px" /><span>Fire-based kit. Watch out on fire tornado planets.</span>
           </div>
         ) : null}
+
+        <LoadoutReading reading={reading} compact />
 
         <div className="border-t border-base-800 pt-2.5 flex flex-col gap-1.5">
           {rows.map(([label, value]) => {

@@ -56,18 +56,18 @@ Data authority lives outside this repo, in the Helldivers 2 project files: `hell
 > | **Enemy armour** | 80 enemies, 594 body parts. Shown on every row as a fact, moves no rating, waits for loadout scoring |
 > | **Vehicles** | All eight, rated |
 >
-> **What is left**, in order: three judgement tags, loadout and squad scoring, then Drop Bay becoming the drop screen. The plan lives in `dds-roadmap.md`, which also explains how the phases relate to the v2 and v3 labels in the sidebar.
+> **What is left**, in order: three judgement tags, then Drop Bay becoming the drop screen. Loadout scoring landed in 1.20.0. The plan lives in `dds-roadmap.md`, which also explains how the phases relate to the v2 and v3 labels in the sidebar.
 
-> [!danger] Armour is held and shown, and it moves no rating. Do not wire it back into scoring
+> [!success] Armour moves a rating again, at the loadout level. 1.20.0. Do not put it back on the item
 > Five armour rules shipped in 1.10.0 and came out in 1.13.0. They were the wrong altitude and the measurement is blunt: **48 of 51 primaries on the Automaton front share one of two identical armour readings**, and the rules took a tier off 42 of them. Only the Eruptor, the Double-Edge Sickle and the Torcher differ.
 >
 > **A community tier already prices in what an item is for.** Voters know an assault rifle does not open a Hulk, so the Liberator's B on bots is a B *given* that it is a chaff gun. Penalising it again charges twice for one fact.
 >
 > The curator found it within minutes of the feature shipping, and the second half of his argument is the one that settles it: even the item that **is** good at armour is not straightforwardly better, because bringing an Eruptor on bugs forces a Stalwart to cover chaff. That trade is invisible to per item scoring. **Armour is a loadout property.**
 >
-> `src/lib/squad.js` already had this right, asking whether *anyone in the squad* carries AP 4 or better rather than judging each weapon alone. That is the shape it comes back in, at Phase 5.
+> `src/lib/squad.js` already had this right, asking whether *anyone in the squad* carries AP 4 or better rather than judging each weapon alone. **That is the shape it came back in, on 22 August 2026.** `penetration-misses-the-front` in `build-rules.json` reads the best thing a build holds, and the same reading that split 51 primaries 48 to 3 splits the 39 curated builds **36, 41 and 23 percent** three ways. See The Loadout Reading.
 >
-> **The test any replacement must pass:** a scenario rule has to fire on something that varies with the scenario. Armour reach per item does not. `npm run rules` measures this for every rule and flags any firing on 60% or more of its pool.
+> **The test any replacement must pass:** a scenario rule has to fire on something that varies with the scenario. Armour reach per item does not. `npm run rules` measures this for every rule and flags any firing on 60% or more of its pool, and `npm run builds` does the same for the loadout rules against 300 random builds.
 
 > [!success] Enemy armour landed in 1.10.0, 21 August 2026
 > The tool showed an armor penetration number for months with nothing to measure it against, so every judgement about it was a threshold somebody picked. `src/data/enemies.json` is the other half: **80 enemies, 594 body parts**, each with its armor value, health and durable share.
@@ -354,6 +354,8 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 | `wiki-stats.json` | **Generated.** The stats the tables never had, for 174 items. Never edit by hand |
 | `planets.json` | **Generated.** 269 planets, their biome and their hazards. Nothing reads it yet |
 | `enemies.json` | **Generated.** 80 enemies, 594 body parts, each with an armor value, plus the difficulty each enemy starts appearing at. What every penetration figure is measured against. Never edit by hand |
+| `context-rules.json` | The 34 rules that move one item rating. Read by `score.js`, checked by `npm run rules` |
+| `build-rules.json` | The 9 rules that move a whole build. Read by `build.js`, checked by `npm run builds` |
 
 ### Item shape
 
@@ -587,6 +589,13 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > the delta against the sign of `scaleBy.times`. Testing `delta < 0` gets one of the two rules
 > backwards, which is the bug that shipped for about ten minutes.
 
+> [!danger] A peril rule must not name a squad size in its copy
+> Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad], so **depth reaches it as readily as being alone does**: four players on Super Helldive sit at 30, the same figure as a duo on Impossible plus a step.
+>
+> All three bot peril rules shipped in 1.19.0 asserting the reader was outnumbered, and their inverted halves asserted the reader was not. A full squad at difficulty 10 read "there are not enough of you to hold them". Both directions were claiming a party size the rule never checked.
+>
+> Fixed on 22 August 2026 by describing the pressure instead: "at this level there is not enough slack to absorb one more fight". **`npm run rules` was byte identical before and after**, which is the only acceptable outcome for a copy change. If a rule ever genuinely needs to talk about how many of you there are, it has to gate on `squad` and say so.
+
 > [!danger] Peril does not fire on an unset value
 > `peril()` returns null unless **both** difficulty and squad are answered, and a rule scaling off it
 > then does not fire at all. Zero means not said. Assuming a squad size is how a list confidently
@@ -606,6 +615,71 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!info] It only reaches three tier rules, all on the bot front
 > Difficulty and squad still move nothing on bugs or squids in the tier list. The squad panel is
 > front agnostic and reads peril on every front.
+
+---
+
+# **The Loadout Reading**
+
+> [!success] A build is scored as a build. 1.20.0, 22 August 2026
+> `src/lib/build.js`, 9 rules in `src/data/build-rules.json`, `npm run builds` to check them. Pure, same shape as `score.js`, `squad.js` and `enemies.js`: no React, no storage, runnable from a script.
+>
+> **Two readings, and the difference between them is the product.** The gear badge is the mean of what the nine items are worth where you are dropping, each scored by `scoreItem` against the same 34 rules the tier list shows. The build badge is that plus what the combination adds or takes off. A kit whose parts average an A and which fits together like a B is the interesting case, and showing only the B makes it a verdict nobody can argue with.
+
+> [!danger] There is no community base here and one must never be invented
+> A tier row shows two ratings because there is an outside opinion to disagree with. **Nobody votes on loadouts.** The base is the build's own parts, which is the only outside opinion available, and inventing a sourced looking column would launder our own judgement through something that looks like a vote. `whyThereIsNoCommunityBase` in `build-rules.json` says this next to the rules.
+
+> [!info] The scale is the item scale, deliberately unchanged
+> A build scoring 68 and an item scoring 68 mean the same thing, so the two numbers sit on one screen with no translation step and a build inherits `tierForScore` rather than growing a second ladder nobody has learned. The clamp is the same too: two tiers, growing past peril 22, so the combination may argue with the parts and may not rewrite them.
+>
+> **The score is uncapped above 95 and that is fine.** It is a ranking device, the same way an item's is, and `tierForScore` tops out at S+ regardless. Nothing renders the raw number as a percentage.
+
+> [!danger] Penetration counts only what you aim, and that is not a detail
+> `facts.heldAp` reads primaries, secondaries and support weapons. A sentry cannot pick a weak point and an orbital does not care where the plate is thin, so a build whose only AP 6 is a Railcannon has **not** answered what to do about the thing already on top of you. What the Railcannon does answer is the `anti-armor` role, counted separately over everything in the build. **Two questions, both asked**, and conflating them is how the rule stops meaning anything.
+>
+> `isHeldWeapon` in `loadouts.js` is the one definition. It lived in three places until 1.20.0: inside `heldGear`, inside `squad.js`, and inside `score.js` as the `held` match key, whose comment read "mirrors heldGear in loadouts.js". **`heldGear` is wider by exactly one thing, a backpack**, because a pack vents with you but is not something you aim.
+
+> [!danger] The 39 curated builds are not a fair denominator, and `npm run builds` says so in two columns
+> The curator's call, 22 August 2026: **they are legacy AI generations**, made before this project had stats or scoring behind it, and using the tool's own tiering and warnings would net better ones. `dds-roadmap.md` already had the measurement: 35 of 39 use an S or S+ primary, 13 distinct primaries appear across all of them, and three A tier marksman rifles for bots appear zero times.
+>
+> So the health check reports every rule against **300 random legal builds**, 100 per front, seeded so two runs stay comparable. That is the honest denominator for whether a rule discriminates. The curated column stays beside it because those 39 are what is on screen today, **and the gap between the two columns is itself a reading**: a rule firing far more often on the curated set than on a random one is describing his 39.
+
+> [!failure] Two rules were written, measured and cut before they shipped
+> The 1.13.0 lesson applied before the fact instead of after. Both were only visible against the random denominator.
+>
+> | Cut | Why |
+> |---|---|
+> | `hole-closers-need-the-angle` | Asked for a demolition 40 hole closer in a cave. **86% of random builds carry none.** `squad.js` can ask that across four builds and get a real answer; over one build it cannot |
+> | `penetration-reaches-everything` | Fired on **45% of random builds and only ever on bots**, because AP 5 is where that front stops needing a weak point and most builds carrying any support weapon are already past it |
+>
+> Both facts are true. Neither discriminates. They are recorded in `knownGaps` rather than shipped.
+
+> [!warning] The layer only deducts, with one exception, and that is deliberate
+> `squad.js` settled this first: **silence is the normal state and never a claim of coverage.** A build with no holes scores exactly what its parts are worth rather than being congratulated for it. The single positive is `answers-everything`, and it survives because carrying armour, crowd and hole answers **in your hands** is 22% of random builds where carrying them anywhere is 54%. The first is a property, the second is the pool.
+
+> [!info] What a rule may ask about a build
+> `covers` and `notCovers` for roles, `count` for how many items match an ordinary context-rule clause, `has` and `notHas`, and `number` reading `facts.*`, `reach.*` or `scenario.*`.
+>
+> **`count` calls `score.js`'s own item matcher**, which is why a build rule can say `{ "of": { "roles": ["chaff"], "held": true }, "lte": 0 }` and read any field a tier rule can read. One item matcher, two engines, no second vocabulary to keep in step. `matches`, `applies`, `numberTest` and `reach` are exported from `score.js` for exactly this.
+>
+> The engine **throws** on an unknown match key rather than skipping it, and `npm run validate` checks every key, path, role and severity so the throw never reaches a browser.
+
+> [!info] Where it renders, and the one contradiction that got caught
+> `LoadoutReading` in `Tiers.jsx`, on the Drop Bay card in `compact` form and in the Builder with the arithmetic underneath. The Builder recomputes on every edit, which is the point of putting it there: change a slot and watch the gap close.
+>
+> **The caption keys on the points, not on the badge.** It chose its sentence on whether the tier moved at first, so a build that gained 8 points without crossing a band rendered "nothing about how this fits together changes what the gear is worth" directly above a green +8. Three states, three sentences: the badge moved, the points moved but the badge did not, and genuinely nothing happened.
+
+> [!warning] Drop Bay carries the scenario bar now
+> Added to `SCENARIO_SURFACES` in `App.jsx` when the cards started reading the scenario. A control that changes what is on screen has to be on screen, the same rule the folded filter pane keeps.
+>
+> **Drop Bay's own biome, mission and difficulty are still filters and still local.** They are not the scenario, they do not feed the reading, and folding the two together is Phase 6a's job. The loose end `dds-roadmap.md` already names, five internal mission ids against seventy real names, is unchanged.
+
+> [!info] There is still no ranking in Drop Bay
+> `DropBay.jsx` says so in its header and it stays true: a plain grid, no scored picks. The score exists and `byReading` is exported for the day Exchange needs it, which is the thing `dds-roadmap.md` says loadout scoring was blocking. **Turning Drop Bay into a ranked list is a product decision nobody has made.**
+
+> [!tip] The scripts share one loader now
+> `scripts/lib/app.mjs` inlines the JSON imports and hands back the real `src/lib` modules, so a script measures the code that ships rather than a copy of it. `check-rules.mjs` and `check-builds.mjs` both use it.
+>
+> It exists because the first copy of those twenty lines **carried a stale peril formula, 4 times difficulty minus squad minus 1, for two versions after `SQUAD_PRESSURE` replaced it.** Every rule gating on peril was being sampled in a situation the engine no longer produces. It calls `score.peril` now and cannot drift again.
 
 ---
 
@@ -700,6 +774,17 @@ Nine slots. Tapping one opens a picker over the whole screen that reuses the tie
 
 > [!danger] Opening a preset forks it
 > The 39 curated builds are stigly's and are never written to. Opening one in the builder hands you a copy carrying `forkedFrom`, and the banner says so. Saving stores the copy under `hd2-loadouts`; the original is untouched.
+>
+> **The mechanism outlives the set**, and replacing `loadouts.json` wholesale is safe. Checked on 22 August 2026, because the 39 are getting binned:
+>
+> - **`forkedFrom` is written and never read.** `forkPreset` sets it and nothing anywhere looks at it, so a saved build pointing at a preset id that no longer exists is inert rather than broken. `cleanLoadout` does not validate it and does not need to. **If anything ever does read it, that reader owns the dangling case**, because nothing else will catch it: the validator checks slots, not provenance.
+> - **The forked banner reads the route, not the link.** It renders from `presets.find(p => p.id === loadoutId)` and is guarded on that being found, so a dead id renders nothing rather than "Forked from undefined".
+> - **Favourites and the Drop Bay comparison both filter to what resolves**, so a starred or compared preset that stops existing disappears quietly.
+
+> [!danger] A slot row shows one badge, for the front the build is for
+> It rendered all three faction ratings until 1.20.0, unlabelled, so you could not tell which was which and two of them answered a question nobody asked. **A build declares a front and keeps it when saved.** The tier list dropped its three faction columns in 1.9.0 for exactly this reason and the builder slot was the last place they survived.
+>
+> **It shows our reading, not the vote**, because the gear badge above it is the mean of these nine and two halves of one screen must not disagree about the same weapon. The vote is not hidden: it is the delta marker, the same top left dot the tier row uses, and the tooltip opens with what the crowd said. The full community rating is one tap away in the picker, which reuses the whole tier row.
 
 ### Derived metadata
 
@@ -946,6 +1031,16 @@ npm run build
 `npm run build` runs the validator first and stops if names do not line up. Run the check on its own with `npm run validate`.
 
 ```bash
+npm run rules
+```
+
+```bash
+npm run builds
+```
+
+The two rule health reports. `rules` measures every item rule against the pool it can fire on, and `builds` measures every loadout rule against the 39 curated builds **and** 300 random legal ones. Both flag anything firing on 60% or more, which is the shape the armour rules had. **Run them after adding a rule.** The armour bug was visible in one line of output and shipped anyway, because nothing was looking.
+
+```bash
 npm run wiki
 ```
 
@@ -1017,7 +1112,7 @@ Re-fetches the weapon stats and the planet table, and **reports what would chang
 - **Weapon stats beyond the tables.** Magazine size, spare magazines, fire rate, recoil, reload time, projectile count and stagger are not in the source data. They would come from helldivers.wiki.gg.
 - **Vehicles and mechs.** No EXO-45, EXO-49, FRV or GATER anywhere in the source tables. The stratagem list is incomplete without them.
 - **A smart roll-the-dice generator in the builder.** Roll a build that is deliberately not just the top rated item in every slot, plus playstyle options to steer it. Wanted, and explicitly parked: it needs the coverage logic to be much better first. **This is not the auto-calibration that was declined.** That was a live picker that re-adjusted your other slots as you chose. This is a deliberate roll you ask for.
-- **Better curated base loadouts, authored offline.** The current 39 are tier maximised and it shows: 35 of 39 use an S or S+ primary, only 13 distinct primaries appear across all of them, and the Grenade Pistol is in 16. On bugs and squids, 31 primaries are rated A or better and 8 get used. Three A tier marksman rifles for bots appear zero times. The plan is a separate tool that reads this project's data plus a logic document and writes `loadouts.json`, with variety as a hard constraint rather than a hope.
+- **The 39 curated builds get binned and a new set built from scratch.** The curator's call, 22 August 2026, and it supersedes both earlier plans: not authored by hand one at a time, and not merely moved out of the default view into Exchange. They are legacy AI generations from before this project had stats or scoring, and the numbers say so: 35 of 39 use an S or S+ primary, 13 distinct primaries appear across all of them, the Grenade Pistol is in 16, and three A tier marksman rifles for bots appear zero times. The replacement is a separate tool that reads this project's data plus a logic document and writes `loadouts.json`, with variety as a hard constraint. **Phase 5 built most of what it needs**: `readBuild` is the validator and `check-builds.mjs` already generates and scores 300 legal builds. See `dds-roadmap.md`.
 - **A bug and feature request form on Support.** Needs somewhere for a submission to go, so it waits on the same shared storage that accounts need. The footer no longer claims no data leaves your browser, so this is unblocked on the copy side.
 
 ---

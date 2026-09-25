@@ -61,14 +61,15 @@
     {
       "id": "loadout-scoring",
       "title": "Scoring a whole build",
-      "status": "planned",
+      "status": "shipped",
       "track": "solo",
-      "say": "Rate a loadout rather than one item at a time, and a squad rather than one loadout. This is where armour penetration finally means something: the question was never whether your rifle opens a Hulk, it is whether anything you brought does."
+      "say": "Every build now carries two readings, what its gear is worth where you are dropping and what the nine pieces are worth together, which is where armour penetration finally means something: the question was never whether your rifle opens a Hulk, it is whether anything you brought does.",
+      "version": "1.20.0"
     },
     {
       "id": "drop-screen",
       "title": "Drop Bay becomes the drop screen",
-      "status": "planned",
+      "status": "next",
       "track": "solo",
       "say": "The thirty seconds before you dive: who is bringing what, where you are going, and what is going to hurt."
     },

@@ -1,0 +1,243 @@
+{
+  "note": "How the nine slots together read differently from the nine slots apart. Read by src/lib/build.js. Every rule here fires on something that varies between builds, which is the test the item level armour rules failed: 48 of 51 primaries share one of two identical armour readings, so a rule keyed on one item's penetration was describing the pool. Keyed on a whole build, the same reading splits 36 / 41 / 23 across the 39 curated loadouts. A rule states a delta in points on the item scale, where roughly 14 points is one tier, and every rule must carry a `say`, because a score that cannot explain itself is a score nobody should trust.",
+  "whyThereIsNoCommunityBase": "A tier row shows two ratings side by side because there is an outside opinion to disagree with. There is no community vote on a loadout, and inventing one would be laundering our own judgement through a column that looks sourced. So the base here is the build's own parts, each scored by the same engine and the same rules the tier list shows, and the loadout layer argues with that. partsTier and tier are both returned for exactly the reason the two columns exist: a kit worth an A that fits together like a B is the interesting case, and hiding the A makes the B unarguable.",
+  "howACoefficientIsChosen": "The same question score.js asks. At what point should this be worth one tier? A tier is about 14 points. Opening under half the front you are dropping on is worth a tier, which sets the penetration coefficient at 25 against a shortfall of 0.55. Coverage gaps are anchored against peril the way squad.js anchors its own: 12 is where the checks switch on, 22 is where one person carrying the only answer stops being a structure and starts being a single point of failure.",
+  "rules": [
+    {
+      "id": "penetration-misses-the-front",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "reach.openShare",
+            "lt": 0.7
+          }
+        ]
+      },
+      "scaleBy": {
+        "path": "reach.openShare",
+        "from": 1,
+        "times": 25,
+        "clamp": 20
+      },
+      "severity": "amber",
+      "say": "Nothing you aim opens most of what is on this front. Sentries and orbitals do not count here: they cannot pick a weak point, and neither can you when the thing is already on top of you.",
+      "measured": "Held penetration across the 39 curated builds is AP 3 in 14 of them, AP 4 in 16 and AP 6 in 9. Against the bot front at difficulty 10 those open 10, 16 and 22 of 22 enemies. The 0.7 gate is what keeps this off the builds that already have an answer: AP 4 on bugs opens 20 of 21 and says nothing worth a point."
+    },
+    {
+      "id": "no-answer-to-armour",
+      "when": {
+        "faction": [
+          "bots",
+          "bugs"
+        ],
+        "peril": {
+          "gte": 12
+        }
+      },
+      "match": {
+        "notCovers": [
+          "anti-armor"
+        ]
+      },
+      "delta": -12,
+      "severity": "red",
+      "say": "Nothing in this build is for opening armour. Chargers and Hulks are not a thing you out-shoot with volume, and at this level they are not optional either.",
+      "measured": "17 of the 39 curated builds carry no anti-armor tag at all, so this splits the set 44 / 56 before the front and peril gates narrow it further. Peril 12 is squad.js's own switch-on point, four players at difficulty 7, so a build read for a quiet drop is not marked down for being built for one."
+    },
+    {
+      "id": "no-answer-to-armour-squids",
+      "when": {
+        "faction": [
+          "squids"
+        ],
+        "peril": {
+          "gte": 12
+        }
+      },
+      "match": {
+        "notCovers": [
+          "anti-armor"
+        ]
+      },
+      "delta": 0,
+      "severity": "grey",
+      "say": "No dedicated anti-tank, which is usually the right call on squids. The tier data warns off most of it on this front.",
+      "measured": "Zero points on purpose. It is the same gap as the rule above and it is not a fault here, so it says so and moves nothing. squad.js makes the same call for the same reason."
+    },
+    {
+      "id": "no-chaff-clear",
+      "when": {
+        "peril": {
+          "gte": 12
+        }
+      },
+      "match": {
+        "notCovers": [
+          "chaff"
+        ]
+      },
+      "delta": -14,
+      "severity": "red",
+      "say": "Nothing here holds off a crowd. Everything you have kills one thing at a time, and that was never the problem.",
+      "measured": "3 of 39 curated builds carry no chaff tag, which is 8%. Asking the question the other way round, whether a build has chaff, fires on 92% and tells you nothing: that is the difference between a check and a description of the pool."
+    },
+    {
+      "id": "all-punch-no-volume",
+      "when": {
+        "faction": [
+          "bugs",
+          "squids"
+        ],
+        "peril": {
+          "gte": 12
+        }
+      },
+      "match": {
+        "covers": [
+          "chaff"
+        ],
+        "number": [
+          {
+            "path": "facts.heldAp",
+            "gte": 4
+          }
+        ],
+        "count": [
+          {
+            "of": {
+              "roles": [
+                "chaff"
+              ],
+              "held": true
+            },
+            "lte": 0
+          }
+        ]
+      },
+      "delta": -10,
+      "severity": "amber",
+      "say": "Everything you aim is built for armour and none of it is built for numbers. Bringing an Eruptor means bringing a Stalwart, and this build brought the Eruptor twice.",
+      "measured": "This is the curator's own argument from 1.13.0, and it is the reason armour came out of item scoring and came back here. Per item the trade is invisible: the Eruptor is simply good. Across a build it is the whole point. It requires chaff to exist somewhere in the build, so it never stacks with no-chaff-clear: having none at all is one fault, and having it all in a sentry is a different one."
+    },
+    {
+      "id": "nothing-closes-a-hole",
+      "when": {
+        "mission": [
+          "nest"
+        ]
+      },
+      "match": {
+        "notCovers": [
+          "objective"
+        ]
+      },
+      "delta": -12,
+      "severity": "red",
+      "say": "Nothing here closes a hole or a fabricator without spending a stratagem. That is the entire mission.",
+      "measured": "3 of 39 carry no objective tag. Gated on the mission trait rather than fired everywhere, because carrying no hole closer to a defence map is not a gap."
+    },
+    {
+      "id": "quiet-kit-loud-drop",
+      "when": {
+        "faction": [
+          "bots"
+        ],
+        "peril": {
+          "gte": 22
+        }
+      },
+      "match": {
+        "count": [
+          {
+            "of": {
+              "tags": [
+                "suppressed"
+              ],
+              "held": true
+            },
+            "gte": 1
+          }
+        ]
+      },
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 0,
+        "times": 0.4,
+        "clamp": 16
+      },
+      "severity": "grey",
+      "say": "Something you carry is silenced, which is worth more the fewer of you there are. Alone, a loud gun brings the whole base down on you and there is nobody holding the line while you run.",
+      "sayInverted": "A silenced weapon in this drop is effort spent on a problem you do not have. Four of you at this level are not sneaking anywhere.",
+      "measured": "The loadout mirror of peril-bots-wants-quiet, which fires on 5 of 232 items. At the build level it asks whether any of the five suppressed weapons is in a hand, which is a different and rarer question than whether a given weapon is one of them."
+    },
+    {
+      "id": "half-built",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "facts.filled",
+            "lt": 9
+          }
+        ]
+      },
+      "delta": 0,
+      "severity": "grey",
+      "say": "Not every slot is filled, so this reads as a draft. The score is what the gear you have picked is worth, not a judgement on the empty slots.",
+      "measured": "Zero points, deliberately. All 39 curated builds fill all nine, so this only ever fires on something you are still writing, and marking down a build mid-authoring for not being finished is obnoxious. It exists so the number admits what it is missing."
+    },
+    {
+      "id": "answers-everything",
+      "when": {
+        "peril": {
+          "gte": 12
+        }
+      },
+      "match": {
+        "count": [
+          {
+            "of": {
+              "roles": [
+                "anti-armor"
+              ],
+              "held": true
+            },
+            "gte": 1
+          },
+          {
+            "of": {
+              "roles": [
+                "chaff"
+              ],
+              "held": true
+            },
+            "gte": 1
+          },
+          {
+            "of": {
+              "roles": [
+                "objective"
+              ]
+            },
+            "gte": 1
+          }
+        ]
+      },
+      "delta": 8,
+      "severity": null,
+      "say": "Armour, crowds and holes all have an answer, and the first two are in your hands rather than in a call-in. Nothing here forces you to hope somebody else brought the other thing.",
+      "measured": "Over 300 random legal builds, carrying all three roles somewhere is 54% and carrying the two you aim in your hands is 22%. The first is a description of the pool and the second is a real property, which is why this reads held rather than carried. Worth about half a tier: a complete kit is what a good build is supposed to be, not an achievement."
+    }
+  ],
+  "knownGaps": [
+    "The penetration rule varies strongly between builds and only weakly with the scenario. Its inputs are the front, which is fixed for any build shown in Drop Bay, and difficulty, which moves the roster a little: AP 3 on bugs opens 0.63 of the front at difficulty 7 and 0.67 at 10, both under the gate, so the rule fires either way. That is the right behaviour at this altitude, where the question is which build to bring rather than which item, but it means the rule is closer to a fact about the build than a fact about the drop.",
+    "Role tags are ours, not a vote, and three of these rules rest entirely on them. The 27 anti-armor, 55 chaff and 22 objective tags come from scripts/tag-roles.mjs, and 134 rated rows carry none of the three. A build made entirely of untagged gear reads as covering nothing, which is a limit of the tagging rather than a fact about the build.",
+    "Nothing reads the booster or the armor passive. Both are in the parts average and neither is in a single loadout rule, so a build carrying Hellpod Space Optimization and one carrying Muscle Enhancement read identically. Boosters are squad wide and armor passives are situational, and neither has a field a rule could key on yet.",
+    "There is no ammo economy axis and no range band axis. dds-roadmap.md asks whether those become tagged axes or stay human judgement, and it is still open. A build of three magazine hungry weapons and no resupply is a real hole this cannot see.",
+    "Nothing here reads the squad. readBuild judges one loadout and squad.js judges the combination, and neither knows the other ran. A build that is thin on armour is not thin if the other three brought Recoilless rifles, and until the drop screen exists there is nowhere that both readings appear together.",
+    "The curated set scores high before the loadout layer touches it. Parts averages run from 74.6 to 99.1 with a median of 87.9, because 35 of the 39 use an S or S+ primary. dds-roadmap.md already measured that as the set's weakness, and it means most of what this layer does to them is subtract. That is a fact about those 39 builds rather than about the engine, and it is the clearest argument yet for the offline authoring pass.",
+    "Two rules were written, measured and cut before shipping, both because they described the pool rather than the build. `hole-closers-need-the-angle` asked for a demolition 40 hole closer in a cave, which 86% of random builds do not carry: squad.js can ask that across four builds and get a real answer, and over one build it cannot. `penetration-reaches-everything` fired on 45% of random builds and only ever on bots, because AP 5 is the line where that front stops needing a weak point and most builds carrying any support weapon are already past it. Both facts are true and neither discriminates. They are recorded here rather than shipped, which is the 1.13.0 lesson applied before the fact instead of after.",
+    "Nothing in this file rewards a build. It only ever deducts, and that is deliberate rather than an omission. squad.js settled the same question first: silence is the normal state and never a claim of coverage, so a squad with nothing wrong says nothing rather than being congratulated. A build with no holes scores exactly what its parts are worth, and `answers-everything` is the single exception because carrying the whole answer in your hands is rare enough at 22% to be worth saying."
+  ]
+}
