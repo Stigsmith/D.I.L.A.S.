@@ -11,9 +11,25 @@
 
 Everything below rests on one primitive: **data living somewhere that is not one browser, plus identity to say whose it is.** Today every lock, favorite, profile and build sits in `localStorage`, which is scoped to one browser on one machine. That is why a second player has to set the tool up again from scratch on their own device.
 
+> [!success] Settled 25 September 2026: Cloudflare, and the plan is `dds-cloudflare-handover.md`
+> Enodia, stigly's Hades II tool, built every stage of this chain first on the same Cloudflare account. The handover in the repo root is the port plan, stage by stage, with the pitfalls it cost. **Its decisions table is settled and is not reopened here**: Cloudflare Workers, its own D1, Resend for mail, its own domain.
+>
+> | Stage | | Status |
+> |---|---|---|
+> | 0 | Hosting on Cloudflare, security headers, fonts vendored | **Done, 1.21.0.** Live at `dds.stigly-official.workers.dev` |
+> | 1 | Worker, D1 and accounts | Next, or Stage 6. **stigly's call** |
+> | 2 | Mail and password reset | Accounts stay shut until a forgotten password has a way back |
+> | 3 | Sync between devices | Needs the profiles question answered |
+> | 4 | Publishing and short links | |
+> | 5 | Exchange, friends, leaderboards | Needs "what is a run and what is a clear" answered |
+> | 6 | Live war state | Needs no account. Pairs with the starmap |
+> | 7 | Live squad | Enodia has not built it. Nothing carries over |
+>
+> **Netlify stays the address people use until the domain is bought**, because each move of address empties everybody's collection and `workers.dev` to the domain would be a second move. See `CLAUDE.md`, Hosting.
+
 **Recommended order:**
 
-1. **Auth and shared storage.** The only genuinely new infrastructure. For two users the free tier of Supabase or Cloudflare D1 covers it and neither needs a server to run.
+1. **Auth and shared storage.** The only genuinely new infrastructure. Cloudflare D1, decided 25 September 2026, and it needs no server of its own to run.
 2. **Exchange.** Write a document, fetch it by id. This is a subset of what live squad needs, so it doubles as the share mechanism for the storage half.
 3. **Live squad compare.** Needs subscribe and push, which publishing a loadout never does. Budget the realtime layer separately rather than expecting Exchange to hand it over.
 

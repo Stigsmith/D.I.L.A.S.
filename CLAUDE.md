@@ -56,7 +56,7 @@ Data authority lives outside this repo, in the Helldivers 2 project files: `hell
 > | **Enemy armour** | 80 enemies, 594 body parts. Shown on every row as a fact, moves no rating, waits for loadout scoring |
 > | **Vehicles** | All eight, rated |
 >
-> **What is left**, in order: three judgement tags, then Drop Bay becoming the drop screen. Loadout scoring landed in 1.20.0. The plan lives in `dds-roadmap.md`, which also explains how the phases relate to the v2 and v3 labels in the sidebar.
+> **What is left**, in order: three judgement tags, then Drop Bay becoming the drop screen. Loadout scoring landed in 1.20.0. **The tool moved to Cloudflare in 1.21.0**, Stage 0 of `dds-cloudflare-handover.md`, which is the plan for accounts, sync, Exchange and the live war map. The plan lives in `dds-roadmap.md`, which also explains how the phases relate to the v2 and v3 labels in the sidebar.
 
 > [!success] Armour moves a rating again, at the loadout level. 1.20.0. Do not put it back on the item
 > Five armour rules shipped in 1.10.0 and came out in 1.13.0. They were the wrong altitude and the measurement is blunt: **48 of 51 primaries on the Automaton front share one of two identical armour readings**, and the rules took a tier off 42 of them. Only the Eruptor, the Double-Edge Sickle and the Torcher differ.
@@ -303,7 +303,7 @@ The second column was a dashed placeholder until the scoring engine existed. It 
 - **Faction theming runs through the whole UI.** Bots red `#EF4444`, bugs orange `#F97316`, squids purple `#A855F7`. Not just labels: badges, borders, chips and card accents all shift.
 - **Stratagem colour groups follow the in-game menu.** Blue for support and backpacks, red for Eagle and orbital, green for sentries, emplacements and mines, with a per-subtype icon inside each colour.
 - **No damage type icon on `ballistic` and `utility` rows.** Those are the nothing-special defaults, so a glyph there is decoration. The kinds that keep an icon are the ones that change behaviour.
-- **Fonts.** Oswald for headers and tier badges, JetBrains Mono for item names.
+- **Fonts.** Oswald for headers and tier badges, JetBrains Mono for item names. **Served from this origin since 1.21.0**, vendored by `npm run fonts`. Never link them from Google again: the security policy blocks it. See Hosting.
 
 ### Domain calls
 
@@ -826,7 +826,7 @@ Every colour goes through a CSS custom property, so a theme is a token set rathe
 | `accent-*` | The lock and favorite chrome |
 | `brand` | The Super Earth yellow |
 
-**Eleven themes ship.** Three base ones: **Dark** (grey), **Light** (off white), **Neon** (near black with `#FFE900`, taken straight off `ui_logo_helldivers_yellow.svg` so the brand colour is the game's own rather than a guess). Then eight warbond skins: Castellan's Creed, Automaton, Bile Titan, Hellpod Drop Bay, Malevelon Creek, Ministry of Truth, Super Destroyer and Viper Commandos.
+**Thirteen themes ship.** Three base ones: **Dark** (grey), **Light** (off white), **Neon** (near black with `#FFE900`, taken straight off `ui_logo_helldivers_yellow.svg` so the brand colour is the game's own rather than a guess). Then ten skins: Castellan's Creed, Automaton, Bile Titan, Entrenched Division, ODST, Hellpod Drop Bay, Malevelon Creek, Ministry of Truth, Super Destroyer and Viper Commandos. **Counted from `THEMES` in `src/lib/theme.js` on 25 September 2026**; this line said eleven for a while after the last two landed.
 
 Two are light, Light and Ministry of Truth, which the token architecture allows on purpose. Bile Titan is a generic Terminid skin rather than a warbond.
 
@@ -1049,8 +1049,10 @@ Re-fetches the weapon stats and the planet table, and **reports what would chang
 > [!info] Node is on the PATH
 > Verified 18 August 2026: a fresh PowerShell resolves `node` to `C:\Program Files\nodejs\node.exe` and `npm` works with no setup. This used to need prepending, because a shell opened before the install could not see it. That is no longer true.
 
-> [!tip] How stigly actually builds it
-> File Explorer into `C:\Dev\dds`, click the address bar, type `powershell`, Enter. That opens a terminal already in the folder. Then `npm run build`, and drag `dist` onto Netlify. He does not use a terminal habitually, so give the path and the clicks, not just the command.
+> [!tip] How stigly actually deploys it
+> File Explorer into `C:\Dev\dds`, click the address bar, type `cmd`, Enter. That opens a terminal already in the folder. Then `npm run deploy`, which builds and puts it on Cloudflare in one go. He does not use a terminal habitually, so give the path and the clicks, not just the command.
+>
+> **Until the domain exists, Netlify is still the address people use**, and `npm run build` then dragging `dist` onto Netlify still works exactly as before. See Hosting for why the two coexist.
 
 > [!bug] PowerShell refuses to run npm
 > `npm : File C:\Program Files\nodejs\npm.ps1 cannot be loaded because running scripts is disabled on this system.` PowerShell blocks the npm script wrapper by default. **Use `cmd` in the address bar instead of `powershell`**, where plain `npm run build` works. From an already open PowerShell, `npm.cmd run build` skips the wrapper and works too. Neither needs a system change. `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` is the permanent fix but is not required, so do not run it on his behalf.
@@ -1084,17 +1086,71 @@ Re-fetches the weapon stats and the planet table, and **reports what would chang
 
 # **Hosting**
 
-`npm run build` writes `dist`, and `dist` is the whole product. There is no server, no API and no database, so any static host works.
+> [!success] Served from Cloudflare since 1.21.0, 25 September 2026
+> **https://dds.stigly-official.workers.dev**, on the same Cloudflare account as Enodia. Stage 0 of `dds-cloudflare-handover.md`: `dist/` served as static assets, **no Worker script and no database yet**, so everything the tool does still happens in the browser. Read that handover before Stage 1; it carries eighteen pitfalls Enodia paid for.
+
+| File | What it does |
+|---|---|
+| `wrangler.jsonc` | The whole deploy config. Every key carries its reason |
+| `public/_headers` | Cache rules and security headers. Vite copies it into `dist/`, Cloudflare parses it at deploy time and never serves it |
+| `public/fonts/`, `src/fonts.css` | Oswald and JetBrains Mono, vendored. **Generated by `npm run fonts`, never hand edited** |
+
+```bash
+npm run deploy
+```
+
+Builds, then deploys. From `cmd` in the address bar of `C:\Dev\dds`, the same as the build always was. **This machine is already logged in to Cloudflare**, machine wide, from Enodia, so there is no login step.
+
+> [!danger] A deploy that reports success is not evidence that it landed
+> Enodia saw `wrangler deploy` print a new version id and "100%" three times in a row while old code kept running. **After every deploy, read something the new build changed off the live site.** The cheapest check: the `index-*.js` name in the live page must match the one in `dist/assets`, and the version in the footer must be the new one. If it did not land, `npx wrangler versions upload` then `npx wrangler versions deploy <id>@100% --yes`.
+
+> [!danger] Local dev on the real host is port 8788, never 8787
+> `npx wrangler dev` serves the built `dist/` exactly as Cloudflare will, headers included. It needs `npm run build` first. The port is set in `wrangler.jsonc` so it belongs to the project.
+>
+> **Enodia's wrangler dev uses 8787 on this same machine.** On 25 September 2026 D.D.S. started on 8787 while Enodia was already running there, printed "Ready on 8787", and Enodia went on answering every request. Every header read back was Enodia's policy over an app that did not have D.D.S.'s files. Nothing errored. The tell was a policy containing `data:`, which D.D.S. deliberately does not allow.
+>
+> Stopping a background `wrangler dev` on Windows can orphan its `workerd` and `esbuild` children. Check nothing from `C:\Dev\dds` is still listening before starting another.
+
+### The security headers
+
+Netlify never sent any, for the whole life of the tool. Now every response carries:
+
+| Header | Value, and why |
+|---|---|
+| **Content-Security-Policy** | Nothing from any other address. `img-src 'self'` with **no `data:`**, tighter than Enodia, because nothing in D.D.S. draws a data URI: `assetsInlineLimit` is 0 and theme art is extracted to real files. `style-src` allows `'unsafe-inline'` for React's style attributes, which carry every faction colour. `connect-src 'self'` is what lets Stage 1's `/api/*` arrive without editing the policy |
+| **Strict-Transport-Security** | A year, `includeSubDomains`, **no `preload`**, which is a one way commitment and the domain is not bought yet |
+| `X-Content-Type-Options`, `Referrer-Policy` | `nosniff`, `strict-origin-when-cross-origin` |
+| **Cache-Control** | `/assets/*` and `/fonts/*` immutable for a year, because every file there has a content hash in its name. The page revalidates on every visit, so a deploy reaches people the next time they open the tool |
+
+**Verified by reading, not by the config.** Under `wrangler dev` and again live: every header, every content type, eleven screens and all thirteen themes walked with a `securitypolicyviolation` listener, Export exercised, and zero requests to any other host.
+
+> [!danger] A header set twice is joined with a comma, not overridden
+> So `Cache-Control` lives only on patterns that cannot both match one file. Put one on `/*` and every image gets two conflicting values. The note is at the top of `_headers`.
+
+> [!warning] If an image ever needs a data URI, change the policy on purpose
+> It will not fail loudly. The browser drops the image and logs a violation nobody is reading. Add `data:` to `img-src` deliberately, in the same change.
+
+### The fonts
+
+`App.jsx` used to `@import` both faces from `fonts.googleapis.com`. The policy blocks that, both the stylesheet and the files from `fonts.gstatic.com`, and it was also handing every visitor's IP to Google. **This is exactly the bug Enodia shipped**, invisible there for the same reason: the old host never applied a policy.
+
+`npm run fonts` fetches both faces once, **every subset Google offers**, with each `unicode-range` intact. The browser downloads only the slices a page renders: the tier list pulls two files of the eleven. 136 KB on disk. It is a one time job, not a build step, and the site depends on Google neither at build time nor at run time.
+
+### Still true from before
 
 | Fact | Consequence |
 |---|---|
-| Hash routing, `#/tiers/primary` | **No rewrite rules needed.** The path never reaches the server, so there is nothing to configure |
-| Asset paths are absolute, `/assets/...` | Must be served from a **domain root**. A subpath deploy needs `base` set in `vite.config.js` |
-| 15MB across 297 files | Comfortably inside every free tier |
-| State is `localStorage` | Per origin. Nothing follows you from `localhost` to a hosted URL, and nothing syncs between two people |
+| Hash routing, `#/tiers/primary` | No path ever reaches the server. `not_found_handling: "single-page-application"` only decides what a mistyped path shows today, and becomes load bearing with short links in Stage 4 |
+| Asset paths are absolute, `/assets/...` | Must be served from a domain root |
+| State is `localStorage` | Per origin. Nothing follows you between addresses, and nothing syncs between two people |
 
-> [!warning] Moving between origins loses your collection
-> Profiles, locks and favorites live in `localStorage`, which is scoped to the origin. Going from `localhost:5173` to a hosted URL starts empty. Export from Settings first and Import on the other side; that is exactly what the backup file is for.
+> [!danger] Moving address empties everybody's collection, and there are two moves coming, not one
+> Profiles, locks, favorites and builds live in `localStorage`, scoped to the exact address. Netlify to `workers.dev` is one move; `workers.dev` to the bought domain is a second. **Telling anyone to use the `workers.dev` address now means Export and Import twice.**
+>
+> So Netlify stays the address people use until the domain exists. Then: one last Netlify build carrying a notice with the new address and "Export here, Import there", and Netlify left up for a while rather than deleted the same day. Both calls are stigly's. `_headers` travels in `dist/`, and Netlify reads the same file format, so that last Netlify build gets the security headers too.
+
+> [!warning] Retire the "no server" sentence when Stage 1 lands
+> Support says "There is no account and no server behind this tool" (`Pages.jsx`, "Your data stays yours"), and `roadmap.json` says the solo track runs "with no account, no server and no network call". **Both are still true at Stage 0**, which serves files and holds nothing of yours. Both become false the day a Worker script and D1 exist. Enodia shipped the same kind of sentence past its expiry: "Nothing is tracked about you" outlived the day stats existed.
 
 > [!danger] Only `study_*` art is bundled
 > `src/lib/assets.js` globs `../assets/themes/*/study_*`, not the whole folder. A theme folder also holds its palette study, a preview render and the loose reference art the skin was drawn from, none of which the app renders. Globbing everything shipped **22.7MB of dead weight, 60% of the built output**. If a skin needs a new file at runtime, name it `study_*` or it will not be bundled.
