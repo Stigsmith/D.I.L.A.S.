@@ -12,24 +12,19 @@
 
 import { AlertTriangle, Bug } from "lucide-react";
 import { artCounts } from "./lib/assets.js";
-import { items } from "./lib/items.js";
+import { items, warbonds } from "./lib/items.js";
 import CHANGELOG from "./data/changelog.json";
 import ROADMAP from "./data/roadmap.json";
 import { BRAND } from "./lib/brand.js";
 
-/* One patch stamp, written once. The footer shows the short form on    */
-/* every page and About expands it, so the two can never drift apart.   */
-export const PATCH = {
-  game: "7.0.0",
-  gameName: "Devoid of Liberty",
-  gameDate: "12 August 2026",
-  ratings: "6.3.1",
-  armor: "7.0.0",
-};
+/* The patch record moved to src/lib/patch.js in 1.23.0, so the expanded */
+/* row can read it too. Re-exported here for anything importing it from  */
+/* this file.                                                             */
+import { PATCH, PATCH_SHORT } from "./lib/patch.js";
+export { PATCH, PATCH_SHORT };
 
 export const VERSION = CHANGELOG[0].version;
 
-export const PATCH_SHORT = `Patch ${PATCH.game} · ratings ${PATCH.ratings} (armor ${PATCH.armor})`;
 
 export function Panel({ title, note, children }) {
   return (
@@ -78,7 +73,7 @@ export function About() {
           than quietly presented as current. An item nobody has rated shows a question mark instead of a guess.
         </p>
         <p>
-          It tracks {items.length} items across six slots, {rated} of them rated, 39 curated builds, and 24 warbonds
+          It tracks {items.length} items across six slots, {rated} of them rated, 39 curated builds, and {warbonds.length} warbonds
           with both ownership axes: owning the warbond and unlocking the item are separate purchases, so they are
           separate switches.
         </p>
@@ -87,13 +82,12 @@ export function About() {
       <Panel title="Where the numbers come from">
         <div className="flex flex-col gap-1.5">
           <p><span className="text-base-200">Game version</span> {PATCH.game} {PATCH.gameName}, {PATCH.gameDate}.</p>
-          <p><span className="text-base-200">Ratings</span> u.gg community vote aggregates at patch {PATCH.ratings}.</p>
-          <p><span className="text-base-200">Armor passives</span> restamped to {PATCH.armor}.</p>
+          <p><span className="text-base-200">Ratings</span> u.gg community vote aggregates, stamped {PATCH.ratings}, read on {PATCH.readOn}.</p>
         </div>
         <p>
-          Two patch stamps coexist and the tool says so rather than hiding it. Most ratings are one patch behind the
-          game. Where a confirmed {PATCH.game} change touched an item after the vote was cast, that row carries a
-          caveat you can expand and read.
+          u.gg dates each of its lists separately, so the ratings carry more than one stamp and every expanded row
+          says which one it has. Where a confirmed change touches an item after the vote was cast, that row carries a
+          caveat you can expand and read. None does right now.
         </p>
         <p className="text-base-500">
           Facts rather than opinions, the armor classes, damage figures, capacities, demolition force, armor set
@@ -161,20 +155,20 @@ export function About() {
 /* that is not.                                                         */
 const KNOWN = [
   {
-    what: "Most ratings are one patch behind",
-    detail: `Ratings are u.gg consensus at ${PATCH.ratings} applied to a ${PATCH.game} game. 19 items carry a caveat because a confirmed change touched them after the vote was cast. Expand any flagged row to read which.`,
+    what: "The ratings carry three different stamps",
+    detail: `u.gg dates its lists separately. Primaries are stamped 7.1.1; support weapons, backpacks, eagles and sentries 7.0.2; the other six lists print no stamp but already include the 7.1.0 warbond, so they are read as 7.1.0. The P-33 Missile Pistol has dropped off u.gg's list while staying in the game, so it keeps its 6.3.1 rating.`,
   },
   {
-    what: "Four items have no rating at all",
-    detail: "The Castellan's Creed weapons are in the game with no community data yet. They render a dashed question mark and survive every tier floor, because being seen is the only way they ever get tried.",
+    what: "One item has no rating at all",
+    detail: "The P/40-K Bolt Pistol is in the game with no community data yet. It renders a dashed question mark and survives every tier floor, because being seen is the only way it ever gets tried.",
   },
   {
-    what: "One item has no art",
-    detail: "Electrical Conduit falls back to its initials. Nothing else is missing.",
+    what: "Twelve items have no art",
+    detail: "The eleven added in 1.23.0, eight of them from the Ironclad Democracy warbond, and Electrical Conduit. They fall back to their initials until art for them is added. The Ironclad Democracy warbond has no cover yet either, so its tile in Collection shows the name alone.",
   },
   {
     what: "Some weapon stats are absent, not zero",
-    detail: "Magazine size, spare magazines, fire rate, reload time, recoil, projectile count and stagger are in no source this project has. Rows say so, rather than showing a blank and letting you read it as nothing.",
+    detail: "Reload time and projectile count are in no source this project has, and the TD-110 Maelstrom has no data on the wiki yet. Rows say so, rather than showing a blank and letting you read it as nothing.",
   },
   {
     what: "The curated builds lean hard on high tiers",

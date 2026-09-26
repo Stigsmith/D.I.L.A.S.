@@ -148,5 +148,10 @@
     "light": ["EX-00 Prototype X"],
     "medium": ["EX-03 Prototype 3", "EX-16 Prototype 16"],
     "heavy": []
+  },
+  "blunt-force-mitigation": {
+    "light": ["BFM-16 Tanker"],
+    "medium": [],
+    "heavy": ["BFM-220 Ironclad"]
   }
 }

@@ -21,6 +21,7 @@
     { "id": "exo-experts", "name": "Exo Experts", "tier": "premium" },
     { "id": "python-commandos", "name": "Python Commandos", "tier": "premium" },
     { "id": "siege-breakers", "name": "Siege Breakers", "tier": "premium" },
+    { "id": "ironclad-democracy", "name": "Ironclad Democracy", "tier": "premium" },
     { "id": "halo-odst", "name": "Halo: ODST", "tier": "legendary" },
     { "id": "righteous-revenants", "name": "Righteous Revenants", "tier": "legendary" },
     { "id": "castellans-creed", "name": "Castellan's Creed", "tier": "legendary" }

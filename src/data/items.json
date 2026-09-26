@@ -27,23 +27,23 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -78,23 +78,23 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -129,21 +129,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -178,21 +178,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -227,21 +227,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -276,23 +276,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -327,23 +327,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -378,23 +378,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -429,23 +429,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -480,26 +480,26 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Short mag spare 10 to 13, starting 6 to 7, reload 2.8s down to 2.3s.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "SMG with underbarrel flamethrower"
   },
@@ -531,21 +531,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
-        "tier": "S",
+        "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -580,23 +580,23 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [
       "suppressed"
     ],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -631,21 +631,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -680,21 +680,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -731,23 +731,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -782,23 +782,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -833,21 +833,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -882,23 +882,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -933,21 +933,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -982,21 +982,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1031,21 +1031,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1080,23 +1080,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1131,23 +1131,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1182,26 +1182,26 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Short mag spare 12 to 16, starting 7 to 9.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "starter rifle, A against bugs and squids"
   },
@@ -1235,26 +1235,26 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Short mag spare 12 to 16, starting 7 to 9.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "assault rifle"
   },
@@ -1286,23 +1286,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1337,23 +1337,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1388,26 +1388,26 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Short mag spare 12 to 16, starting 7 to 9.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "A against bugs"
   },
@@ -1439,23 +1439,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1490,23 +1490,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1541,23 +1541,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1592,28 +1592,28 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [
-      "chaff"
-    ],
     "tags": [
       "suppressed"
     ],
+    "roles": [
+      "chaff"
+    ],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Short mag spare 12 to 16, starting 7 to 9.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "assault rifle"
   },
@@ -1645,23 +1645,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1696,26 +1696,26 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Short mag spare 9 to 11, starting 6 to 7.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "applies fire, A against bugs"
   },
@@ -1747,26 +1747,26 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Short mag spare 9 to 11, starting 6 to 7.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "free shotgun, A against bugs and squids"
   },
@@ -1798,23 +1798,23 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1849,21 +1849,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1898,23 +1898,23 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -1949,23 +1949,23 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2000,23 +2000,23 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2051,23 +2051,23 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
-        "tier": "S+",
+        "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2102,24 +2102,24 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [
-      "chaff"
-    ],
     "tags": [
       "suppressed"
+    ],
+    "roles": [
+      "chaff"
     ],
     "traits": [],
     "flag": null,
@@ -2155,26 +2155,26 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Short mag spare 9 to 12, starting 6 to 8.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "SMG"
   },
@@ -2208,26 +2208,26 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Short mag spare 16 to 20, starting 11 to 12.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "shotgun"
   },
@@ -2259,21 +2259,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2308,23 +2308,23 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2359,23 +2359,23 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2410,21 +2410,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2459,26 +2459,26 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Short mag spare 9 to 12, starting 6 to 8.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "SMG"
   },
@@ -2510,26 +2510,26 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Short mag spare 12 to 16, starting 7 to 9.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "bottom of the list"
   },
@@ -2561,24 +2561,24 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Full stripper clip reload when the magazine is empty. Expect this D/D/D to move.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "bolt action, stripper clip reload added in 7.0.0"
   },
@@ -2598,7 +2598,7 @@
     "stats": {
       "ap": 3,
       "apClass": null,
-      "dps": null,
+      "dps": 962,
       "capacity": null,
       "demoForce": null,
       "cooldown": null,
@@ -2608,25 +2608,25 @@
     },
     "ratings": {
       "bots": {
-        "tier": null,
-        "source": null,
-        "patch": null
+        "tier": "B",
+        "source": "ugg",
+        "patch": "7.1.1"
       },
       "bugs": {
-        "tier": null,
-        "source": null,
-        "patch": null
+        "tier": "D",
+        "source": "ugg",
+        "patch": "7.1.1"
       },
       "squids": {
-        "tier": null,
-        "source": null,
-        "patch": null
+        "tier": "C",
+        "source": "ugg",
+        "patch": "7.1.1"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
-    "flag": "new",
+    "flag": null,
     "patchNote": null,
     "effect": null,
     "note": "Hot-Shot Lasgun, energy semi-auto, 35 medals"
@@ -2659,24 +2659,24 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2711,23 +2711,23 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2760,23 +2760,23 @@
     },
     "ratings": {
       "bots": {
-        "tier": "S+",
+        "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2811,21 +2811,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2860,21 +2860,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2909,23 +2909,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [
       "suppressed"
     ],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -2960,21 +2960,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3009,21 +3009,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3058,24 +3058,24 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Max spare mags 8 to 10, starting 4 to 6.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": null
   },
@@ -3107,24 +3107,24 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Bug fix removed an extra round the Siege-Ready passive was granting. Slight nerf in that pairing.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": null
   },
@@ -3156,21 +3156,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3218,10 +3218,10 @@
         "patch": "6.3.1"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3256,24 +3256,24 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Spare mags 4 to 6.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "machine pistol"
   },
@@ -3305,26 +3305,26 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [
       "suppressed"
     ],
+    "roles": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Max spare mags 8 to 10, starting 5 to 6.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "Halo crossover"
   },
@@ -3356,21 +3356,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3405,21 +3405,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3454,21 +3454,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3503,21 +3503,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3552,21 +3552,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3601,21 +3601,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3650,21 +3650,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3699,21 +3699,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3748,21 +3748,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3810,8 +3810,8 @@
         "patch": null
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": "new",
     "patchNote": null,
@@ -3846,24 +3846,24 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3898,24 +3898,24 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -3950,24 +3950,24 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4002,23 +4002,23 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4053,23 +4053,23 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4104,24 +4104,24 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [
-      "anti-armor"
-    ],
     "tags": [
       "long-range"
+    ],
+    "roles": [
+      "anti-armor"
     ],
     "traits": [],
     "flag": null,
@@ -4157,24 +4157,24 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff",
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4209,23 +4209,23 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4260,21 +4260,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4309,24 +4309,24 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4361,25 +4361,25 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [
+      "long-range"
+    ],
     "roles": [
       "anti-armor",
       "objective"
-    ],
-    "tags": [
-      "long-range"
     ],
     "traits": [],
     "flag": null,
@@ -4415,24 +4415,24 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4467,23 +4467,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4518,21 +4518,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4569,21 +4569,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4618,23 +4618,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4669,23 +4669,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4720,24 +4720,24 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4772,23 +4772,23 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -4823,24 +4823,24 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [
-      "anti-armor"
-    ],
     "tags": [
       "long-range"
+    ],
+    "roles": [
+      "anti-armor"
     ],
     "traits": [],
     "flag": null,
@@ -4876,24 +4876,24 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [
-      "anti-armor"
-    ],
     "tags": [
       "long-range"
+    ],
+    "roles": [
+      "anti-armor"
     ],
     "traits": [],
     "flag": null,
@@ -4929,24 +4929,24 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [
-      "anti-armor"
-    ],
     "tags": [
       "long-range"
+    ],
+    "roles": [
+      "anti-armor"
     ],
     "traits": [],
     "flag": null,
@@ -4982,23 +4982,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5033,24 +5033,24 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5085,21 +5085,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5134,23 +5134,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5185,23 +5185,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5236,23 +5236,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5287,24 +5287,24 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [
-      "anti-armor"
-    ],
     "tags": [
       "long-range"
+    ],
+    "roles": [
+      "anti-armor"
     ],
     "traits": [],
     "flag": null,
@@ -5340,21 +5340,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5389,21 +5389,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5438,21 +5438,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5485,25 +5485,25 @@
     },
     "ratings": {
       "bots": {
-        "tier": null,
-        "source": null,
-        "patch": null
+        "tier": "S+",
+        "source": "ugg",
+        "patch": "7.0.2"
       },
       "bugs": {
-        "tier": null,
-        "source": null,
-        "patch": null
+        "tier": "S+",
+        "source": "ugg",
+        "patch": "7.0.2"
       },
       "squids": {
-        "tier": null,
-        "source": null,
-        "patch": null
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
-    "flag": "new",
+    "flag": null,
     "patchNote": null,
     "effect": null,
     "note": "anti-armor focus"
@@ -5536,24 +5536,24 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5588,23 +5588,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5639,23 +5639,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5690,23 +5690,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5741,21 +5741,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5790,21 +5790,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5839,23 +5839,23 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5890,24 +5890,24 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5942,21 +5942,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -5991,23 +5991,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6042,23 +6042,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6093,23 +6093,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6144,24 +6144,24 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6196,23 +6196,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6247,21 +6247,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6296,21 +6296,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6345,21 +6345,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6394,21 +6394,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6443,21 +6443,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6492,21 +6492,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6515,8 +6515,10 @@
   },
   {
     "id": "g-40-k-meltamine",
-    "name": "G/40-K Meltamine",
-    "aliases": [],
+    "name": "G/40-K Melta Mine",
+    "aliases": [
+      "G/40-K Meltamine"
+    ],
     "slot": "throwable",
     "stratType": null,
     "category": null,
@@ -6527,11 +6529,11 @@
       "warbond": "castellans-creed"
     },
     "stats": {
-      "ap": null,
-      "apClass": null,
+      "ap": 7,
+      "apClass": "AT",
       "dps": null,
       "capacity": null,
-      "demoForce": null,
+      "demoForce": 10,
       "cooldown": null,
       "uses": null,
       "usesUpgraded": null,
@@ -6539,25 +6541,27 @@
     },
     "ratings": {
       "bots": {
-        "tier": null,
-        "source": null,
-        "patch": null
+        "tier": "S+",
+        "source": "ugg",
+        "patch": "7.1.0"
       },
       "bugs": {
-        "tier": null,
-        "source": null,
-        "patch": null
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.1.0"
       },
       "squids": {
-        "tier": null,
-        "source": null,
-        "patch": null
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [
+      "anti-armor"
+    ],
     "traits": [],
-    "flag": "new",
+    "flag": null,
     "patchNote": null,
     "effect": null,
     "note": "anti-armor focus"
@@ -6590,23 +6594,23 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6641,21 +6645,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6690,21 +6694,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6739,23 +6743,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6790,26 +6794,26 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Explosion radius 8m to 10m and a wider bomb pattern. Rating is pre-buff.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": null
   },
@@ -6841,21 +6845,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6890,21 +6894,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6939,21 +6943,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -6988,23 +6992,23 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7039,23 +7043,23 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7088,23 +7092,23 @@
     },
     "ratings": {
       "bots": {
-        "tier": "S",
+        "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
-        "tier": "S",
+        "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
-        "tier": "S",
+        "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7139,21 +7143,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7188,23 +7192,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7239,21 +7243,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7288,21 +7292,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7337,21 +7341,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7386,21 +7390,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7435,21 +7439,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7484,21 +7488,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7533,21 +7537,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7582,21 +7586,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7631,21 +7635,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7680,21 +7684,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7729,21 +7733,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7778,21 +7782,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7827,21 +7831,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7876,21 +7880,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7925,21 +7929,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -7974,21 +7978,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8023,21 +8027,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8072,24 +8076,24 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Illuminate Veracitor melee force 25 to 40 and conformed to Anti-Tank. Blocking ragdolls you, shield breaks after roughly 15 direct hits.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "weakest of the shields"
   },
@@ -8121,21 +8125,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8170,23 +8174,23 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8221,21 +8225,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8270,23 +8274,23 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8321,23 +8325,23 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8372,23 +8376,23 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8423,21 +8427,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8472,21 +8476,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8521,23 +8525,23 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8572,23 +8576,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8623,23 +8627,23 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8674,21 +8678,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8723,27 +8727,27 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "objective"
     ],
-    "tags": [],
     "traits": [],
-    "flag": "stale",
-    "patchNote": "Demolition 30 to 40. Now closes bug holes and fabricators from outside, and qualifies for Bile Titan holes. Most likely rating to move up.",
+    "flag": null,
+    "patchNote": null,
     "effect": null,
     "note": "demo 40 as of 7.0.0, closes holes from outside"
   },
@@ -8775,21 +8779,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8824,21 +8828,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8873,21 +8877,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8922,21 +8926,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -8971,23 +8975,23 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -9022,21 +9026,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.0.2"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -9071,21 +9075,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "survive"
     ],
@@ -9122,21 +9126,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "handling"
     ],
@@ -9173,21 +9177,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "stealth"
     ],
@@ -9224,21 +9228,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "blast",
       "survive"
@@ -9276,21 +9280,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "blast",
       "elem",
@@ -9329,21 +9333,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "blast",
       "throwing"
@@ -9381,21 +9385,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "blast",
       "handling"
@@ -9433,21 +9437,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "handling"
     ],
@@ -9484,21 +9488,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "handling",
       "throwing"
@@ -9536,21 +9540,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "mobility"
     ],
@@ -9587,21 +9591,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "survive",
       "blast"
@@ -9639,21 +9643,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "elem",
       "throwing"
@@ -9691,21 +9695,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "elem"
     ],
@@ -9742,21 +9746,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "survive"
     ],
@@ -9793,21 +9797,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "survive",
       "stealth"
@@ -9845,21 +9849,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "melee",
       "handling"
@@ -9897,21 +9901,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "elem",
       "survive"
@@ -9949,21 +9953,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "stealth"
     ],
@@ -10000,21 +10004,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "elem"
     ],
@@ -10051,21 +10055,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "survive",
       "elem"
@@ -10103,21 +10107,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
-        "tier": "B",
+        "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "survive",
       "melee"
@@ -10155,21 +10159,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "handling",
       "melee"
@@ -10207,21 +10211,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "handling"
     ],
@@ -10258,21 +10262,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "survive"
     ],
@@ -10309,21 +10313,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "survive",
       "mobility"
@@ -10361,21 +10365,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "stealth"
     ],
@@ -10412,21 +10416,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "throwing"
     ],
@@ -10463,21 +10467,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "elem"
     ],
@@ -10514,21 +10518,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "throwing",
       "survive"
@@ -10566,21 +10570,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [
       "elem"
     ],
@@ -10617,21 +10621,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10666,21 +10670,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10715,21 +10719,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10764,21 +10768,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10813,21 +10817,21 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10862,21 +10866,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10911,21 +10915,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -10960,21 +10964,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11009,21 +11013,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11058,21 +11062,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11107,21 +11111,21 @@
       "bots": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11156,21 +11160,21 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11205,21 +11209,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11254,21 +11258,21 @@
       "bots": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11303,21 +11307,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11352,21 +11356,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "C",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11401,21 +11405,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11450,21 +11454,21 @@
       "bots": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "D",
         "source": "ugg",
-        "patch": "6.3.1"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11499,23 +11503,23 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11550,21 +11554,21 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
-    "roles": [],
     "tags": [],
+    "roles": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11599,23 +11603,23 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11650,24 +11654,24 @@
       "bots": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "A",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11702,23 +11706,23 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11753,24 +11757,24 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11805,23 +11809,23 @@
       "bots": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "S",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "chaff"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
@@ -11856,28 +11860,576 @@
       "bots": {
         "tier": "S+",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "bugs": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       },
       "squids": {
         "tier": "B",
         "source": "ugg",
-        "patch": "7.0.0"
+        "patch": "7.1.0"
       }
     },
+    "tags": [],
     "roles": [
       "anti-armor",
       "objective"
     ],
-    "tags": [],
     "traits": [],
     "flag": null,
     "patchNote": null,
     "effect": null,
     "note": "a tank destroyer. 8000 hull, a 120mm cannon and demolition 40, which closes holes from outside"
+  },
+  {
+    "id": "ar-11-arbitrator",
+    "name": "AR-11 Arbitrator",
+    "aliases": [],
+    "slot": "primary",
+    "stratType": null,
+    "category": "Assault Rifle",
+    "damageType": "ballistic",
+    "usesBackpackSlot": null,
+    "acquisition": {
+      "type": "warbond",
+      "warbond": "ironclad-democracy"
+    },
+    "stats": {
+      "ap": 2,
+      "apClass": null,
+      "dps": 1400,
+      "capacity": null,
+      "demoForce": null,
+      "cooldown": null,
+      "uses": null,
+      "usesUpgraded": null,
+      "medals": null
+    },
+    "ratings": {
+      "bots": {
+        "tier": "A",
+        "source": "ugg",
+        "patch": "7.1.1"
+      },
+      "bugs": {
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.1.1"
+      },
+      "squids": {
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.1.1"
+      }
+    },
+    "tags": [],
+    "roles": [
+      "chaff"
+    ],
+    "traits": [],
+    "flag": null,
+    "patchNote": null,
+    "effect": null,
+    "note": null
+  },
+  {
+    "id": "gl-15-evictor",
+    "name": "GL-15 Evictor",
+    "aliases": [],
+    "slot": "primary",
+    "stratType": null,
+    "category": "Explosive",
+    "damageType": "explosive",
+    "usesBackpackSlot": null,
+    "acquisition": {
+      "type": "warbond",
+      "warbond": "ironclad-democracy"
+    },
+    "stats": {
+      "ap": 3,
+      "apClass": null,
+      "dps": 490,
+      "capacity": null,
+      "demoForce": null,
+      "cooldown": null,
+      "uses": null,
+      "usesUpgraded": null,
+      "medals": null
+    },
+    "ratings": {
+      "bots": {
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.1.1"
+      },
+      "bugs": {
+        "tier": "A",
+        "source": "ugg",
+        "patch": "7.1.1"
+      },
+      "squids": {
+        "tier": "A",
+        "source": "ugg",
+        "patch": "7.1.1"
+      }
+    },
+    "tags": [],
+    "roles": [],
+    "traits": [],
+    "flag": null,
+    "patchNote": null,
+    "effect": null,
+    "note": null
+  },
+  {
+    "id": "las-12-sai",
+    "name": "LAS-12 Sai",
+    "aliases": [],
+    "slot": "primary",
+    "stratType": null,
+    "category": "Energy",
+    "damageType": "heat",
+    "usesBackpackSlot": null,
+    "acquisition": {
+      "type": "superstore",
+      "warbond": null
+    },
+    "stats": {
+      "ap": 3,
+      "apClass": null,
+      "dps": 1066,
+      "capacity": null,
+      "demoForce": null,
+      "cooldown": null,
+      "uses": null,
+      "usesUpgraded": null,
+      "medals": null
+    },
+    "ratings": {
+      "bots": {
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.1.1"
+      },
+      "bugs": {
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.1.1"
+      },
+      "squids": {
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.1.1"
+      }
+    },
+    "tags": [],
+    "roles": [],
+    "traits": [],
+    "flag": null,
+    "patchNote": null,
+    "effect": null,
+    "note": null
+  },
+  {
+    "id": "p-34-breacher",
+    "name": "P-34 Breacher",
+    "aliases": [],
+    "slot": "secondary",
+    "stratType": null,
+    "category": "Special",
+    "damageType": "fire",
+    "usesBackpackSlot": null,
+    "acquisition": {
+      "type": "warbond",
+      "warbond": "ironclad-democracy"
+    },
+    "stats": {
+      "ap": 7,
+      "apClass": "AT",
+      "dps": null,
+      "capacity": null,
+      "demoForce": null,
+      "cooldown": null,
+      "uses": null,
+      "usesUpgraded": null,
+      "medals": null
+    },
+    "ratings": {
+      "bots": {
+        "tier": "S+",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "bugs": {
+        "tier": "S+",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "squids": {
+        "tier": "A",
+        "source": "ugg",
+        "patch": "7.1.0"
+      }
+    },
+    "tags": [],
+    "roles": [
+      "anti-armor"
+    ],
+    "traits": [],
+    "flag": null,
+    "patchNote": null,
+    "effect": null,
+    "note": null
+  },
+  {
+    "id": "g-8-immolation",
+    "name": "G-8 Immolation",
+    "aliases": [],
+    "slot": "throwable",
+    "stratType": null,
+    "category": null,
+    "damageType": "fire",
+    "usesBackpackSlot": null,
+    "acquisition": {
+      "type": "warbond",
+      "warbond": "ironclad-democracy"
+    },
+    "stats": {
+      "ap": null,
+      "apClass": null,
+      "dps": null,
+      "capacity": null,
+      "demoForce": null,
+      "cooldown": null,
+      "uses": null,
+      "usesUpgraded": null,
+      "medals": null
+    },
+    "ratings": {
+      "bots": {
+        "tier": "C",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "bugs": {
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "squids": {
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.1.0"
+      }
+    },
+    "tags": [],
+    "roles": [],
+    "traits": [],
+    "flag": null,
+    "patchNote": null,
+    "effect": null,
+    "note": null
+  },
+  {
+    "id": "g-60-anti-tank-seeker",
+    "name": "G-60 Anti-Tank Seeker",
+    "aliases": [],
+    "slot": "throwable",
+    "stratType": null,
+    "category": null,
+    "damageType": "explosive",
+    "usesBackpackSlot": null,
+    "acquisition": {
+      "type": "warbond",
+      "warbond": "ironclad-democracy"
+    },
+    "stats": {
+      "ap": 5,
+      "apClass": "AT",
+      "dps": null,
+      "capacity": null,
+      "demoForce": 40,
+      "cooldown": null,
+      "uses": null,
+      "usesUpgraded": null,
+      "medals": null
+    },
+    "ratings": {
+      "bots": {
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "bugs": {
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "squids": {
+        "tier": "B",
+        "source": "ugg",
+        "patch": "7.1.0"
+      }
+    },
+    "tags": [],
+    "roles": [
+      "anti-armor",
+      "objective"
+    ],
+    "traits": [],
+    "flag": null,
+    "patchNote": null,
+    "effect": null,
+    "note": null
+  },
+  {
+    "id": "eagle-gas-airstrike",
+    "name": "Eagle Gas Airstrike",
+    "aliases": [],
+    "slot": "stratagem",
+    "stratType": "eagle",
+    "category": null,
+    "damageType": "gas",
+    "usesBackpackSlot": false,
+    "acquisition": {
+      "type": "campaign",
+      "warbond": null
+    },
+    "stats": {
+      "ap": null,
+      "apClass": null,
+      "dps": null,
+      "capacity": null,
+      "demoForce": null,
+      "cooldown": null,
+      "uses": 2,
+      "usesUpgraded": 3,
+      "medals": null
+    },
+    "ratings": {
+      "bots": {
+        "tier": "B",
+        "source": "ugg",
+        "patch": "7.0.2"
+      },
+      "bugs": {
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.0.2"
+      },
+      "squids": {
+        "tier": "S",
+        "source": "ugg",
+        "patch": "7.0.2"
+      }
+    },
+    "tags": [],
+    "roles": [],
+    "traits": [],
+    "flag": null,
+    "patchNote": null,
+    "effect": null,
+    "note": null
+  },
+  {
+    "id": "td-110-maelstrom",
+    "name": "TD-110 Maelstrom",
+    "aliases": [],
+    "slot": "stratagem",
+    "stratType": "vehicle",
+    "category": null,
+    "damageType": "explosive",
+    "usesBackpackSlot": false,
+    "acquisition": {
+      "type": "campaign",
+      "warbond": null
+    },
+    "stats": {
+      "ap": null,
+      "apClass": null,
+      "dps": null,
+      "capacity": null,
+      "demoForce": null,
+      "cooldown": 780,
+      "uses": null,
+      "usesUpgraded": null,
+      "medals": null
+    },
+    "ratings": {
+      "bots": {
+        "tier": "C",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "bugs": {
+        "tier": "B",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "squids": {
+        "tier": null,
+        "source": null,
+        "patch": null
+      }
+    },
+    "tags": [],
+    "roles": [],
+    "traits": [],
+    "flag": null,
+    "patchNote": null,
+    "effect": null,
+    "note": null
+  },
+  {
+    "id": "surplus-eat-allocation",
+    "name": "Surplus EAT Allocation",
+    "aliases": [],
+    "slot": "booster",
+    "stratType": null,
+    "category": null,
+    "damageType": "utility",
+    "usesBackpackSlot": null,
+    "acquisition": {
+      "type": "warbond",
+      "warbond": "ironclad-democracy"
+    },
+    "stats": {
+      "ap": null,
+      "apClass": null,
+      "dps": null,
+      "capacity": null,
+      "demoForce": null,
+      "cooldown": null,
+      "uses": null,
+      "usesUpgraded": null,
+      "medals": 55
+    },
+    "ratings": {
+      "bots": {
+        "tier": "A",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "bugs": {
+        "tier": "B",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "squids": {
+        "tier": "C",
+        "source": "ugg",
+        "patch": "7.1.0"
+      }
+    },
+    "tags": [],
+    "roles": [],
+    "traits": [],
+    "flag": null,
+    "patchNote": null,
+    "effect": "Two free Expendable Anti-Tank call-ins per mission",
+    "note": null
+  },
+  {
+    "id": "integrated-extinguishers",
+    "name": "Integrated Extinguishers",
+    "aliases": [],
+    "slot": "booster",
+    "stratType": null,
+    "category": null,
+    "damageType": "utility",
+    "usesBackpackSlot": null,
+    "acquisition": {
+      "type": "warbond",
+      "warbond": "ironclad-democracy"
+    },
+    "stats": {
+      "ap": null,
+      "apClass": null,
+      "dps": null,
+      "capacity": null,
+      "demoForce": null,
+      "cooldown": null,
+      "uses": null,
+      "usesUpgraded": null,
+      "medals": 65
+    },
+    "ratings": {
+      "bots": {
+        "tier": "A",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "bugs": {
+        "tier": "C",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "squids": {
+        "tier": "D",
+        "source": "ugg",
+        "patch": "7.1.0"
+      }
+    },
+    "tags": [],
+    "roles": [],
+    "traits": [],
+    "flag": null,
+    "patchNote": null,
+    "effect": "Burning goes out faster",
+    "note": null
+  },
+  {
+    "id": "blunt-force-mitigation",
+    "name": "Blunt-Force Mitigation",
+    "aliases": [],
+    "slot": "armor",
+    "stratType": null,
+    "category": null,
+    "damageType": "utility",
+    "usesBackpackSlot": null,
+    "acquisition": {
+      "type": "armorSet",
+      "warbond": null
+    },
+    "stats": {
+      "ap": null,
+      "apClass": null,
+      "dps": null,
+      "capacity": null,
+      "demoForce": null,
+      "cooldown": null,
+      "uses": null,
+      "usesUpgraded": null,
+      "medals": null
+    },
+    "ratings": {
+      "bots": {
+        "tier": "B",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "bugs": {
+        "tier": "B",
+        "source": "ugg",
+        "patch": "7.1.0"
+      },
+      "squids": {
+        "tier": "A",
+        "source": "ugg",
+        "patch": "7.1.0"
+      }
+    },
+    "tags": [],
+    "roles": [],
+    "traits": [
+      "survive"
+    ],
+    "flag": null,
+    "patchNote": null,
+    "effect": "Harder to knock down, 30% less damage from impacts and collisions, higher armor rating",
+    "note": null
   }
 ]

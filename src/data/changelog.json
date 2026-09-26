@@ -1,5 +1,20 @@
 [
   {
+    "version": "1.23.0",
+    "date": "2026-09-26",
+    "title": "Ironclad Democracy arrives, and the ratings catch up with the game",
+    "changes": [
+      "Eleven new items. Eight come from the Ironclad Democracy warbond: the AR-11 Arbitrator, GL-15 Evictor, P-34 Breacher, G-8 Immolation and G-60 Anti-Tank Seeker, the Surplus EAT Allocation and Integrated Extinguishers boosters, and the Blunt-Force Mitigation armor passive on the Tanker and Ironclad sets. The LAS-12 Sai comes from the Superstore, and the Eagle Gas Airstrike and TD-110 Maelstrom from the campaign. Every one of them is rated. None has art yet, so they show their initials for now.",
+      "The ratings were read off u.gg again on 26 September. The game is on 7.1.1, which fixed crashes and changed no weapon. u.gg dates its lists separately, so primaries are now stamped 7.1.1, support weapons, backpacks, eagles and sentries 7.0.2, and the rest 7.1.0. Every expanded row still says which one it has.",
+      "Five ratings moved. The Orbital Precision Strike goes from S to S+ on every front. The P-4 Senator drops from S+ to S on bots, the FLAM-66 Torcher from S+ to S on squids, and the VG-70 Variable from S to A on squids. Rock Solid climbs from B to A on squids.",
+      "Three Castellan's Creed items finally have a rating: the 40-K Meltagun and the Melta Mine sit at S+ or S everywhere, and the Hot-Shot Marksman Rifle lands at B on bots, D on bugs and C on squids. The P/40-K Bolt Pistol is now the only item in the tool nobody has rated.",
+      "All nineteen patch caveats are gone. Each one warned that an item had changed after the vote was cast, and every vote now comes after the change. Worth knowing: the Anti-Tank Mines, flagged as the rating most likely to move once voters caught up with the demolition buff, did not move.",
+      "The Meltamine is now the Melta Mine, as the game spells it. Anything you saved under the old name still finds it.",
+      "Fresh figures from the wiki. All nine melee weapons now show their handling, the Trident's recoil drops from 12 to 2, and the Orbital Precision Strike's cooldown from 90 to 80 seconds. Two of our own ratings move because of it: the Cremator climbs from S to S+ on bugs now that its damage against big targets is known, and the GL-52 De-Escalator drops from A to B on bugs. Everything else that moved in our column moved because the vote did.",
+      "A loadout card could keep warning about a patch caveat after that caveat had been retired. It only warns about a live one now, and right now there are none."
+    ]
+  },
+  {
     "version": "1.22.0",
     "date": "2026-09-25",
     "title": "The groundwork for accounts, switched off",

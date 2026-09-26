@@ -319,7 +319,7 @@ function WarbondsTab({ lockedItems, lockedWarbonds, toggleWarbond, setWarbondGro
       <p className="text-[11px] leading-relaxed text-base-600">
         Counts are items this tool tracks from that warbond, not total warbond contents. Cosmetics, capes, player cards and
         vehicle patterns are not tracked. Righteous Revenants is the Killzone crossover; the reference tables never label it
-        by tier, so its placement under Legendary is inferred from the 24 warbond count.
+        by tier, so its placement under Legendary is inferred from how many warbonds those tables list.
       </p>
     </div>
   );
