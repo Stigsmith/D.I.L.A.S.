@@ -1,0 +1,2034 @@
+{
+ "note": "The u.gg Helldivers 2 tier lists as read on 26 September 2026, one row per item: name, then the vote vs Automatons, vs Terminids, vs Illuminate. Columns were mapped by each header cell's data-col attribute, not by position. Read by scripts/apply-ugg-7-1.mjs. Kept as the record of what the ratings were set from, the way .wiki-cache keeps the raw wiki pulls.",
+ "source": "https://u.gg/hd2/tier-list",
+ "readOn": "2026-09-26",
+ "lists": [
+  {
+   "list": "eagle-stratagem-tier-list",
+   "stamp": "As of SEPTEMBER 2026 – Patch 7.0.2 – Helldivers 2 has 8 Eagle Stratagems.",
+   "rows": [
+    [
+     "Eagle Strafing Run",
+     "S+",
+     "S",
+     "S+"
+    ],
+    [
+     "Eagle Airstrike",
+     "S+",
+     "S+",
+     "A"
+    ],
+    [
+     "Eagle 500kg Bomb",
+     "S+",
+     "S+",
+     "B"
+    ],
+    [
+     "Eagle Cluster Bomb",
+     "A",
+     "S",
+     "A"
+    ],
+    [
+     "Eagle 110mm Rocket Pods",
+     "A",
+     "A",
+     "D"
+    ],
+    [
+     "Eagle Smoke Strike",
+     "B",
+     "D",
+     "D"
+    ],
+    [
+     "Eagle Napalm Airstrike",
+     "B",
+     "A",
+     "S"
+    ],
+    [
+     "Eagle Gas Airstrike",
+     "B",
+     "S",
+     "S"
+    ]
+   ]
+  },
+  {
+   "list": "orbital-stratagem-tier-list",
+   "stamp": null,
+   "rows": [
+    [
+     "Orbital Precision Strike",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "Orbital Gatling Barrage",
+     "S+",
+     "S+",
+     "A"
+    ],
+    [
+     "Orbital Gas Strike",
+     "S+",
+     "S+",
+     "S"
+    ],
+    [
+     "Orbital Airburst Strike",
+     "A",
+     "S+",
+     "A"
+    ],
+    [
+     "Orbital Laser",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "Orbital Napalm Barrage",
+     "A",
+     "S",
+     "S"
+    ],
+    [
+     "Orbital Railcannon Strike",
+     "A",
+     "A",
+     "D"
+    ],
+    [
+     "Orbital 120mm HE Barrage",
+     "S",
+     "B",
+     "A"
+    ],
+    [
+     "Orbital EMS Strike",
+     "D",
+     "B",
+     "B"
+    ],
+    [
+     "Orbital 380mm HE Barrage",
+     "B",
+     "B",
+     "C"
+    ],
+    [
+     "Orbital Walking Barrage",
+     "S",
+     "B",
+     "A"
+    ],
+    [
+     "Orbital Smoke Strike",
+     "B",
+     "D",
+     "D"
+    ]
+   ]
+  },
+  {
+   "list": "booster-tier-list",
+   "stamp": null,
+   "rows": [
+    [
+     "Hellpod Space Optimization",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "Experimental Infusion",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "Stamina Enhancement",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "Vitality Enhancement",
+     "S",
+     "S",
+     "S"
+    ],
+    [
+     "Muscle Enhancement",
+     "B",
+     "S",
+     "B"
+    ],
+    [
+     "Increased Reinforcement Budget",
+     "S",
+     "S",
+     "S"
+    ],
+    [
+     "Armed Resupply Pods",
+     "C",
+     "A",
+     "A"
+    ],
+    [
+     "Sample Extricator",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "Sample Scanner",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "Flexible Reinforcement Budget",
+     "B",
+     "B",
+     "B"
+    ],
+    [
+     "Localization Confusion",
+     "B",
+     "B",
+     "B"
+    ],
+    [
+     "Dead Sprint",
+     "C",
+     "B",
+     "B"
+    ],
+    [
+     "Surplus EAT Allocation",
+     "A",
+     "B",
+     "C"
+    ],
+    [
+     "Expert Extraction Pilot",
+     "C",
+     "C",
+     "C"
+    ],
+    [
+     "Motivational Shocks",
+     "D",
+     "C",
+     "D"
+    ],
+    [
+     "Firebomb Hellpods",
+     "D",
+     "C",
+     "C"
+    ],
+    [
+     "Integrated Extinguishers",
+     "A",
+     "C",
+     "D"
+    ],
+    [
+     "UAV Recon Booster",
+     "D",
+     "D",
+     "D"
+    ],
+    [
+     "Stun Pods",
+     "D",
+     "D",
+     "D"
+    ],
+    [
+     "Concealed Insertion",
+     "A",
+     "D",
+     "D"
+    ]
+   ]
+  },
+  {
+   "list": "armor-passive-tier-list",
+   "stamp": null,
+   "rows": [
+    [
+     "Desert Stormer",
+     "A",
+     "S+",
+     "A"
+    ],
+    [
+     "Acclimated",
+     "A",
+     "S+",
+     "A"
+    ],
+    [
+     "Inflammable",
+     "B",
+     "S+",
+     "C"
+    ],
+    [
+     "Med-Kit",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "True Grit",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "Siege-Ready",
+     "S",
+     "S",
+     "S"
+    ],
+    [
+     "Engineering Kit",
+     "S",
+     "S",
+     "S"
+    ],
+    [
+     "Oxygenator",
+     "S",
+     "S",
+     "S"
+    ],
+    [
+     "Ballistic Padding",
+     "S",
+     "A",
+     "A"
+    ],
+    [
+     "Unflinching",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "Peak Physique",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "Democracy Protects",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "Kinetic Displacement Mitigation",
+     "A",
+     "A",
+     "B"
+    ],
+    [
+     "Concussive Padding, Reinforced",
+     "S+",
+     "B",
+     "A"
+    ],
+    [
+     "Concussive Padding, Hazmat",
+     "S+",
+     "B",
+     "B"
+    ],
+    [
+     "Concussive Padding, Grenadier",
+     "S+",
+     "B",
+     "B"
+    ],
+    [
+     "Reduced Signature",
+     "S+",
+     "B",
+     "S"
+    ],
+    [
+     "Rock Solid",
+     "B",
+     "B",
+     "A"
+    ],
+    [
+     "Adreno-Defibrillator",
+     "B",
+     "B",
+     "A"
+    ],
+    [
+     "Reinforced Epaulettes",
+     "B",
+     "B",
+     "B"
+    ],
+    [
+     "Gunslinger",
+     "B",
+     "B",
+     "B"
+    ],
+    [
+     "Servo-Assisted",
+     "C",
+     "B",
+     "C"
+    ],
+    [
+     "Extra Padding",
+     "B",
+     "B",
+     "B"
+    ],
+    [
+     "Supplementary Adrenaline",
+     "B",
+     "B",
+     "B"
+    ],
+    [
+     "Blunt-Force Mitigation",
+     "B",
+     "B",
+     "A"
+    ],
+    [
+     "Integrated Explosives",
+     "C",
+     "C",
+     "C"
+    ],
+    [
+     "Advanced Filtration",
+     "C",
+     "C",
+     "C"
+    ],
+    [
+     "Fortified",
+     "S+",
+     "C",
+     "B"
+    ],
+    [
+     "Scout",
+     "A",
+     "C",
+     "B"
+    ],
+    [
+     "Feet First",
+     "B",
+     "D",
+     "C"
+    ],
+    [
+     "Electrical Conduit",
+     "D",
+     "D",
+     "A"
+    ]
+   ]
+  },
+  {
+   "list": "sentry-stratagem-tier-list",
+   "stamp": "As of SEPTEMBER 2026 – Patch 7.0.2 – Helldivers 2 has: 8 Emplacements & 10 Sentries.",
+   "rows": [
+    [
+     "E/AT-12 Anti-Tank Emplacement",
+     "S+",
+     "S",
+     "S+"
+    ],
+    [
+     "A/MG-43 Machine Gun Sentry",
+     "S",
+     "S+",
+     "S+"
+    ],
+    [
+     "A/ARC-3 Tesla Tower",
+     "B",
+     "S+",
+     "S+"
+    ],
+    [
+     "A/G-16 Gatling Sentry",
+     "A",
+     "S",
+     "S+"
+    ],
+    [
+     "A/AC-8 Autocannon Sentry",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "E/MG-101 HMG Emplacement",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "A/FLAM-40 Flame Sentry",
+     "B",
+     "S",
+     "S"
+    ],
+    [
+     "A/MLS-4X Rocket Sentry",
+     "S+",
+     "S",
+     "S"
+    ],
+    [
+     "MD-I4 Incendiary Mines",
+     "B",
+     "S",
+     "S"
+    ],
+    [
+     "MD-8 Gas Mines",
+     "S",
+     "S",
+     "S"
+    ],
+    [
+     "A/LAS-98 Laser Sentry",
+     "C",
+     "B",
+     "A"
+    ],
+    [
+     "A/M-23 EMS Mortar Sentry",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "MD-6 Anti-Personnel Minefield",
+     "B",
+     "A",
+     "A"
+    ],
+    [
+     "E/GL-21 Grenadier Battlement",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "A/GM-17 Gas Mortar Sentry",
+     "A",
+     "B",
+     "B"
+    ],
+    [
+     "FX-12 Shield Generator Relay",
+     "B",
+     "D",
+     "B"
+    ],
+    [
+     "A/M-12 Mortar Sentry",
+     "S",
+     "D",
+     "D"
+    ],
+    [
+     "MD-17 Anti-Tank Mines",
+     "S",
+     "A",
+     "D"
+    ]
+   ]
+  },
+  {
+   "list": "helldivers-2-throwables-tier-list",
+   "stamp": null,
+   "rows": [
+    [
+     "G-123 Thermite",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "G-13 Incendiary Impact",
+     "B",
+     "S+",
+     "S+"
+    ],
+    [
+     "G-10 Incendiary",
+     "B",
+     "S+",
+     "S+"
+    ],
+    [
+     "G-4 Gas",
+     "A",
+     "S",
+     "S+"
+    ],
+    [
+     "TM-1 Lure Mine",
+     "A",
+     "S",
+     "A"
+    ],
+    [
+     "G-16 Impact",
+     "A",
+     "S",
+     "S"
+    ],
+    [
+     "TED-63 Dynamite",
+     "S",
+     "S",
+     "A"
+    ],
+    [
+     "G-23 Stun",
+     "S",
+     "S",
+     "C"
+    ],
+    [
+     "G/SH-39 Shield",
+     "S",
+     "S",
+     "A"
+    ],
+    [
+     "G-8 Immolation",
+     "C",
+     "S",
+     "S"
+    ],
+    [
+     "G-60 Anti-Tank Seeker",
+     "S",
+     "S",
+     "B"
+    ],
+    [
+     "G/40-K Melta Mine",
+     "S+",
+     "S",
+     "S"
+    ],
+    [
+     "G-142 Pyrotech",
+     "S",
+     "A",
+     "A"
+    ],
+    [
+     "G-6 Frag",
+     "B",
+     "A",
+     "A"
+    ],
+    [
+     "G-12 High Explosive",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "G-7 Pineapple",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "G-48 Giga Grenade",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "G-50 Seeker",
+     "A",
+     "B",
+     "A"
+    ],
+    [
+     "G-31 Arc",
+     "C",
+     "C",
+     "C"
+    ],
+    [
+     "G-109 Urchin",
+     "D",
+     "D",
+     "C"
+    ],
+    [
+     "K-2 Throwing Knife",
+     "D",
+     "D",
+     "D"
+    ],
+    [
+     "G-89 Smokecreen",
+     "B",
+     "D",
+     "D"
+    ],
+    [
+     "G-3 Smoke",
+     "B",
+     "D",
+     "D"
+    ]
+   ]
+  },
+  {
+   "list": "helldivers-2-secondary-weapons-tier-list",
+   "stamp": null,
+   "rows": [
+    [
+     "GP-31 Grenade Pistol",
+     "S",
+     "S+",
+     "S+"
+    ],
+    [
+     "GP-20 Ultimatum",
+     "S+",
+     "S+",
+     "A"
+    ],
+    [
+     "P-34 Breacher",
+     "S+",
+     "S+",
+     "A"
+    ],
+    [
+     "LAS-58 Talon",
+     "S",
+     "S",
+     "S+"
+    ],
+    [
+     "PLAS-15 Loyalist",
+     "A",
+     "S",
+     "S+"
+    ],
+    [
+     "P-4 Senator",
+     "S",
+     "S",
+     "A"
+    ],
+    [
+     "P-35 Re-Educator",
+     "A",
+     "S",
+     "S"
+    ],
+    [
+     "P-72 Crisper",
+     "B",
+     "A",
+     "S+"
+    ],
+    [
+     "P-113 Verdict",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "P-69 Veto",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "P-19 Redeemer",
+     "B",
+     "A",
+     "A"
+    ],
+    [
+     "P-92 Warrant",
+     "B",
+     "A",
+     "S"
+    ],
+    [
+     "P-11 Stim Pistol",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "M6C-SOCOM",
+     "B",
+     "B",
+     "B"
+    ],
+    [
+     "SG-22 Bushwhacker",
+     "C",
+     "B",
+     "C"
+    ],
+    [
+     "CQC-2 Saber",
+     "C",
+     "B",
+     "B"
+    ],
+    [
+     "CQC-5 Combat Hatchet",
+     "C",
+     "B",
+     "B"
+    ],
+    [
+     "CQC-42 Machete",
+     "B",
+     "B",
+     "B"
+    ],
+    [
+     "P-2 Peacemaker",
+     "D",
+     "C",
+     "C"
+    ],
+    [
+     "CQC-19 Stun Lance",
+     "D",
+     "C",
+     "C"
+    ],
+    [
+     "CQC-30 Stun Baton",
+     "D",
+     "C",
+     "C"
+    ],
+    [
+     "LAS-7 Dagger",
+     "C",
+     "C",
+     "B"
+    ],
+    [
+     "CQC-73 Entrenchment Tool",
+     "D",
+     "C",
+     "C"
+    ]
+   ]
+  },
+  {
+   "list": "support-weapon-stratagem-tier-list",
+   "stamp": "As of SEPTEMBER 2026 – Patch 7.0.2 – Helldivers 2 has 33 Support Weapons.",
+   "rows": [
+    [
+     "RL-77 Airburst Rocket Launcher",
+     "A",
+     "B",
+     "S+"
+    ],
+    [
+     "M-105 Stalwart",
+     "B",
+     "A",
+     "S+"
+    ],
+    [
+     "FLAM-40 Flamethrower",
+     "B",
+     "S",
+     "S+"
+    ],
+    [
+     "AC-8 Autocannon",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "StA-X3 W.A.S.P. Launcher",
+     "B",
+     "B",
+     "S+"
+    ],
+    [
+     "B/FLAM-80 Cremator",
+     "A",
+     "S+",
+     "S+"
+    ],
+    [
+     "MGX-42 Bullet Storm",
+     "B",
+     "A",
+     "S+"
+    ],
+    [
+     "S-11 Speargun",
+     "S",
+     "S",
+     "S"
+    ],
+    [
+     "GL-21 Grenade Launcher",
+     "S",
+     "S",
+     "S"
+    ],
+    [
+     "MG-43 Machine Gun",
+     "B",
+     "B",
+     "S"
+    ],
+    [
+     "EAT-700 Expendable Napalm",
+     "B",
+     "S",
+     "S"
+    ],
+    [
+     "40-K Meltagun",
+     "S+",
+     "S+",
+     "S"
+    ],
+    [
+     "B/MD C4 Pack",
+     "S+",
+     "S",
+     "A"
+    ],
+    [
+     "EAT-411 Leveller",
+     "S+",
+     "B",
+     "A"
+    ],
+    [
+     "MS-11 Solo Silo",
+     "S",
+     "S",
+     "A"
+    ],
+    [
+     "CQC-20 Breaching Hammer",
+     "S",
+     "S",
+     "A"
+    ],
+    [
+     "ARC-3 Arc Thrower",
+     "C",
+     "A",
+     "A"
+    ],
+    [
+     "GL-52 De-Escalator",
+     "B",
+     "A",
+     "A"
+    ],
+    [
+     "M-1000 Maxigun",
+     "B",
+     "B",
+     "A"
+    ],
+    [
+     "GL-28 Belt-Fed Grenade Launcher",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "MLS-4X Commando",
+     "S",
+     "B",
+     "B"
+    ],
+    [
+     "PLAS-45 Epoch",
+     "S",
+     "A",
+     "B"
+    ],
+    [
+     "MG-206 Heavy Machine Gun",
+     "B",
+     "B",
+     "B"
+    ],
+    [
+     "LAS-98 Laser Cannon",
+     "B",
+     "B",
+     "B"
+    ],
+    [
+     "GR-8 Recoilless Rifle",
+     "S+",
+     "S+",
+     "C"
+    ],
+    [
+     "APW-1 Anti-Materiel Rifle",
+     "A",
+     "B",
+     "C"
+    ],
+    [
+     "FAF-14 Spear",
+     "S",
+     "A",
+     "C"
+    ],
+    [
+     "RS-422 Railgun",
+     "S",
+     "B",
+     "C"
+    ],
+    [
+     "EAT-17 Expendable Anti-Tank",
+     "S",
+     "S+",
+     "C"
+    ],
+    [
+     "LAS-99 Quasar Cannon",
+     "S",
+     "S",
+     "C"
+    ],
+    [
+     "TX-41 Sterilizer",
+     "D",
+     "D",
+     "C"
+    ],
+    [
+     "CQC-9 Defoliation Tool",
+     "D",
+     "C",
+     "C"
+    ],
+    [
+     "CQC-1 One True Flag",
+     "D",
+     "D",
+     "D"
+    ]
+   ]
+  },
+  {
+   "list": "helldivers-2-vehicle-tier-list",
+   "stamp": null,
+   "rows": [
+    [
+     "M-102 Gunner FRV",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "M-104 Incinerator FRV",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "M-103 Supply FRV",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "EXO-49 Emancipator Exosuit",
+     "S",
+     "S",
+     "S+"
+    ],
+    [
+     "EXO-55 Breakthrough Exosuit",
+     "S",
+     "S",
+     "S+"
+    ],
+    [
+     "EXO-51 Lumberer Exosuit",
+     "S",
+     "S",
+     "B"
+    ],
+    [
+     "EXO-45 Patriot Exosuit",
+     "A",
+     "A",
+     "B"
+    ],
+    [
+     "TD-220 Bastion MK XVI",
+     "S+",
+     "B",
+     "B"
+    ],
+    [
+     "TD-110 Maelstrom",
+     "C",
+     "B",
+     "—"
+    ]
+   ]
+  },
+  {
+   "list": "helldivers-2-primary-weapons-tier-list",
+   "stamp": "Updated Manually for Patch 7.1.1",
+   "rows": [
+    [
+     "CB-9 Explosive Crossbow",
+     "S+",
+     "S+",
+     "S"
+    ],
+    [
+     "R-36 Eruptor",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "PLAS-101 Purifier",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "AR-2 Coyote",
+     "A",
+     "S+",
+     "S+"
+    ],
+    [
+     "SG-8 Punisher Plasma",
+     "S+",
+     "S",
+     "S+"
+    ],
+    [
+     "PLAS-1 Scorcher",
+     "S",
+     "S",
+     "S"
+    ],
+    [
+     "DBS-2 Double Freedom",
+     "A",
+     "S",
+     "A"
+    ],
+    [
+     "ARC-12 Blitzer",
+     "D",
+     "S",
+     "A"
+    ],
+    [
+     "SG-97 Sweeper",
+     "A",
+     "S",
+     "S"
+    ],
+    [
+     "SMG-203 Gallant",
+     "B",
+     "S",
+     "S"
+    ],
+    [
+     "AR-11 Arbitrator",
+     "A",
+     "S",
+     "S"
+    ],
+    [
+     "LAS-12 Sai",
+     "S",
+     "S",
+     "S"
+    ],
+    [
+     "LAS-13 Trident",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "VG-70 Variable",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "LAS-17 Double-Edge Sickle",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "JAR-5 Dominator",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "BR-14 Adjudicator",
+     "B",
+     "A",
+     "B"
+    ],
+    [
+     "AR-23P Liberator Penetrator",
+     "B",
+     "A",
+     "B"
+    ],
+    [
+     "SMG-32 Reprimand",
+     "B",
+     "A",
+     "A"
+    ],
+    [
+     "AR-61 Tenderizer",
+     "B",
+     "A",
+     "A"
+    ],
+    [
+     "AR/GL-21 One-Two",
+     "B",
+     "A",
+     "B"
+    ],
+    [
+     "AR-23 Liberator",
+     "B",
+     "A",
+     "A"
+    ],
+    [
+     "AR-23A Liberator Carbine",
+     "B",
+     "A",
+     "A"
+    ],
+    [
+     "SG-20 Halt",
+     "B",
+     "A",
+     "B"
+    ],
+    [
+     "MP-98 Knight",
+     "B",
+     "A",
+     "A"
+    ],
+    [
+     "AR-32 Pacifier",
+     "B",
+     "A",
+     "C"
+    ],
+    [
+     "SG-225IE Breaker Incendiary",
+     "C",
+     "A",
+     "A"
+    ],
+    [
+     "SG-225 Breaker",
+     "C",
+     "A",
+     "A"
+    ],
+    [
+     "SG-451 Cookout",
+     "C",
+     "A",
+     "B"
+    ],
+    [
+     "SG-8 Punisher",
+     "C",
+     "A",
+     "C"
+    ],
+    [
+     "MA5C Assault Rifle",
+     "C",
+     "A",
+     "A"
+    ],
+    [
+     "LAS-5 Scythe",
+     "A",
+     "A",
+     "A"
+    ],
+    [
+     "SMG/FLAM-34 Stoker",
+     "B",
+     "A",
+     "S"
+    ],
+    [
+     "GL-15 Evictor",
+     "S",
+     "A",
+     "A"
+    ],
+    [
+     "PLAS-39 Accelerator Rifle",
+     "A",
+     "B",
+     "A"
+    ],
+    [
+     "AR-59 Suppressor",
+     "B",
+     "B",
+     "B"
+    ],
+    [
+     "LAS-16 Sickle",
+     "B",
+     "B",
+     "B"
+    ],
+    [
+     "FLAM-66 Torcher",
+     "C",
+     "B",
+     "S"
+    ],
+    [
+     "M7S SMG",
+     "C",
+     "B",
+     "B"
+    ],
+    [
+     "StA-52 Assault Rifle",
+     "C",
+     "B",
+     "A"
+    ],
+    [
+     "StA-11 SMG",
+     "C",
+     "B",
+     "A"
+    ],
+    [
+     "M90A Shotgun",
+     "D",
+     "B",
+     "C"
+    ],
+    [
+     "SG-8S Slugger",
+     "D",
+     "B",
+     "D"
+    ],
+    [
+     "R-4 Hyena",
+     "A",
+     "B",
+     "B"
+    ],
+    [
+     "R-72 Censor",
+     "S",
+     "C",
+     "A"
+    ],
+    [
+     "R-63 Diligence",
+     "S",
+     "C",
+     "A"
+    ],
+    [
+     "R-2 Amendment",
+     "A",
+     "C",
+     "A"
+    ],
+    [
+     "R-63CS Diligence Counter Sniper",
+     "A",
+     "C",
+     "B"
+    ],
+    [
+     "SMG-37 Defender",
+     "C",
+     "C",
+     "B"
+    ],
+    [
+     "SG-225SP Breaker SPRAY & PRAY",
+     "C",
+     "C",
+     "B"
+    ],
+    [
+     "R-6 Deadeye",
+     "C",
+     "C",
+     "B"
+    ],
+    [
+     "SMG-72 Pummeler",
+     "D",
+     "C",
+     "C"
+    ],
+    [
+     "AR-23C Liberator Concussive",
+     "D",
+     "D",
+     "D"
+    ],
+    [
+     "R-2124 Constitution",
+     "D",
+     "D",
+     "D"
+    ],
+    [
+     "R/40-K Hot-Shot Marksman Rifle",
+     "B",
+     "D",
+     "C"
+    ]
+   ]
+  },
+  {
+   "list": "helldivers-2-backpack-stratagem-tier-list",
+   "stamp": "As of SEPTEMBER 2026 – Patch 7.0.2 – Helldivers 2 has 13 Backpack Stratagems.",
+   "rows": [
+    [
+     "AX/FLAM-75 Hot Dog",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "LIFT-182 Warp Pack",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "B-1 Supply Pack",
+     "S+",
+     "S+",
+     "S+"
+    ],
+    [
+     "B-100 Portable Hellbomb",
+     "S+",
+     "S",
+     "S"
+    ],
+    [
+     "AX/AR-23 Guard Dog",
+     "A",
+     "A",
+     "S"
+    ],
+    [
+     "LIFT-850 Jump Pack",
+     "S",
+     "S",
+     "S"
+    ],
+    [
+     "SH-32 Shield Generator Pack",
+     "S",
+     "S",
+     "S"
+    ],
+    [
+     "AX/LAS-5 Rover",
+     "B",
+     "S",
+     "A"
+    ],
+    [
+     "LIFT-860 Hover Pack",
+     "A",
+     "S",
+     "A"
+    ],
+    [
+     "AX/ARC-3 K-9",
+     "C",
+     "B",
+     "B"
+    ],
+    [
+     "AX/TX-13 Dog Breath",
+     "B",
+     "A",
+     "B"
+    ],
+    [
+     "SH-20 Ballistic Shield Backpack",
+     "B",
+     "C",
+     "C"
+    ],
+    [
+     "SH-51 Directional Shield",
+     "D",
+     "D",
+     "D"
+    ]
+   ]
+  }
+ ],
+ "facts": {
+  "note": "The stat columns u.gg shows beside the votes, for the three weapon lists. DPS as u.gg states it, AP as the leading number of its Armor Pen column, demolition as its Demo Force column. null where u.gg writes N/A.",
+  "primary": [
+   {
+    "name": "CB-9 Explosive Crossbow",
+    "dps": 516,
+    "ap": 3
+   },
+   {
+    "name": "R-36 Eruptor",
+    "dps": 853.12,
+    "ap": 4
+   },
+   {
+    "name": "PLAS-101 Purifier",
+    "dps": 2916,
+    "ap": 3
+   },
+   {
+    "name": "AR-2 Coyote",
+    "dps": 750,
+    "ap": 3
+   },
+   {
+    "name": "SG-8 Punisher Plasma",
+    "dps": 299.99,
+    "ap": 3
+   },
+   {
+    "name": "PLAS-1 Scorcher",
+    "dps": 1166,
+    "ap": 3
+   },
+   {
+    "name": "DBS-2 Double Freedom",
+    "dps": 1680,
+    "ap": 3
+   },
+   {
+    "name": "ARC-12 Blitzer",
+    "dps": 333,
+    "ap": 3
+   },
+   {
+    "name": "SG-97 Sweeper",
+    "dps": 1260,
+    "ap": 3
+   },
+   {
+    "name": "SMG-203 Gallant",
+    "dps": 1495,
+    "ap": 3
+   },
+   {
+    "name": "AR-11 Arbitrator",
+    "dps": 1400,
+    "ap": 2
+   },
+   {
+    "name": "LAS-12 Sai",
+    "dps": 1066,
+    "ap": 3
+   },
+   {
+    "name": "LAS-13 Trident",
+    "dps": 1800,
+    "ap": 2
+   },
+   {
+    "name": "VG-70 Variable",
+    "dps": 1062,
+    "ap": 2
+   },
+   {
+    "name": "LAS-17 Double-Edge Sickle",
+    "dps": 816,
+    "ap": 4
+   },
+   {
+    "name": "JAR-5 Dominator",
+    "dps": 1145,
+    "ap": 3
+   },
+   {
+    "name": "BR-14 Adjudicator",
+    "dps": 870,
+    "ap": 3
+   },
+   {
+    "name": "AR-23P Liberator Penetrator",
+    "dps": 693,
+    "ap": 3
+   },
+   {
+    "name": "SMG-32 Reprimand",
+    "dps": 1143,
+    "ap": 3
+   },
+   {
+    "name": "AR-61 Tenderizer",
+    "dps": 1487,
+    "ap": 2
+   },
+   {
+    "name": "AR/GL-21 One-Two",
+    "dps": 1029,
+    "ap": 2
+   },
+   {
+    "name": "AR-23 Liberator",
+    "dps": 960,
+    "ap": 2
+   },
+   {
+    "name": "AR-23A Liberator Carbine",
+    "dps": 1380,
+    "ap": 2
+   },
+   {
+    "name": "SG-20 Halt",
+    "dps": 513,
+    "ap": 3
+   },
+   {
+    "name": "MP-98 Knight",
+    "dps": 2070,
+    "ap": 2
+   },
+   {
+    "name": "AR-32 Pacifier",
+    "dps": 640,
+    "ap": 3
+   },
+   {
+    "name": "SG-225IE Breaker Incendiary",
+    "dps": 1200,
+    "ap": 2
+   },
+   {
+    "name": "SG-225 Breaker",
+    "dps": 1650,
+    "ap": 2
+   },
+   {
+    "name": "SG-451 Cookout",
+    "dps": 426,
+    "ap": 2
+   },
+   {
+    "name": "SG-8 Punisher",
+    "dps": 540,
+    "ap": 2
+   },
+   {
+    "name": "MA5C Assault Rifle",
+    "dps": 960,
+    "ap": 3
+   },
+   {
+    "name": "LAS-5 Scythe",
+    "dps": 350,
+    "ap": 2
+   },
+   {
+    "name": "SMG/FLAM-34 Stoker",
+    "dps": 910,
+    "ap": 2
+   },
+   {
+    "name": "GL-15 Evictor",
+    "dps": 490,
+    "ap": 3
+   },
+   {
+    "name": "PLAS-39 Accelerator Rifle",
+    "dps": 3208,
+    "ap": 3
+   },
+   {
+    "name": "AR-59 Suppressor",
+    "dps": 1133,
+    "ap": 2
+   },
+   {
+    "name": "LAS-16 Sickle",
+    "dps": 750,
+    "ap": 2
+   },
+   {
+    "name": "FLAM-66 Torcher",
+    "dps": 250,
+    "ap": 4
+   },
+   {
+    "name": "M7S SMG",
+    "dps": 1308,
+    "ap": 2
+   },
+   {
+    "name": "StA-52 Assault Rifle",
+    "dps": 1185,
+    "ap": 2
+   },
+   {
+    "name": "StA-11 SMG",
+    "dps": 1575,
+    "ap": 2
+   },
+   {
+    "name": "M90A Shotgun",
+    "dps": 806,
+    "ap": 2
+   },
+   {
+    "name": "SG-8S Slugger",
+    "dps": 440,
+    "ap": 3
+   },
+   {
+    "name": "R-4 Hyena",
+    "dps": 712.5,
+    "ap": 3
+   },
+   {
+    "name": "R-72 Censor",
+    "dps": 1100,
+    "ap": 2
+   },
+   {
+    "name": "R-63 Diligence",
+    "dps": 962,
+    "ap": 2
+   },
+   {
+    "name": "R-2 Amendment",
+    "dps": 1600,
+    "ap": 2
+   },
+   {
+    "name": "R-63CS Diligence Counter Sniper",
+    "dps": 1166,
+    "ap": 3
+   },
+   {
+    "name": "SMG-37 Defender",
+    "dps": 953,
+    "ap": 2
+   },
+   {
+    "name": "SG-225SP Breaker SPRAY & PRAY",
+    "dps": 1320,
+    "ap": 2
+   },
+   {
+    "name": "R-6 Deadeye",
+    "dps": 500,
+    "ap": 3
+   },
+   {
+    "name": "SMG-72 Pummeler",
+    "dps": 672,
+    "ap": 2
+   },
+   {
+    "name": "AR-23C Liberator Concussive",
+    "dps": 500,
+    "ap": 2
+   },
+   {
+    "name": "R-2124 Constitution",
+    "dps": 180,
+    "ap": 3
+   },
+   {
+    "name": "R/40-K Hot-Shot Marksman Rifle",
+    "dps": 962,
+    "ap": 3
+   }
+  ],
+  "secondary": [
+   {
+    "name": "GP-31 Grenade Pistol",
+    "ap": 3
+   },
+   {
+    "name": "GP-20 Ultimatum",
+    "ap": 6
+   },
+   {
+    "name": "P-34 Breacher",
+    "ap": 7
+   },
+   {
+    "name": "LAS-58 Talon",
+    "ap": 3
+   },
+   {
+    "name": "PLAS-15 Loyalist",
+    "ap": 3
+   },
+   {
+    "name": "P-4 Senator",
+    "ap": 4
+   },
+   {
+    "name": "P-35 Re-Educator",
+    "ap": 4
+   },
+   {
+    "name": "P-72 Crisper",
+    "ap": 4
+   },
+   {
+    "name": "P-113 Verdict",
+    "ap": 3
+   },
+   {
+    "name": "P-69 Veto",
+    "ap": 3
+   },
+   {
+    "name": "P-19 Redeemer",
+    "ap": 2
+   },
+   {
+    "name": "P-92 Warrant",
+    "ap": 3
+   },
+   {
+    "name": "P-11 Stim Pistol",
+    "ap": 0
+   },
+   {
+    "name": "M6C-SOCOM",
+    "ap": 2
+   },
+   {
+    "name": "SG-22 Bushwhacker",
+    "ap": 2
+   },
+   {
+    "name": "CQC-2 Saber",
+    "ap": 3
+   },
+   {
+    "name": "CQC-5 Combat Hatchet",
+    "ap": 3
+   },
+   {
+    "name": "CQC-42 Machete",
+    "ap": 3
+   },
+   {
+    "name": "P-2 Peacemaker",
+    "ap": 2
+   },
+   {
+    "name": "CQC-19 Stun Lance",
+    "ap": 3
+   },
+   {
+    "name": "CQC-30 Stun Baton",
+    "ap": 3
+   },
+   {
+    "name": "LAS-7 Dagger",
+    "ap": 2
+   },
+   {
+    "name": "CQC-73 Entrenchment Tool",
+    "ap": 3
+   }
+  ],
+  "throwable": [
+   {
+    "name": "G-123 Thermite",
+    "demoForce": 30,
+    "ap": 7
+   },
+   {
+    "name": "G-13 Incendiary Impact",
+    "demoForce": 30,
+    "ap": 4
+   },
+   {
+    "name": "G-10 Incendiary",
+    "demoForce": 30,
+    "ap": 4
+   },
+   {
+    "name": "G-4 Gas",
+    "demoForce": 30,
+    "ap": 6
+   },
+   {
+    "name": "TM-1 Lure Mine",
+    "demoForce": 30,
+    "ap": 5
+   },
+   {
+    "name": "G-16 Impact",
+    "demoForce": 30,
+    "ap": 4
+   },
+   {
+    "name": "TED-63 Dynamite",
+    "demoForce": 40,
+    "ap": 4
+   },
+   {
+    "name": "G-23 Stun",
+    "demoForce": 0,
+    "ap": 6
+   },
+   {
+    "name": "G/SH-39 Shield",
+    "demoForce": 20,
+    "ap": 0
+   },
+   {
+    "name": "G-8 Immolation",
+    "demoForce": null,
+    "ap": null
+   },
+   {
+    "name": "G-60 Anti-Tank Seeker",
+    "demoForce": null,
+    "ap": 5
+   },
+   {
+    "name": "G/40-K Melta Mine",
+    "demoForce": 10,
+    "ap": 7
+   },
+   {
+    "name": "G-142 Pyrotech",
+    "demoForce": 30,
+    "ap": 7
+   },
+   {
+    "name": "G-6 Frag",
+    "demoForce": 20,
+    "ap": 3
+   },
+   {
+    "name": "G-12 High Explosive",
+    "demoForce": 30,
+    "ap": 4
+   },
+   {
+    "name": "G-7 Pineapple",
+    "demoForce": 30,
+    "ap": 3
+   },
+   {
+    "name": "G-48 Giga Grenade",
+    "demoForce": 40,
+    "ap": 5
+   },
+   {
+    "name": "G-50 Seeker",
+    "demoForce": 30,
+    "ap": 4
+   },
+   {
+    "name": "G-31 Arc",
+    "demoForce": 0,
+    "ap": 4
+   },
+   {
+    "name": "G-109 Urchin",
+    "demoForce": 0,
+    "ap": 6
+   },
+   {
+    "name": "K-2 Throwing Knife",
+    "demoForce": 10,
+    "ap": 3
+   },
+   {
+    "name": "G-89 Smokecreen",
+    "demoForce": 0,
+    "ap": 0
+   },
+   {
+    "name": "G-3 Smoke",
+    "demoForce": 0,
+    "ap": 0
+   }
+  ]
+ }
+}
