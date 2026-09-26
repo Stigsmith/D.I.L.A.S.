@@ -80,12 +80,18 @@ if (dupeNames.length) fail(`${dupeNames.length} duplicate display name(s). Not f
 
 /* An alias that collides with a live id would make a rename resolve   */
 /* an old reference onto the wrong item.                               */
+/*                                                                     */
+/* Onto the WRONG item: an alias that slugs to its own item's id is    */
+/* the ordinary case of a rename that changed spacing or capitals, and */
+/* it resolves exactly where it should. The display name check below   */
+/* always exempted the item's own entry and this one did not, until    */
+/* "G/40-K Meltamine" became "G/40-K Melta Mine" on 26 September 2026. */
 const aliasCollisions = [];
 const aliasOwner = new Map();
 for (const it of items) {
   for (const a of it.aliases) {
     const asId = a.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-    if (ids.has(asId)) aliasCollisions.push(`"${a}" on ${it.id} slugs to live id ${asId}`);
+    if (ids.has(asId) && asId !== it.id) aliasCollisions.push(`"${a}" on ${it.id} slugs to live id ${asId}`);
     if (names.has(a) && names.get(a) !== it.id) aliasCollisions.push(`"${a}" on ${it.id} is the live display name of ${names.get(a)}`);
     if (aliasOwner.has(a)) aliasCollisions.push(`"${a}" claimed by both ${aliasOwner.get(a)} and ${it.id}`);
     aliasOwner.set(a, it.id);

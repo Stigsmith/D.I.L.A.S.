@@ -109,6 +109,15 @@ const CHAFF_INCLUDE = [
   "orbital-napalm-barrage",
   "orbital-gas-strike",
   "md-i4-incendiary-mines",
+  /* Vehicles. Their roles were written by hand in add-vehicles.mjs in
+     1.5.0, and this script was never told, so any --write run stripped
+     them. Found on 26 September 2026 when adding the 7.1.1 items. Listed
+     here so the derivation and the data agree. */
+  "m-102-gunner-frv",
+  "m-104-incinerator-frv",
+  "exo-45-patriot-exosuit",
+  "exo-51-lumberer-exosuit",
+  "exo-55-breakthrough-exosuit",
 ];
 
 /* Caught by category, but too slow or too precise to hold off a swarm. */
@@ -144,6 +153,7 @@ const OBJECTIVE_INCLUDE = [
   "las-99-quasar-cannon",
   "gp-20-ultimatum",
   "md-17-anti-tank-mines",           /* note: demo 40 as of 7.0.0, closes holes from outside */
+  "td-220-bastion-mk-xvi",           /* set by add-vehicles.mjs: a main cannon at demo 40 */
 ];
 
 /* Throwables the demo floor catches that do not actually close a hole. */
@@ -181,7 +191,11 @@ const chaff = (item) => {
 const objective = (item) => {
   if (OBJECTIVE_EXCLUDE.includes(item.id)) return false;
   if (OBJECTIVE_INCLUDE.includes(item.id)) return true;
-  return item.stats.demoForce !== null && item.stats.demoForce >= DEMO_FLOOR;
+  /* Throwables only, as the comment above the floor has always said. The
+     code used to apply it to everything, which would have tagged three
+     exosuits as hole closers on the strength of their demolition figure
+     the first time anyone ran --write after the vehicles landed. */
+  return item.slot === "throwable" && item.stats.demoForce !== null && item.stats.demoForce >= DEMO_FLOOR;
 };
 
 let changed = 0;

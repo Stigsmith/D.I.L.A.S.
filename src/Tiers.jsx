@@ -23,6 +23,7 @@ import LOADOUTS from "./data/loadouts.json";
 import { itemArt, uiArt, FACTION_GLYPH } from "./lib/assets.js";
 import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 import { BRAND } from "./lib/brand.js";
+import { PATCH } from "./lib/patch.js";
 import {
   planets, biomeInfo, hazardInfo, biomeName, hazardName, hazardEffect,
   missionsFor, missionTraits, missionByName, traitsOf,
@@ -814,10 +815,12 @@ function Section({ title, children }) {
 const STILL_MISSING =
   "Reload time and projectile count are still not in any source this project has. Everything above is fetched from helldivers.wiki.gg.";
 
-/* The nine melee weapons have no data page on the wiki at all, so they   */
-/* get the admission rather than an empty section.                        */
+/* A weapon the wiki has no data page for gets the admission rather than  */
+/* an empty section. This was six of the nine melee weapons until 26     */
+/* September 2026, when the wiki published them; it is kept for the next  */
+/* item that arrives before its page does.                                */
 const NO_FETCHED_STATS =
-  "No handling or ammo figures for this one. The wiki has no data page for the melee weapons, so magazine, rate of fire, recoil and ergonomics are all genuinely unknown rather than merely unlisted.";
+  "No handling or ammo figures for this one. The wiki has no data page for it yet, so magazine, rate of fire, recoil and ergonomics are genuinely unknown rather than merely unlisted.";
 
 function RowDetail({ item, faction, scored, difficulty }) {
   const sets = item.slot === "armor" ? ARMOR_SETS[item.id] : null;
@@ -827,9 +830,9 @@ function RowDetail({ item, faction, scored, difficulty }) {
   const strat = item.slot === "stratagem" ? CAT_META[item.stratType] : null;
   const isWeapon = item.slot === "primary" || item.slot === "secondary"
     || (item.slot === "stratagem" && item.stratType === "support");
-  /* The fetched half, joined on read by id. Null for the nine melee      */
-  /* weapons, which have no data page on the wiki, and for armor passives */
-  /* and boosters, which the fetch does not cover.                        */
+  /* The fetched half, joined on read by id. Null for armor passives and */
+  /* boosters, which the fetch does not cover, and for anything the wiki  */
+  /* has no data page for yet.                                            */
   const wiki = statsFor(item.id);
   /* Null for anything with no penetration recorded, which is every armor */
   /* passive and every booster, so the section simply does not appear     */
@@ -851,9 +854,9 @@ function RowDetail({ item, faction, scored, difficulty }) {
       ) : null}
       {item.flag === "stale" && item.patchNote ? (
         <div className="text-[11px] leading-relaxed text-base-400">
-          <span className="font-semibold text-accent-500">Changed in 7.0.0. </span>
+          <span className="font-semibold text-accent-500">Changed after the vote. </span>
           {item.patchNote}
-          <span className="text-base-600"> The tiers above are community votes from 6.3.1 and have not absorbed this.</span>
+          <span className="text-base-600"> The tiers above were voted before this change and have not absorbed it.</span>
         </div>
       ) : null}
 
@@ -1038,8 +1041,8 @@ function RowDetail({ item, faction, scored, difficulty }) {
               <p className="text-[11px] text-base-400">
                 {sourceName[rated[0].r.source] || rated[0].r.source}, patch{" "}
                 <span className="text-base-200">{rated[0].r.patch}</span>
-                {rated[0].r.patch !== "7.0.0" ? (
-                  <span className="text-base-600"> · the game is on 7.0.0, so this is one patch behind</span>
+                {rated[0].r.patch !== PATCH.game ? (
+                  <span className="text-base-600"> · the game is on {PATCH.game}</span>
                 ) : null}
               </p>
             ) : (
@@ -2183,7 +2186,9 @@ export function LoadoutCard({ loadout, isFavorite, onToggleFavorite, rankLabel, 
   const lockedHere = loadoutItems(loadout).filter((id) => lockedSet.has(id));
   const staleHere = loadoutItems(loadout)
     .map(getItem)
-    .filter((it) => it && it.patchNote)
+    /* The flag, not the note. Keyed on the note, this kept warning about  */
+    /* items whose caveat had been retired, for as long as a note survived. */
+    .filter((it) => it && it.flag === "stale" && it.patchNote)
     .map((it) => it.name);
   const rows = [["Primary", loadout.primary], ["Secondary", loadout.secondary], ["Grenade", loadout.grenade], ["Armor", loadout.armor], ["Booster", loadout.booster]];
 

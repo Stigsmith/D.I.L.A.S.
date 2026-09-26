@@ -156,7 +156,7 @@ Data authority lives outside this repo, in the Helldivers 2 project files: `hell
 `src/Collection.jsx`. Two tabs, because owning a warbond and unlocking an item are separate purchases: super credits buy the warbond, medals unlock each item in it.
 
 - **Warbonds tab.** Every warbond grouped by tier, an owned toggle, its tracked item count, and per warbond bulk unlock and bulk lock of its contents.
-- **Items tab.** A flat searchable list of all 228 items with acquisition path and availability, filterable by slot, source and availability, with bulk lock and unlock over whatever is currently shown.
+- **Items tab.** A flat searchable list of every item, 247 as of 1.23.0, with acquisition path and availability, filterable by slot, source and availability, with bulk lock and unlock over whatever is currently shown.
 - **Availability is derived** on read and stored nowhere. A warbond item is available only when the warbond is owned **and** the item is unlocked. Anything on another acquisition path ignores the warbond axis entirely.
 
 > [!danger] Three rules that are easy to get wrong
@@ -225,7 +225,7 @@ npm run validate
 
 It runs automatically before `npm run build`, so a break stops the build. It checks:
 
-- Ids are unique and are real slugs, and no alias collides with a live id or a live name
+- Ids are unique and are real slugs, and no alias collides with a live id or a live name. **An item's own id is exempt**: the Melta Mine keeps its old name "G/40-K Meltamine" as an alias, and that slugs to the item's own unchanged id, which is a rename working as designed rather than a collision. Narrowed in 1.23.0 and proven to still catch a real one
 - Every loadout slot resolves to an item **of the right kind**, so a booster cannot end up in the armor slot
 - Every armor set key and every ownership entry resolves
 - Every item's warbond resolves to a real warbond
@@ -235,7 +235,7 @@ It runs automatically before `npm run build`, so a break stops the build. It che
 
 ### Renames
 
-Rename freely. Put the old name in that item's `aliases` array and nothing breaks: ids never moved, and the alias is what lets state saved by an older build still resolve. Two aliases exist from the 7.0.0 data rebuild, `SG-225 Trident` and `AR-23C Liberator Carbine`, both verified to still migrate correctly.
+Rename freely. Put the old name in that item's `aliases` array and nothing breaks: ids never moved, and the alias is what lets state saved by an older build still resolve. Two aliases exist from the 7.0.0 data rebuild, `SG-225 Trident` and `AR-23C Liberator Carbine`, both verified to still migrate correctly. A third arrived in 1.23.0: `g-40-k-meltamine` is now named "G/40-K Melta Mine", as the game spells it, with the old name kept as its alias.
 
 > [!info] Saved state migrates once
 > State written before ids existed was keyed by display name. On load, names and aliases resolve to ids, anything that resolves to nothing is dropped, and the result is written straight back. A list that is already ids passes through untouched, so the migration is safe to run on every load.
@@ -345,14 +345,14 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 
 | File | Holds |
 |---|---|
-| `items.json` | All 236 items. The authority for everything else |
+| `items.json` | All 247 items. The authority for everything else |
 | `loadouts.json` | 39 curated builds, one readable object each, every slot an id |
-| `armor-sets.json` | All 107 armor sets, keyed by passive id, grouped by weight class |
-| `warbonds.json` | The 24 gateable warbonds by tier, plus the labels for paths that are never gated |
+| `armor-sets.json` | All 109 armor sets, keyed by passive id, grouped by weight class |
+| `warbonds.json` | The 25 gateable warbonds by tier, plus the labels for paths that are never gated |
 | `vocabulary.json` | The shared enums. The app and the validator both read this one so they cannot disagree |
 | `ownership.json` | What you own. Ships empty |
 | `ownership.template.json` | Every warbond listed as not owned, ready to fill in |
-| `wiki-stats.json` | **Generated.** The stats the tables never had, for 174 items. Never edit by hand |
+| `wiki-stats.json` | **Generated.** The stats the tables never had, for 195 items. Never edit by hand |
 | `planets.json` | **Generated.** 269 planets, their biome and their hazards. Nothing reads it yet |
 | `enemies.json` | **Generated.** 80 enemies, 594 body parts, each with an armor value, plus the difficulty each enemy starts appearing at. What every penetration figure is measured against. Never edit by hand |
 | `context-rules.json` | The 34 rules that move one item rating. Read by `score.js`, checked by `npm run rules` |
@@ -389,9 +389,9 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 - **`slot`** is one of `primary`, `secondary`, `throwable`, `stratagem`, `armor`, `booster`. The six browsable lists derive from it, so the five stratagem call-in menus become one list. You pick a stratagem by faction and tier, not by which menu it sits under.
 - **A tier of `null`** means no rating exists. Those rows render a dashed `?` badge and sort last. This is a first class state, not missing data, and a rating with a tier always carries its source and patch.
 - **`damageType`** drives the damage type filter and the row icon. **`heat` and `arc` are the thermally affected ones**, which is what the hot exclusion and the cold advantage key off.
-- **`roles`** is the editorial layer. Three values, `anti-armor`, `chaff` and `objective`, and `chaff` is the most used of the three. An empty array is the normal case: 135 rated rows carry nothing, and there is deliberately no validator rule demanding otherwise.
+- **`roles`** is the editorial layer. Three values, `anti-armor`, `chaff` and `objective`, and `chaff` is the most used of the three. An empty array is the normal case: 145 rated rows carry nothing, and there is deliberately no validator rule demanding otherwise.
 - **`tags`** is the other curated layer and it is not the same thing as `roles`. A role says what job an item does for a squad. A tag says something a scoring rule needs to ask about that no fetched field answers. Two exist, `long-range` and `suppressed`, and **each declares its own provenance in `vocabulary.json`**: `long-range` is `curator`, `suppressed` is `wiki`. See The Tag Layer.
-- **`flag`** is `"stale"` when the rating predates a 7.0.0 change to that exact item, which requires a `patchNote`, or `"new"` when the item is in the game with no rating yet.
+- **`flag`** is `"stale"` when the rating predates a confirmed change to that exact item, which requires a `patchNote`, or `"new"` when the item is in the game with no rating yet. **None is stale as of 1.23.0**: the nineteen that were all cleared when u.gg's votes came to postdate the changes, flag and note both set to null. Only the P/40-K Bolt Pistol is `new`. The machinery stays for the next patch.
 - **`effect` versus `note`.** Armor passives and boosters carry an `effect`, which is what the thing actually does. Everything else carries a `note`, which is opinion. They never both appear.
 - **`stats` are sparse, and that is now a gap rather than a principle.** AP, DPS, capacity, demo force, cooldown, uses and medal cost came out of the source tables. Magazine size, spare magazines, fire rate, recoil, reload time, projectile count and stagger were recorded here as **not in any source this project has**. The data spike on 20 August 2026 found all of them published, plus ergonomics, sway, durable damage, stagger, pushback and projectile drag. See `dds-data-spike.md`. Still leave them absent rather than guessing, but the answer now is to fetch them rather than to shrug.
 
@@ -399,8 +399,48 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 > `damageType` of `heat` or `arc` marked 26 items as thermally affected, and a hot biome removed any build carrying one. Only ten of them can overheat: the LAS laser family, the Quasar and the Rover's drone. Every plasma weapon feeds from magazines. Three Purifier builds and one Blitzer build were ruled out of every hot planet over a mechanic they do not have.
 > `ventsHeat` in `src/lib/items.js` is the answer now, and it reads the fetched heat block. It has three states rather than two: a real yes or no for anything the fetch covers, and a fall back to the old `damageType` guess for the call-ins and melee weapons it does not.
 
-> [!info] Two patch stamps coexist
-> Game version is 7.0.0 "Devoid of Liberty", 12 August 2026. Only the armor passive table is stamped 7.0.0. Everything else is u.gg 6.3.1 community consensus applied to a post-patch game. Say so when it matters rather than presenting a stale rating as current.
+> [!info] The ratings carry four patch stamps, and `src/lib/patch.js` is the one place that says which game
+> Game version is **7.1.1** "Devoid of Liberty", 24 September 2026, a crash fix patch that changed no weapon. The last balance changes were 7.1.0 on 22 September. Ratings were read off u.gg on **26 September 2026**, and u.gg dates each of its eleven lists separately:
+>
+> | Stamp | Lists | Ratings |
+> |---|---|---|
+> | **7.1.1** | Primaries | 165 |
+> | **7.0.2** | Support weapons, backpacks, eagles, sentries | 216 |
+> | **7.1.0** | Secondaries, throwables, orbitals, boosters, armor passives, vehicles | 353 |
+> | **6.3.1** | The P-33 Missile Pistol alone | 3 |
+>
+> **The six 7.1.0 lists print no stamp at all.** They are read as 7.1.0 because every one of them already carries Ironclad Democracy content, which only exists from 7.1.0. That is an inference and Support says so. **The P-33 dropped off u.gg's secondary list while staying in the game**, so it keeps its old 6.3.1 rating rather than losing one.
+>
+> `PATCH` in `src/lib/patch.js` holds the game version, its date, the ratings range and the read date. **The footer, About, Support and every expanded row read it**, so a restamp is one edit. It lived in `Pages.jsx` until 1.23.0 while the expanded row hardcoded its own "the game is on 7.0.0", and the two had already disagreed once. `Pages.jsx` re-exports it.
+
+---
+
+# **Refreshing The Ratings**
+
+> [!success] Done once by script, 26 September 2026, 1.23.0. The next refresh copies it
+> u.gg was read by hand into **`scripts/data/ugg-2026-09-26.json`**: eleven lists, each with the stamp u.gg printed or null, every row as name and three faction tiers, plus the few facts u.gg carries that no other source had yet. It is committed, so the update can be re-derived and audited without trusting a chat.
+>
+> **`scripts/apply-ugg-7-1.mjs`** reports by default and applies with `--write`, the same shape as `add-vehicles.mjs`. Every rating it writes is read from the snapshot, never typed into the script. It:
+>
+> - matches u.gg rows by name or alias, with `UGG_SPELLING` for u.gg's own typos ("G-89 Smokecreen"), and **fails loudly on an unmatched row** rather than skipping it
+> - restamps every matched rating with its list's patch, and clears `stale` flags on anything u.gg listed
+> - writes the new items in full, each field commented with where it came from
+> - edits `warbonds.json` and `armor-sets.json` **as text**, through `insertText`, because both are hand formatted and a `JSON.stringify` round trip would reflow every line. The result is `JSON.parse` checked before it is written
+
+> [!warning] The order matters, and the last step is the one that gets skipped
+> 1. Apply the snapshot.
+> 2. `node scripts/tag-roles.mjs --write` for the new items' roles, then `npm run roles` must report zero changes.
+> 3. `npm run wiki -- --refresh`, read the report, then `--write`.
+> 4. Restamp `src/lib/patch.js`.
+> 5. **Measure before shipping.** In 1.23.0, of 2,124 item and loadout rows across the scenarios checked, our column changed on 51: 45 because the vote moved and 6 because of new wiki figures. Show that number to the curator before anything that re-ranks a list.
+
+> [!danger] The wiki reorders a weapon's attacks, so the fetch picks the attack by name
+> `fetch-wiki.mjs` used to take the first level 1 attack as a weapon's own. By 26 September 2026 the wiki's data module listed the Recoilless Rifle's **backblast** first and several charged shots ahead of the plain one, so a refresh would have read the backblast as the Recoilless's damage.
+>
+> It now looks for the attack named after the weapon's designation, `GR-8_P` for the GR-8, falls back to the first level 1 attack only when there is none, and never takes a status effect or anything named BACKBLAST. **After any refresh, spot check a launcher**: the Recoilless should read AP 6 with 100% durable damage.
+
+> [!bug] `npm run wiki -- --write` restamps planets and enemies even when it did not fetch them
+> Their `fetchedAt` moves to today while the content comes from the cache, so the diff shows two data files changing when neither did. In 1.23.0 both were restored with `git checkout` because only the date had moved. Check the diff of `planets.json` and `enemies.json` before committing a refresh.
 
 ---
 
@@ -457,7 +497,7 @@ The two axes are separate purchases: super credits buy the warbond, medals unloc
 | absent | Not locked |
 
 > [!success] An empty file locks nothing
-> Only an explicit `false` locks anything. That is why the shipped file is empty and everything starts unlocked. `ownership.template.json` carries all 24 warbonds at `false`, ready to be filled in and copied over `ownership.json`.
+> Only an explicit `false` locks anything. That is why the shipped file is empty and everything starts unlocked. `ownership.template.json` carries all 25 warbonds at `false`, ready to be filled in and copied over `ownership.json`.
 
 > [!warning] It is a seed, not a source of truth
 > It fills lock state the first time the app runs in a given browser, and only then. After that whatever you toggle in the app wins, so clearing locks by hand is not undone on the next reload. To apply a filled file to a browser that already has state, use Import on the Warbonds tab.
@@ -498,7 +538,7 @@ The whole row is the click target, not a chevron, and **every item expands**, no
 An expanded row carries the item's art at full size, its numbers, what the source does not record, and where the rating came from. Only one row is open at a time, which the single `openRow` value gives for free.
 
 > [!success] Provenance is shown, not implied
-> Every expanded row states the rating source and its patch stamp, and says plainly when that is behind the game. Armor passives read "patch 7.0.0" with no caveat; everything else reads "patch 6.3.1, the game is on 7.0.0, so this is one patch behind". The two stamps are real and the UI should keep admitting it.
+> Every expanded row states the rating source and its patch stamp, and says plainly when that is behind the game. A primary reads "u.gg community votes, patch 7.1.1" with no caveat, because it matches `PATCH.game`; anything else adds "· the game is on 7.1.1". The stamps are real and the UI should keep admitting it. The comparison reads `PATCH` from `src/lib/patch.js`, never a literal.
 
 > [!success] The stats gap closed, and the row now shows the numbers. 1.14.0
 > The row used to name seven fields as missing from every source. **The wiki pass filled five of them**, in 1.8.0, and the line went on apologising for their absence for another week. That is worse than never claiming a gap: it tells a reader the tool does not know something it is holding.
@@ -507,7 +547,7 @@ An expanded row carries the item's art at full size, its numbers, what the sourc
 >
 > **The admission survives, narrowed to what is actually still absent:** reload time and projectile count. Do not delete it. Restate it if a later fetch fills either.
 >
-> The six melee weapons have no data page on the wiki at all, so they get a different line saying those figures are genuinely unknown rather than merely unlisted. That is the only case where the section does not render.
+> **A weapon the wiki has no data page for** gets a different line saying those figures are genuinely unknown rather than merely unlisted. That is the only case where the section does not render. It was six melee weapons until 26 September 2026, when the wiki published them; since 1.23.0 all nine melee weapons show handling and nothing held is in that state. The line stays for the next item that arrives before its page does. The TD-110 Maelstrom is the one call-in with no wiki data yet.
 
 `usesBackpackSlot: null` renders as "not recorded in the source yet", never as "leaves your backpack free". Only the 40-K Meltagun is in that state. Never guess false here.
 
@@ -740,10 +780,13 @@ Three tags, `anti-armor`, `chaff` and `objective`, and a panel in Drop Bay that 
 - **`chaff` derives** from weapon `category` being Assault Rifle, SMG or Shotgun, plus a hand list for the machine guns, flamethrowers, gatling sentries and area call-ins that no category covers.
 - **`objective` is hand listed**, assisted by `demoForce` on throwables at 30 or more. Eagles and orbitals are excluded on purpose: the tag means closing a hole from your carried kit, without burning a call-in.
 
+> [!danger] The vehicles' roles live in the script, and re-running it used to strip them
+> The eight vehicles came in with 1.5.0 through their own one-off script, which set their roles by hand. `tag-roles.mjs` never knew, so the first `--write` after that, on 26 September 2026, would have taken chaff off five of them and objective off the Bastion. **They are in `CHAFF_INCLUDE` and `OBJECTIVE_INCLUDE` now**, and `npm run roles` reports zero changes on the shipped data. The same pass found the demolition floor applying to every slot in code, which would have tagged three exosuits as hole closers on their demolition figure alone; it now asks `slot === "throwable"`, which is what the bullet above always said. **If a role is ever set anywhere but this script, the next run deletes it.**
+
 > [!warning] `chaff` is about rate, not capability
 > Almost anything kills one hunter, and that is not what the tag means. It means holding off a swarm without reloading into your own death. The Eruptor is deliberately **not** chaff: it kills a hunter and takes a second doing it, and a duo built on Eruptors and Senators has a real hole even though every gun in it can hurt a small enemy. Sidearms are out for the same reason. A Redeemer is an emergency weapon, not a squad's answer to a crowd.
 
-> [!info] 27 anti-armor, 55 chaff, 22 objective, 134 rated rows untagged
+> [!info] 34 anti-armor, 61 chaff, 24 objective, 145 rated rows untagged. Counted at 1.23.0
 > Untagged is correct and common. An earlier draft wanted six tags across every rated row with the build failing on an empty one, which forced boosters and armor passives into a taxonomy with no room for them.
 
 > [!success] The bot penetration check needs no tag at all
@@ -997,8 +1040,8 @@ It used to be 277 loose files in one directory. It is now sorted, and the import
 
 | Kind | Count | Notes |
 |---|---|---|
-| Item art | 227 of 228 | Only Electrical Conduit has none |
-| Warbond covers | 24 of 24 | 512px cover art |
+| Item art | 235 of 247 | Electrical Conduit, and the eleven items added in 1.23.0 |
+| Warbond covers | 24 of 25 | 512px cover art. Ironclad Democracy has none, and its Collection tile shows the name alone |
 | Generic | 28 | Skull, faction marks, logos, category and tier badges |
 
 Three different art styles are in there and they are not interchangeable. Stratagems are flat in-game icons at about 4KB, already colour coded by call-in menu group, which is why they read so well at row size. Weapons are hero renders at about 93KB. Warbonds are cover art.
@@ -1006,7 +1049,7 @@ Three different art styles are in there and they are not interchangeable. Strata
 > [!danger] Nothing may depend on art existing
 > Delete `src/assets` and every lookup returns null, every item still reads through its text fallback, and nothing throws. This is deliberate. The build spec is explicit that extracted game art is the most likely thing to have to come out, so the asset layer stays swappable. The generated directories are gitignored, so a fresh clone genuinely runs art free until `npm run images`.
 
-Item ids come from the display name, so the file naming lines up on its own for 227 of 228. The handful that do not are listed explicitly in `scripts/import-images.mjs` rather than fuzzy matched, so a wrong pairing is visible in review.
+Item ids come from the display name, so the file naming lines up on its own for every item that has art. The handful that do not are listed explicitly in `scripts/import-images.mjs` rather than fuzzy matched, so a wrong pairing is visible in review.
 
 **Single colour art is masked, not recoloured by hand.** The skull and the faction marks are painted with `currentColor` through a CSS mask, so they take the theme token or the locked faction hex without a second copy of the file per colour.
 
@@ -1263,7 +1306,12 @@ The Worker only. `tsconfig.worker.json` stands alone, because D.D.S. has no root
 
 # **Open Threads**
 
-- The 19 stale flags should be reviewed once u.gg restamps to 7.0.0. Anti-Tank Mines is the most likely rating to move, since demo 30 to 40 crosses the threshold that closes holes from outside.
-- The four Castellan's Creed weapons have no ratings and render as `?` until u.gg has data.
+- **Resolved in 1.23.0:** the 19 stale flags came off when u.gg's votes came to postdate the changes. The Anti-Tank Mines, flagged as the rating most likely to move, did not; neither did the Constitution, whose note said "Expect this D/D/D to move". Three of the four Castellan's Creed items are rated now.
+- **The P/40-K Bolt Pistol is the one unrated item** and renders as `?` until u.gg lists it.
+- **The P-33 Missile Pistol keeps a 6.3.1 rating** because u.gg dropped it from the secondary list while it stayed in the game. Restamp it the day it reappears.
+- **Three calls in the 1.23.0 items are inferences, not sourced.** The LAS-12 Sai is recorded as Superstore from the icon u.gg shows beside it. The P-34 Breacher's damage type is `fire`, and it carries anti-armor from its AP 7 but no objective role, pending its demolition figure. The six unstamped u.gg lists are read as 7.1.0, for the reason in the patch stamp block above. Correct any of them the moment a source says otherwise.
+- **The TD-110 Maelstrom has no wiki data**, so re-run `npm run wiki -- --refresh` after the wiki catches up. **The G-8 Immolation has no armor penetration or demolition of its own**, so its row shows no AP. The wiki's entry for it reads AP 0 with a fire status, which looks like the burn rather than the grenade, and was deliberately not copied into `stats.ap`. Fill it when a source states it.
+- **Twelve items and one warbond have no art**: the eleven added in 1.23.0, Electrical Conduit, and the Ironclad Democracy cover. The curator adds art; see Art.
+- **`helldivers-2_tables.md` is behind the data now.** It has none of the eleven 1.23.0 items and still carries the 6.3.1 ratings. The repo is correct; the source document is the one to update, and that is the curator's call.
 - **True Grit is in no curated loadout.** It is S+ on all three fronts and gives +30% support weapon reload, which is large on the Autocannon, Recoilless and Grenade Launcher builds. Swapping it in is an obvious improvement, but the curated set is his, so it was left alone pending his call.
 - Where credible sources disagree by a full tier, for example the SG-8 Punisher Plasma at S+/S/S+ on u.gg against B/B/B on GamesRadar, the UI currently shows only one of them. Averaging it away would lose the most useful signal in the data.

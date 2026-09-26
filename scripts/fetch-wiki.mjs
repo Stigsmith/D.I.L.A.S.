@@ -181,8 +181,30 @@ function extract(pool, wikiName, stratEntry) {
   if (companion && w.ergonomics === undefined) src.ergonomics = companion.ergonomics;
   if (companion && w.sway === undefined) src.sway = companion.sway;
 
-  const level1 = attacks.filter((a) => a.level === 1 && a.type !== "status" && a.type !== "weapons");
-  const first = level1[0];
+  /* Which attack is the weapon's own hit, and not by position.
+   *
+   * This used to be "the first level 1 attack", which held while the
+   * wiki listed a weapon's own shot first. By 26 September 2026 it had
+   * renamed and reordered every attack, and two things broke silently:
+   *
+   *  - Six launchers gained a level 1 BACKBLAST explosion listed ahead of
+   *    the rocket, so the Recoilless read as 20 damage at AP 3 rather than
+   *    3200 at AP 6. The EATs, the Leveller, the Commando and the Airburst
+   *    went the same way. Backblast is what the launcher does to whoever
+   *    stands behind it, never what it does to the target.
+   *  - The Loyalist's charged shots moved ahead of its base shot.
+   *
+   * The new names follow one convention: the base shot is
+   * "<designation>_P" (GR-8_P, PLAS-15_P), alternates are _P1 and _P2. So
+   * that name is preferred, backblast is never a candidate, and position
+   * is only the last resort. A negative result here once cost every
+   * rocket launcher its damage figure; check a re-fetch against the
+   * previous file before trusting it. */
+  const level1 = attacks.filter(
+    (a) => a.level === 1 && a.type !== "status" && a.type !== "weapons" && !/BACKBLAST/i.test(a.name)
+  );
+  const designation = String(wikiName).split(" ")[0];
+  const first = level1.find((a) => a.name === `${designation}_P`) || level1[0];
   const blastOf = first && attacks.find((a) => a.parent === first.name && a.type === "explosion");
 
   const proj = first && pool.projectile ? pool.projectile[first.name] : null;
