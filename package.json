@@ -1,12 +1,13 @@
 {
   "name": "dds",
   "private": true,
-  "version": "1.23.0",
+  "version": "1.24.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "images": "node scripts/import-images.mjs",
     "validate": "node scripts/validate.mjs",
+    "drop": "node scripts/check-drop.mjs",
     "roles": "node scripts/tag-roles.mjs",
     "prebuild": "npm run images && npm run validate",
     "build": "vite build",

@@ -88,6 +88,11 @@ export const SETTINGS = {
      not move somebody's badge finish. See src/lib/badge.js. */
   badgeFinish: "hd2-badge-finish",
   badgeSurface: "hd2-badge-surface",
+  /* Who is bringing what on the drop screen: your slot, whether you have
+     confirmed it, and the squadmate slots filled by hand. Ids only, never
+     copies, so an edited build is re-read. What you are dropping with
+     tonight, not what you own, so it stays out of the export. */
+  drop: "hd2-drop",
 };
 
 /* Both scenario keys were spelled hd2-brief-* until 21 August 2026. A    */

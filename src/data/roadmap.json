@@ -6,8 +6,8 @@
       "note": "Runs in your browser with no account, no server and no network call."
     },
     "social": {
-      "label": "Needs an account",
-      "note": "Waits on somewhere to keep data that is not one browser on one machine."
+      "label": "Needs the server",
+      "note": "Passes something between browsers or keeps it somewhere other than yours, so it waits on the server rather than running in this tab."
     }
   },
   "milestones": [
@@ -69,9 +69,17 @@
     {
       "id": "drop-screen",
       "title": "Drop Bay becomes the drop screen",
-      "status": "next",
+      "status": "shipped",
       "track": "solo",
-      "say": "The thirty seconds before you dive: who is bringing what, where you are going, and what is going to hurt."
+      "say": "The moment before you dive: the mission brief, a slot for each of your squad, your loadout confirmed in yours, and what is going to hurt.",
+      "version": "1.24.0"
+    },
+    {
+      "id": "squad",
+      "title": "Live party",
+      "status": "next",
+      "track": "social",
+      "say": "Open a party, share its code, and your squadmates' confirmed loadouts land in their slots as they commit, with no account needed."
     },
     {
       "id": "map",
@@ -85,8 +93,16 @@
       "title": "Accounts",
       "status": "later",
       "track": "social",
-      "say": "Log in somewhere else and your collection is there. Nothing social can happen before this and everything social waits on it.",
+      "say": "Log in somewhere else and your collection is there. Opens once the tool has its own domain, because a forgotten password needs an email to come back from.",
       "release": "v2"
+    },
+    {
+      "id": "social",
+      "title": "Friends and finding a group",
+      "status": "later",
+      "track": "social",
+      "say": "A friends list, so a party invite comes from your list instead of a code, and an LFG board. Arrives with accounts.",
+      "release": "v3"
     },
     {
       "id": "exchange",
@@ -94,22 +110,6 @@
       "status": "later",
       "track": "social",
       "say": "Browse other people's builds, and keep the ones worth keeping.",
-      "release": "v3"
-    },
-    {
-      "id": "squad",
-      "title": "Live squad",
-      "status": "later",
-      "track": "social",
-      "say": "Your squadmates' slots fill themselves, you save a build straight off someone else's card, and the warnings read the real four of you.",
-      "release": "v3"
-    },
-    {
-      "id": "social",
-      "title": "Friends and finding a group",
-      "status": "later",
-      "track": "social",
-      "say": "A friends list and an LFG board, on their own screen and as a panel inside the drop screen so joining up never means leaving it.",
       "release": "v3"
     }
   ]

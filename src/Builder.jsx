@@ -441,7 +441,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario 
                   className="rounded border border-base-700 p-1.5 text-base-400 hover:border-base-500 hover:text-base-100">
                   <Copy className="h-3.5 w-3.5" />
                 </button>
-                <button onClick={() => { state.deleteLoadout(draft.id); navigate("bay"); }}
+                <button onClick={() => { state.deleteLoadout(draft.id); navigate("bay/builds"); }}
                   title="Delete"
                   className="rounded border border-base-700 p-1.5 text-base-400 hover:border-red-600 hover:text-red-400">
                   <Trash2 className="h-3.5 w-3.5" />

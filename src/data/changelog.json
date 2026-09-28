@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.24.0",
+    "date": "2026-09-28",
+    "title": "Drop Bay becomes the drop screen",
+    "changes": [
+      "Drop Bay now opens on a screen for the moment before you dive: a slot for you and three for your squad, what the mission and the planet are going to ask of you above them, and what the four of you are going to struggle with below.",
+      "Choose your loadout, then confirm it. Until you do, your slot says you are still deciding and the squad warnings leave it out, so a half picked kit never sets off a false alarm. Edit the build after confirming and it goes back to still deciding.",
+      "Your squadmates' slots are filled in by hand for now. Next is a party code: open a party, share the code, and their confirmed loadouts land in their slots on their own, with no account needed.",
+      "The loadout picker keeps the rules the grid always had. On a hot planet, builds that vent heat are not offered, and builds made for another difficulty are left out, and it tells you how many each rule took out. A build already in a slot that the planet now rules out stays there and says why.",
+      "The grid of every build moved to a Builds tab beside it and lost its squad comparison, because the drop screen does that job now. Deleting a build in the builder takes you back to that tab.",
+      "The structure demolition warning now fires from the mission you actually picked, like Destroy Command Bunkers, rather than only from the grid's old mission filter.",
+      "Adjusting the scenario from Drop Bay and pressing Done brings you back to Drop Bay instead of the tier list."
+    ]
+  },
+  {
     "version": "1.23.0",
     "date": "2026-09-26",
     "title": "Ironclad Democracy arrives, and the ratings catch up with the game",

@@ -18,6 +18,7 @@ import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser, Sc
 import { SKULL, themeArt } from "./lib/assets.js";
 import Builder from "./Builder.jsx";
 import DropBay from "./DropBay.jsx";
+import DropScreen from "./DropScreen.jsx";
 import Collection, { COLLECTION_TABS } from "./Collection.jsx";
 import Ambient, { Grain, Masthead } from "./Ambient.jsx";
 import { About, Support, Changelog, Roadmap, Footer } from "./Pages.jsx";
@@ -217,7 +218,13 @@ function SidebarLink({ item, active, onClick }) {
 
 /* A destination with tabs needs one named in the route, or the tab bar   */
 /* and the surface disagree about which one is open on a cold link.       */
-const LANDING = { tiers: "tiers/primary", collection: "collection/warbonds" };
+const LANDING = { tiers: "tiers/primary", collection: "collection/warbonds", bay: "bay/drop" };
+
+/* Drop Bay's two jobs, since 1.24.0. The drop is the moment before you
+   go; the builds are the grid it used to be, kept until Exchange has
+   somewhere to put other people's. The drop comes first because it is
+   what the destination is for. */
+const BAY_TABS = [{ id: "drop", label: "Drop" }, { id: "builds", label: "Builds" }];
 
 function Sidebar({ destination, navigate, onNavigated }) {
   const go = (id) => { navigate(LANDING[id] || id); onNavigated(); };
@@ -510,19 +517,22 @@ export default function App() {
 
   const favSet = new Set(state.favoriteItems);
   const catId = CATEGORIES.some((c) => c.id === param) ? param : "primary";
+  const collectionTab = COLLECTION_TABS.some((t) => t.id === param) ? param : "warbonds";
+  const bayTab = BAY_TABS.some((t) => t.id === param) ? param : "drop";
+
   /* Where "Done" goes back to. Adjusting the scenario from Secondaries  */
   /* and being returned to Primaries is the kind of small wrong that     */
-  /* makes a round trip feel like a detour.                              */
-  const lastTierCat = useRef("primary");
+  /* makes a round trip feel like a detour. It remembered only the tier  */
+  /* list until 1.24.0, so adjusting from Drop Bay threw you out of the  */
+  /* drop and onto a list; it now remembers any surface that reads the   */
+  /* scenario, tab included.                                             */
+  const lastSurface = useRef("tiers/primary");
   useEffect(() => {
-    if (dest === "tiers") lastTierCat.current = catId;
-  }, [dest, catId]);
+    if (dest === "tiers") lastSurface.current = `tiers/${catId}`;
+    if (dest === "bay") lastSurface.current = `bay/${bayTab}`;
+  }, [dest, catId, bayTab]);
   const openScenario = useCallback(() => navigate("scenario"), [navigate]);
-  const closeScenario = useCallback(
-    () => navigate(`tiers/${lastTierCat.current}`),
-    [navigate]
-  );
-  const collectionTab = COLLECTION_TABS.some((t) => t.id === param) ? param : "warbonds";
+  const closeScenario = useCallback(() => navigate(lastSurface.current), [navigate]);
 
   /* Which tab bar the current destination gets, and what the active tab  */
   /* inside it is. Both surfaces put the tab in the route, so a Collection */
@@ -546,7 +556,9 @@ export default function App() {
             })),
             collectionTab,
           ]
-        : [null, null];
+        : dest === "bay"
+          ? [BAY_TABS, bayTab]
+          : [null, null];
 
   const surface = (() => {
     switch (dest) {
@@ -581,7 +593,9 @@ export default function App() {
       case "collection":
         return <Collection tab={collectionTab} state={state} />;
       case "bay":
-        return <DropBay state={state} navigate={navigate} faction={scenario.faction} setFaction={setFaction} scenario={scenario} />;
+        return bayTab === "builds"
+          ? <DropBay state={state} navigate={navigate} faction={scenario.faction} setFaction={setFaction} scenario={scenario} />
+          : <DropScreen state={state} navigate={navigate} scenario={scenario} setFaction={setFaction} />;
       case "builder":
         /* Browsing happens in Drop Bay. The builder edits one build, so  */
         /* landing on it with nothing chosen starts a fresh one.          */
