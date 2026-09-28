@@ -75,11 +75,16 @@ src = swap(src, "score", scoreUrl);
 src = swap(src, "squad", squadUrl);
 const buildUrl = asModule(swap(src, "enemies", enemiesUrl));
 
+src = inlineJson(read("src/lib/drop.js"), "vocabulary");
+src = swap(src, "loadouts", loadoutsUrl);
+const dropUrl = asModule(swap(src, "scenario", scenarioUrl));
+
 export const items = await import(itemsUrl);
 export const enemies = await import(enemiesUrl);
 export const score = await import(scoreUrl);
 export const loadouts = await import(loadoutsUrl);
 export const squad = await import(squadUrl);
 export const build = await import(buildUrl);
+export const drop = await import(dropUrl);
 
 export const FACTIONS = ["bots", "bugs", "squids"];

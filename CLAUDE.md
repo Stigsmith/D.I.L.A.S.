@@ -21,7 +21,7 @@ A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai a
 | **Tier Lists** | `#/tiers/:category` | Built. The primary experience. Six categories as top tabs, **one chosen front**, two rating columns, filters, search, locking, favorites, full row expansion |
 | **Collection** | `#/collection/:tab` | Built. Two tabs, Warbonds and Items, one per ownership axis |
 | **Loadout Builder** | `#/builder/:id?` | Built. Edits one build. With no id it starts a fresh one |
-| **Drop Bay** | `#/bay` | Built. The grid, and the only place that browses every build at once |
+| **Drop Bay** | `#/bay/:tab` | Built. Two tabs: **Drop**, the screen for the moment before you go, and **Builds**, the grid that browses every build at once. See The Drop Screen |
 | **Settings** | `#/settings` | Built. Theme, export, import, reset |
 | **Support** | `#/support` | Built. Where the numbers come from |
 | **Roadmap** | `#/roadmap` | Built. One timeline, what is next and what it waits on |
@@ -712,7 +712,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!warning] Drop Bay carries the scenario bar now
 > Added to `SCENARIO_SURFACES` in `App.jsx` when the cards started reading the scenario. A control that changes what is on screen has to be on screen, the same rule the folded filter pane keeps.
 >
-> **Drop Bay's own biome, mission and difficulty are still filters and still local.** They are not the scenario, they do not feed the reading, and folding the two together is Phase 6a's job. The loose end `dds-roadmap.md` already names, five internal mission ids against seventy real names, is unchanged.
+> **The Builds tab's own biome, mission and difficulty are still filters and still local.** The drop screen reads the scenario instead, which was Phase 6a's job and landed in 1.24.0. The grid kept its filters because it is on its way to becoming Exchange, and there they describe builds rather than a drop. The five internal mission ids against seventy real names are unchanged there.
 
 > [!info] There is still no ranking in Drop Bay
 > `DropBay.jsx` says so in its header and it stays true: a plain grid, no scored picks. The score exists and `byReading` is exported for the day Exchange needs it, which is the thing `dds-roadmap.md` says loadout scoring was blocking. **Turning Drop Bay into a ranked list is a product decision nobody has made.**
@@ -721,6 +721,44 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > `scripts/lib/app.mjs` inlines the JSON imports and hands back the real `src/lib` modules, so a script measures the code that ships rather than a copy of it. `check-rules.mjs` and `check-builds.mjs` both use it.
 >
 > It exists because the first copy of those twenty lines **carried a stale peril formula, 4 times difficulty minus squad minus 1, for two versions after `SQUAD_PRESSURE` replaced it.** Every rule gating on peril was being sampled in a situation the engine no longer produces. It calls `score.peril` now and cannot drift again.
+
+---
+
+# **The Drop Screen**
+
+> [!success] Drop Bay's first tab, 1.24.0, 27 September 2026. Local, no server
+> `src/DropScreen.jsx` for the screen, `src/lib/drop.js` for everything that is not a picture. The moment before you dive: **a brief**, **four slots**, and **the squad read**. Picking a loadout happens in a picker over the screen, the builder's pattern, so the main screen says nothing about choosing. `dds-roadmap.md`, "What Drop Bay turns into", is the plan it was built from.
+
+| Part | What it is |
+|---|---|
+| **The brief** | What the scenario's mission asks for and what each planet hazard does. Both come from tables the tool already ships; nothing is invented for flavour |
+| **Your slot** | Choose a build, then **Confirm**. Only then does it count |
+| **Three squadmate slots** | Filled by hand, from your builds and the presets, until the live party fills them from a code |
+| **The squad read** | `squadWarnings` over the builds that count |
+
+> [!danger] An unconfirmed slot says "Still deciding" and nothing else, and does not count
+> **The curator's call, 27 September 2026.** The squad checks read confirmed loadouts and hand filled slots only, so a half picked kit never sets off a false alarm. Confirming stamps the build's `updatedAt`; **edit the build afterwards and the slot drops back to still deciding**, because what you confirmed is not what you now hold. The live party will publish that confirmed version, so the two must agree. Presets have no `updatedAt` and stamp as the empty string, which is why `confirmed` is null for not confirmed rather than falsy.
+
+> [!danger] The picker keeps both locked hard gates, and one function decides them
+> **A hot planet removes builds that vent heat, and a difficulty band removes builds declaring another.** Both are locked decisions, read here off the scenario rather than off a second set of filters. `gateOf` in `drop.js` is the single test: the picker uses it to refuse a build, and a slot uses it to say "the picker would not offer this now". They cannot disagree.
+>
+> **A slot keeps a build the scenario would now refuse**, and says why in its own line, amber for heat. It is still what somebody chose. The picker says in one line how many builds each gate took out, because a list that silently shrinks reads as a bug.
+>
+> **Hot comes from the `intense_heat` hazard**, the same thing the scoring rules read, through `gateBiome`. Cold is `extreme_cold`, foggy is `thick_fog`. Urban and cave have no hazard behind them, so the scenario never says either and a build declaring only those survives everywhere.
+
+> [!warning] Your lock list hides builds in your slot and never in a squadmate's
+> Builds needing gear you have not unlocked are hidden in your own slot's picker by default, with a toggle, the builder's precedent. **A squadmate's picker ignores your locks entirely**: your collection says nothing about what they own.
+
+> [!info] Stored as ids in `hd2-drop`, and out of the export
+> `{ mine, confirmed, mates }`, ids only, the way the old comparison was, so an edited build is re-read rather than held stale. A slot whose build was deleted reads as empty. It is what you are dropping with tonight, not what you own, so it stays out of the export like the scenario does.
+
+> [!info] No ranking, still
+> The picker orders favourites, then yours, then the presets, the grid's order, and shows each build's reading badge so you can judge. **Ranking builds is still a product decision nobody has made.** See The Loadout Reading.
+
+> [!tip] Done on the scenario screen returns to where you opened it
+> It remembered only the tier list's category until 1.24.0, so adjusting the scenario from the drop screen threw you onto a tier list. `lastSurface` in `App.jsx` now remembers any surface that reads the scenario, tab included.
+
+**`npm run drop`** checks it against the real builds: both hard gates, what counts as the squad, that editing a confirmed build un-confirms it, and that a real mission name reaches the demolition warning. It exits non zero on a fail. `scripts/lib/app.mjs` loads `drop.js` like the other libs, so it measures the shipped code.
 
 ---
 
@@ -796,9 +834,9 @@ Three tags, `anti-armor`, `chaff` and `objective`, and a panel in Drop Bay that 
 
 ### The squad panel
 
-Drop Bay, top of the page, when two or more builds are selected with the squad icon on a card. **It is not a room.** No code, no link, no sync, nothing shared. Drop Bay's own faction, biome, mission and difficulty controls are the squad context.
+**On the drop screen since 1.24.0**, under the four slots. It used to be a sticky panel over the Builds grid, fed by a squad icon on each card; both are gone. A squad member's slot is the comparison now. See The Drop Screen.
 
-The rules live in `src/lib/squad.js` as a pure function, so the logic is in one place and testable. The panel is **sticky** under the shell chrome and **collapses to a tally**, because the point is fixing something down in the grid and watching the warning clear without scrolling back up.
+The rules live in `src/lib/squad.js` as a pure function, so the logic is in one place and testable. It reads **the scenario**, spoken to it by `dropContext` in `src/lib/drop.js`, rather than the grid's own filters. A real mission name reaches the checks through its traits, which is how "Destroy Command Bunkers" fires the structure demolition warning.
 
 **Severity reads as critical, warning, note.** Their plurals are written out rather than guessed, since "2 criticals" is not a phrase.
 
@@ -1083,6 +1121,12 @@ npm run builds
 ```
 
 The two rule health reports. `rules` measures every item rule against the pool it can fire on, and `builds` measures every loadout rule against the 39 curated builds **and** 300 random legal ones. Both flag anything firing on 60% or more, which is the shape the armour rules had. **Run them after adding a rule.** The armour bug was visible in one line of output and shipped anyway, because nothing was looking.
+
+```bash
+npm run drop
+```
+
+The drop screen's rules against the real builds. See The Drop Screen.
 
 ```bash
 npm run test:worker

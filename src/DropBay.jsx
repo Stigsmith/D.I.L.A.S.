@@ -1,7 +1,14 @@
 /* ================================================================== */
-/* DROP BAY                                                           */
-/* The read surface for the moment before you drop, and the only place */
-/* that browses every build at once: yours and the curated presets.    */
+/* DROP BAY, THE BUILDS TAB                                           */
+/* The only place that browses every build at once: yours and the     */
+/* curated presets. The drop screen, DropScreen.jsx, is the first tab; */
+/* this is the second, and it is what Exchange inherits once there is  */
+/* somewhere for other people's builds to live.                        */
+/*                                                                    */
+/* It used to carry the squad comparison too, as a sticky panel over   */
+/* the grid. That moved to the drop screen in 1.24.0, where a squad   */
+/* member's slot is the comparison rather than an extra on top of a    */
+/* browser.                                                           */
 /*                                                                    */
 /* Biome and difficulty are hard gates, not soft scoring. A build the  */
 /* scenario excludes does not appear. That was explicit feedback on an    */
@@ -13,130 +20,12 @@
 /* ================================================================== */
 
 import { useMemo, useState } from "react";
-import { Plus, Star, FilterX, Thermometer, Snowflake, Users, X, AlertTriangle, Info, ChevronDown, Lock } from "lucide-react";
+import { Plus, Star, FilterX, Snowflake, Info, Lock } from "lucide-react";
 
 import { LoadoutCard, FACTIONS, BIOMES, BIOME_THEME, MISSION_TYPES, FactionBar, FactionChooser, DifficultySlider, bandForLevel } from "./Tiers.jsx";
 import { presets, deriveHeat, loadoutItemIds } from "./lib/loadouts.js";
-import { squadWarnings, isQuietBand, coverageIsQuiet } from "./lib/squad.js";
 
 const ANY = { id: "any", label: "Any" };
-
-/* ------------------------------------------------------------------ */
-/* The squad panel                                                     */
-/*                                                                     */
-/* Not a room. No code, no link, no sync, nothing shared. You put two  */
-/* to four builds side by side and it tells you what is going to hurt. */
-/* Drop Bay's own faction, biome, mission and difficulty controls are  */
-/* the squad context, because they already exist and already mean this. */
-/* ------------------------------------------------------------------ */
-
-/* Three words for three levels of "this is going to hurt". Critical is    */
-/* something you will meet and cannot answer. Warning is a call that is    */
-/* probably wrong. Note is information, not a problem.                     */
-/* Three words for three levels of "this is going to hurt", with their     */
-/* plurals written out rather than guessed at, because "2 criticals" is    */
-/* not a phrase. Critical is something you will meet and cannot answer.    */
-/* Warning is a call that is probably wrong. Note is information.          */
-const SEVERITY = {
-  red: { Icon: AlertTriangle, one: "critical", many: "critical", box: "border-red-800/70 bg-red-950/40", text: "text-red-300", chip: "text-red-300" },
-  amber: { Icon: AlertTriangle, one: "warning", many: "warnings", box: "border-accent-800/60 bg-accent-950/40", text: "text-accent-300", chip: "text-accent-300" },
-  grey: { Icon: Info, one: "note", many: "notes", box: "border-base-700 bg-base-900", text: "text-base-400", chip: "text-base-400" },
-};
-
-const tallyLabel = (n, k) => `${n} ${n === 1 ? SEVERITY[k].one : SEVERITY[k].many}`;
-
-function SquadPanel({ builds, context, onRemove, onClear }) {
-  const warnings = squadWarnings(builds, context);
-  const size = builds.length;
-  const [open, setOpen] = useState(true);
-
-  /* Counts per level, in severity order, for the collapsed summary.      */
-  const tally = ["red", "amber", "grey"]
-    .map((k) => ({ k, n: warnings.filter((w) => w.severity === k).length }))
-    .filter((x) => x.n > 0);
-
-  return (
-    /* Sticky under the shell chrome, whose real height is published as a  */
-    /* variable rather than guessed at. The point is fixing a warning down */
-    /* in the grid and watching it clear without scrolling back up.        */
-    <div className="sticky z-20 rounded-lg border border-base-700 bg-base-900/95 p-4 backdrop-blur"
-      style={{ top: "calc(var(--shell-chrome, 0px) + 0.5rem)" }}>
-      <div className={"flex flex-wrap items-center gap-x-3 gap-y-2 " + (open ? "mb-3" : "")}>
-        <button onClick={() => setOpen((v) => !v)} aria-expanded={open}
-          title={open ? "Collapse to a summary" : "Show every warning"}
-          className="flex items-center gap-1.5 rounded p-0.5 text-base-500 hover:bg-base-800 hover:text-base-200">
-          <ChevronDown className={"h-4 w-4 transition-transform " + (open ? "" : "-rotate-90")} />
-        </button>
-        <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-base-400"
-          style={{ fontFamily: "'Oswald', sans-serif" }}>
-          <Users className="h-3.5 w-3.5" /> Squad of {size}
-        </span>
-
-        {/* Collapsed, the tally is the whole panel, so it has to carry     */}
-        {/* enough to tell you whether anything still needs fixing.        */}
-        {!open ? (
-          <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-            {tally.length === 0 ? (
-              <span className="text-base-500">nothing flagged</span>
-            ) : tally.map(({ k, n }, i) => (
-              <span key={k} className={SEVERITY[k].chip}>
-                {tallyLabel(n, k)}{i < tally.length - 1 ? "," : ""}
-              </span>
-            ))}
-          </span>
-        ) : null}
-        {builds.map((l) => (
-          <span key={l.id} className="flex items-center gap-1 rounded border border-base-700 bg-base-900 py-1 pl-2 pr-1 text-xs text-base-200">
-            <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>{l.name}</span>
-            <button onClick={() => onRemove(l.id)} aria-label={`Remove ${l.name} from the comparison`}
-              className="rounded p-0.5 text-base-600 hover:bg-base-800 hover:text-base-100">
-              <X className="h-3 w-3" />
-            </button>
-          </span>
-        ))}
-        <button onClick={onClear} className="text-[11px] text-base-500 underline hover:text-base-200">clear</button>
-      </div>
-
-      {!open ? null : size < 2 ? (
-        <p className="text-xs text-base-500">
-          Add one more build and this starts checking what the two of you are missing.
-        </p>
-      ) : (coverageIsQuiet(context.level, builds.length) ?? isQuietBand(context.difficulty)) ? (
-        /* Never claim coverage here. The checks are switched off at this  */
-        /* band, which is not the same as the squad being fine.            */
-        <p className="text-xs text-base-500">
-          Coverage checks are off below difficulty 7. Everything behind them assumes 7 and up, and under that the gaps
-          stop mattering.
-        </p>
-      ) : warnings.length === 0 ? (
-        /* Silence is the normal state, but an empty box reads as broken,  */
-        /* so it says once that it looked and found nothing.               */
-        <p className="text-xs text-base-500">
-          Nothing worth flagging. Anti-tank and hole closing are covered for this scenario.
-        </p>
-      ) : (
-        <div className="flex flex-col gap-1.5">
-          {warnings.map((w) => {
-            const s = SEVERITY[w.severity];
-            return (
-              <div key={w.id} className={`flex items-start gap-2 rounded border px-2.5 py-2 text-xs leading-relaxed ${s.box} ${s.text}`}>
-                <s.Icon className="mt-px h-3.5 w-3.5 shrink-0" />
-                <span>{w.text}</span>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {open ? (
-        <p className="mt-3 text-[10px] leading-relaxed text-base-600">
-          Advisory only, and nothing here is removed from the grid below. Role tags are our own call, not a community
-          vote. Set faction, biome, mission and difficulty above to sharpen what this says.
-        </p>
-      ) : null}
-    </div>
-  );
-}
 
 function Row({ label, options, value, onChange, hint }) {
   return (
@@ -177,12 +66,6 @@ export default function DropBay({ state, navigate, faction, setFaction, scenario
      noise when you are deciding what to bring tonight. */
   const [gear, setGear] = useState("all");
   const [confirmDelete, setConfirmDelete] = useState(null);
-  /* Ids rather than objects, so a build edited elsewhere is re-read      */
-  /* rather than held as a stale copy inside the comparison.              */
-  const [compare, setCompare] = useState([]);
-
-  const toggleCompare = (id) =>
-    setCompare((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : prev.length >= 4 ? prev : [...prev, id]));
 
   /* Both derive their heat flag, which is what this comment always      */
   /* claimed and the code did not do: presets kept the hand authored     */
@@ -242,13 +125,6 @@ export default function DropBay({ state, navigate, faction, setFaction, scenario
   const filtering = biome !== "any" || mission !== "any"
     || level !== 0 || source !== "all" || favesOnly || gear !== "all";
 
-  /* Resolved against everything, not against the filtered grid, so       */
-  /* narrowing the scenario never silently drops a member of the squad.      */
-  const compared = useMemo(
-    () => compare.map((id) => everything.find((l) => l.id === id)).filter(Boolean),
-    [compare, everything]
-  );
-
   if (!faction) {
     return <FactionChooser onChoose={setFaction} />;
   }
@@ -260,11 +136,6 @@ export default function DropBay({ state, navigate, faction, setFaction, scenario
       {/* choosing bots in one place and finding bugs in the other.        */}
       <FactionBar faction={faction} onChoose={setFaction} />
 
-      {compared.length > 0 ? (
-        <SquadPanel builds={compared} context={{ faction, biome, mission, difficulty, level }}
-          onRemove={toggleCompare} onClear={() => setCompare([])} />
-      ) : null}
-
       <div className="flex flex-wrap items-center gap-3">
         <button onClick={() => navigate("builder/new")}
           className="flex items-center gap-1.5 rounded border border-base-200 bg-base-200 px-3 py-1.5 text-xs text-base-900 hover:bg-base-100">
@@ -273,11 +144,6 @@ export default function DropBay({ state, navigate, faction, setFaction, scenario
         <span className="text-[11px] text-base-500">
           {state.loadouts.length} of your own, {presets.length} curated presets
         </span>
-        {compare.length === 0 ? (
-          <span className="flex items-center gap-1.5 text-[11px] text-base-600">
-            <Users className="h-3.5 w-3.5" /> tap the squad icon on two builds to check them against each other
-          </span>
-        ) : null}
       </div>
 
       <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
@@ -356,10 +222,7 @@ export default function DropBay({ state, navigate, faction, setFaction, scenario
               scenario={scenario}
               lockedSet={state.lockedSet}
               onOpen={() => navigate(`builder/${l.id}`)}
-              onDelete={l.preset ? undefined : () => setConfirmDelete(l)}
-              inCompare={compare.includes(l.id)}
-              compareFull={compare.length >= 4}
-              onToggleCompare={toggleCompare} />
+              onDelete={l.preset ? undefined : () => setConfirmDelete(l)} />
           ))}
         </div>
       )}

@@ -322,7 +322,7 @@ function ItemArt({ item, className = "h-9 w-9", dim }) {
   );
 }
 
-export { TierBadge, TierRow, sourceLabelFor, statSummary as itemStatSummary, ItemArt, Chips, KIND_META, FACTIONS, FACTION_THEME, BIOMES, BIOME_THEME, MISSION_TYPES, DIFFICULTIES, CAT_META, STRAT_GROUP, tierStyle, FactionBar, FactionChooser };
+export { TierBadge, TierRow, sourceLabelFor, statSummary as itemStatSummary, ItemArt, Chips, KIND_META, FACTIONS, FACTION_THEME, BIOMES, BIOME_THEME, MISSION_TYPES, DIFFICULTIES, CAT_META, STRAT_GROUP, tierStyle, FactionBar, FactionChooser, StratChip };
 
 /**
  * quiet steps a badge back because its column is not the one the list
@@ -2246,7 +2246,7 @@ export function LoadoutCard({ loadout, isFavorite, onToggleFavorite, rankLabel, 
         {staleHere.length > 0 ? (
           <div className="flex items-start gap-1.5 rounded border border-base-700 bg-base-800/60 px-2 py-1.5 text-[11px] text-base-400">
             <HelpCircle className="w-3.5 h-3.5 shrink-0 mt-px text-accent-500" />
-            <span>{staleHere.join(", ")} changed in 7.0.0. The tier list has not caught up.</span>
+            <span>{staleHere.join(", ")} changed after the vote. The tier list has not caught up.</span>
           </div>
         ) : null}
 

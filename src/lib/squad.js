@@ -90,7 +90,11 @@ const HEAVY_FRONTS = {
 
 /**
  * builds  the loadouts being compared
- * context { faction, biome, mission, difficulty } as Drop Bay already has them
+ * context { faction, biome, mission, difficulty, level, traits }. The first
+ *         four are the old grid's filter words. traits is how the drop
+ *         screen's real mission name arrives, through dropContext in
+ *         drop.js, since "Destroy Command Bunkers" is not a word these
+ *         checks know and "nest" is
  * returns [{ id, severity, text }], most severe first, empty when there is
  *         nothing worth saying
  */
@@ -103,7 +107,8 @@ export function squadWarnings(builds, context = {}) {
   /* what one person is carrying.                                         */
   if (squad.length < 2) return [];
 
-  const { faction = "any", biome = "any", mission = "any", difficulty = "any", level = 0 } = context;
+  const { faction = "any", biome = "any", mission = "any", difficulty = "any", level = 0, traits = [] } = context;
+  const nestMission = mission === "nest" || traits.includes("nest");
   const out = [];
   const add = (id, severity, text) => out.push({ id, severity, text });
 
@@ -188,7 +193,7 @@ export function squadWarnings(builds, context = {}) {
       "Nothing you hold punches above light armor. You can still headshot every Devastator you meet, but one of you bringing an Autocannon, an Anti-Materiel Rifle, a Laser Cannon or even a Senator stops the plate being the problem. All four are AP 4, and a Devastator is armored to 3.");
   }
 
-  if (!quiet && objectiveMembers === 0 && mission === "nest") {
+  if (!quiet && objectiveMembers === 0 && nestMission) {
     add("objective-absent-nest", "red",
       "Nothing here closes a hole or a fabricator without spending a stratagem. That is the entire mission.");
   } else if (!quiet && objectiveItems <= size && biome === "cave") {

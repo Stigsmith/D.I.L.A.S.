@@ -21,11 +21,24 @@ Everything below rests on one primitive: **data living somewhere that is not one
 > | 2 | Mail and password reset | **Blocked on the domain.** Resend only sends from a domain you own. `dds.me` was taken. Accounts stay shut until this works |
 > | 3 | Sync between devices | Needs the profiles question answered |
 > | 4 | Publishing and short links | |
-> | 5 | Exchange, friends, leaderboards | Needs "what is a run and what is a clear" answered |
+> | 5 | Exchange, friends, leaderboards | Needs "what is a run and what is a clear" answered. **Friends split off and wait on accounts opening**, which waits on the domain |
 > | 6 | Live war state | Needs no account. Pairs with the starmap |
-> | 7 | Live squad | Enodia has not built it. Nothing carries over |
+> | 7 | Live squad | **Next, and it needs no account.** A party by code, decided 27 September 2026. Enodia has not built it, so nothing carries over |
 >
 > **Netlify stays the address people use until the domain is bought**, because each move of address empties everybody's collection and `workers.dev` to the domain would be a second move. See `CLAUDE.md`, Hosting.
+
+> [!success] Decided 27 September 2026: a party by code first, friends once accounts open
+> The curator asked for accounts and friends "so that we can get the drop bay working". Three calls came out of it, all his:
+>
+> | Question | Answer |
+> |---|---|
+> | **How do people join a squad** | **A party code, no account.** One person opens a party and shares a short code; the others type it in. Accounts cannot open before Stage 2, Stage 2 needs the domain, and the domain is not bought, so a squad that needed accounts would stay offline until all three happened. A code needs only the Worker, which is live. **Friends layer on top later** as "invite from your list" instead of reading a code out, and nothing built for codes is thrown away |
+> | **What an unconfirmed slot shows** | **"Still deciding", and nothing else.** The squad checks count confirmed loadouts only, so a half picked kit never sets off a false alarm. Closes the open question in "Party auto-fill on the compare slots" |
+> | **The galaxy map** | **After the party works.** The drop screen uses the scenario screen that already exists for choosing a planet, so nothing is built twice; the map replaces that picker later. This reverses "Order, revised" below, which pulled the map into Phase 6a, for the reason that a working squad arrives sooner |
+>
+> **Verified before recommending it:** Durable Objects run on the Workers Free plan, SQLite backed only, with 100,000 requests and 13,000 GB-s a day, and incoming WebSocket messages billed at 20 to 1. The hibernation API keeps an idle party from costing duration. Read off `developers.cloudflare.com/durable-objects/platform/pricing` and `/limits` on 27 September 2026.
+>
+> **The catch, and it is the domain again.** The server exists only at the `workers.dev` address, never on Netlify, so a party works there and nowhere else. Using it means importing your collection there, then once more when the domain arrives. Buying the domain soon makes that one move.
 
 **Recommended order:**
 
@@ -76,9 +89,10 @@ Everything shipped in 1.3.0 through 1.9.0 sits in the first track. **None of it 
 1. ~~**Phase 2.5**, enemy armour~~. **Done, 1.10.0, 21 August 2026.** See below
 2. **Phase 4**, the three judgement tags. Small, and it closes the gaps `context-rules.json` currently admits to
 3. ~~**Phase 5**, loadout and squad scoring~~. **Done, 1.20.0, 22 August 2026.** See below
-4. **Phase 6a**, Drop Bay becomes the drop screen. Local, no infrastructure
-5. **v2**, auth and shared storage. The infrastructure step, unchanged
-6. **v3**, Exchange inherits the grid, and live party fills the drop screen's slots
+4. ~~**Phase 6a**, Drop Bay becomes the drop screen. Local, no infrastructure~~. **Done, 1.24.0, 27 September 2026**, without the map. See "What Drop Bay turns into"
+5. **Live party by code.** Moved ahead of accounts on 27 September 2026, because it needs the Worker and no account. See the decision at the top of this file
+6. **v2**, accounts open once the domain and password reset exist, and friends come with them
+7. **v3**, Exchange inherits the grid
 
 ### Phase 2.5 as built
 
@@ -227,6 +241,21 @@ A staging screen with two stages, because picking a loadout and reading the squa
 > [!tip] The confirm step is the point, not ceremony
 > A slot that silently reflects whatever you last touched cannot tell the difference between "still deciding" and "this is what I am dropping with". The squad warnings are only worth reading once the answer is the second one. Confirm is what makes a slot mean something to the other three people looking at it.
 
+> [!success] Built, 1.24.0, 27 September 2026. Local, and without the map
+> `src/DropScreen.jsx` is Drop Bay's first tab and the grid is its second, **Builds**, until Exchange takes it. What landed against the list above:
+>
+> | Planned | As built |
+> |---|---|
+> | The scenario across the top | The scenario bar the tier list already carries, plus a **brief**: what the mission asks for and what each planet hazard does, both from tables the tool already ships |
+> | One slot per member, confirmed gear | Four slots. Yours is chosen, then **confirmed**; confirming stamps the build, and editing it afterwards drops you back to still deciding. The other three are **filled by hand** until the party fills them |
+> | Squad warnings and coverage | `squad.js`, unchanged, over **confirmed loadouts and hand filled slots only** |
+> | Mission information and tips | The mission's own lines. No invented tips |
+> | What other people are taking here | **Not built.** It needs data from other people, so it waits on Exchange |
+>
+> **The picker keeps both hard gates.** A hot planet removes builds that vent heat and a difficulty band removes builds declaring another, read off the scenario rather than off a second set of filters, and it says in one line how many each gate took out. A slot already holding a build the scenario would now refuse **keeps it and says why**, because it is still what somebody chose.
+>
+> **The grid lost its comparison.** The sticky squad panel over the grid is gone; a squad member's slot is the comparison now, which is what "What this changes about the earlier sections" said would happen. The grid's own biome, mission and difficulty filters are untouched and still local, because the grid is on its way to becoming Exchange and those filters describe builds rather than a drop.
+
 ### What Exchange turns into
 
 Today's Drop Bay, kept: the grid, the cards, the filters, the favourites. `LoadoutCard` and the filter controls move rather than being rebuilt.
@@ -298,6 +327,9 @@ The game's interface is designed to look like military hardware. A planning tool
 
 The map moves **out of Phase 7 and into Phase 6a**, alongside the drop screen, because it is that screen's entry point rather than a later addition. Building a planet dropdown, then a drop screen, then replacing the dropdown with a map is doing the work twice.
 
+> [!warning] Moved again, 27 September 2026: after the live party
+> The curator's call. No planet dropdown was built for the drop screen: it uses the scenario screen that already existed, so the double work this paragraph warns about does not happen. The map replaces that picker once the party works.
+
 The live layer stays optional and can arrive whenever. It needs no account, so it is independent of v2.
 
 > [!success] The training manual is out of this project entirely
@@ -330,8 +362,8 @@ Drop Bay's squad compare takes two to four builds and warns on the combination. 
 
 **The ask:** once party or account state exists, one compare slot auto-fills with whatever the party member currently has selected. Manual selection stays for every slot when not in a party, and for slots beyond the connected member.
 
-> [!question] Fallback behaviour must be decided, not invented
-> If you are in a party and the other player has not picked a loadout yet, does their slot show empty, show a placeholder, or fall back to manual selection until they pick? Decide this explicitly in that session. It is exactly the kind of edge case that produces a technically correct and wrong feeling result when guessed.
+> [!success] Fallback behaviour, decided 27 September 2026
+> The question was: if you are in a party and the other player has not picked yet, does their slot show empty, a placeholder, or fall back to manual selection? **The curator's answer: "Still deciding", and nothing else.** The squad checks count confirmed loadouts only. Built that way into the local drop screen in 1.24.0, so the party inherits it.
 
 ---
 
@@ -442,7 +474,9 @@ Two pieces of it are worth remembering when that happens. **Operation modifiers 
 
 ## Open questions carried forward
 
-- **Fallback when a party member has not picked.** See above.
+- ~~**Fallback when a party member has not picked.**~~ **Settled 27 September 2026:** the slot reads "Still deciding" and nothing else, and the squad checks ignore it until it is confirmed.
+- ~~**Does a party need accounts, or only a code.**~~ **Settled 27 September 2026:** only a code. Friends come later, with accounts.
+- **Who sets the scenario in a party.** Recommendation: the person who opened it, the way the host picks the mission in game, with everyone else's drop screen following. Ask before building it the other way.
 - **Do profiles survive accounts.** See above.
 - ~~**Does the tier ramp move.**~~ **Settled 21 August 2026, 1.17.0.** Three candidate ramps were in play and the curator picked a fourth: the badge study's palette rotated down one rank, with the brown replaced by a grey. Red at the top cooling to grey at D, so the ladder reads as falling off toward unrated. Both losing sets are out of the code.
 - **The accent disagreement.** Several studies paint their signature colour on the lock and the stale chip. `CLAUDE.md` says the accent is never the brand colour, and that rule won. Worth settling if the skins are redrawn.
