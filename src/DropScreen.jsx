@@ -777,7 +777,11 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
             </button>
           </div>
           <PlanetChooser chosen={scenario.planet} autoFocus={false}
-            onChoose={(name) => { setPlanet(name); setMapOpen(false); }} />
+            onChoose={(name, front) => {
+              setPlanet(name);
+              if (front && front !== scenario.faction) setFaction(front);
+              setMapOpen(false);
+            }} />
         </div>
       ) : null}
       {showMap && nowhere && !scenario.mission ? null : (

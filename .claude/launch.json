@@ -15,7 +15,8 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": [
         "wrangler",
-        "dev"
+        "dev",
+        "--test-scheduled"
       ],
       "port": 8788
     }

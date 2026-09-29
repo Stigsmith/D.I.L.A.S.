@@ -126,6 +126,21 @@ export function About() {
         </p>
       </Panel>
 
+      <Panel title="The galaxy map and the live war">
+        <p>
+          Where every planet sits and the supply lines between them come from the{" "}
+          <a href="https://api.helldivers2.dev" target="_blank" rel="noreferrer noopener"
+            className="text-base-200 underline hover:text-base-100">helldivers-2 community API</a>, read once and
+          shipped with the tool, so the map draws with nothing fetched.
+        </p>
+        <p className="text-base-500">
+          Who holds each planet, where the fronts are and how they are going come from the same API, live. This
+          tool's own server asks it every five minutes and keeps the answer, and your browser only ever asks this
+          tool's server, never anybody else. Nothing about you goes with the question. An answer more than half an
+          hour old is not drawn, because an out of date map looks exactly like a current one.
+        </p>
+      </Panel>
+
       <Panel title="Role tags are ours">
         <p>
           Anti-armor, chaff clear and objective are our own judgment, not a community vote. Everything else on a row

@@ -41,3 +41,28 @@ export const apiRateLimit = sqliteTable('api_rate_limit', {
   /** When the current window opened, epoch ms. Fixed, not sliding. */
   windowStart: integer('window_start').notNull(),
 })
+
+/**
+ * The live war, as last fetched. **One row**, id `war`, written by the Cron
+ * Trigger in `worker/war.ts` every five minutes and read by `GET /api/war`.
+ * Stage 6 of `dds-cloudflare-handover.md`.
+ *
+ * A snapshot rather than a pass-through, so the community API is called a
+ * fixed number of times a day whatever the traffic, and so an outage there
+ * leaves the last good answer here **with its real age on it**: a failed fetch
+ * moves `tried_at` and sets `ok` to 0, and leaves `payload` and `fetched_at`
+ * exactly as they were. The browser decides whether that is too old to draw.
+ */
+export const warSnapshot = sqliteTable('war_snapshot', {
+  id: text('id').primaryKey(),
+  /** The trimmed planets as JSON, or null when no fetch has ever succeeded. */
+  payload: text('payload'),
+  /** When the payload was fetched, epoch ms. Null alongside a null payload. */
+  fetchedAt: integer('fetched_at'),
+  /** When the last fetch was tried, whether it worked or not. */
+  triedAt: integer('tried_at').notNull(),
+  /** Whether that last try worked. */
+  ok: integer('ok', { mode: 'boolean' }).notNull(),
+  /** Why it did not, in a sentence, for whoever reads the table. Never sent to a browser. */
+  error: text('error'),
+})

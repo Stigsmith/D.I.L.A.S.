@@ -11,7 +11,10 @@
       "Support now says exactly what a party sends: your name, your confirmed loadout and the host's scenario, to the others in it and nobody else. Everything else still stays in your browser.",
       "Pick where you are dropping on the galaxy map, laid out the way the game draws it. Click the planet where you clicked it in the game and its biome and hazards fill themselves in. Hover one first to see what it does to you.",
       "Drop Bay opens onto the map while you have not said where you are going, and folds it away once you have. Drag to move, scroll or pinch to zoom, and names appear as you zoom in. Searching by planet or sector lights the matches up.",
-      "An ordinary planet no longer counts normal temperature as one of its hazards."
+      "An ordinary planet no longer counts normal temperature as one of its hazards.",
+      "The map shows the war as it stands: every planet in the colour of whoever holds it, and the fronts you can drop on ringed and named. Hover one to see how far it is liberated or defended and how many Helldivers are there.",
+      "Choose a planet with fighting on it and your front switches to whoever you would be fighting there, so one click fills in the whole scenario.",
+      "The war is read every five minutes by the tool's own server; your browser never talks to anybody else. If it cannot be read, or the last reading is more than half an hour old, the map simply stays uncoloured and says why."
     ]
   },
   {

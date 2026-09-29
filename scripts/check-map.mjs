@@ -90,3 +90,55 @@ ok(Math.hypot(middle.x - creek.x, middle.y - creek.y) < RADIUS * 0.2,
 const inner = galaxy.placeOf("Meridia") || galaxy.placed.find((p) => !p.home && Math.hypot(p.x - CENTRE, p.y - CENTRE) < RADIUS * 0.3);
 const exact = galaxy.toMap(galaxy.centreOn(inner, 3), { x: CENTRE, y: CENTRE });
 ok(near(exact.x, inner.x, 1e-9) && near(exact.y, inner.y, 1e-9), `flying to ${inner.name}, well inside the edge, centres it exactly`);
+
+/* The live war, as the browser reads it */
+const NOW = 10_000_000;
+const snapshot = {
+  fetchedAt: NOW - 4 * 60 * 1000,
+  planets: [
+    { name: "MALEVELON CREEK", owner: "Automaton", health: 250000, maxHealth: 1000000, players: 4210, campaign: true, event: null },
+    { name: "HELLMIRE", owner: "Terminids", health: 900000, maxHealth: 1000000, players: 0, campaign: false, event: null },
+    { name: "CALYPSO", owner: "Humans", health: 1000000, maxHealth: 1000000, players: 900, campaign: true,
+      event: { faction: "Illuminate", health: 600000, maxHealth: 2000000, endTime: new Date(NOW + 3 * 3600000).toISOString() } },
+    { name: "NOT A PLANET", owner: "Automaton", campaign: true },
+    { name: "CYBERSTAN", owner: "Martians", campaign: true },
+    { name: "SUPER EARTH", owner: "Humans", campaign: false, event: null },
+  ],
+};
+const war = galaxy.cleanWar(snapshot, NOW);
+ok(war && war.fresh && war.planets.size === 3, "the snapshot is read by name against this browser's table, and a planet it does not know is dropped");
+ok(!war.planets.has("Cyberstan"), "an owner nobody has heard of is dropped rather than drawn");
+ok(!war.planets.has("Super Earth"), "a quiet planet Super Earth holds is not a front");
+const creekWar = war.planets.get("Malevelon Creek");
+ok(creekWar && creekWar.front === "bots" && creekWar.campaign && Math.abs(creekWar.liberation - 0.75) < 1e-9,
+  "an enemy world under a campaign reads its front and how much is liberated");
+const calypso = war.planets.get("Calypso");
+ok(calypso && calypso.owner === null && calypso.front === "squids" && Math.abs(calypso.defence.progress - 0.7) < 1e-9,
+  "a defence reads the attacker as the front, and how much has been defended");
+ok(war.fronts === 2, "two fronts open: the campaign and the defence, not the planet merely held");
+ok(galaxy.frontOf(war, "Malevelon Creek") === "bots" && galaxy.frontOf(war, "Calypso") === "squids",
+  "choosing a planet with fighting on it fills in who you would fight");
+ok(galaxy.frontOf(war, "Gunvald") === null, "choosing a quiet planet leaves the front alone");
+
+const old = galaxy.cleanWar(snapshot, snapshot.fetchedAt + galaxy.WAR_TOO_OLD_MS + 1);
+ok(old && !old.fresh && galaxy.frontOf(old, "Malevelon Creek") === null,
+  "past half an hour the snapshot is not trusted, and fills in nothing");
+ok(galaxy.cleanWar({ planets: [] }) === null && galaxy.cleanWar("<html>") === null && galaxy.cleanWar(null) === null,
+  "an answer with no age, or no answer at all, is no war");
+const odd = galaxy.cleanWar({ fetchedAt: NOW, planets: [{ name: "MALEVELON CREEK", owner: "Automaton", health: "x", maxHealth: 0, campaign: true, players: -3 }] }, NOW);
+ok(odd.planets.get("Malevelon Creek").liberation === null && odd.planets.get("Malevelon Creek").players === 0,
+  "numbers that make no sense are dropped rather than shown");
+
+/* Which names fit */
+const clash = [
+  { name: "Quiet", x: 100, y: 100, offset: 5, priority: 3 },
+  { name: "Busy front", x: 101, y: 100, offset: 5, priority: 2, weight: 900 },
+  { name: "Other front", x: 102, y: 101, offset: 5, priority: 2, weight: 10 },
+  { name: "Far away", x: 400, y: 400, offset: 5, priority: 3 },
+];
+const fit = galaxy.placeLabels(clash, 1);
+ok(fit.has("Busy front") && !fit.has("Other front") && !fit.has("Quiet") && fit.has("Far away"),
+  "overlapping names: the busier front wins, the rest wait for a closer zoom, and a name with room is drawn");
+const forced = galaxy.placeLabels([...clash, { name: "Chosen", x: 100, y: 100, offset: 5, priority: 0, must: true }], 1);
+ok(forced.has("Chosen") && !forced.has("Busy front"), "the chosen planet is always named, and takes the spot first");
+ok(galaxy.placeLabels(clash, 100).size === 4, "zoomed in far enough, every name fits");
