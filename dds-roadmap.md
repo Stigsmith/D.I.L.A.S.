@@ -23,7 +23,7 @@ Everything below rests on one primitive: **data living somewhere that is not one
 > | 4 | Publishing and short links | |
 > | 5 | Exchange, friends, leaderboards | Needs "what is a run and what is a clear" answered. **Friends split off and wait on accounts opening**, which waits on the domain |
 > | 6 | Live war state | Needs no account. Pairs with the starmap |
-> | 7 | Live squad | **Next, and it needs no account.** A party by code, decided 27 September 2026. Enodia has not built it, so nothing carries over |
+> | 7 | Live squad | **Built, 1.25.0, 29 September 2026, not yet deployed.** A party by code, no account. See `CLAUDE.md`, The Live Party |
 >
 > **Netlify stays the address people use until the domain is bought**, because each move of address empties everybody's collection and `workers.dev` to the domain would be a second move. See `CLAUDE.md`, Hosting.
 
@@ -90,7 +90,7 @@ Everything shipped in 1.3.0 through 1.9.0 sits in the first track. **None of it 
 2. **Phase 4**, the three judgement tags. Small, and it closes the gaps `context-rules.json` currently admits to
 3. ~~**Phase 5**, loadout and squad scoring~~. **Done, 1.20.0, 22 August 2026.** See below
 4. ~~**Phase 6a**, Drop Bay becomes the drop screen. Local, no infrastructure~~. **Done, 1.24.0, 27 September 2026**, without the map. See "What Drop Bay turns into"
-5. **Live party by code.** Moved ahead of accounts on 27 September 2026, because it needs the Worker and no account. See the decision at the top of this file
+5. ~~**Live party by code.**~~ **Built, 1.25.0, 29 September 2026**, waiting on a deploy. Moved ahead of accounts because it needs the Worker and no account
 6. **v2**, accounts open once the domain and password reset exist, and friends come with them
 7. **v3**, Exchange inherits the grid
 

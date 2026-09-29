@@ -77,9 +77,10 @@
     {
       "id": "squad",
       "title": "Live party",
-      "status": "next",
+      "status": "shipped",
       "track": "social",
-      "say": "Open a party, share its code, and your squadmates' confirmed loadouts land in their slots as they commit, with no account needed."
+      "say": "Open a party, read its code out, and your squadmates' confirmed loadouts land in their slots as they commit, with no account needed.",
+      "version": "1.25.0"
     },
     {
       "id": "map",

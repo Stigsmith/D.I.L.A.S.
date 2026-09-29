@@ -188,13 +188,17 @@ export class Party extends DurableObject<Env> {
     return true
   }
 
-  /** The WebSocket upgrade. Anything else is refused, and so is a party that is gone. */
+  /**
+   * The WebSocket upgrade. A party that is gone is a 404 whatever was asked,
+   * and a plain request to a live one is a 426, which is how a browser whose
+   * socket failed finds out which of the two happened.
+   */
   async fetch(request: Request): Promise<Response> {
-    if (request.headers.get('upgrade')?.toLowerCase() !== 'websocket') {
-      return json({ error: 'This address only speaks WebSocket.' }, 426)
-    }
     if (!(await this.live())) {
       return json({ error: 'No party with that code. It may have ended.' }, 404)
+    }
+    if (request.headers.get('upgrade')?.toLowerCase() !== 'websocket') {
+      return json({ error: 'This address only speaks WebSocket.' }, 426)
     }
     const pair = new WebSocketPair()
     const [client, server] = [pair[0], pair[1]]

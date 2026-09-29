@@ -733,7 +733,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 |---|---|
 | **The brief** | What the scenario's mission asks for and what each planet hazard does. Both come from tables the tool already ships; nothing is invented for flavour |
 | **Your slot** | Choose a build, then **Confirm**. Only then does it count |
-| **Three squadmate slots** | Filled by hand, from your builds and the presets, until the live party fills them from a code |
+| **Three squadmate slots** | Filled by hand, from your builds and the presets. In a party they are the party's members instead. See The Live Party |
 | **The squad read** | `squadWarnings` over the builds that count |
 
 > [!danger] An unconfirmed slot says "Still deciding" and nothing else, and does not count
@@ -759,6 +759,50 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > It remembered only the tier list's category until 1.24.0, so adjusting the scenario from the drop screen threw you onto a tier list. `lastSurface` in `App.jsx` now remembers any surface that reads the scenario, tab included.
 
 **`npm run drop`** checks it against the real builds: both hard gates, what counts as the squad, that editing a confirmed build un-confirms it, and that a real mission name reaches the demolition warning. It exits non zero on a fail. `scripts/lib/app.mjs` loads `drop.js` like the other libs, so it measures the shipped code.
+
+---
+
+# **The Live Party**
+
+> [!success] Built, 1.25.0, 29 September 2026. **Not deployed yet**: that waits for the curator
+> Squad up with a code on the drop screen. One person opens a party and reads out six characters; whoever types them in is in, up to four. Each person's **confirmed** loadout lands in their slot on everybody's screen, the host's scenario becomes everybody's, and the squad read is the same on every screen because it counts the same builds. Stage 7 of `dds-cloudflare-handover.md`, which Enodia never built, so nothing was ported.
+
+| Part | Where |
+|---|---|
+| **The party** | `worker/party.ts`. One Durable Object per code: members, their confirmed builds, the host's scenario, and every open WebSocket |
+| **The two routes** | `worker/index.ts`. `POST /api/party` opens one and answers with its code; `GET /api/party/<code>` is the WebSocket, or, as a plain GET, the question "does this party exist" |
+| **The limits** | `worker/limit.ts` and the `api_rate_limit` table, ported from Enodia. 20 parties opened and 120 joins an hour per address |
+| **The browser half** | `src/lib/party.js`: `useParty` holds the connection, `usePartySync` keeps the party and this browser in step |
+| **The screen** | `src/DropScreen.jsx`: the party panel, the members' slots, open seats with the code in them |
+| **The tests** | `worker/party.test.ts`, 25 of them, inside workerd against a real Durable Object |
+
+> [!danger] Three calls, all the curator's, and the code is shaped around them
+> **A code, not an account** (27 September 2026). Accounts cannot open before password reset, which needs a domain nobody has bought. A code needs only the Worker. **An unconfirmed slot shows "Still deciding" and nothing else**, so the browser sends null until you confirm and the server never holds a half picked kit. **The host sets the scenario** (28 September 2026), the way the host picks the mission in game; everybody else's scenario follows it.
+
+> [!danger] The server has no opinion about what a build is
+> The handover's rule for published builds. A confirmed build is packed by the browser (`packBuild` in `drop.js`, which leaves the blurb at home) and handed to the others exactly as it came. **Every browser cleans what it receives against its own tables** (`unpackBuild`, `cleanScenario`), so an item in the wrong slot, or no item at all, is dropped rather than drawn. The server enforces only size, shape, rate and who may say what.
+
+> [!info] Identity is a token per party, kept in `hd2-party`
+> The browser makes 32 random bytes per party and keeps them; the server stores only the SHA-256. **A reload, a dropped line or a second tab on the same address rejoins the same seat** rather than taking a new one. Members see each other by a prefix of that hash, never the token. `hd2-party` also keeps the name you go by, and stays out of the export: it belongs to this browser.
+
+> [!info] How a party behaves
+> - **Four seats.** A fifth person is refused with "That party is full", not queued.
+> - **A host who leaves hands the party to whoever has been in longest.** The last one out ends it. The host can remove somebody, in two presses.
+> - **Twelve quiet hours and nobody connected, and the party is deleted** by its own alarm. An open tab keeps it alive.
+> - **The host's squad size follows the party.** The scenario's "how many of you" is set to the member count, since that is the true answer and the peril rules read it.
+> - **Following is not enforcing.** A squadmate who adjusts their own scenario keeps it until the host's next change, and the party panel says so with a one click "Follow the party".
+> - **While in a party, the hand filled squadmate slots step aside** and come back on leaving. Party slots are members only.
+
+> [!bug] A same-site GET carries no Origin header, and the first version demanded one
+> Found in the browser on 29 September 2026. A socket that fails to open tells the page nothing, so the party asks over a plain GET whether the code exists. That GET arrived with no Origin, the same-origin check refused it with a 403, the page read the 403 as a dropped line, and it retried a dead code forever. **Origin is now required on a POST and a WebSocket, where browsers always send it, and only refused on a plain GET when it is present and foreign.** Reproduced in `party.test.ts` against the unfixed server first.
+
+> [!warning] It only exists where the Worker does
+> A party needs `/api/party`, so it works under `wrangler dev` and at the Cloudflare address, and **not on Netlify or under `npm run dev`**. There the panel says "Parties need the tool's own server, and this address does not have one", because the answer comes back as a page rather than the server's JSON. Two players on one machine for testing: `127.0.0.1:8788` and `localhost:8788` are different addresses to the browser, so each gets its own storage and its own token.
+
+> [!info] Every party rule was broken on purpose to see its test fail
+> The squad cap, host only scenario, host only removal, the returning seat, the host handover and the loadout size cap, on 29 September 2026. Each broke exactly the test aimed at it. Do the same for any new rule.
+
+**Shipping it** is two steps, in this order, and both wait for the curator: `npx wrangler d1 migrations apply dds --remote` for the `api_rate_limit` table, then `npm run deploy`, which also creates the Durable Object class from the `v1` migration in `wrangler.jsonc`. Then open a party on the live address from two browsers before calling it done.
 
 ---
 
@@ -1247,7 +1291,7 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 > So Netlify stays the address people use until the domain exists. Then: one last Netlify build carrying a notice with the new address and "Export here, Import there", and Netlify left up for a while rather than deleted the same day. Both calls are stigly's. `_headers` travels in `dist/`, and Netlify reads the same file format, so that last Netlify build gets the security headers too.
 
 > [!success] The "no server" sentence was retired in 1.22.0, when Stage 1 landed
-> Support said "There is no account and no server behind this tool" (`Pages.jsx`, "Your data stays yours"). It went false the day the Worker deployed, so it now says **"Nothing you do here is sent anywhere, and there are no accounts yet"**, which is exactly true while `ACCOUNTS_LIVE` is off. **That sentence goes false in turn the day accounts open**, and must change with the switch. `roadmap.json` still says the solo track runs "with no account, no server and no network call", which describes that track's features and stays true. Enodia shipped the same kind of sentence past its expiry: "Nothing is tracked about you" outlived the day stats existed.
+> Support said "There is no account and no server behind this tool" (`Pages.jsx`, "Your data stays yours"). It went false the day the Worker deployed, so it said **"Nothing you do here is sent anywhere, and there are no accounts yet"**. **That went false in turn with the live party in 1.25.0**, and Support now says what a party sends, to whom, and when it is deleted. **The "no accounts yet" half goes false the day accounts open**, and must change with the switch. `roadmap.json` still says the solo track runs "with no account, no server and no network call", which describes that track's features and stays true. Enodia shipped the same kind of sentence past its expiry: "Nothing is tracked about you" outlived the day stats existed.
 
 > [!danger] Only `study_*` art is bundled
 > `src/lib/assets.js` globs `../assets/themes/*/study_*`, not the whole folder. A theme folder also holds its palette study, a preview render and the loose reference art the skin was drawn from, none of which the app renders. Globbing everything shipped **22.7MB of dead weight, 60% of the built output**. If a skin needs a new file at runtime, name it `study_*` or it will not be bundled.
@@ -1266,11 +1310,12 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 
 | | |
 |---|---|
-| `worker/index.ts` | The three routes: `/api/auth/*` to better-auth, `/api/capabilities`, `/api/me`. Everything else is a JSON 404 |
+| `worker/index.ts` | The routes: `/api/auth/*` to better-auth, `/api/capabilities`, `/api/me`, and the two party routes. Everything else is a JSON 404 |
 | `worker/auth.ts` | Every better-auth option, each with the reason. Nearly verbatim from Enodia |
 | `worker/email.ts` | The mail swap point. **Inert until Stage 2**: no domain, so no sender, so no reset |
 | `worker/schema.ts` | **Generated** by `npm run db:schema`. Never edit |
-| `worker/schema-app.ts` | Ours, and empty until Stage 3 |
+| `worker/schema-app.ts` | Ours. The `api_rate_limit` table, since the live party |
+| `worker/party.ts`, `worker/limit.ts` | The live party and the limiter for our own routes. See The Live Party |
 | `migrations/` | Generated by `npm run db:generate`. Applied locally by `npm run db:migrate` |
 | `src/lib/account.js`, `src/Account.jsx` | The browser half and the screen |
 
@@ -1295,7 +1340,7 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 npm run test:worker
 ```
 
-Fifteen tests, run **inside workerd against a real local D1**, never in node, where none of what matters is true. Each protection was seen failing before it was trusted: rate limiting left to the library default (two fail, and it reproduces Enodia's finding that better-auth does not limit on Workers by default), the address read from `x-forwarded-for` (two fail), the schema missing `issuer` (five fail), and the response hardening removed (one fails).
+Forty tests, fifteen for accounts and twenty five for the live party, run **inside workerd against a real local D1**, never in node, where none of what matters is true. Each protection was seen failing before it was trusted: rate limiting left to the library default (two fail, and it reproduces Enodia's finding that better-auth does not limit on Workers by default), the address read from `x-forwarded-for` (two fail), the schema missing `issuer` (five fail), and the response hardening removed (one fails).
 
 ```bash
 npm run typecheck
@@ -1332,7 +1377,6 @@ The Worker only. `tsconfig.worker.json` stands alone, because D.D.S. has no root
 
 ### What is deliberately not here yet
 
-- **`worker/limit.ts`**, Enodia's counter for routes better-auth cannot see. Every Stage 1 route is better-auth's own or a session read. It arrives with Stage 3, the first route of ours that writes anything, with its table in `schema-app.ts`
 - **Password reset**, Stage 2, which needs the domain
 - **The account doing anything.** The "What an account does" panel says "Nothing yet". **It must change the day Stage 3 sync lands**, or it becomes a sentence that outlived its truth
 

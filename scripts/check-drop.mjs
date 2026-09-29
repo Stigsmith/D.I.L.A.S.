@@ -63,3 +63,14 @@ const noObjective = all.filter((l) => l.faction === "bugs").slice(0, 2).map((l) 
 const ctx = drop.dropContext({ faction: "bugs", mission: "Destroy Command Bunkers" , difficulty: 9 });
 const names = squad.squadWarnings(noObjective, ctx).map((w) => w.id);
 ok(names.includes("objective-absent-nest"), "a real demolition mission name reaches the nest check through its traits");
+
+/* on the wire: what a squadmate's build becomes when it arrives */
+const sample = all.find((l) => l.faction === "bots");
+const packed = drop.packBuild({ ...sample, blurb: "private notes" });
+ok(!("blurb" in packed), "the blurb stays home");
+const back = drop.unpackBuild(JSON.parse(JSON.stringify(packed)));
+ok(back && back.primary === sample.primary && back.strats.join() === sample.strats.join() && back.name === sample.name, "a packed build comes back whole");
+const tampered = drop.unpackBuild({ ...packed, primary: "orbital-precision-strike", armor: "not-an-item", strats: ["r-63-diligence", null] });
+ok(tampered.primary === null && tampered.armor === null && tampered.strats.every((s) => s === null), "an item in the wrong slot, or no item at all, is dropped");
+ok(drop.unpackBuild(null) === null && drop.unpackBuild([1, 2]) === null && drop.unpackBuild("x") === null, "junk from the wire reads as nothing");
+ok(drop.unpackBuild({ ...packed, name: "x".repeat(500) }).name.length <= 60, "a shared name is capped");
