@@ -25,13 +25,15 @@ import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 import { BRAND } from "./lib/brand.js";
 import { PATCH } from "./lib/patch.js";
 import {
-  planets, biomeInfo, hazardInfo, biomeName, hazardName, hazardEffect,
+  planets, biomeInfo, hazardInfo, biomeName, hazardName, hazardEffect, QUIET_HAZARDS, loudHazards,
   missionsFor, missionTraits, missionByName, traitsOf,
 } from "./lib/scenario.js";
 import { scoreItem, scenarioIsSet } from "./lib/score.js";
 import { readBuild, explainScore } from "./lib/build.js";
 import { describeArmour, enemiesUpTo, arrivalsLine, EXPOSURE_GAP, enemySource } from "./lib/enemies.js";
 import TierBadgePlate from "./TierBadgePlate.jsx";
+import GalaxyMap from "./GalaxyMap.jsx";
+import { searchPlanets, unplaced } from "./lib/galaxy.js";
 import { useBadgeStyle } from "./lib/badge.js";
 import {
   CATEGORIES, vocabulary, acquisitionLabels,
@@ -406,6 +408,11 @@ function TierChips({ label, value, onChange }) {
 /*                                                                    */
 /* 281 planets ship as a table. Biome and permanent hazards do not     */
 /* change, so this needs no network at runtime.                       */
+/*                                                                    */
+/* The planet is picked on the galaxy map since 1.25.0, where you      */
+/* clicked it in the game. The search stays: it lights the matches up  */
+/* on the map and lists them underneath, which is also the way in for  */
+/* a keyboard and for the nine planets with no place on the map.       */
 /* ================================================================== */
 
 /* Planet and mission sit side by side and share one fold out pane, so
@@ -423,13 +430,6 @@ function PlanetBar({ scenario, setPlanet, setBiome, toggleHazard, setMission, cl
     setOpen((cur) => (cur === which ? null : which));
   };
 
-  const planetHits = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return planets.slice(0, 60);
-    return planets
-      .filter((p) => p.name.toLowerCase().includes(q) || (p.sector || "").toLowerCase().includes(q))
-      .slice(0, 60);
-  }, [query]);
 
   const missionHits = useMemo(() => {
     const all = missionsFor(scenario.faction);
@@ -448,7 +448,7 @@ function PlanetBar({ scenario, setPlanet, setBiome, toggleHazard, setMission, cl
   );
   const hazards = useMemo(
     () => Object.entries(hazardInfo)
-      .filter(([slug]) => slug !== "none" && slug !== "normal_temperature")
+      .filter(([slug]) => !QUIET_HAZARDS.has(slug))
       .map(([slug, v]) => ({ slug, ...v }))
       .sort((a, b) => a.name.localeCompare(b.name)),
     []
@@ -457,7 +457,7 @@ function PlanetBar({ scenario, setPlanet, setBiome, toggleHazard, setMission, cl
   const byHand = scenario.biome || scenario.hazards.length;
   const placeLabel = scenario.planet || (byHand ? biomeName(scenario.biome) || "Set by hand" : "Choose a planet");
   const placeSub = scenario.planet
-    ? [biomeName(scenario.biome), scenario.hazards.length ? scenario.hazards.length + " hazards" : null]
+    ? [biomeName(scenario.biome), loudHazards(scenario.hazards).length ? loudHazards(scenario.hazards).length + (loudHazards(scenario.hazards).length === 1 ? " hazard" : " hazards") : null]
         .filter(Boolean).join(" · ")
     : byHand ? "set by hand" : planets.length + " to choose from";
   const missionSub = scenario.mission
@@ -478,7 +478,7 @@ function PlanetBar({ scenario, setPlanet, setBiome, toggleHazard, setMission, cl
       {/* What the place and the mission actually do to you. The half worth
           reading, and the half the scoring engine reads too. Hidden while
           a pane is open, because the pane is what you are looking at. */}
-      {!open && (scenario.hazards.length || scenario.mission) ? (
+      {!open && (loudHazards(scenario.hazards).length || scenario.mission || scenario.planet || byHand) ? (
         <div className="mt-2.5 flex flex-col gap-1 border-t border-base-800 pt-2.5 text-left">
           {scenario.mission ? traitsOf(scenario.mission).map((t) => (
             <p key={t} className="text-[11px] leading-relaxed text-base-400">
@@ -486,7 +486,7 @@ function PlanetBar({ scenario, setPlanet, setBiome, toggleHazard, setMission, cl
               {(missionTraits[t] || {}).line}
             </p>
           )) : null}
-          {scenario.hazards.map((h) => (
+          {loudHazards(scenario.hazards).map((h) => (
             <p key={h} className="text-[11px] leading-relaxed text-base-400">
               <span className="text-accent-300">{hazardName(h)}</span> {hazardEffect(h)}
             </p>
@@ -501,16 +501,9 @@ function PlanetBar({ scenario, setPlanet, setBiome, toggleHazard, setMission, cl
       ) : null}
 
       {open === "planet" ? (
-        <Pane placeholder={"Search " + planets.length + " planets or a sector"} query={query} setQuery={setQuery}>
-          {planetHits.length === 0 ? (
-            <Empty>No planet by that name. Try a sector, or set the biome by hand below.</Empty>
-          ) : planetHits.map((p) => (
-            <PickRow key={p.name} on={p.name === scenario.planet}
-              onClick={() => { setPlanet(p.name); setOpen(null); }}
-              title={p.name}
-              sub={(p.sector ? p.sector + " sector · " : "") + biomeName(p.biome)}
-              tags={(p.hazards || []).map((h) => ({ key: h, label: hazardName(h), warn: true }))} />
-          ))}
+        <div className="mt-2.5 flex flex-col gap-2.5 border-t border-base-800 pt-2.5">
+          <PlanetChooser chosen={scenario.planet} onChoose={(name) => { setPlanet(name); setOpen(null); }}
+            none="No planet by that name. Try a sector, or set the biome by hand below." />
 
           <div className="grid grid-cols-1 gap-3 border-t border-base-800 pt-3 sm:grid-cols-2">
             <div>
@@ -540,7 +533,7 @@ function PlanetBar({ scenario, setPlanet, setBiome, toggleHazard, setMission, cl
               </div>
             </div>
           </div>
-        </Pane>
+        </div>
       ) : null}
 
       {open === "mission" ? (
@@ -558,6 +551,40 @@ function PlanetBar({ scenario, setPlanet, setBiome, toggleHazard, setMission, cl
               tags={m.traits.map((t) => ({ key: t, label: (missionTraits[t] || {}).name || t }))} />
           ))}
         </Pane>
+      ) : null}
+    </div>
+  );
+}
+
+/* The galaxy map with its search. One piece, so the scenario screen and
+   the drop screen cannot drift into two ways of choosing a planet. The
+   search lights its matches up on the map and lists the first few
+   underneath, which is also the way in for a keyboard and for the
+   planets with no place on the map. */
+export function PlanetChooser({ chosen, onChoose, none, autoFocus = true }) {
+  const [query, setQuery] = useState("");
+  const hits = useMemo(() => searchPlanets(query, 8), [query]);
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      <SearchField placeholder={"Search " + planets.length + " planets or a sector"} query={query} setQuery={setQuery}
+        autoFocus={autoFocus} />
+      <GalaxyMap chosen={chosen} query={query} onChoose={onChoose} />
+      <p className="text-center text-[10px] text-base-600">
+        Drag to move, scroll or pinch to zoom, and click a planet to drop there.
+      </p>
+      {query.trim() ? (
+        <div className="flex max-h-56 flex-col gap-1 overflow-y-auto text-left">
+          {hits.length === 0 ? (
+            <Empty>{none || "No planet by that name. Try a sector."}</Empty>
+          ) : hits.map((p) => (
+            <PickRow key={p.name} on={p.name === chosen} onClick={() => onChoose(p.name)}
+              title={p.name}
+              sub={(p.sector ? p.sector + " sector · " : "") + biomeName(p.biome) +
+                (unplaced.includes(p.name) ? " · not on the map" : "")}
+              tags={loudHazards(p.hazards).map((h) => ({ key: h, label: hazardName(h), warn: true }))} />
+          ))}
+        </div>
       ) : null}
     </div>
   );
@@ -587,12 +614,18 @@ function Picker({ label, icon: Icon, value, sub, open, chosen, onToggle }) {
 function Pane({ placeholder, query, setQuery, children }) {
   return (
     <div className="mt-2.5 flex flex-col gap-2.5 border-t border-base-800 pt-2.5">
-      <div className="relative">
-        <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-base-500" />
-        <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder={placeholder}
-          className="w-full rounded border border-base-700 bg-base-900 py-1.5 pl-7 pr-2 text-xs text-base-100 placeholder-base-600 outline-none focus:border-base-500" />
-      </div>
+      <SearchField placeholder={placeholder} query={query} setQuery={setQuery} />
       <div className="flex max-h-56 flex-col gap-1 overflow-y-auto text-left">{children}</div>
+    </div>
+  );
+}
+
+function SearchField({ placeholder, query, setQuery, autoFocus = true }) {
+  return (
+    <div className="relative">
+      <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-base-500" />
+      <input autoFocus={autoFocus} value={query} onChange={(e) => setQuery(e.target.value)} placeholder={placeholder}
+        className="w-full rounded border border-base-700 bg-base-900 py-1.5 pl-7 pr-2 text-xs text-base-100 placeholder-base-600 outline-none focus:border-base-500" />
     </div>
   );
 }
@@ -625,7 +658,7 @@ function PickRow({ on, onClick, title, sub, tags }) {
   );
 }
 
-export { PlanetBar };
+export { PlanetBar, SearchField, PickRow };
 
 /* ================================================================== */
 /* DIFFICULTY                                                         */

@@ -17,10 +17,13 @@
 /* reading once the answer is the second one. So they count confirmed */
 /* loadouts and nothing else. The curator's call, 27 September 2026.  */
 /*                                                                    */
-/* The squadmate slots are filled by hand until live parties land.    */
-/* A party will fill them from a code, and nothing below changes:     */
-/* squad.js is a pure function over a list of builds and has never    */
-/* cared where they came from.                                        */
+/* The squadmate slots are filled by hand, or by a live party from a  */
+/* code since 1.25.0. squad.js is a pure function over a list of      */
+/* builds and has never cared where they came from.                   */
+/*                                                                    */
+/* It opens onto the galaxy map while nothing says where you are      */
+/* dropping: click the planet where you clicked it in the game and    */
+/* the brief fills itself. The map folds away once you have chosen.   */
 /* ================================================================== */
 
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -29,12 +32,12 @@ import {
   Pencil, Rocket, UserPlus, RotateCcw, Flag, MapPin, Copy, LogOut, Crown, Radio, Loader2,
 } from "lucide-react";
 
-import { FACTIONS, FACTION_THEME, TierBadge, StratChip, FactionChooser, difficultyAt } from "./Tiers.jsx";
+import { FACTIONS, FACTION_THEME, TierBadge, StratChip, FactionChooser, difficultyAt, PlanetChooser } from "./Tiers.jsx";
 import { presets, heldGear } from "./lib/loadouts.js";
 import { readBuild } from "./lib/build.js";
 import { itemName } from "./lib/items.js";
 import { squadWarnings, isQuietBand, coverageIsQuiet } from "./lib/squad.js";
-import { missionByName, missionTraits, hazardName, hazardEffect, biomeName } from "./lib/scenario.js";
+import { missionByName, missionTraits, hazardName, hazardEffect, biomeName, loudHazards } from "./lib/scenario.js";
 import { SETTINGS, readDoc, writeDoc } from "./lib/storage.js";
 import {
   EMPTY_DROP, cleanDrop, readDrop, stampOf, dropPool, dropContext, withHeat, gateOf, unpackBuild,
@@ -70,19 +73,24 @@ export function useDrop() {
 /* are the dataset's own descriptions. Nothing is invented for flavour. */
 /* ------------------------------------------------------------------ */
 
-const QUIET_HAZARDS = new Set(["none", "normal_temp"]);
-
-function Brief({ scenario }) {
+/* `onMap` opens the galaxy map, and is null when you may not choose:
+   in a party the host sets the scenario, so a squadmate's brief says so
+   instead. */
+function Brief({ scenario, onMap, hostPicks }) {
   const mission = scenario.mission ? missionByName.get(scenario.mission) : null;
   const lines = mission ? mission.traits.map((t) => missionTraits[t]).filter(Boolean) : [];
-  const hazards = (scenario.hazards || []).filter((h) => !QUIET_HAZARDS.has(h));
+  const hazards = loudHazards(scenario.hazards);
   const place = scenario.planet || (scenario.biome ? biomeName(scenario.biome) : null);
 
   if (!mission && !place) {
     return (
-      <div className="rounded-lg border border-dashed border-base-700 px-4 py-3 text-xs text-base-500">
-        No mission and no planet yet. Adjust the scenario above and this says what the mission asks for and what the
-        planet does to you.
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-dashed border-base-700 px-4 py-3 text-xs text-base-500">
+        <span className="flex-1">
+          {hostPicks
+            ? "No mission and no planet yet. The host sets those, and this says what they will ask of you once they do."
+            : "No mission and no planet yet. Choose them and this says what the mission asks for and what the planet does to you."}
+        </span>
+        {onMap ? <SlotButton onClick={onMap} Icon={MapPin}>Choose the planet on the map</SlotButton> : null}
       </div>
     );
   }
@@ -108,6 +116,12 @@ function Brief({ scenario }) {
       <div>
         <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>
           <MapPin className="h-3.5 w-3.5" /> {place || "Any planet"}
+          {onMap ? (
+            <button onClick={onMap}
+              className="ml-auto text-[10px] font-normal normal-case tracking-normal text-base-500 underline hover:text-base-200">
+              {scenario.planet ? "change on the map" : "choose on the map"}
+            </button>
+          ) : null}
         </p>
         {hazards.length ? (
           <div className="flex flex-col gap-1.5">
@@ -673,9 +687,14 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted, inParty }
 
 /* ------------------------------------------------------------------ */
 
-export default function DropScreen({ state, navigate, scenario, setFaction, drop, update, party, sync }) {
+export default function DropScreen({ state, navigate, scenario, setFaction, setPlanet, drop, update, party, sync }) {
   /* Which slot the picker is open for: "mine", a squadmate index, or null. */
   const [picking, setPicking] = useState(null);
+
+  /* The galaxy map. Null means decide for me: open while nothing says
+     where you are dropping, which is what makes Drop Bay open onto the
+     map. Choosing a planet folds it away; the brief can open it again. */
+  const [mapOpen, setMapOpen] = useState(null);
 
   /* Every build that exists, yours and the presets, with heat derived the
      same way the grid derives it. Resolved against all of it rather than
@@ -735,10 +754,36 @@ export default function DropScreen({ state, navigate, scenario, setFaction, drop
 
   const mineState = mine ? (confirmed ? "confirmed" : "deciding") : null;
 
+  /* In a party the host sets the scenario, so only the host gets the map. */
+  const canChoose = !inParty || party.isHost;
+  const nowhere = !scenario.planet && !scenario.biome && !(scenario.hazards || []).length;
+  const showMap = canChoose && (mapOpen === null ? nowhere : mapOpen);
+
   return (
     <div className="flex flex-col gap-4">
       <PartyPanel party={party} sync={sync} />
-      <Brief scenario={scenario} />
+      {showMap ? (
+        <div className="rounded-lg border border-base-800 bg-base-900/60 p-3 sm:p-4">
+          <div className="mb-3 flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-bold text-base-200" style={OSWALD}>Where are you dropping</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-base-500">
+                Click the planet where you clicked it in the game. Its biome and hazards come with it.
+              </p>
+            </div>
+            <button onClick={() => setMapOpen(false)} title="Put the map away" aria-label="Put the map away"
+              className="shrink-0 rounded border border-base-800 p-1.5 text-base-400 hover:border-base-600 hover:text-base-100">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <PlanetChooser chosen={scenario.planet} autoFocus={false}
+            onChoose={(name) => { setPlanet(name); setMapOpen(false); }} />
+        </div>
+      ) : null}
+      {showMap && nowhere && !scenario.mission ? null : (
+        <Brief scenario={scenario} onMap={canChoose && !showMap ? () => setMapOpen(true) : null}
+          hostPicks={inParty && !party.isHost} />
+      )}
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {mine ? (

@@ -353,7 +353,7 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 | `ownership.json` | What you own. Ships empty |
 | `ownership.template.json` | Every warbond listed as not owned, ready to fill in |
 | `wiki-stats.json` | **Generated.** The stats the tables never had, for 195 items. Never edit by hand |
-| `planets.json` | **Generated.** 269 planets, their biome and their hazards. Nothing reads it yet |
+| `planets.json` | **Generated.** 281 planets: biome, hazards, sector, and for 274 of them a place on the galaxy map and the supply lines to their neighbours. Read by the scenario and the map |
 | `enemies.json` | **Generated.** 80 enemies, 594 body parts, each with an armor value, plus the difficulty each enemy starts appearing at. What every penetration figure is measured against. Never edit by hand |
 | `context-rules.json` | The 34 rules that move one item rating. Read by `score.js`, checked by `npm run rules` |
 | `build-rules.json` | The 9 rules that move a whole build. Read by `build.js`, checked by `npm run builds` |
@@ -806,6 +806,39 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 
 ---
 
+# **The Galaxy Map**
+
+> [!success] Built, 1.25.0, 29 September 2026. **Not deployed yet**, it ships with the live party
+> Click the planet where you clicked it in the game and its biome and hazards fill themselves in. The curator's framing from 20 August 2026, and the reason it is a map rather than a longer list: finding a place again in the same shape is instant, and finding it among 281 names is not. `src/GalaxyMap.jsx` draws it, `src/lib/galaxy.js` holds everything that is not a picture.
+
+| Where it appears | |
+|---|---|
+| **The scenario screen** | "Dropping on" opens the map where the list used to be. `PlanetChooser` in `Tiers.jsx` is the map plus its search, and both screens use it |
+| **Drop Bay** | **Opens onto the map while nothing says where you are dropping**, and folds it away once a planet is chosen. The brief's "change on the map" brings it back. In a party only the host gets it, because the host sets the scenario |
+
+> [!danger] The layout is patch data and the map needs no network
+> Positions and supply lines ship in `planets.json`, fetched once by `npm run wiki` from `api.helldivers2.dev`. A planet does not move. **The map draws, pans and fills the scenario with nothing fetched at run time.** Who holds what is live and arrives separately, if it arrives: it decorates the map and never carries it. **Never ship ownership**; a stale territory map is worse than an uncoloured one. `dds-roadmap.md`, "The live starmap".
+
+> [!danger] The data's y points up, and the flip lives in exactly one place
+> `project()` in `galaxy.js`. Cyberstan, the Automaton home world, sits up and to the left in game and does here; `npm run map` checks it, and a map drawn without the flip fails that check and nothing else.
+
+> [!info] The game's layout, not its styling
+> A chart to be read: grey dots, plain supply lines, sector names in small caps, the chosen planet ringed in the brand colour. No scanlines, no glow, no holo table. The ambient layer already carries each theme's atmosphere, behind the content where a texture belongs.
+
+> [!info] How it behaves
+> - **Marks keep their size on screen at every zoom.** Zooming in spreads the planets apart rather than inflating them, and **a planet's name appears once there is room for it**, measured against its own nearest neighbour, so the sparse rim labels itself early and the crowded core waits. Sector names show while you are zoomed out and step aside once planet names take over.
+> - **Drag to pan, the wheel or a pinch to zoom, a click to choose.** A press that moves more than five pixels is a drag and never a choice. The planet is read off the press, because the map captures the pointer.
+> - **The wheel lets go at either limit**, so scrolling past the map scrolls the page. **Fully zoomed out, a finger sliding up the map scrolls the page too**, since there is nothing to pan; zoomed in, the map takes every gesture.
+> - **Hover shows what a planet is before you commit**: sector, biome, and its hazards. Touch screens have no hover, and a tap chooses.
+> - **Search lights the matches up** and dims the rest, names them when there are few enough, and lists the first eight underneath. The list is the way in for a keyboard, and for **the nine planets with no place on the map**: seven Void entries with no position, and two placeholders in a sector called TBD parked exactly on Super Earth. Choosing from the list flies the map there; clicking the map does not move it, because you are already looking at the place.
+
+> [!bug] An ordinary planet counted normal temperature as a hazard
+> Fixed alongside the map. The hazard table calls it `normal_temp`, and the scenario screen's filter looked for `normal_temperature`, so it never matched: every ordinary planet read "2 hazards", and Normal Temperature was offered as a hazard toggle. `QUIET_HAZARDS` and `loudHazards` in `scenario.js` are the one definition now; the drop screen's brief had its own copy, which was right, and uses the shared one.
+
+**`npm run map`** checks the arithmetic against the shipped table: the right way up, every planet inside the disc, each supply line drawn once and none missing, search, and that zooming holds the point under the cursor still. Four of its rules were broken on purpose on 29 September 2026 and each broke exactly its own check.
+
+---
+
 # **The Tag Layer**
 
 Two tags on items, read by the scoring rules. They exist because six rules used to spell out the same
@@ -1171,6 +1204,12 @@ npm run drop
 ```
 
 The drop screen's rules against the real builds. See The Drop Screen.
+
+```bash
+npm run map
+```
+
+The galaxy map's arithmetic against the shipped planet table. See The Galaxy Map.
 
 ```bash
 npm run test:worker

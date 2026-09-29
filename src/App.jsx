@@ -602,7 +602,7 @@ export default function App() {
       case "bay":
         return bayTab === "builds"
           ? <DropBay state={state} navigate={navigate} faction={scenario.faction} setFaction={setFaction} scenario={scenario} />
-          : <DropScreen state={state} navigate={navigate} scenario={scenario} setFaction={setFaction}
+          : <DropScreen state={state} navigate={navigate} scenario={scenario} setFaction={setFaction} setPlanet={setPlanet}
               drop={drop} update={updateDrop} party={party} sync={partySync} />;
       case "builder":
         /* Browsing happens in Drop Bay. The builder edits one build, so  */

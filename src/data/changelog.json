@@ -2,13 +2,16 @@
   {
     "version": "1.25.0",
     "date": "2026-09-29",
-    "title": "Squad up with a code",
+    "title": "Squad up, and the galaxy map",
     "changes": [
       "Drop Bay can now hold a live party. Open one and read out its six character code, and whoever types it in joins you, up to four. Nobody needs an account.",
       "Everybody's confirmed loadout lands in their slot on everybody's screen as they commit. Until somebody confirms, their slot says they are still deciding and nothing else, and the squad warnings wait for them.",
       "The host picks where you are dropping, the way the host picks the mission in game, and everybody else's scenario follows. If you change yours anyway, the party panel tells you it no longer matches and puts it back in one click.",
       "Reload the page or lose your connection and you come back to the same seat. A host who leaves hands the party to whoever has been in longest, the host can remove somebody, and a party nobody has touched for twelve hours is deleted.",
-      "Support now says exactly what a party sends: your name, your confirmed loadout and the host's scenario, to the others in it and nobody else. Everything else still stays in your browser."
+      "Support now says exactly what a party sends: your name, your confirmed loadout and the host's scenario, to the others in it and nobody else. Everything else still stays in your browser.",
+      "Pick where you are dropping on the galaxy map, laid out the way the game draws it. Click the planet where you clicked it in the game and its biome and hazards fill themselves in. Hover one first to see what it does to you.",
+      "Drop Bay opens onto the map while you have not said where you are going, and folds it away once you have. Drag to move, scroll or pinch to zoom, and names appear as you zoom in. Searching by planet or sector lights the matches up.",
+      "An ordinary planet no longer counts normal temperature as one of its hazards."
     ]
   },
   {
