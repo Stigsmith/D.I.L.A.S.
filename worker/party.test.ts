@@ -181,6 +181,30 @@ describe('joining', () => {
     expect((await connect('not-a-code')).response.status).toBe(404)
   })
 
+  it('answers a plain request about a missing party with 404, so a browser can stop retrying', async () => {
+    const response = await SELF.fetch(`${ORIGIN}/api/party/ZZZZZZ`, { headers: { origin: ORIGIN } })
+    expect(response.status).toBe(404)
+  })
+
+  /**
+   * A browser sends no Origin on a plain same-site GET, which is exactly the
+   * request the drop screen makes to find out why a socket failed. Demanding
+   * one there made it retry a dead code forever, found in the browser on 29
+   * September 2026 and reproduced here before the fix.
+   */
+  it('answers that same question when the browser sends no origin, as a same-site GET does', async () => {
+    const response = await SELF.fetch(`${ORIGIN}/api/party/ZZZZZZ`)
+    expect(response.status).toBe(404)
+  })
+
+  it('still refuses that question from another site, and a socket with no origin', async () => {
+    const foreign = await SELF.fetch(`${ORIGIN}/api/party/ZZZZZZ`, { headers: { origin: 'https://elsewhere.example' } })
+    expect(foreign.status).toBe(403)
+    const { code } = await hostParty()
+    const bare = await SELF.fetch(`${ORIGIN}/api/party/${code}`, { headers: { upgrade: 'websocket' } })
+    expect(bare.status).toBe(403)
+  })
+
   it('refuses a plain request to a party address', async () => {
     const { code } = await hostParty()
     const response = await SELF.fetch(`${ORIGIN}/api/party/${code}`, { headers: { origin: ORIGIN } })

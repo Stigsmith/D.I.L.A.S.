@@ -11,12 +11,13 @@
 /*  - An unconfirmed slot reads as still deciding and nothing else.   */
 /*    The squad checks count confirmed loadouts only, so a half       */
 /*    picked kit never sets off a false alarm.                        */
-/*  - People join by a party code, not an account. That is the next   */
-/*    step; until it lands the squadmate slots are filled by hand.    */
+/*  - People join by a party code, not an account. Outside a party    */
+/*    the squadmate slots are filled by hand; inside one, by the      */
+/*    party, from what each person confirmed.                         */
 /* ================================================================== */
 
 import vocabulary from "../data/vocabulary.json";
-import { deriveHeat, loadoutItemIds } from "./loadouts.js";
+import { deriveHeat, loadoutItemIds, cleanLoadout } from "./loadouts.js";
 import { traitsOf } from "./scenario.js";
 
 /* In game the cap is four, and so is the screen. */
@@ -183,4 +184,44 @@ export function readDrop(drop, resolve) {
     ...mates.filter(Boolean),
   ];
   return { mine, mates, confirmed: isConfirmed(drop, mine), counted };
+}
+
+/* ------------------------------------------------------------------ */
+/* On the wire                                                         */
+/*                                                                     */
+/* What goes to the party when you confirm, and what a squadmate's      */
+/* build is turned back into when it arrives. The server has no opinion */
+/* about what a build is, so this is the only check it ever gets:       */
+/* every slot is resolved against this browser's own item table, and    */
+/* anything that is not the right kind of item is dropped, exactly as   */
+/* a build read back from storage would be.                             */
+/*                                                                     */
+/* Only the fields a slot draws. The blurb and the notes stay home:     */
+/* nobody in the squad needs them to read the drop, and a free text     */
+/* field is the one thing on a shared screen worth not sending.         */
+/* ------------------------------------------------------------------ */
+
+const WIRE_FIELDS = ["id", "name", "faction", "preset", "primary", "secondary", "grenade", "armor", "booster", "strats", "diff", "biomes", "updatedAt"];
+
+export function packBuild(l) {
+  if (!l) return null;
+  const out = {};
+  for (const k of WIRE_FIELDS) if (l[k] !== undefined) out[k] = l[k];
+  return out;
+}
+
+/* A squadmate's build, made safe to draw, or null when nothing usable
+   arrived. The name is capped because it is the one string drawn large. */
+export function unpackBuild(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const clean = cleanLoadout({ ...raw, id: typeof raw.id === "string" ? raw.id : "shared" });
+  if (!clean) return null;
+  const name = typeof raw.name === "string" && raw.name.trim() ? raw.name.trim().slice(0, 60) : "Unnamed build";
+  return {
+    ...clean,
+    name,
+    preset: raw.preset === true,
+    diff: Array.isArray(raw.diff) ? raw.diff.filter((d) => typeof d === "string") : [],
+    biomes: Array.isArray(raw.biomes) ? raw.biomes.filter((b) => typeof b === "string") : [],
+  };
 }

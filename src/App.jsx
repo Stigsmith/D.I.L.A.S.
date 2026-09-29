@@ -18,7 +18,8 @@ import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser, Sc
 import { SKULL, themeArt } from "./lib/assets.js";
 import Builder from "./Builder.jsx";
 import DropBay from "./DropBay.jsx";
-import DropScreen from "./DropScreen.jsx";
+import DropScreen, { useDrop } from "./DropScreen.jsx";
+import { useParty, usePartySync } from "./lib/party.js";
 import Collection, { COLLECTION_TABS } from "./Collection.jsx";
 import Ambient, { Grain, Masthead } from "./Ambient.jsx";
 import { About, Support, Changelog, Roadmap, Footer } from "./Pages.jsx";
@@ -466,7 +467,13 @@ export default function App() {
   const { theme, setTheme } = useTheme();
   const { destination, param, navigate } = useRoute("tiers/primary");
   /* Where you are dropping. Faction today, the rest of the scenario next. */
-  const { scenario, setFaction, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment } = useScenario();
+  const { scenario, setFaction, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment, replaceScenario } = useScenario();
+  /* The drop and the party live here rather than on the drop screen: what
+     you confirmed has to reach the party, and the host's scenario has to
+     reach you, while you are in the builder or on the tier list too. */
+  const [drop, updateDrop] = useDrop();
+  const party = useParty();
+  const partySync = usePartySync({ party, drop, loadouts: state.loadouts, scenario, replaceScenario, setSquad });
   /* Owned here so a trip to Drop Bay does not reset them. */
   const { filters, patchFilters } = useTierFilters(BLANK_FILTERS, CATEGORIES.map((c) => c.id));
   const { sortBy, setSortBy } = useTierSort();
@@ -595,7 +602,8 @@ export default function App() {
       case "bay":
         return bayTab === "builds"
           ? <DropBay state={state} navigate={navigate} faction={scenario.faction} setFaction={setFaction} scenario={scenario} />
-          : <DropScreen state={state} navigate={navigate} scenario={scenario} setFaction={setFaction} />;
+          : <DropScreen state={state} navigate={navigate} scenario={scenario} setFaction={setFaction}
+              drop={drop} update={updateDrop} party={party} sync={partySync} />;
       case "builder":
         /* Browsing happens in Drop Bay. The builder edits one build, so  */
         /* landing on it with nothing chosen starts a fresh one.          */

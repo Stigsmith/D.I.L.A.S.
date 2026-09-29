@@ -93,6 +93,11 @@ export const SETTINGS = {
      copies, so an edited build is re-read. What you are dropping with
      tonight, not what you own, so it stays out of the export. */
   drop: "hd2-drop",
+  /* The party you are in: its code, the token that makes you you in it,
+     and the name you go by. The token is the one secret the tool keeps in
+     storage, and it only ever says which seat in one short-lived party is
+     yours. Out of the export: it belongs to this browser. */
+  party: "hd2-party",
 };
 
 /* Both scenario keys were spelled hd2-brief-* until 21 August 2026. A    */

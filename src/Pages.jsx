@@ -210,9 +210,13 @@ export function Support() {
 
       <Panel title="Your data stays yours">
         <p>
-          Locks, favorites, profiles and your own builds live in this browser and nowhere else. Nothing you do here
-          is sent anywhere, and there are no accounts yet. Clearing your browser data clears them, which is what Export
-          in Settings is for.
+          Locks, favorites, profiles and your own builds live in this browser and nowhere else, and there are no
+          accounts yet. Clearing your browser data clears them, which is what Export in Settings is for.
+        </p>
+        <p className="mt-2">
+          The one thing that leaves is a party, and only while you are in one. The name you give, the loadout you
+          confirm and the host's scenario pass through the tool's server to the others in that party, and the party is
+          deleted twelve hours after it goes quiet. Nothing else about you goes with it.
         </p>
       </Panel>
     </div>

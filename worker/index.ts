@@ -112,8 +112,19 @@ const tooMany = (retryAfter: number) =>
  * Same origin or nothing. better-auth checks this on its own routes; the party
  * routes are ours, so they check it here. A page on another site cannot open
  * parties in a visitor's name or hold sockets on this API.
+ *
+ * **A plain same-site GET carries no Origin header at all**, so demanding one
+ * there refuses this tool's own pages. Found on 29 September 2026: the drop
+ * screen's "does this party exist" question got a 403, read it as a dropped
+ * line, and retried a dead code forever. So a missing Origin is accepted on a
+ * plain GET, where a foreign page could not read the answer anyway, and
+ * required everywhere a browser always sends one: a POST and a WebSocket.
  */
 const sameOrigin = (request: Request, url: URL) => request.headers.get('origin') === url.origin
+const noForeignOrigin = (request: Request, url: URL) => {
+  const origin = request.headers.get('origin')
+  return origin === null || origin === url.origin
+}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -198,12 +209,20 @@ async function route(request: Request, env: Env): Promise<Response> {
     return json({ error: 'Could not find a free code. Try again in a moment.' }, 503)
   }
 
+  /**
+   * One party. A WebSocket upgrade joins it; a plain GET only asks whether it
+   * exists, answering 404 or 426, because a browser whose socket failed to
+   * open is told nothing about why and would otherwise retry a dead code
+   * forever. Both go through the same limit, so asking is no cheaper than
+   * guessing. The Durable Object decides which answer.
+   */
   const joining = url.pathname.match(/^\/api\/party\/([^/]+)$/)
   if (joining) {
-    if (request.headers.get('upgrade')?.toLowerCase() !== 'websocket') {
-      return json({ error: 'This address only speaks WebSocket.' }, 426)
+    if (request.method !== 'GET') return json({ error: 'Join a party with a GET.' }, 405)
+    const upgrading = request.headers.get('upgrade')?.toLowerCase() === 'websocket'
+    if (upgrading ? !sameOrigin(request, url) : !noForeignOrigin(request, url)) {
+      return json({ error: 'wrong origin' }, 403)
     }
-    if (!sameOrigin(request, url)) return json({ error: 'wrong origin' }, 403)
     const code = normaliseCode(decodeURIComponent(joining[1] ?? ''))
     if (!code) return json({ error: 'That is not a party code.' }, 404)
     const over = await take(db, addressKey('join', request), RULES.join)

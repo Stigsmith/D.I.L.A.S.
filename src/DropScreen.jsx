@@ -26,7 +26,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Users, Check, ChevronLeft, X, Search, Plus, Lock, Star, Snowflake, FilterX, AlertTriangle, Info,
-  Pencil, Rocket, UserPlus, RotateCcw, Flag, MapPin,
+  Pencil, Rocket, UserPlus, RotateCcw, Flag, MapPin, Copy, LogOut, Crown, Radio, Loader2,
 } from "lucide-react";
 
 import { FACTIONS, FACTION_THEME, TierBadge, StratChip, FactionChooser, difficultyAt } from "./Tiers.jsx";
@@ -37,15 +37,18 @@ import { squadWarnings, isQuietBand, coverageIsQuiet } from "./lib/squad.js";
 import { missionByName, missionTraits, hazardName, hazardEffect, biomeName } from "./lib/scenario.js";
 import { SETTINGS, readDoc, writeDoc } from "./lib/storage.js";
 import {
-  EMPTY_DROP, cleanDrop, readDrop, stampOf, dropPool, dropContext, withHeat, gateOf,
+  EMPTY_DROP, cleanDrop, readDrop, stampOf, dropPool, dropContext, withHeat, gateOf, unpackBuild,
 } from "./lib/drop.js";
+import { SQUAD_CAP } from "./lib/party.js";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 const MONO = { fontFamily: "'JetBrains Mono', monospace" };
 
 /* Read after mount rather than in the initialiser, the same shape the
-   scenario uses, so nothing touches localStorage during render. */
-function useDrop() {
+   scenario uses, so nothing touches localStorage during render. Owned by
+   the shell rather than this screen since the party arrived: what you
+   confirmed has to reach the party even while you are in the builder. */
+export function useDrop() {
   const [drop, setDrop] = useState(EMPTY_DROP);
   useEffect(() => { setDrop(cleanDrop(readDoc(SETTINGS.drop))); }, []);
   const update = useCallback((change) => {
@@ -128,6 +131,10 @@ function Brief({ scenario }) {
 /* A slot                                                              */
 /* ------------------------------------------------------------------ */
 
+/* A squadmate's slot never shows your locks: your collection says nothing
+   about what they own. One empty set, rather than a new one per render. */
+const NO_LOCKS = new Set();
+
 const GEAR_ROWS = [["Primary", "primary"], ["Secondary", "secondary"], ["Grenade", "grenade"], ["Armor", "armor"], ["Booster", "booster"]];
 
 function Status({ state }) {
@@ -174,7 +181,7 @@ function EmptySlot({ mine, label, onChoose }) {
         <p className="mx-auto mt-1 max-w-[16rem] text-xs leading-relaxed text-base-500">
           {mine
             ? "Choose what you are dropping with, then confirm it."
-            : "Live parties are next. Until then, pick the build they told you they are bringing."}
+            : "Pick the build they told you they are bringing, or open a party above and they fill this in themselves."}
         </p>
       </div>
       <SlotButton onClick={onChoose} Icon={mine ? Rocket : Plus} primary={mine}>
@@ -195,7 +202,7 @@ const GATE_NOTE = {
   biome: { tone: "grey", text: "Built for different terrain than this planet." },
 };
 
-function FilledSlot({ label, build, state, scenario, lockedSet, actions }) {
+function FilledSlot({ label, build, state, scenario, lockedSet, actions, source }) {
   const theme = FACTION_THEME[build.faction] || FACTION_THEME.all;
   const reading = useMemo(() => readBuild(build, scenario), [build, scenario]);
   const gate = build.faction === scenario.faction ? gateOf(build, scenario) : null;
@@ -209,7 +216,7 @@ function FilledSlot({ label, build, state, scenario, lockedSet, actions }) {
           <div className="min-w-0">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-base-500">{label}</p>
             <h3 className={`text-base font-bold leading-tight ${theme.text}`} style={OSWALD}>{build.name}</h3>
-            <p className="text-[10px] text-base-600">{build.preset ? "Curated preset" : "Yours"}</p>
+            <p className="text-[10px] text-base-600">{build.preset ? "Curated preset" : source || "Yours"}</p>
           </div>
           <Status state={state} />
         </div>
@@ -257,6 +264,175 @@ function FilledSlot({ label, build, state, scenario, lockedSet, actions }) {
 
         <div className="mt-auto flex flex-wrap gap-1.5 border-t border-base-800 pt-2.5">{actions}</div>
       </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Party slots                                                         */
+/* ------------------------------------------------------------------ */
+
+function MemberLabel({ member, isHost }) {
+  return (
+    <span className="flex items-center gap-1.5">
+      <span className={"h-1.5 w-1.5 shrink-0 rounded-full " + (member.online ? "bg-emerald-400" : "bg-base-600")}
+        title={member.online ? "Connected" : "Not connected right now"} />
+      <span className="truncate">{member.name}</span>
+      {isHost ? <Crown className="h-3 w-3 shrink-0 text-brand" aria-label="Host" /> : null}
+      {member.online ? null : <span className="normal-case tracking-normal text-base-600">offline</span>}
+    </span>
+  );
+}
+
+/* Somebody in the party who has not confirmed. "Still deciding" and
+   nothing else: the curator's call, and the server never even holds what
+   they are looking at, so there is nothing else to show. */
+function DecidingSlot({ member, isHost, action }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-base-600 px-4 py-5 text-center sm:min-h-[18rem] sm:py-6">
+      <Loader2 className="h-6 w-6 animate-spin text-base-600 motion-reduce:animate-none" />
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-base-400" style={OSWALD}>
+        <MemberLabel member={member} isHost={isHost} />
+      </div>
+      <Status state="deciding" />
+      {action}
+    </div>
+  );
+}
+
+/* An empty seat in a party. The code is right there, because the next
+   thing anybody does with an empty seat is read the code out. */
+function WaitingSlot({ code }) {
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-base-800 px-4 py-5 text-center sm:min-h-[18rem] sm:py-6">
+      <UserPlus className="h-6 w-6 text-base-700" />
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-base-600" style={OSWALD}>Open seat</p>
+      <p className="max-w-[14rem] text-xs leading-relaxed text-base-600">
+        Waiting for a squadmate. The code is <span className="text-base-300" style={MONO}>{code}</span>.
+      </p>
+    </div>
+  );
+}
+
+/* Removing somebody takes two presses. One would be a misclick away from
+   throwing a friend out of the room mid planning. */
+function RemoveButton({ name, onRemove }) {
+  const [sure, setSure] = useState(false);
+  return sure ? (
+    <span className="flex flex-wrap gap-1.5">
+      <SlotButton danger onClick={onRemove} Icon={X}>Remove {name}</SlotButton>
+      <SlotButton onClick={() => setSure(false)}>Keep</SlotButton>
+    </span>
+  ) : (
+    <SlotButton danger onClick={() => setSure(true)} Icon={X}>Remove from party</SlotButton>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* The party panel                                                     */
+/*                                                                     */
+/* Squad up with a code. No account, by the curator's call: open a     */
+/* party, read the six characters out, and whoever types them in is   */
+/* in. The host sets the scenario and everybody else follows it.       */
+/* ------------------------------------------------------------------ */
+
+const STATUS_LINE = {
+  opening: "Opening a party",
+  connecting: "Joining",
+  reconnecting: "Connection lost. Reconnecting",
+};
+
+function PartyPanel({ party, sync }) {
+  const [typed, setTyped] = useState("");
+  const [copied, setCopied] = useState(false);
+  const inParty = Boolean(party.code);
+  const busy = party.status === "opening" || party.status === "connecting";
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(party.code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* No clipboard here. The code is on screen to read out anyway. */
+    }
+  };
+
+  if (!inParty) {
+    return (
+      <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="min-w-[14rem] flex-1">
+            <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-base-400" style={OSWALD}>
+              <Radio className="h-3.5 w-3.5" /> Squad up
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-base-500">
+              Open a party and read its code out, or type the code a friend gave you. Everybody's confirmed loadout lands
+              in their slot here. No account needed.
+            </p>
+          </div>
+          <label className="flex flex-col gap-1">
+            <span className="text-[10px] uppercase tracking-wider text-base-500">Your name</span>
+            <input value={party.name} onChange={(e) => party.setName(e.target.value)} placeholder="Helldiver" maxLength={24}
+              className="w-36 rounded border border-base-700 bg-base-900 px-2 py-1.5 text-xs text-base-100 placeholder-base-600 outline-none focus:border-base-500" />
+          </label>
+          <SlotButton primary onClick={party.open} Icon={busy ? Loader2 : Radio}>
+            {party.status === "opening" ? "Opening" : "Open a party"}
+          </SlotButton>
+          <form className="flex items-center gap-1.5" onSubmit={(e) => { e.preventDefault(); party.join(typed); }}>
+            <input value={typed} onChange={(e) => setTyped(e.target.value)} placeholder="CODE" maxLength={9} aria-label="Party code"
+              autoCapitalize="characters" spellCheck={false}
+              className="w-24 rounded border border-base-700 bg-base-900 px-2 py-1.5 text-xs uppercase tracking-widest text-base-100 placeholder-base-600 outline-none focus:border-base-500"
+              style={MONO} />
+            <button type="submit"
+              className="rounded border border-base-700 px-2.5 py-1.5 text-xs text-base-300 hover:border-base-500 hover:text-base-100">
+              Join
+            </button>
+          </form>
+        </div>
+        {party.problem ? (
+          <p className="mt-3 flex items-start gap-1.5 text-[11px] text-accent-400">
+            <AlertTriangle className="mt-px h-3.5 w-3.5 shrink-0" /><span className="flex-1">{party.problem}</span>
+            <button onClick={party.dismiss} aria-label="Dismiss" className="text-base-500 hover:text-base-200"><X className="h-3.5 w-3.5" /></button>
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
+  const count = party.state ? party.state.members.length : 0;
+  const line = party.status === "live"
+    ? `${count} of ${SQUAD_CAP}. ` + (party.isHost
+      ? "You are the host, so the scenario is yours to set."
+      : party.host ? `Following ${party.host.name}'s scenario.` : "")
+    : `${STATUS_LINE[party.status] || "Connecting"}...`;
+
+  return (
+    <div className="rounded-lg border border-base-700 bg-base-900/80 p-4">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-base-400" style={OSWALD}>
+          <Radio className={"h-3.5 w-3.5 " + (party.status === "live" ? "text-emerald-400" : "text-accent-400")} /> Party
+        </span>
+        <span className="text-2xl font-bold tracking-[0.25em] text-base-100" style={MONO}>{party.code}</span>
+        <SlotButton onClick={copy} Icon={copied ? Check : Copy}>{copied ? "Copied" : "Copy code"}</SlotButton>
+        <span className="text-xs text-base-500">{line}</span>
+        <span className="ml-auto">
+          <SlotButton danger onClick={party.leave} Icon={LogOut}>Leave</SlotButton>
+        </span>
+      </div>
+      {sync.drifted ? (
+        <p className="mt-3 flex flex-wrap items-center gap-2 text-[11px] text-accent-400">
+          <Info className="h-3.5 w-3.5 shrink-0" />
+          Your scenario differs from the host's, so what you see here may not match their screen.
+          <button onClick={sync.follow} className="underline hover:text-accent-300">Follow the party</button>
+        </p>
+      ) : null}
+      {party.notice ? (
+        <p className="mt-2 flex items-start gap-1.5 text-[11px] text-base-400">
+          <Info className="mt-px h-3.5 w-3.5 shrink-0" /><span className="flex-1">{party.notice}</span>
+          <button onClick={party.dismiss} aria-label="Dismiss" className="text-base-500 hover:text-base-200"><X className="h-3.5 w-3.5" /></button>
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -432,7 +608,7 @@ const SEVERITY = {
   grey: { Icon: Info, box: "border-base-700 bg-base-900", text: "text-base-400" },
 };
 
-function SquadReadout({ counted, context, waitingOnYou, mineUncounted }) {
+function SquadReadout({ counted, context, waitingOnYou, mineUncounted, inParty }) {
   const size = counted.length;
   const warnings = useMemo(() => squadWarnings(counted, context), [counted, context]);
 
@@ -443,8 +619,12 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted }) {
         {waitingOnYou
           ? "Confirm your loadout and this starts reading the squad. It only counts what somebody has committed to, so a half picked kit never sets off a false alarm."
           : size === 1
-            ? "One loadout is a loadout, not a squad. Add a squadmate's build and this starts checking what the two of you are missing."
-            : "Nobody has confirmed anything yet. Choose yours, confirm it, and add your squad."}
+            ? inParty
+              ? "One loadout is a loadout, not a squad. This starts reading the squad once somebody else confirms."
+              : "One loadout is a loadout, not a squad. Add a squadmate's build and this starts checking what the two of you are missing."
+            : inParty
+              ? "Nobody has confirmed anything yet. It fills in as each of you confirms."
+              : "Nobody has confirmed anything yet. Choose yours, confirm it, and add your squad."}
       </p>
     );
   } else if (coverageIsQuiet(context.level, size) ?? isQuietBand(context.difficulty)) {
@@ -483,8 +663,9 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted }) {
         </div>
       ) : null}
       <p className="mt-3 text-[10px] leading-relaxed text-base-600">
-        Advisory only. Counts confirmed loadouts and the ones you filled in by hand. Role tags are our own call, not a
-        community vote.
+        {inParty
+          ? "Advisory only. Counts confirmed loadouts only, the same on every screen in the party. Role tags are our own call, not a community vote."
+          : "Advisory only. Counts confirmed loadouts and the ones you filled in by hand. Role tags are our own call, not a community vote."}
       </p>
     </div>
   );
@@ -492,8 +673,7 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted }) {
 
 /* ------------------------------------------------------------------ */
 
-export default function DropScreen({ state, navigate, scenario, setFaction }) {
-  const [drop, update] = useDrop();
+export default function DropScreen({ state, navigate, scenario, setFaction, drop, update, party, sync }) {
   /* Which slot the picker is open for: "mine", a squadmate index, or null. */
   const [picking, setPicking] = useState(null);
 
@@ -509,11 +689,28 @@ export default function DropScreen({ state, navigate, scenario, setFaction }) {
     [state.loadouts]
   );
   const byId = useMemo(() => new Map(everything.map((l) => [l.id, l])), [everything]);
-  const { mine, mates, confirmed, counted } = useMemo(
+  const { mine, mates, confirmed, counted: handCounted } = useMemo(
     () => readDrop(drop, (id) => byId.get(id)),
     [drop, byId]
   );
   const context = useMemo(() => dropContext(scenario), [scenario]);
+
+  /* In a party the other three slots are the party's, in the order people
+     joined. What arrives is cleaned against this browser's own tables
+     before it is drawn or counted, because the server never checks it. */
+  const inParty = Boolean(party.code);
+  const others = useMemo(() => {
+    if (!party.state) return [];
+    return party.state.members
+      .filter((m) => m.id !== party.state.you)
+      .map((m) => {
+        const build = unpackBuild(m.build);
+        return { ...m, build: build ? withHeat([build])[0] : null };
+      });
+  }, [party.state]);
+  const counted = inParty
+    ? [...(confirmed ? [mine] : []), ...others.filter((m) => m.build).map((m) => m.build)]
+    : handCounted;
 
   const closePicker = useCallback(() => setPicking(null), []);
 
@@ -540,6 +737,7 @@ export default function DropScreen({ state, navigate, scenario, setFaction }) {
 
   return (
     <div className="flex flex-col gap-4">
+      <PartyPanel party={party} sync={sync} />
       <Brief scenario={scenario} />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -558,9 +756,25 @@ export default function DropScreen({ state, navigate, scenario, setFaction }) {
           <EmptySlot mine label="You" onChoose={() => setPicking("mine")} />
         )}
 
-        {mates.map((b, i) =>
+        {inParty ? (
+          <>
+            {others.map((m) =>
+              m.build ? (
+                <FilledSlot key={m.id} label={<MemberLabel member={m} isHost={Boolean(party.state) && m.id === party.state.host} />}
+                  build={m.build} state="confirmed" scenario={scenario} lockedSet={NO_LOCKS} source="Their build"
+                  actions={party.isHost ? <RemoveButton name={m.name} onRemove={() => party.kick(m.id)} /> : null} />
+              ) : (
+                <DecidingSlot key={m.id} member={m} isHost={Boolean(party.state) && m.id === party.state.host}
+                  action={party.isHost ? <RemoveButton name={m.name} onRemove={() => party.kick(m.id)} /> : null} />
+              )
+            )}
+            {Array.from({ length: Math.max(0, SQUAD_CAP - 1 - others.length) }, (_, i) => (
+              <WaitingSlot key={`seat-${i}`} code={party.code} />
+            ))}
+          </>
+        ) : mates.map((b, i) =>
           b ? (
-            <FilledSlot key={i} label={`Squadmate ${i + 2}`} build={b} state="manual" scenario={scenario} lockedSet={new Set()}
+            <FilledSlot key={i} label={`Squadmate ${i + 2}`} build={b} state="manual" scenario={scenario} lockedSet={NO_LOCKS}
               actions={
                 <>
                   <SlotButton onClick={() => setPicking(i)}>Swap</SlotButton>
@@ -573,7 +787,7 @@ export default function DropScreen({ state, navigate, scenario, setFaction }) {
         )}
       </div>
 
-      {[mine, ...mates].some(offFront) ? (
+      {[mine, ...(inParty ? others.map((m) => m.build) : mates)].some(offFront) ? (
         <p className="flex items-start gap-1.5 text-[11px] text-base-500">
           <Info className="mt-px h-3.5 w-3.5 shrink-0" />
           A build here was made for another front. It still counts, because it is what that person is bringing, but its
@@ -581,7 +795,7 @@ export default function DropScreen({ state, navigate, scenario, setFaction }) {
         </p>
       ) : null}
 
-      <SquadReadout counted={counted} context={context}
+      <SquadReadout counted={counted} context={context} inParty={inParty}
         waitingOnYou={Boolean(mine) && !confirmed && counted.length < 2}
         mineUncounted={Boolean(mine) && !confirmed} />
 

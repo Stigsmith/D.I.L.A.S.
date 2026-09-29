@@ -80,6 +80,42 @@ export const traitsOf = (name) => {
   return m ? m.traits : [];
 };
 
+/* ------------------------------------------------------------------ */
+/* A scenario from somewhere else                                      */
+/*                                                                     */
+/* In a party the host's scenario arrives over the wire, and the       */
+/* server has no opinion about what one is. So it is cleaned against   */
+/* this browser's own tables, field by field, the same bounds the      */
+/* storage read below applies: a planet or mission that does not       */
+/* resolve is dropped rather than carried, and no front means nothing  */
+/* usable arrived.                                                     */
+/* ------------------------------------------------------------------ */
+
+const inRange = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
+
+export function cleanScenario(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  if (!isFaction(raw.faction)) return null;
+  return {
+    faction: raw.faction,
+    planet: typeof raw.planet === "string" && planetByName.has(raw.planet) ? raw.planet : null,
+    biome: typeof raw.biome === "string" && biomeInfo[raw.biome] ? raw.biome : null,
+    hazards: Array.isArray(raw.hazards)
+      ? [...new Set(raw.hazards.filter((h) => typeof h === "string" && hazardInfo[h]))]
+      : [],
+    mission: typeof raw.mission === "string" && missionByName.has(raw.mission) ? raw.mission : null,
+    difficulty: inRange(raw.difficulty, 0, 10) ? raw.difficulty : NO_DIFFICULTY,
+    squad: inRange(raw.squad, 0, 4) ? raw.squad : NO_SQUAD,
+  };
+}
+
+/* Two scenarios that say the same thing, compared without caring about
+   key order or hazard order. */
+export const sameScenario = (a, b) => {
+  const key = (x) => (x ? JSON.stringify({ ...x, hazards: [...(x.hazards || [])].sort() }) : "null");
+  return key(cleanScenario(a)) === key(cleanScenario(b));
+};
+
 export function useScenario() {
   const [scenario, setScenario] = useState(EMPTY_SCENARIO);
 
@@ -177,7 +213,16 @@ export function useScenario() {
     setScenario((b) => saveEnv({ ...b, planet: null, biome: null, hazards: [], mission: null }));
   }, []);
 
-  return { scenario, setFaction, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment };
+  /* The whole scenario at once, for following a party's host. Cleaned
+     first; anything that does not clean leaves the scenario alone. */
+  const replaceScenario = useCallback((raw) => {
+    const next = cleanScenario(raw);
+    if (!next) return;
+    writeSetting(SETTINGS.scenario, next.faction);
+    setScenario(() => saveEnv(next));
+  }, []);
+
+  return { scenario, setFaction, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment, replaceScenario };
 }
 
 /* ------------------------------------------------------------------ */
