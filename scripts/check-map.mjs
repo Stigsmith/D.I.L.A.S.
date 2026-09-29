@@ -142,3 +142,17 @@ ok(fit.has("Busy front") && !fit.has("Other front") && !fit.has("Quiet") && fit.
 const forced = galaxy.placeLabels([...clash, { name: "Chosen", x: 100, y: 100, offset: 5, priority: 0, must: true }], 1);
 ok(forced.has("Chosen") && !forced.has("Busy front"), "the chosen planet is always named, and takes the spot first");
 ok(galaxy.placeLabels(clash, 100).size === 4, "zoomed in far enough, every name fits");
+const rightFlank = galaxy.placed.filter((p) => galaxy.labelSide(p) === "left");
+ok(rightFlank.length > 0 && rightFlank.every((p) => p.x > CENTRE) &&
+   galaxy.placed.every((p) => galaxy.labelSide(p) === "left" || p.x - CENTRE < RADIUS * 0.46),
+  `names on the galaxy's right flank run inward (${rightFlank.length} planets), so none runs off the edge`);
+const sideBySide = galaxy.placeLabels([
+  { name: "Leftward", x: 100, y: 100, offset: 5, side: "left", priority: 2 },
+  { name: "Rightward", x: 100, y: 100, offset: 5, side: "right", priority: 2 },
+], 1);
+ok(sideBySide.size === 2, "a name to the left of a planet and one to the right of it do not collide");
+const sectorUnder = galaxy.placeLabels([
+  { name: "Planet", x: 100, y: 100, offset: 5, side: "right", priority: 2 },
+  { key: "sector:Planetary", name: "Planetary", x: 110, y: 100, side: "middle", priority: 4 },
+], 1);
+ok(sectorUnder.has("Planet") && !sectorUnder.has("sector:Planetary"), "a sector's name steps aside for a planet's");
