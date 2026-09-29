@@ -3,7 +3,7 @@
 > Written 25 September 2026 in the Enodia repo, for the next Claude session that opens `C:\Dev\dds`. Enodia is stigly's Hades II tool. It has already done everything in the v2 and v3 half of `dds-roadmap.md`: it moved off Netlify onto Cloudflare Workers, opened accounts, synced between devices, published builds under short links, built an exchange with friends and leaderboards, and sent password resets from its own domain. This file says what to take from it, in what order, and what it cost Enodia to learn.
 
 > [!danger] The source is the code, not this file
-> Every Enodia claim below names a file in **`C:\Dev\Hades 2`**. Open that file before porting anything. The docblocks there are long on purpose and they carry reasoning this summary drops. If this file and the code disagree, the code wins, and this file should be corrected.
+> Every Enodia claim below names a file in **`C:\Dev\Enodia`**. Open that file before porting anything. The docblocks there are long on purpose and they carry reasoning this summary drops. If this file and the code disagree, the code wins, and this file should be corrected.
 >
 > One example, found while writing this: the comment in `worker/limit.ts` says publishing is capped at fifty builds per account, and `MAX_PER_USER` in `worker/publish.ts` is **100**. The comment went stale and the number did not.
 
@@ -132,7 +132,7 @@ Small, independent, and worth doing first on its own: it puts security headers o
 
 ### What to port, file by file
 
-All paths are in `C:\Dev\Hades 2`. **Keep the Worker in TypeScript** even though the app is JS: wrangler bundles TS itself, the Worker types are generated, and the typecheck runs as its own project so the Workers globals and the DOM globals never collide (`tsconfig.worker.json` explains why).
+All paths are in `C:\Dev\Enodia`. **Keep the Worker in TypeScript** even though the app is JS: wrangler bundles TS itself, the Worker types are generated, and the typecheck runs as its own project so the Workers globals and the DOM globals never collide (`tsconfig.worker.json` explains why).
 
 | Enodia file | Port | Notes |
 |---|---|---|
@@ -373,7 +373,7 @@ Every one of these passed a type check and a green build. Most were found by mea
 # **Suggested First Session**
 
 1. `git status`, and ask stigly what to do with the uncommitted work before branching
-2. Read this file, then in `C:\Dev\Hades 2`: `wrangler.jsonc`, `assets/_headers`, `worker/index.ts`, `worker/auth.ts`, `worker/limit.ts`
+2. Read this file, then in `C:\Dev\Enodia`: `wrangler.jsonc`, `assets/_headers`, `worker/index.ts`, `worker/auth.ts`, `worker/limit.ts`
 3. **Stage 0 on a branch**: vendor the two fonts, `public/_headers`, `wrangler.jsonc` with assets only, the `workers` launch config. Verify under `wrangler dev` by curling headers and loading the page
 4. Deploy to `*.workers.dev` once stigly has run `wrangler login`, then curl the live headers
 5. Update DDS `CLAUDE.md` "Hosting" and `dds-roadmap.md`, and add a changelog entry. The markdown roadmap moves first and `roadmap.json` follows

@@ -1163,6 +1163,9 @@ Re-fetches the weapon stats and the planet table, and **reports what would chang
 | **Minor**, 1.x.0 | A new surface, a new capability, a batch of skins. The normal bump |
 | **Major**, x.0.0 | The tool becomes a different thing. Accounts landing would qualify |
 
+> [!danger] Deploying is the curator's call, and he saves it for a major upgrade
+> Said on 28 September 2026. **Never run `npm run deploy` unless he asks for it in that conversation.** 1.21.0 through 1.24.0 each went out the day they were built; that habit is over. Develop, check, commit and verify under `wrangler dev`, keep adding to the top changelog entry as work lands, and say when a body of work is ready to ship. Production migrations wait with the deploy.
+
 > [!danger] Three places have to agree, and two of them are automatic
 > Add the entry to `changelog.json` with a new `version`, then set the same string in `package.json`. The footer and the Changelog page both read `CHANGELOG[0].version`, so they cannot drift. **Nothing else hardcodes a version.**
 
@@ -1257,7 +1260,7 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 # **Accounts**
 
 > [!success] Stage 1 built, 1.22.0, 25 September 2026. **Switched off**
-> A Cloudflare Worker answers `/api/*` and nothing else, a D1 database named `dds` holds the accounts, and better-auth runs email and password sign in. Ported from Enodia's backend in `C:\Dev\Hades 2`, which built all of this first; `dds-cloudflare-handover.md` is the plan and its eighteen pitfalls.
+> A Cloudflare Worker answers `/api/*` and nothing else, a D1 database named `dds` holds the accounts, and better-auth runs email and password sign in. Ported from Enodia's backend in `C:\Dev\Enodia`, which built all of this first; `dds-cloudflare-handover.md` is the plan and its eighteen pitfalls.
 >
 > **Nobody using the tool can see any of it.** `ACCOUNTS_LIVE` in `src/lib/account.js` is `false`, so the sidebar keeps "Account v2" locked and `#/account` falls back to the tier list, exactly as before.
 

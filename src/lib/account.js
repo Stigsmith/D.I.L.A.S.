@@ -5,7 +5,7 @@
 /* under /api/, which is why public/_headers still says               */
 /* connect-src 'self' with nothing added to it.                       */
 /*                                                                    */
-/* Ported from Enodia's src/state/account.ts in C:\Dev\Hades 2, minus */
+/* Ported from Enodia's src/state/account.ts in C:\Dev\Enodia, minus */
 /* the sync and password reset halves, which arrive with Stages 3 and */
 /* 2 of dds-cloudflare-handover.md.                                   */
 /*                                                                    */

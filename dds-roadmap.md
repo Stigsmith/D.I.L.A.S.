@@ -476,7 +476,7 @@ Two pieces of it are worth remembering when that happens. **Operation modifiers 
 
 - ~~**Fallback when a party member has not picked.**~~ **Settled 27 September 2026:** the slot reads "Still deciding" and nothing else, and the squad checks ignore it until it is confirmed.
 - ~~**Does a party need accounts, or only a code.**~~ **Settled 27 September 2026:** only a code. Friends come later, with accounts.
-- **Who sets the scenario in a party.** Recommendation: the person who opened it, the way the host picks the mission in game, with everyone else's drop screen following. Ask before building it the other way.
+- ~~**Who sets the scenario in a party.**~~ **Settled 28 September 2026:** the person who opened it, the way the host picks the mission in game, with everyone else's screen following.
 - **Do profiles survive accounts.** See above.
 - ~~**Does the tier ramp move.**~~ **Settled 21 August 2026, 1.17.0.** Three candidate ramps were in play and the curator picked a fourth: the badge study's palette rotated down one rank, with the brown replaced by a grey. Red at the top cooling to grey at D, so the ladder reads as falling off toward unrated. Both losing sets are out of the code.
 - **The accent disagreement.** Several studies paint their signature colour on the lock and the stale chip. `CLAUDE.md` says the accent is never the brand colour, and that rule won. Worth settling if the skins are redrawn.

@@ -9,7 +9,7 @@
   // Deploy with `npm run deploy`, which builds first. Cache rules and security
   // headers are in public/_headers, which Vite copies into dist/.
   //
-  // Modelled on Enodia's wrangler.jsonc in C:\Dev\Hades 2, which carries the
+  // Modelled on Enodia's wrangler.jsonc in C:\Dev\Enodia, which carries the
   // longer reasoning behind every key here. Read it before changing one.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "dds",
@@ -90,7 +90,23 @@
       "database_id": "be6b81cb-3738-4d05-9950-375cf9ba6245",
       "migrations_dir": "migrations"
     }
-  ]
+  ],
+
+  // The live party. One Durable Object per party code, holding up to four
+  // members and pushing every change to their open connections. See
+  // worker/party.ts.
+  //
+  // **SQLite backed, because the free plan allows nothing else.** Verified
+  // on 27 September 2026 against developers.cloudflare.com: key-value backed
+  // Durable Objects are paid only. That is what `new_sqlite_classes` says.
+  //
+  // **The binding is PARTY and the class is Party**, exported from
+  // worker/index.ts. Renaming the class later needs a `renamed_classes`
+  // migration, not an edit here, or every live party is orphaned.
+  "durable_objects": {
+    "bindings": [{ "name": "PARTY", "class_name": "Party" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Party"] }]
 
   // No `vars` yet. MAIL_FROM needs an address on a domain stigly owns, which
   // is Stage 2; SUPER_CLIENT and SUPER_CONTACT belong to the war state fetch in
