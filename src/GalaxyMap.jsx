@@ -20,7 +20,7 @@ import { Plus, Minus, Maximize2 } from "lucide-react";
 
 import {
   VIEW, CENTRE, RADIUS, MAX_ZOOM, HOME, placed, lanes, sectors, roomFor, placeOf, matchSet,
-  clampView, zoomAt, centreOn, placeLabels,
+  clampView, zoomAt, centreOn, placeLabels, labelSide,
 } from "./lib/galaxy.js";
 import { planetByName, biomeName, hazardName, loudHazards } from "./lib/scenario.js";
 
@@ -246,11 +246,18 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
       const w = !matches && live ? live.get(p.name) : null;
       const front = Boolean(w && w.campaign);
       const roomy = !matches && roomFor.get(p.name) * scale >= NAME_ROOM;
-      const offset = (front ? DOT * 1.5 : DOT) + 5;
-      if (on) wanted.push({ name: p.name, x: p.x, y: p.y, offset, priority: 0, must: true });
-      else if (lit && namesMatches) wanted.push({ name: p.name, x: p.x, y: p.y, offset, priority: 1, must: true });
-      else if (front) wanted.push({ name: p.name, x: p.x, y: p.y, offset, priority: 2, weight: w.players });
-      else if (roomy) wanted.push({ name: p.name, x: p.x, y: p.y, offset, priority: 3, weight: roomFor.get(p.name) });
+      const base = { name: p.name, x: p.x, y: p.y, offset: (front ? DOT * 1.5 : DOT) + 5, side: labelSide(p) };
+      if (on) wanted.push({ ...base, priority: 0, must: true });
+      else if (lit && namesMatches) wanted.push({ ...base, priority: 1, must: true });
+      else if (front) wanted.push({ ...base, priority: 2, weight: w.players });
+      else if (roomy) wanted.push({ ...base, priority: 3, weight: roomFor.get(p.name) });
+    }
+    /* Sector names last, and only where no planet's name already is. */
+    if (showSectors) {
+      for (const s of sectors) {
+        wanted.push({ key: "sector:" + s.name, name: s.name, x: s.x, y: s.y, side: "middle", priority: 4,
+          weight: s.count, charPx: 6.6, height: 11 });
+      }
     }
     const named = placeLabels(wanted, scale);
 
@@ -263,7 +270,7 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
         <path d={LANE_PATH} className="fill-none stroke-base-700" strokeWidth={u} opacity={matches ? 0.35 : 0.8} />
 
         {showSectors
-          ? sectors.map((s) => (
+          ? sectors.filter((s) => named.has("sector:" + s.name)).map((s) => (
               <text key={s.name} x={s.x} y={s.y} textAnchor="middle" dominantBaseline="middle"
                 className="pointer-events-none fill-base-500 stroke-base-950" strokeWidth={3 * u}
                 style={{ ...halo, fontFamily: OSWALD, fontSize: SECTOR_PX * u, letterSpacing: 1.2 * u,
@@ -312,7 +319,9 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
           const lit = matches ? matches.has(p.name) : false;
           const front = Boolean(!matches && live && live.get(p.name) && live.get(p.name).campaign);
           return (
-            <text key={p.name} x={p.x + ((front ? DOT * 1.5 : DOT) + 5) * u} y={p.y} dominantBaseline="middle"
+            <text key={p.name} dominantBaseline="middle" y={p.y}
+              x={labelSide(p) === "left" ? p.x - ((front ? DOT * 1.5 : DOT) + 5) * u : p.x + ((front ? DOT * 1.5 : DOT) + 5) * u}
+              textAnchor={labelSide(p) === "left" ? "end" : "start"}
               className={"pointer-events-none stroke-base-950 " +
                 (on || lit ? "fill-brand" : front ? "fill-base-100" : "fill-base-300")}
               strokeWidth={3 * u}

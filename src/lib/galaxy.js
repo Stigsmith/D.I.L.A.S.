@@ -264,27 +264,33 @@ export const frontOf = (war, name) => {
 /* Boxes are in screen pixels: `scale` is pixels per map unit at the   */
 /* current zoom. The width is an estimate from the name's length,      */
 /* which is close enough for a condensed face at one size.             */
+/*                                                                     */
+/* A name sits to the right of its planet, or to the left for a planet */
+/* on the galaxy's right flank, so the rim's names run inward rather   */
+/* than off the edge of the map. Sector names are centred on their     */
+/* sector and go through the same placement, after every planet name. */
 /* ------------------------------------------------------------------ */
 
 export const LABEL_CHAR_PX = 5.8;
 export const LABEL_HEIGHT_PX = 13;
+
+/* Which side of its dot a planet's name goes on. */
+export const labelSide = (p) => (p.x > CENTRE + RADIUS * 0.45 ? "left" : "right");
 
 export function placeLabels(candidates, scale) {
   const order = [...candidates].sort((a, b) => a.priority - b.priority || (b.weight || 0) - (a.weight || 0));
   const boxes = [];
   const shown = new Set();
   for (const c of order) {
-    const left = c.x * scale + (c.offset || 0);
-    const box = {
-      left,
-      right: left + c.name.length * LABEL_CHAR_PX + 4,
-      top: c.y * scale - LABEL_HEIGHT_PX / 2,
-      bottom: c.y * scale + LABEL_HEIGHT_PX / 2,
-    };
+    const width = c.name.length * (c.charPx || LABEL_CHAR_PX) + 4;
+    const height = c.height || LABEL_HEIGHT_PX;
+    const x = c.x * scale;
+    const left = c.side === "middle" ? x - width / 2 : c.side === "left" ? x - (c.offset || 0) - width : x + (c.offset || 0);
+    const box = { left, right: left + width, top: c.y * scale - height / 2, bottom: c.y * scale + height / 2 };
     const clash = boxes.some((b) => box.left < b.right && box.right > b.left && box.top < b.bottom && box.bottom > b.top);
     if (clash && !c.must) continue;
     boxes.push(box);
-    shown.add(c.name);
+    shown.add(c.key || c.name);
   }
   return shown;
 }
