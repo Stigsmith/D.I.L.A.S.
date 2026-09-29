@@ -2,6 +2,7 @@
   "name": "dds",
   "private": true,
   "version": "1.25.0",
+  "author": "Stigsmith",
   "type": "module",
   "scripts": {
     "dev": "vite",
