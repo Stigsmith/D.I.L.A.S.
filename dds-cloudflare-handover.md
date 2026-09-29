@@ -281,6 +281,15 @@ Short links need a path route, `/b/<id>`, which is where `not_found_handling: "s
 
 Independent of accounts, and it pairs with the starmap in Phase 6a. It can ship any time after Stage 0.
 
+> [!success] Built in D.D.S. 1.25.0, 30 September 2026, as designed below. Not yet deployed
+> A Cron Trigger every five minutes, one trimmed row in D1 (`war_snapshot`), `GET /api/war` with `Cache-Control: public, max-age=60`, and the browser refusing anything over thirty minutes old. `worker/war.ts`. What the "verify" list below found:
+>
+> - **Rate limit:** 5 requests per 10 seconds, from the upstream's README. This design makes 2 per 5 minutes.
+> - **Cron allowance:** 5 Cron Triggers per account on the free plan, 10 ms CPU each. Parsing the planet answer measured 1.5 ms.
+> - **Endpoints:** `/api/v1/planets` for ownership, health, defences and players; `/api/v1/campaigns` for which planets are fronts. Planet effects and the Major Order are not read yet.
+> - **Headers:** both `X-Super-Client` **and** `X-Super-Contact` are required by the live service, which answers 400 without either, although its README calls the contact optional. The contact is a placeholder until stigly picks a project address.
+> - **The Cache API on workers.dev** was not needed: the cron snapshot made it moot.
+
 > [!danger] The API decorates, it never carries
 > DDS's own rule, from `dds-roadmap.md`, and the backend is built around it. The shipped planet table is identity and layout. Live state only colours it in. If the upstream is down, you lose the colouring and nothing else: no spinner on the critical path, and never a stale ownership map presented as current.
 

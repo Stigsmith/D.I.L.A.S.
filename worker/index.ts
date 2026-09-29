@@ -30,6 +30,14 @@
  * accounts cannot open until a domain exists and a party code needs only this
  * Worker. `worker/party.ts` is the party; `worker/limit.ts` counts both routes,
  * which are the first of ours better-auth cannot see.
+ *
+ * ## The live war, Stage 6
+ *
+ *   GET /api/war   who holds what and where the fighting is, as last fetched
+ *   scheduled      the Cron Trigger that fetches it, every five minutes
+ *
+ * `worker/war.ts`. No account and no limit of ours: it is one read of one row,
+ * and nothing a caller sends reaches the upstream.
  */
 
 import { drizzle } from 'drizzle-orm/d1'
@@ -38,6 +46,7 @@ import { createAuth } from './auth.ts'
 import { RULES, addressKey, take } from './limit.ts'
 import { cleanName, hashToken, newCode, normaliseCode, validToken } from './party.ts'
 import * as schema from './schema.ts'
+import { readWar, refreshWar } from './war.ts'
 
 /** The Durable Object class has to be exported from the entry point to exist. */
 export { Party } from './party.ts'
@@ -130,6 +139,15 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     return harden(await route(request, env))
   },
+
+  /**
+   * The Cron Trigger in `wrangler.jsonc`. Fetches the war and keeps it in D1.
+   * `refreshWar` never throws, so a failed fetch is a row saying so rather than
+   * a failed invocation nobody reads.
+   */
+  async scheduled(_controller: ScheduledController, env: Env): Promise<void> {
+    await refreshWar(drizzle(env.DB, { schema }), { client: env.SUPER_CLIENT, contact: env.SUPER_CONTACT })
+  },
 }
 
 async function route(request: Request, env: Env): Promise<Response> {
@@ -176,6 +194,25 @@ async function route(request: Request, env: Env): Promise<Response> {
       user: { id: session.user.id, email: session.user.email, name: session.user.name },
       expiresAt: session.session.expiresAt,
     })
+  }
+
+  /**
+   * The war as last fetched, with its age. A plain same-site GET carries no
+   * Origin, so only a foreign one is refused, the party rule. Cacheable for a
+   * minute, since the row changes every five: a browser polling while the map
+   * is open asks the network at most once a minute.
+   *
+   * **The server never hides staleness.** It sends what it has and when it got
+   * it, and the browser decides whether that is too old to draw.
+   */
+  if (url.pathname === '/api/war') {
+    if (request.method !== 'GET') return json({ error: 'Read the war with a GET.' }, 405)
+    if (!noForeignOrigin(request, url)) return json({ error: 'wrong origin' }, 403)
+    const snapshot = await readWar(db)
+    if (!snapshot) return json({ error: 'The war has not been fetched yet.' }, 503)
+    const response = json(snapshot)
+    response.headers.set('cache-control', 'public, max-age=60')
+    return response
   }
 
   if (url.pathname === '/api/party') {

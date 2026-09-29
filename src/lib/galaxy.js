@@ -171,3 +171,120 @@ export function centreOn(point, k) {
 
 /* The map point under a point of the frame. */
 export const toMap = (view, point) => ({ x: (point.x - view.x) / view.k, y: (point.y - view.y) / view.k });
+
+/* ------------------------------------------------------------------ */
+/* The live war                                                        */
+/*                                                                     */
+/* What GET /api/war sends, cleaned against this browser's own table.  */
+/* The server keeps no copy of the planet table and has no opinion     */
+/* about planets, so a name that does not resolve here is dropped      */
+/* rather than drawn, and every number is bounded before it is read.  */
+/*                                                                     */
+/* The API decorates, it never carries. A snapshot older than half an  */
+/* hour is not drawn at all: a stale territory map is worse than an    */
+/* uncoloured one, because it looks exactly like a current one.        */
+/* ------------------------------------------------------------------ */
+
+export const WAR_TOO_OLD_MS = 30 * 60 * 1000;
+
+/* The upstream's names for who holds a planet, onto this tool's fronts.
+   Super Earth holding a planet is no front at all. */
+const FRONT_OF = { Automaton: "bots", Terminids: "bugs", Illuminate: "squids" };
+
+const share = (part, whole) => {
+  const p = Number(part);
+  const w = Number(whole);
+  if (!Number.isFinite(p) || !Number.isFinite(w) || w <= 0) return null;
+  return Math.min(1, Math.max(0, p / w));
+};
+
+export function cleanWar(raw, now = Date.now()) {
+  if (!raw || typeof raw !== "object" || !Array.isArray(raw.planets)) return null;
+  const fetchedAt = Number.isFinite(raw.fetchedAt) ? raw.fetchedAt : null;
+  if (fetchedAt === null) return null;
+
+  const planets = new Map();
+  for (const p of raw.planets) {
+    if (!p || typeof p !== "object" || typeof p.name !== "string") continue;
+    const own = byUpper.get(p.name.toUpperCase());
+    if (!own) continue;
+    const humans = p.owner === "Humans";
+    const owner = FRONT_OF[p.owner] || null;
+    if (!humans && !owner) continue;
+
+    const e = p.event && typeof p.event === "object" ? p.event : null;
+    const attacker = e ? FRONT_OF[e.faction] || null : null;
+    const ends = e && typeof e.endTime === "string" ? Date.parse(e.endTime) : NaN;
+    /* A defence's health is the attack's, and it falls as the defence
+       succeeds, so progress is how much of it is gone. */
+    const defence = attacker
+      ? { front: attacker, progress: share(Number(e.maxHealth) - Number(e.health), Number(e.maxHealth)), endsAt: Number.isFinite(ends) ? ends : null }
+      : null;
+
+    /* The front is who you would be fighting there: the attacker in a
+       defence, otherwise whoever holds it. */
+    const front = defence ? defence.front : owner;
+    const campaign = p.campaign === true;
+    if (!front && !campaign) continue;
+
+    planets.set(own.name, {
+      owner,
+      front,
+      campaign,
+      /* How much of an enemy world has been taken back. */
+      liberation: owner && !defence ? share(Number(p.maxHealth) - Number(p.health), Number(p.maxHealth)) : null,
+      defence,
+      players: Number.isFinite(p.players) && p.players > 0 ? Math.round(p.players) : 0,
+    });
+  }
+
+  const age = Math.max(0, now - fetchedAt);
+  return { fetchedAt, age, fresh: age <= WAR_TOO_OLD_MS, planets, fronts: [...planets.values()].filter((p) => p.campaign).length };
+}
+
+/* The front to fill in when a planet is chosen: who you would be
+   fighting there, from a snapshot fresh enough to trust, or null to
+   leave the scenario's front alone. */
+export const frontOf = (war, name) => {
+  if (!war || !war.fresh) return null;
+  const p = war.planets.get(name);
+  return p ? p.front : null;
+};
+
+/* ------------------------------------------------------------------ */
+/* Which names fit                                                     */
+/*                                                                     */
+/* Every label that wants to be drawn, in priority order, placed only  */
+/* where it overlaps no label already placed. `must` labels are placed */
+/* whatever they overlap: the chosen planet and what you searched for  */
+/* are never hidden. Everything else waits until you zoom in far       */
+/* enough for it to fit, which is the rule that was already true for   */
+/* a planet's nearest neighbour, applied to the names themselves.      */
+/*                                                                     */
+/* Boxes are in screen pixels: `scale` is pixels per map unit at the   */
+/* current zoom. The width is an estimate from the name's length,      */
+/* which is close enough for a condensed face at one size.             */
+/* ------------------------------------------------------------------ */
+
+export const LABEL_CHAR_PX = 5.8;
+export const LABEL_HEIGHT_PX = 13;
+
+export function placeLabels(candidates, scale) {
+  const order = [...candidates].sort((a, b) => a.priority - b.priority || (b.weight || 0) - (a.weight || 0));
+  const boxes = [];
+  const shown = new Set();
+  for (const c of order) {
+    const left = c.x * scale + (c.offset || 0);
+    const box = {
+      left,
+      right: left + c.name.length * LABEL_CHAR_PX + 4,
+      top: c.y * scale - LABEL_HEIGHT_PX / 2,
+      bottom: c.y * scale + LABEL_HEIGHT_PX / 2,
+    };
+    const clash = boxes.some((b) => box.left < b.right && box.right > b.left && box.top < b.bottom && box.bottom > b.top);
+    if (clash && !c.must) continue;
+    boxes.push(box);
+    shown.add(c.name);
+  }
+  return shown;
+}

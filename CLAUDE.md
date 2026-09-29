@@ -802,13 +802,13 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!info] Every party rule was broken on purpose to see its test fail
 > The squad cap, host only scenario, host only removal, the returning seat, the host handover and the loadout size cap, on 29 September 2026. Each broke exactly the test aimed at it. Do the same for any new rule.
 
-**Shipping it** is two steps, in this order, and both wait for the curator: `npx wrangler d1 migrations apply dds --remote` for the `api_rate_limit` table, then `npm run deploy`, which also creates the Durable Object class from the `v1` migration in `wrangler.jsonc`. Then open a party on the live address from two browsers before calling it done.
+**Shipping it** is two steps, in this order, and both wait for the curator: `npx wrangler d1 migrations apply dds --remote` for the `api_rate_limit` and `war_snapshot` tables, then `npm run deploy`, which also creates the Durable Object class from the `v1` migration in `wrangler.jsonc` and registers the five minute Cron Trigger. Then open a party on the live address from two browsers, and after five minutes check `/api/war` answers 200, before calling it done.
 
 ---
 
 # **The Galaxy Map**
 
-> [!success] Built, 1.25.0, 29 September 2026. **Not deployed yet**, it ships with the live party
+> [!success] Built, 1.25.0, 29 and 30 September 2026. **Not deployed yet**, it ships with the live party
 > Click the planet where you clicked it in the game and its biome and hazards fill themselves in. The curator's framing from 20 August 2026, and the reason it is a map rather than a longer list: finding a place again in the same shape is instant, and finding it among 281 names is not. `src/GalaxyMap.jsx` draws it, `src/lib/galaxy.js` holds everything that is not a picture.
 
 | Where it appears | |
@@ -835,7 +835,42 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!bug] An ordinary planet counted normal temperature as a hazard
 > Fixed alongside the map. The hazard table calls it `normal_temp`, and the scenario screen's filter looked for `normal_temperature`, so it never matched: every ordinary planet read "2 hazards", and Normal Temperature was offered as a hazard toggle. `QUIET_HAZARDS` and `loudHazards` in `scenario.js` are the one definition now; the drop screen's brief had its own copy, which was right, and uses the shared one.
 
-**`npm run map`** checks the arithmetic against the shipped table: the right way up, every planet inside the disc, each supply line drawn once and none missing, search, and that zooming holds the point under the cursor still. Four of its rules were broken on purpose on 29 September 2026 and each broke exactly its own check.
+> [!success] The live war colours it in, same version
+> **Stage 6 of `dds-cloudflare-handover.md`, built the way that plan designed it.** A Cron Trigger fetches `api.helldivers2.dev` every five minutes and keeps one trimmed row in D1; `GET /api/war` hands it out with its age; the browser decides whether it is young enough to draw. `worker/war.ts` for the server, `cleanWar` in `galaxy.js` and `useWar` in `src/lib/war.js` for the browser.
+>
+> | On the map | |
+> |---|---|
+> | **A planet somebody holds** | Takes their locked faction hex |
+> | **A front you can drop on** | Larger, ringed in the colour of who you would fight, and named at every zoom, busiest first |
+> | **A quiet planet Super Earth holds** | Steps back a shade, so the war reads first |
+> | **The hover card** | Who holds it, how far liberated or defended, time left on a defence, and how many Helldivers are there |
+> | **The line under the map** | "Live, read N minutes ago", and how many fronts are open |
+>
+> **Choosing a planet with fighting on it sets the front too.** That is the other half of "the whole scenario fills itself": the attacker in a defence, otherwise whoever holds it. A quiet planet leaves the front alone. In a party the host's choice carries the front to everybody, since it is part of the scenario.
+>
+> **Fronts are emphasised, not enforced.** The roadmap said "only offering planets with an active campaign"; every planet stays choosable, because the scenario is also for pre building while nobody is online. Fronts come first in the search list. If the curator wants the rest hidden, it is one filter.
+
+> [!danger] The API decorates, it never carries, and the rules that make that true
+> - **Half an hour is the limit.** A snapshot older than `WAR_TOO_OLD_MS` is not drawn at all, not drawn faded, and the line under the map says how old it is. It also fills in no front. A stale territory map is worse than an uncoloured one because it looks exactly like a current one.
+> - **A failed fetch never disguises the age of the last good one.** It moves `tried_at` and sets `ok` to 0; `payload` and `fetched_at` stay exactly as they were. The server never hides staleness and never throws a snapshot away.
+> - **No server, no colour, no error.** Under `npm run dev`, on Netlify, or with the Worker down, the answer is the app's own page rather than JSON, and the map draws uncoloured with its ordinary hint. Checked on 30 September 2026.
+> - **The server keeps no planet table.** Planets go out under the upstream's upper case names and every browser joins them to its own table by name, dropping anything it does not know and any owner nobody has heard of. All 62 names in the first real answer resolved.
+> - **Only planets with something happening are sent.** Enemy held, a campaign, or a defence. Most of the galaxy is none of those, so the snapshot is about 7.5 KB rather than 300.
+
+> [!warning] The upstream requires both headers, whatever its README says
+> `api.helldivers2.dev` answers **400 "The X-Super-Client and X-Super-Contact headers are required"** to a request missing either. Its README still calls the contact optional. Found on 30 September 2026 against the real service, after an eight second timeout had hidden it the first time.
+>
+> **`SUPER_CONTACT` in `wrangler.jsonc` is a placeholder**: the tool's own public address, because the service will not answer without something. It should be a project address, never a personal one, and **which one is stigly's to pick**: the published repository, or an address on the domain. `SUPER_CLIENT` is the tool's address and **changes with the domain**. `npm run wiki` sends the same two; it used to give the API's own organisation as our contact.
+
+> [!info] The numbers behind the schedule
+> Every five minutes is 576 upstream requests a day, two paths each run, whatever the traffic. The service publishes a limit of 5 requests in 10 seconds; this is 2 in 300. **Five Cron Triggers per account on the free plan, 10 ms of CPU each**, verified 29 September 2026; Enodia uses none. Parsing and trimming the 300 KB planet answer measured 1.5 ms. The timeout is 20 seconds, because waiting is not CPU and the service took 10 seconds to answer once.
+>
+> Locally, `wrangler dev --test-scheduled` (the `workers` entry in `.claude/launch.json` passes it) and then `curl "http://localhost:8788/cdn-cgi/handler/scheduled?cron=*/5+*+*+*+*"` runs one fetch by hand. That is a real request to the real service.
+
+> [!info] Names are placed, not just drawn
+> Every name that wants to show is placed in priority order and skipped if it would overlap one already placed: the chosen planet and search matches always, then fronts by how many Helldivers are on them, then any planet with room. `placeLabels` in `galaxy.js`. Thirty eight fronts named at once had run into each other in the dense clusters; now a name that does not fit waits for a closer zoom.
+
+**`npm run map`** checks the arithmetic against the shipped table: the right way up, every planet inside the disc, each supply line drawn once and none missing, search, that zooming holds the point under the cursor still, how the browser reads a war snapshot, and which names fit. Seven of its rules were broken on purpose on 29 and 30 September 2026 and each broke exactly its own check. The server half is in `worker/war.test.ts`, twelve tests with the upstream stood in for; six of its rules were broken the same way.
 
 ---
 
@@ -1349,12 +1384,13 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 
 | | |
 |---|---|
-| `worker/index.ts` | The routes: `/api/auth/*` to better-auth, `/api/capabilities`, `/api/me`, and the two party routes. Everything else is a JSON 404 |
+| `worker/index.ts` | The routes: `/api/auth/*` to better-auth, `/api/capabilities`, `/api/me`, the two party routes and `/api/war`, plus the `scheduled` handler. Everything else is a JSON 404 |
 | `worker/auth.ts` | Every better-auth option, each with the reason. Nearly verbatim from Enodia |
 | `worker/email.ts` | The mail swap point. **Inert until Stage 2**: no domain, so no sender, so no reset |
 | `worker/schema.ts` | **Generated** by `npm run db:schema`. Never edit |
-| `worker/schema-app.ts` | Ours. The `api_rate_limit` table, since the live party |
+| `worker/schema-app.ts` | Ours. The `api_rate_limit` table since the live party, and `war_snapshot` since the live war |
 | `worker/party.ts`, `worker/limit.ts` | The live party and the limiter for our own routes. See The Live Party |
+| `worker/war.ts` | The live war: the Cron Trigger's fetch, and what `GET /api/war` serves. See The Galaxy Map |
 | `migrations/` | Generated by `npm run db:generate`. Applied locally by `npm run db:migrate` |
 | `src/lib/account.js`, `src/Account.jsx` | The browser half and the screen |
 
@@ -1379,7 +1415,7 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 npm run test:worker
 ```
 
-Forty tests, fifteen for accounts and twenty five for the live party, run **inside workerd against a real local D1**, never in node, where none of what matters is true. Each protection was seen failing before it was trusted: rate limiting left to the library default (two fail, and it reproduces Enodia's finding that better-auth does not limit on Workers by default), the address read from `x-forwarded-for` (two fail), the schema missing `issuer` (five fail), and the response hardening removed (one fails).
+Fifty two tests, fifteen for accounts, twenty five for the live party and twelve for the live war, run **inside workerd against a real local D1**, never in node, where none of what matters is true. Each protection was seen failing before it was trusted: rate limiting left to the library default (two fail, and it reproduces Enodia's finding that better-auth does not limit on Workers by default), the address read from `x-forwarded-for` (two fail), the schema missing `issuer` (five fail), and the response hardening removed (one fails).
 
 ```bash
 npm run typecheck

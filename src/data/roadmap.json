@@ -85,9 +85,24 @@
     {
       "id": "map",
       "title": "The galaxy map",
+      "status": "shipped",
+      "track": "solo",
+      "say": "Click the planet where you clicked it in the game and the scenario fills itself, front included, on a map coloured with the live war.",
+      "version": "1.25.0"
+    },
+    {
+      "id": "effects",
+      "title": "Planet effects in the ratings",
+      "status": "next",
+      "track": "solo",
+      "say": "The strains, surges and other live effects on a planet changing what the tool tells you to bring."
+    },
+    {
+      "id": "map-screen",
+      "title": "The map as its own screen",
       "status": "planned",
       "track": "solo",
-      "say": "Click the planet where you clicked it in the game and the whole scenario fills itself. Its own screen too, with history behind it."
+      "say": "The galaxy map reachable on its own, with what each planet has been through behind it."
     },
     {
       "id": "accounts",

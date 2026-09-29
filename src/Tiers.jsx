@@ -33,7 +33,8 @@ import { readBuild, explainScore } from "./lib/build.js";
 import { describeArmour, enemiesUpTo, arrivalsLine, EXPOSURE_GAP, enemySource } from "./lib/enemies.js";
 import TierBadgePlate from "./TierBadgePlate.jsx";
 import GalaxyMap from "./GalaxyMap.jsx";
-import { searchPlanets, unplaced } from "./lib/galaxy.js";
+import { searchPlanets, unplaced, frontOf } from "./lib/galaxy.js";
+import { useWar, agoText } from "./lib/war.js";
 import { useBadgeStyle } from "./lib/badge.js";
 import {
   CATEGORIES, vocabulary, acquisitionLabels,
@@ -419,7 +420,7 @@ function TierChips({ label, value, onChange }) {
    only one is ever open. Two stacked rows each with their own pane cost
    the height twice and let you open both, which made the screen taller
    than the thing it was picking. */
-function PlanetBar({ scenario, setPlanet, setBiome, toggleHazard, setMission, clearEnvironment }) {
+function PlanetBar({ scenario, setPlanet, setFaction, setBiome, toggleHazard, setMission, clearEnvironment }) {
   /* null, "planet" or "mission". One value rather than two booleans is
      what makes opening one close the other, for free. */
   const [open, setOpen] = useState(null);
@@ -502,7 +503,12 @@ function PlanetBar({ scenario, setPlanet, setBiome, toggleHazard, setMission, cl
 
       {open === "planet" ? (
         <div className="mt-2.5 flex flex-col gap-2.5 border-t border-base-800 pt-2.5">
-          <PlanetChooser chosen={scenario.planet} onChoose={(name) => { setPlanet(name); setOpen(null); }}
+          <PlanetChooser chosen={scenario.planet}
+            onChoose={(name, front) => {
+              setPlanet(name);
+              if (front && setFaction && front !== scenario.faction) setFaction(front);
+              setOpen(null);
+            }}
             none="No planet by that name. Try a sector, or set the biome by hand below." />
 
           <div className="grid grid-cols-1 gap-3 border-t border-base-800 pt-3 sm:grid-cols-2">
@@ -561,29 +567,65 @@ function PlanetBar({ scenario, setPlanet, setBiome, toggleHazard, setMission, cl
    search lights its matches up on the map and lists the first few
    underneath, which is also the way in for a keyboard and for the
    planets with no place on the map. */
+/* The fronts as the map needs them: the locked hex, and the name. */
+const FRONTS = Object.fromEntries(FACTIONS.map((f) => [f.id, { hex: f.hex, label: f.label }]));
+
+/* `onChoose(name, front)`. The front is who you would be fighting on that
+   planet according to the live war, or null when the war is not here, too
+   old to trust, or quiet on that planet. The caller fills the scenario's
+   front from it, which is the "whole scenario fills itself" half. */
 export function PlanetChooser({ chosen, onChoose, none, autoFocus = true }) {
   const [query, setQuery] = useState("");
-  const hits = useMemo(() => searchPlanets(query, 8), [query]);
+  const war = useWar(true);
+  const live = war && war.fresh ? war.planets : null;
+
+  /* With the war live, a front you can drop on comes first in the list,
+     since those are the planets you can actually go to. */
+  const hits = useMemo(() => {
+    const found = searchPlanets(query, 40);
+    const ranked = live
+      ? [...found].sort((a, b) => Number(Boolean(live.get(b.name)?.campaign)) - Number(Boolean(live.get(a.name)?.campaign)))
+      : found;
+    return ranked.slice(0, 8);
+  }, [query, live]);
+
+  const choose = (name) => onChoose(name, frontOf(war, name));
 
   return (
     <div className="flex flex-col gap-2.5">
       <SearchField placeholder={"Search " + planets.length + " planets or a sector"} query={query} setQuery={setQuery}
         autoFocus={autoFocus} />
-      <GalaxyMap chosen={chosen} query={query} onChoose={onChoose} />
-      <p className="text-center text-[10px] text-base-600">
-        Drag to move, scroll or pinch to zoom, and click a planet to drop there.
+      <GalaxyMap chosen={chosen} query={query} onChoose={choose} war={war} fronts={FRONTS} />
+      <p className="text-center text-[10px] leading-relaxed text-base-600">
+        {war && war.fresh ? (
+          <>
+            <span className="text-base-400">Live, read {agoText(war.age)}.</span>{" "}
+            {war.fronts === 1 ? "One front is" : `${war.fronts} fronts are`} open, ringed in the colour of who you
+            would fight. Choose one and your front fills itself in too.
+          </>
+        ) : war ? (
+          <>
+            The live war was last read {agoText(war.age)}, too long ago to trust, so the map is not coloured in.
+          </>
+        ) : (
+          "Drag to move, scroll or pinch to zoom, and click a planet to drop there."
+        )}
       </p>
       {query.trim() ? (
         <div className="flex max-h-56 flex-col gap-1 overflow-y-auto text-left">
           {hits.length === 0 ? (
             <Empty>{none || "No planet by that name. Try a sector."}</Empty>
-          ) : hits.map((p) => (
-            <PickRow key={p.name} on={p.name === chosen} onClick={() => onChoose(p.name)}
-              title={p.name}
-              sub={(p.sector ? p.sector + " sector · " : "") + biomeName(p.biome) +
-                (unplaced.includes(p.name) ? " · not on the map" : "")}
-              tags={loudHazards(p.hazards).map((h) => ({ key: h, label: hazardName(h), warn: true }))} />
-          ))}
+          ) : hits.map((p) => {
+            const w = live ? live.get(p.name) : null;
+            const fighting = w && w.campaign && w.front ? " · a front, against the " + FRONTS[w.front].label : "";
+            return (
+              <PickRow key={p.name} on={p.name === chosen} onClick={() => choose(p.name)}
+                title={p.name}
+                sub={(p.sector ? p.sector + " sector · " : "") + biomeName(p.biome) + fighting +
+                  (unplaced.includes(p.name) ? " · not on the map" : "")}
+                tags={loudHazards(p.hazards).map((h) => ({ key: h, label: hazardName(h), warn: true }))} />
+            );
+          })}
         </div>
       ) : null}
     </div>
@@ -1668,7 +1710,7 @@ export function ScenarioScreen({ scenario, setFaction, setPlanet, setBiome, togg
           </div>
 
           <div className="w-full">
-            <PlanetBar scenario={scenario} setPlanet={setPlanet} setBiome={setBiome}
+            <PlanetBar scenario={scenario} setPlanet={setPlanet} setFaction={setFaction} setBiome={setBiome}
               toggleHazard={toggleHazard} setMission={setMission} clearEnvironment={clearEnvironment} />
           </div>
 

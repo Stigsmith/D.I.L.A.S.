@@ -84,10 +84,11 @@ async function pull(name, url) {
   const res = await fetch(url, {
     headers: {
       "user-agent": "dds (community loadout tool)",
-      /* helldivers2.dev asks callers to identify themselves and refuses  */
-      /* the request without it.                                          */
-      "x-super-client": "dds",
-      "x-super-contact": "github.com/helldivers-2",
+      /* helldivers2.dev refuses a request that does not name its client */
+      /* and a contact. The same two the Worker sends, from wrangler.jsonc; */
+      /* this used to give the API's own organisation as our contact.       */
+      "x-super-client": "dds.stigly-official.workers.dev",
+      "x-super-contact": "dds.stigly-official.workers.dev",
     },
   });
   if (!res.ok) throw new Error(`${name}: ${res.status} ${res.statusText}`);

@@ -22,7 +22,7 @@ Everything below rests on one primitive: **data living somewhere that is not one
 > | 3 | Sync between devices | Needs the profiles question answered |
 > | 4 | Publishing and short links | |
 > | 5 | Exchange, friends, leaderboards | Needs "what is a run and what is a clear" answered. **Friends split off and wait on accounts opening**, which waits on the domain |
-> | 6 | Live war state | Needs no account. Pairs with the starmap |
+> | 6 | Live war state | **Built, 1.25.0, 30 September 2026, not yet deployed.** A Cron Trigger every five minutes, a snapshot in D1, the map coloured from it. See `CLAUDE.md`, The Galaxy Map |
 > | 7 | Live squad | **Built, 1.25.0, 29 September 2026, not yet deployed.** A party by code, no account. See `CLAUDE.md`, The Live Party |
 >
 > **Netlify stays the address people use until the domain is bought**, because each move of address empties everybody's collection and `workers.dev` to the domain would be a second move. See `CLAUDE.md`, Hosting.
@@ -329,6 +329,17 @@ The map moves **out of Phase 7 and into Phase 6a**, alongside the drop screen, b
 
 > [!warning] Moved again, 27 September 2026: after the live party
 > The curator's call. No planet dropdown was built for the drop screen: it uses the scenario screen that already existed, so the double work this paragraph warns about does not happen. The map replaces that picker once the party works.
+
+> [!success] Built, 1.25.0, 29 and 30 September 2026, with the live layer, not yet deployed
+> The map replaced the planet list on the scenario screen, and Drop Bay opens onto it while nothing says where you are dropping. The live layer came in the same version: who holds each planet in the faction hexes, the fronts ringed and named, and **choosing a planet with fighting on it sets the front**. See `CLAUDE.md`, The Galaxy Map.
+>
+> | "What live state adds" | As built |
+> |---|---|
+> | Only offering planets with an active campaign | **Emphasised, not enforced.** Fronts are larger, ringed, named and first in search; every planet stays choosable, for pre building while nobody is online. One filter away if the curator wants the rest hidden |
+> | Faction filled from who holds the planet | **Done.** The attacker in a defence, otherwise the owner. A quiet planet leaves the front alone |
+> | Active planet effects feeding the scoring engine | **Not yet.** The real prize, and the next step: the variant enemies in `enemies.json` are waiting for it |
+> | The Major Order as context | **Not yet** |
+> | The map as its own surface, with history | **Not yet.** The component stands alone, so this is a route and a data source, not a rebuild |
 
 The live layer stays optional and can arrive whenever. It needs no account, so it is independent of v2.
 

@@ -20,7 +20,7 @@ import { Plus, Minus, Maximize2 } from "lucide-react";
 
 import {
   VIEW, CENTRE, RADIUS, MAX_ZOOM, HOME, placed, lanes, sectors, roomFor, placeOf, matchSet,
-  clampView, zoomAt, centreOn,
+  clampView, zoomAt, centreOn, placeLabels,
 } from "./lib/galaxy.js";
 import { planetByName, biomeName, hazardName, loudHazards } from "./lib/scenario.js";
 
@@ -42,7 +42,12 @@ const NAME_ALL_MATCHES = 14;
 
 const LANE_PATH = lanes.map(({ a, b }) => `M${a.x.toFixed(1)} ${a.y.toFixed(1)}L${b.x.toFixed(1)} ${b.y.toFixed(1)}`).join("");
 
-export default function GalaxyMap({ chosen, onChoose, query = "", disabled = false, label }) {
+/**
+ * `war` is the cleaned live snapshot from lib/war.js, or null. `fronts`
+ * maps a front's id to its hex and its name, handed in by the caller so
+ * this file does not import the tier list, which imports this file.
+ */
+export default function GalaxyMap({ chosen, onChoose, query = "", disabled = false, label, war = null, fronts = {} }) {
   const svg = useRef(null);
   const [view, setView] = useState(HOME);
   const viewRef = useRef(view);
@@ -217,11 +222,37 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
   const u = 1 / (ppu * view.k);
   const namesMatches = matches && matches.size <= NAME_ALL_MATCHES;
 
-  /* Redrawn when the zoom, the choice or the search changes, never on a
-     pan: a pan only moves the group this sits in. */
+  /* Only a snapshot young enough to trust is drawn. An old one is not
+     drawn faded or with a warning on top: it is not drawn, and the line
+     under the map says why. */
+  const live = war && war.fresh ? war.planets : null;
+
+  /* Redrawn when the zoom, the choice, the search or the war changes, never
+     on a pan: a pan only moves the group this sits in. */
   const layer = useMemo(() => {
     const showSectors = ppu * view.k < SECTOR_UNTIL;
     const halo = { paintOrder: "stroke", strokeLinejoin: "round" };
+    const hexOf = (w) => (w && w.front && fronts[w.front] ? fronts[w.front].hex : null);
+
+    /* Which names are drawn. The chosen planet and the search's matches
+       always; then the fronts you can drop on, busiest first, since those
+       are the planets anybody is looking for; then any planet with room.
+       None of the last two is drawn over a name already placed. */
+    const scale = ppu * view.k;
+    const wanted = [];
+    for (const p of placed) {
+      const on = p.name === chosen;
+      const lit = matches ? matches.has(p.name) : false;
+      const w = !matches && live ? live.get(p.name) : null;
+      const front = Boolean(w && w.campaign);
+      const roomy = !matches && roomFor.get(p.name) * scale >= NAME_ROOM;
+      const offset = (front ? DOT * 1.5 : DOT) + 5;
+      if (on) wanted.push({ name: p.name, x: p.x, y: p.y, offset, priority: 0, must: true });
+      else if (lit && namesMatches) wanted.push({ name: p.name, x: p.x, y: p.y, offset, priority: 1, must: true });
+      else if (front) wanted.push({ name: p.name, x: p.x, y: p.y, offset, priority: 2, weight: w.players });
+      else if (roomy) wanted.push({ name: p.name, x: p.x, y: p.y, offset, priority: 3, weight: roomFor.get(p.name) });
+    }
+    const named = placeLabels(wanted, scale);
 
     return (
       <>
@@ -246,14 +277,29 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
           const on = p.name === chosen;
           const lit = matches ? matches.has(p.name) : false;
           const dim = matches && !lit && !on;
-          const r = (p.home ? HOME_DOT : DOT) * u;
-          const fill = on || lit ? "fill-brand" : p.home ? "fill-base-100" : dim ? "fill-base-700" : "fill-base-400";
+          /* With the war live: a planet somebody holds takes their colour, a
+             front you can drop on is larger and ringed, and a quiet planet
+             Super Earth holds steps back so the war reads first. */
+          const w = live ? live.get(p.name) : null;
+          const hex = hexOf(w);
+          const front = Boolean(w && w.campaign);
+          const r = (p.home ? HOME_DOT : front ? DOT * 1.5 : DOT) * u;
+          const painted = hex && !on && !lit;
+          const fill = on || lit ? "fill-brand"
+            : p.home ? "fill-base-100"
+            : painted ? ""
+            : dim ? "fill-base-700"
+            : live ? "fill-base-600"
+            : "fill-base-400";
           return (
-            <g key={p.name}>
+            <g key={p.name} opacity={dim ? 0.3 : 1}>
               {on ? (
                 <circle cx={p.x} cy={p.y} r={r + 5 * u} className="fill-none stroke-brand" strokeWidth={1.6 * u} />
+              ) : front && hex ? (
+                <circle cx={p.x} cy={p.y} r={r + 3.5 * u} fill="none" stroke={hex} strokeWidth={1.3 * u} />
               ) : null}
-              <circle cx={p.x} cy={p.y} r={r} className={fill} />
+              <circle cx={p.x} cy={p.y} r={r} className={fill}
+                style={painted ? { fill: hex, fillOpacity: front ? 1 : 0.55 } : undefined} />
               <circle cx={p.x} cy={p.y} r={HIT * u} fill="transparent" data-planet={p.name}
                 className={disabled ? "" : "cursor-pointer"} />
             </g>
@@ -261,13 +307,14 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
         })}
 
         {placed.map((p) => {
+          if (!named.has(p.name)) return null;
           const on = p.name === chosen;
           const lit = matches ? matches.has(p.name) : false;
-          const roomy = !matches && roomFor.get(p.name) * ppu * view.k >= NAME_ROOM;
-          if (!on && !roomy && !(lit && namesMatches)) return null;
+          const front = Boolean(!matches && live && live.get(p.name) && live.get(p.name).campaign);
           return (
-            <text key={p.name} x={p.x + (DOT + 5) * u} y={p.y} dominantBaseline="middle"
-              className={"pointer-events-none stroke-base-950 " + (on || lit ? "fill-brand" : "fill-base-300")}
+            <text key={p.name} x={p.x + ((front ? DOT * 1.5 : DOT) + 5) * u} y={p.y} dominantBaseline="middle"
+              className={"pointer-events-none stroke-base-950 " +
+                (on || lit ? "fill-brand" : front ? "fill-base-100" : "fill-base-300")}
               strokeWidth={3 * u}
               style={{ ...halo, fontFamily: OSWALD, fontSize: NAME_PX * u, letterSpacing: 0.3 * u }}>
               {p.name}
@@ -276,10 +323,11 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
         })}
       </>
     );
-  }, [view.k, ppu, chosen, matches, namesMatches, disabled, u]);
+  }, [view.k, ppu, chosen, matches, namesMatches, disabled, u, live, fronts]);
 
   const hovered = hover ? placeOf(hover) : null;
   const detail = hover ? planetByName.get(hover) : null;
+  const fight = detail && live ? warLine(live.get(detail.name), fronts) : null;
   const at = hovered
     ? { left: ((hovered.x * view.k + view.x) / VIEW) * 100, top: ((hovered.y * view.k + view.y) / VIEW) * 100 }
     : null;
@@ -326,6 +374,12 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
           ) : (
             <p className="mt-0.5 text-[10px] text-base-500">Nothing permanent here changes what you bring</p>
           )}
+          {fight ? (
+            <p className={"mt-1 border-t border-base-800 pt-1 text-[10px] leading-snug " + (fight.hex ? "" : "text-base-400")}
+              style={fight.hex ? { color: fight.hex } : undefined}>
+              {fight.text}
+            </p>
+          ) : null}
         </div>
       ) : null}
 
@@ -336,6 +390,35 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
       </div>
     </div>
   );
+}
+
+/* What is happening on a planet, in a sentence, for the hover card. */
+const pct = (share) => Math.round(share * 100) + "%";
+
+function timeLeft(ms) {
+  if (!Number.isFinite(ms) || ms <= 0) return null;
+  const hours = Math.floor(ms / 3600000);
+  if (hours >= 1) return hours === 1 ? "an hour left" : `${hours} hours left`;
+  const minutes = Math.max(1, Math.floor(ms / 60000));
+  return minutes === 1 ? "a minute left" : `${minutes} minutes left`;
+}
+
+function warLine(w, fronts) {
+  if (!w) return { text: "Super Earth holds it. Nothing to fight here right now.", hex: null };
+  const f = w.front ? fronts[w.front] : null;
+  const who = f ? f.label : "the enemy";
+  const hex = f ? f.hex : null;
+  const crowd = w.players ? ` ${w.players.toLocaleString("en-GB")} Helldivers here.` : "";
+  if (w.defence) {
+    const left = w.defence.endsAt ? timeLeft(w.defence.endsAt - Date.now()) : null;
+    const done = w.defence.progress !== null ? `, ${pct(w.defence.progress)} defended` : "";
+    return { text: `Under attack by the ${who}${done}${left ? ", " + left : ""}.${crowd}`, hex };
+  }
+  if (w.campaign) {
+    const done = w.liberation !== null ? `, ${pct(w.liberation)} liberated` : "";
+    return { text: `Held by the ${who}${done}.${crowd}`, hex };
+  }
+  return { text: `Held by the ${who}. No campaign here right now.`, hex };
 }
 
 function MapButton({ label, onClick, disabled, children }) {

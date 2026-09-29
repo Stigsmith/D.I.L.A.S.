@@ -106,9 +106,36 @@
   "durable_objects": {
     "bindings": [{ "name": "PARTY", "class_name": "Party" }]
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Party"] }]
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Party"] }],
 
-  // No `vars` yet. MAIL_FROM needs an address on a domain stigly owns, which
-  // is Stage 2; SUPER_CLIENT and SUPER_CONTACT belong to the war state fetch in
-  // Stage 6.
+  // The live war. Every five minutes the Worker fetches who holds what from
+  // api.helldivers2.dev and keeps a trimmed snapshot in D1; GET /api/war hands
+  // it out. See worker/war.ts, and Stage 6 of dds-cloudflare-handover.md.
+  //
+  // **Five Cron Triggers per account on the free plan**, and this is one.
+  // Enodia uses none. Verified on 29 September 2026 against
+  // developers.cloudflare.com/workers/platform/limits, along with the 10 ms of
+  // CPU a scheduled run gets, which war.ts measures itself against.
+  "triggers": { "crons": ["*/5 * * * *"] },
+
+  // Not secrets: printed on every request to the upstream.
+  //
+  // **Both are required.** The upstream's README still calls the contact
+  // optional; the service itself answers 400 "The X-Super-Client and
+  // X-Super-Contact headers are required" without it. Read off a real response
+  // on 30 September 2026.
+  //
+  // SUPER_CLIENT is who is asking: the tool's own address. **Change it with the
+  // domain.**
+  //
+  // SUPER_CONTACT is **a placeholder**, the same public address, because the
+  // service will not answer without one. It should be a project address, never
+  // a personal one, and which is stigly's to pick: the published repository,
+  // or an address on the domain once there is one.
+  //
+  // MAIL_FROM needs an address on a domain stigly owns, which is Stage 2.
+  "vars": {
+    "SUPER_CLIENT": "dds.stigly-official.workers.dev",
+    "SUPER_CONTACT": "dds.stigly-official.workers.dev"
+  }
 }
