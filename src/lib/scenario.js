@@ -66,6 +66,14 @@ export const hazardName = (slug) => (hazardInfo[slug] ? hazardInfo[slug].name : 
 /* disable Stratagems" is a rule; "Ion Storms" is a label.              */
 export const hazardEffect = (slug) => (hazardInfo[slug] ? hazardInfo[slug].description : "");
 
+/* Two entries in the hazard table are the absence of one. Every planet
+   with nothing special going on lists normal_temp, so counting it made
+   an ordinary planet read as hazardous. One definition, used by every
+   surface that lists what a planet does to you. The scenario keeps them,
+   since nothing reads them and a planet's own list is the fact. */
+export const QUIET_HAZARDS = new Set(["none", "normal_temp"]);
+export const loudHazards = (list) => (list || []).filter((h) => !QUIET_HAZARDS.has(h));
+
 /* Missions are chosen by the name the game uses. The traits underneath   */
 /* are what a scoring rule keys on, because "Retrieve Valuable Data" is   */
 /* the right thing to put in front of a person and "carry" is the right   */

@@ -79,6 +79,8 @@ src = inlineJson(read("src/lib/drop.js"), "vocabulary");
 src = swap(src, "loadouts", loadoutsUrl);
 const dropUrl = asModule(swap(src, "scenario", scenarioUrl));
 
+const galaxyUrl = asModule(inlineJson(read("src/lib/galaxy.js"), "planets"));
+
 export const items = await import(itemsUrl);
 export const enemies = await import(enemiesUrl);
 export const score = await import(scoreUrl);
@@ -86,5 +88,6 @@ export const loadouts = await import(loadoutsUrl);
 export const squad = await import(squadUrl);
 export const build = await import(buildUrl);
 export const drop = await import(dropUrl);
+export const galaxy = await import(galaxyUrl);
 
 export const FACTIONS = ["bots", "bugs", "squids"];

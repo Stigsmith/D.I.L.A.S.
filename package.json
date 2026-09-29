@@ -9,6 +9,7 @@
     "images": "node scripts/import-images.mjs",
     "validate": "node scripts/validate.mjs",
     "drop": "node scripts/check-drop.mjs",
+    "map": "node scripts/check-map.mjs",
     "roles": "node scripts/tag-roles.mjs",
     "prebuild": "npm run images && npm run validate",
     "build": "vite build",
