@@ -11,7 +11,7 @@
  * answers on the same hostname, so the whole API works under a policy that
  * never had to be opened up for it.
  *
- * Shaped after Enodia's `worker/index.ts` in `C:\Dev\Hades 2`, which carries
+ * Shaped after Enodia's `worker/index.ts` in `C:\Dev\Enodia`, which carries
  * a dozen more routes. Each arrives here with the stage that needs it, rather
  * than as a route nothing calls.
  *
@@ -21,18 +21,26 @@
  *   /api/capabilities  what this deployment can do. Public, and honest about mail
  *   /api/me            who is signed in
  *
- * ## What is deliberately not here yet
+ * ## The live party, Stage 7, which came before accounts open
  *
- * **`worker/limit.ts`**, the counter for routes better-auth cannot see. The
- * three routes above are either better-auth's own, which it limits itself, or
- * a session read. Enodia's limiter arrives with Stage 3, sync, which is the
- * first route of ours that writes anything.
+ *   POST /api/party         open a party. Answers with its code
+ *   GET  /api/party/<code>  the WebSocket for one party, handed to its Durable Object
+ *
+ * Neither needs an account: the curator's call, 27 September 2026, because
+ * accounts cannot open until a domain exists and a party code needs only this
+ * Worker. `worker/party.ts` is the party; `worker/limit.ts` counts both routes,
+ * which are the first of ours better-auth cannot see.
  */
 
 import { drizzle } from 'drizzle-orm/d1'
 
 import { createAuth } from './auth.ts'
+import { RULES, addressKey, take } from './limit.ts'
+import { cleanName, hashToken, newCode, normaliseCode, validToken } from './party.ts'
 import * as schema from './schema.ts'
+
+/** The Durable Object class has to be exported from the entry point to exist. */
+export { Party } from './party.ts'
 
 /**
  * `Env` is not declared here. `npm run types` derives it from `wrangler.jsonc`
@@ -63,6 +71,10 @@ import * as schema from './schema.ts'
  * auth.test.ts would fail on the session tests if it did not.
  */
 const harden = (response: Response): Response => {
+  // A WebSocket upgrade cannot be copied into a fresh Response: the copy loses
+  // the socket and a 101 without one throws. It carries no body to sniff and
+  // nothing to cache, so it goes out as the Durable Object made it.
+  if (response.status === 101) return response
   const out = new Response(response.body, response)
   out.headers.set('x-content-type-options', 'nosniff')
   if (!out.headers.has('cache-control')) out.headers.set('cache-control', 'no-store')
@@ -74,6 +86,34 @@ const json = (body: unknown, status = 200) =>
     status,
     headers: { 'content-type': 'application/json; charset=utf-8' },
   })
+
+/**
+ * A refusal from `limit.ts`, with the wait in the sentence, because "too many
+ * requests" with no number is indistinguishable from being broken. Enodia's
+ * shape: `retry-after` is the standard header, `x-retry-after` is what
+ * better-auth sends on its own routes, and both are set.
+ */
+const tooMany = (retryAfter: number) =>
+  new Response(
+    JSON.stringify({
+      error: `Too many tries. Wait ${retryAfter} second${retryAfter === 1 ? '' : 's'} and try again.`,
+    }),
+    {
+      status: 429,
+      headers: {
+        'content-type': 'application/json; charset=utf-8',
+        'retry-after': String(retryAfter),
+        'x-retry-after': String(retryAfter),
+      },
+    },
+  )
+
+/**
+ * Same origin or nothing. better-auth checks this on its own routes; the party
+ * routes are ours, so they check it here. A page on another site cannot open
+ * parties in a visitor's name or hold sockets on this API.
+ */
+const sameOrigin = (request: Request, url: URL) => request.headers.get('origin') === url.origin
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -125,6 +165,50 @@ async function route(request: Request, env: Env): Promise<Response> {
       user: { id: session.user.id, email: session.user.email, name: session.user.name },
       expiresAt: session.session.expiresAt,
     })
+  }
+
+  if (url.pathname === '/api/party') {
+    if (request.method !== 'POST') return json({ error: 'Open a party with a POST.' }, 405)
+    if (!sameOrigin(request, url)) return json({ error: 'wrong origin' }, 403)
+    const over = await take(db, addressKey('open', request), RULES.open)
+    if (over) return tooMany(over.retryAfter)
+
+    const raw = await request.text()
+    if (raw.length > 1024) return json({ error: 'That request is too large.' }, 413)
+    let body: { token?: unknown; name?: unknown }
+    try {
+      body = JSON.parse(raw)
+    } catch {
+      return json({ error: 'That request is not JSON.' }, 400)
+    }
+    if (!validToken(body.token)) return json({ error: 'No token.' }, 400)
+    const name = cleanName(body.name) ?? 'Helldiver'
+    const tokenHash = await hashToken(body.token)
+
+    /**
+     * A clash with a live party is one in hundreds of millions per try, so
+     * five tries failing means something else is wrong. Said plainly rather
+     * than looping.
+     */
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const code = newCode()
+      const stub = env.PARTY.get(env.PARTY.idFromName(code))
+      if (await stub.open(code, tokenHash, name)) return json({ code }, 201)
+    }
+    return json({ error: 'Could not find a free code. Try again in a moment.' }, 503)
+  }
+
+  const joining = url.pathname.match(/^\/api\/party\/([^/]+)$/)
+  if (joining) {
+    if (request.headers.get('upgrade')?.toLowerCase() !== 'websocket') {
+      return json({ error: 'This address only speaks WebSocket.' }, 426)
+    }
+    if (!sameOrigin(request, url)) return json({ error: 'wrong origin' }, 403)
+    const code = normaliseCode(decodeURIComponent(joining[1] ?? ''))
+    if (!code) return json({ error: 'That is not a party code.' }, 404)
+    const over = await take(db, addressKey('join', request), RULES.join)
+    if (over) return tooMany(over.retryAfter)
+    return env.PARTY.get(env.PARTY.idFromName(code)).fetch(request)
   }
 
   return json({ error: 'no such route' }, 404)

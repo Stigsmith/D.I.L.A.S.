@@ -3,7 +3,7 @@
 # Vite copies this out of public/ into dist/, which is the assets directory
 # Cloudflare reads it from. It is parsed at deploy time and never served.
 #
-# Ported from Enodia's assets/_headers in C:\Dev\Hades 2, which found every
+# Ported from Enodia's assets/_headers in C:\Dev\Enodia, which found every
 # trap below the hard way. Read it before changing anything here.
 #
 # TWO THINGS THAT WILL BITE WHOEVER EDITS THIS NEXT.
