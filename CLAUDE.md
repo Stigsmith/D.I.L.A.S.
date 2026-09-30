@@ -822,8 +822,23 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!danger] The data's y points up, and the flip lives in exactly one place
 > `project()` in `galaxy.js`. Cyberstan, the Automaton home world, sits up and to the left in game and does here; `npm run map` checks it, and a map drawn without the flip fails that check and nothing else.
 
-> [!info] The game's layout, not its styling
-> A chart to be read: grey dots, plain supply lines, sector names in small caps, the chosen planet ringed in the brand colour. No scanlines, no glow, no holo table. The ambient layer already carries each theme's atmosphere, behind the content where a texture belongs.
+> [!info] Two skins: the chart, and the Galactic War table
+> **The chart** is the game's layout without its styling: grey dots, plain supply lines, sector names in small caps, the chosen planet ringed in the brand colour, colours from the theme. It was the only look until 30 September 2026, on the reasoning that a planning tool is read rather than admired.
+>
+> **The Galactic War table** is the second skin, which the curator asked for on 30 September 2026 with screenshots of the game's own screen. A switch in the map's top left corner, remembered per browser in `hd2-map-skin`, out of the export. Its colours are the game's rather than the theme's, on purpose, because it is a picture of a place in the game; the faction hexes are still the locked three. `WarBackdrop` in `GalaxyMap.jsx` draws it; `TABLE`, `sectorHolders` and `frontArcs` in `galaxy.js` are its geometry.
+>
+> | On the table | |
+> |---|---|
+> | **Space** | A dark disc with a fixed starfield and four soft nebulae, placed once from a seed so nothing moves between renders |
+> | **Sectors** | Stepped zones on a polar grid, held ones filled and hatched in the front's colour, brighter where there is a front to drop on |
+> | **The rim** | A dark band with ticks, and each front's name written into it at the middle of its territory |
+> | **Planets** | Small lit spheres in the colour of their world, Super Earth as a glowing globe at the centre, the game's target reticle over every front |
+> | **Names** | Under the planet in capitals, in the holder's colour, with a liberation bar under every front: blue for what Super Earth has taken back |
+> | **The hover card** | The game's bordered box in the holder's colour, with the liberation bar and "N% LIBERATED" leading on a front |
+>
+> **The game's sector shapes are not published, so the zones are built from the planets.** Twelve rings, each cut into cells about as wide as they are deep, each cell given to the sector of the planet nearest its middle, runs of one sector merged: 183 wedges, every one of the 55 sectors on the table, and **254 of 271 planets inside their own sector's zone**. The stepped look is the game's; the exact borders are not, and nothing claims they are.
+>
+> **A sector is held by the front holding at least half its planets**, from the live war only. No war, or one too old to trust, and the table is dark, the same rule the chart keeps. **The table shows no sector names**, as the game does not until you hover, and **no planet name reaches into the rim band**, which belongs to the fronts' names. **The Gloom and other planet effects are not drawn**: the game paints the Gloom as a yellow cloud, but no steady source says where it is, and inventing its place would be the stale map problem in a new coat.
 
 > [!info] How it behaves
 > - **Marks keep their size on screen at every zoom.** Zooming in spreads the planets apart rather than inflating them, and **a planet's name appears once there is room for it**, measured against its own nearest neighbour, so the sparse rim labels itself early and the crowded core waits. Sector names show while you are zoomed out and step aside once planet names take over.
@@ -891,7 +906,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!info] Names are placed, not just drawn
 > Every name that wants to show is placed in priority order and skipped if it would overlap one already placed: the chosen planet and search matches always, then fronts by how many Helldivers are on them, then any planet with room. `placeLabels` in `galaxy.js`. Thirty eight fronts named at once had run into each other in the dense clusters; now a name that does not fit waits for a closer zoom.
 
-**`npm run map`** checks the arithmetic against the shipped table: the right way up, every planet inside the disc, each supply line drawn once and none missing, search, that zooming holds the point under the cursor still, how the browser reads a war snapshot, which names fit, and what the planner suggests. Seven of its rules were broken on purpose on 29 and 30 September 2026 and each broke exactly its own check. The server half is in `worker/war.test.ts`, sixteen tests with the upstream stood in for, the Major Order fixture being the real answer; eight of its rules were broken the same way.
+**`npm run map`** checks the arithmetic against the shipped table: the right way up, every planet inside the disc, each supply line drawn once and none missing, search, that zooming holds the point under the cursor still, how the browser reads a war snapshot, which names fit, what the planner suggests, and that the table's rings close and its zones hold their planets. Seven of its rules were broken on purpose on 29 and 30 September 2026 and each broke exactly its own check. The server half is in `worker/war.test.ts`, sixteen tests with the upstream stood in for, the Major Order fixture being the real answer; eight of its rules were broken the same way.
 
 ---
 

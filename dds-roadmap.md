@@ -323,6 +323,11 @@ The Companion site recreates the in-game holo table and lands in the uncanny val
 
 The game's interface is designed to look like military hardware. A planning tool is designed to be read. The map should match the game's **layout**, because that is what makes the click instant, and not its **styling**, because that is what makes it unreadable.
 
+> [!success] Reversed at the curator's request, 30 September 2026: a second skin that looks like the game
+> He asked for "a separate skin for the galaxy map resembling the actual one, with the zones and the effects", with screenshots of the game's Galactic War screen. So the chart above stays, and **a Galactic War table sits beside it as a switch**: polar sector zones hatched in the holder's colour, the rim with the fronts' names, spheres, reticles and liberation bars. Built in 1.25.0; `CLAUDE.md`, The Galaxy Map, has the detail.
+>
+> **Two gaps, both admitted on screen and in the docs.** The game's sector shapes are not published, so the zones are built from where the planets are. And the effects he mentioned, the Gloom's yellow cloud above all, need the same live planet effects nothing reliable publishes yet: see "Planet effects have no steady source yet" below. The day that source exists, the table is where they get drawn.
+
 ### Order, revised
 
 The map moves **out of Phase 7 and into Phase 6a**, alongside the drop screen, because it is that screen's entry point rather than a later addition. Building a planet dropdown, then a drop screen, then replacing the dropdown with a map is doing the work twice.

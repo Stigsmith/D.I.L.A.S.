@@ -206,3 +206,27 @@ ok(hellmireHazards.length > 0 && dodge.picks[dodge.picks.length - 1].name === "H
 ok(galaxy.suggestFronts(null, {}) === null && galaxy.suggestFronts({ ...planWar, fresh: false }, {}) === null,
   "with no live war, or one too old to trust, there is nothing to suggest");
 ok(galaxy.suggestFronts(planWar, {}).picks[0].name === "Malevelon Creek", "with no side chosen, every front is in the running");
+
+/* The war table */
+const T = galaxy.TABLE;
+let ringsWhole = true;
+for (const ring of T.rings) {
+  const spans = T.runs.filter((r) => r.r0 === ring.r0).reduce((n, r) => n + (r.a1 - r.a0), 0);
+  if (Math.abs(spans - 2 * Math.PI) > 1e-9) ringsWhole = false;
+}
+ok(ringsWhole, `every ring of the table is covered exactly once all the way round (${T.rings.length} rings, ${T.runs.length} wedges)`);
+const sectorNames = new Set(galaxy.sectors.map((s) => s.name));
+ok(T.runs.every((r) => sectorNames.has(r.sector)), "every wedge belongs to a real sector");
+const zoned = new Set(T.runs.map((r) => r.sector));
+const zoneless = galaxy.sectors.filter((s) => !zoned.has(s.name)).map((s) => s.name);
+ok(zoneless.length === 0, `every sector has ground on the table${zoneless.length ? ": missing " + zoneless.join(", ") : ""}`);
+const zonable = galaxy.placed.filter((p) => !p.home && p.sector !== "TBD");
+const inOwn = zonable.filter((p) => galaxy.zoneAt(p.x, p.y) === p.sector).length;
+ok(inOwn / zonable.length >= 0.85, `planets sit inside their own sector's zone: ${inOwn} of ${zonable.length}`);
+const holders = galaxy.sectorHolders(planWar);
+ok(galaxy.sectorHolders(null).size === 0 && galaxy.sectorHolders({ ...planWar, fresh: false }).size === 0,
+  "with no live war, or one too old to trust, no sector is coloured");
+const creekSector = table.find((p) => p.name === "Malevelon Creek").sector;
+ok(holders.get(creekSector) && holders.get(creekSector).campaign, "a sector with a front in it is marked as one");
+ok(galaxy.frontArcs(new Map([[creekSector, { front: "bots", share: 1, campaign: true }]]))[0].front === "bots",
+  "a front's name goes where its territory is");

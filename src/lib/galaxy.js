@@ -320,8 +320,13 @@ export function placeLabels(candidates, scale) {
     const width = c.name.length * (c.charPx || LABEL_CHAR_PX) + 4;
     const height = c.height || LABEL_HEIGHT_PX;
     const x = c.x * scale;
-    const left = c.side === "middle" ? x - width / 2 : c.side === "left" ? x - (c.offset || 0) - width : x + (c.offset || 0);
-    const box = { left, right: left + width, top: c.y * scale - height / 2, bottom: c.y * scale + height / 2 };
+    const y = c.y * scale;
+    const box = c.side === "below"
+      ? { left: x - width / 2, right: x + width / 2, top: y + (c.offset || 0), bottom: y + (c.offset || 0) + height }
+      : (() => {
+          const left = c.side === "middle" ? x - width / 2 : c.side === "left" ? x - (c.offset || 0) - width : x + (c.offset || 0);
+          return { left, right: left + width, top: y - height / 2, bottom: y + height / 2 };
+        })();
     const clash = boxes.some((b) => box.left < b.right && box.right > b.left && box.top < b.bottom && box.bottom > b.top);
     if (clash && !c.must) continue;
     boxes.push(box);
@@ -388,4 +393,154 @@ export function suggestFronts(war, { front = null, avoidCaves = false, fewerMega
     b.players - a.players ||
     a.name.localeCompare(b.name));
   return { picks: fits.slice(0, limit), fits: new Set(fits.map((f) => f.name)), count: fits.length, hiddenForCaves: caves };
+}
+
+/* ------------------------------------------------------------------ */
+/* The war table: the game's own look, as a second skin                */
+/*                                                                     */
+/* The curator asked for a skin that looks like the game's Galactic    */
+/* War screen, 30 September 2026: sectors as stepped zones on a polar  */
+/* grid, filled and hatched in the colour of whoever holds them.       */
+/*                                                                     */
+/* **The game's sector shapes are not published**, so they are built    */
+/* here from the planets. The disc is cut into rings, each ring into   */
+/* cells about as wide as they are deep, and each cell goes to the     */
+/* sector of the planet nearest its middle. Runs of cells from one     */
+/* sector merge into one wedge. That gives the game's stepped polar    */
+/* look with borders drawn from where the planets actually are; they   */
+/* will not match the game's own line for line, and nothing claims     */
+/* they do. The middle disc is Sol, which is Super Earth alone.        */
+/* ------------------------------------------------------------------ */
+
+export const TABLE = (() => {
+  const SOL = 44;
+  const OUTER = RADIUS + 22;
+  const RINGS = 12;
+  const depth = (OUTER - SOL) / RINGS;
+  const seeds = placed.filter((p) => !p.home && p.sector && p.sector !== "TBD");
+  const nearest = (x, y) => {
+    let best = null;
+    let bestD = Infinity;
+    for (const p of seeds) {
+      const d = (p.x - x) ** 2 + (p.y - y) ** 2;
+      if (d < bestD) {
+        bestD = d;
+        best = p;
+      }
+    }
+    return best.sector;
+  };
+
+  const runs = [];
+  const rings = [];
+  for (let i = 0; i < RINGS; i++) {
+    const r0 = SOL + i * depth;
+    const r1 = r0 + depth;
+    const mid = (r0 + r1) / 2;
+    const n = Math.max(8, Math.round((2 * Math.PI * mid) / (depth * 1.25)));
+    rings.push({ r0, r1, cells: n });
+    const cells = Array.from({ length: n }, (_, j) => {
+      const a = ((j + 0.5) / n) * 2 * Math.PI;
+      return nearest(CENTRE + mid * Math.cos(a), CENTRE + mid * Math.sin(a));
+    });
+    const step = (2 * Math.PI) / n;
+    /* A ring held by one sector all the way round is two halves, since a
+       single arc cannot start and end at the same point. */
+    const start = cells.findIndex((s, j) => s !== cells[(j - 1 + n) % n]);
+    if (start === -1) {
+      runs.push({ sector: cells[0], r0, r1, a0: 0, a1: Math.PI }, { sector: cells[0], r0, r1, a0: Math.PI, a1: 2 * Math.PI });
+      continue;
+    }
+    for (let j = start, done = 0; done < n;) {
+      const s = cells[j % n];
+      let len = 0;
+      while (done + len < n && cells[(j + len) % n] === s) len += 1;
+      runs.push({ sector: s, r0, r1, a0: j * step, a1: (j + len) * step });
+      j += len;
+      done += len;
+    }
+  }
+  return { sol: SOL, outer: OUTER, rings, runs };
+})();
+
+const at = (r, a) => `${(CENTRE + r * Math.cos(a)).toFixed(1)} ${(CENTRE + r * Math.sin(a)).toFixed(1)}`;
+
+/* One wedge of a ring, as an SVG path. */
+export const wedgePath = ({ r0, r1, a0, a1 }) => {
+  const large = a1 - a0 > Math.PI ? 1 : 0;
+  return `M${at(r1, a0)}A${r1.toFixed(1)} ${r1.toFixed(1)} 0 ${large} 1 ${at(r1, a1)}` +
+    `L${at(r0, a1)}A${r0.toFixed(1)} ${r0.toFixed(1)} 0 ${large} 0 ${at(r0, a0)}Z`;
+};
+
+/* Every sector's zone as one path, built once. */
+export const sectorZones = (() => {
+  const paths = new Map();
+  for (const run of TABLE.runs) paths.set(run.sector, (paths.get(run.sector) || "") + wedgePath(run));
+  return paths;
+})();
+
+/* Which wedge a point on the map falls in, for the checks. */
+export function zoneAt(x, y) {
+  const r = Math.hypot(x - CENTRE, y - CENTRE);
+  let a = Math.atan2(y - CENTRE, x - CENTRE);
+  if (a < 0) a += 2 * Math.PI;
+  for (const run of TABLE.runs) {
+    if (r < run.r0 || r >= run.r1) continue;
+    for (const aa of [a, a + 2 * Math.PI]) if (aa >= run.a0 && aa < run.a1) return run.sector;
+  }
+  return null;
+}
+
+/* Who holds each sector, from the live war: the front holding the most of
+   its planets, when that is at least half of them. A sector with a front
+   you can drop on is marked as one. Nothing live, nothing held: the table
+   draws every sector dark, the same rule the chart keeps. */
+export function sectorHolders(war) {
+  const out = new Map();
+  if (!war || !war.fresh) return out;
+  const tally = new Map();
+  for (const p of placed) {
+    if (p.home || !p.sector || p.sector === "TBD") continue;
+    const t = tally.get(p.sector) || { total: 0, by: {}, campaign: false };
+    t.total += 1;
+    const w = war.planets.get(p.name);
+    if (w && w.owner) t.by[w.owner] = (t.by[w.owner] || 0) + 1;
+    if (w && w.campaign) t.campaign = true;
+    tally.set(p.sector, t);
+  }
+  for (const [sector, t] of tally) {
+    const [front, count] = Object.entries(t.by).sort((a, b) => b[1] - a[1])[0] || [null, 0];
+    if (front && count * 2 >= t.total) out.set(sector, { front, share: count / t.total, campaign: t.campaign });
+    else if (t.campaign) out.set(sector, { front: null, share: 0, campaign: true });
+  }
+  return out;
+}
+
+/* Where each front's name goes on the rim: the middle of its territory,
+   weighted by area, the way the game writes AUTOMATONS across its red. */
+export function frontArcs(holders) {
+  const sums = new Map();
+  for (const run of TABLE.runs) {
+    const h = holders.get(run.sector);
+    if (!h || !h.front) continue;
+    const area = (run.a1 - run.a0) * (run.r1 ** 2 - run.r0 ** 2);
+    const mid = (run.a0 + run.a1) / 2;
+    const s = sums.get(h.front) || { x: 0, y: 0, area: 0 };
+    s.x += Math.cos(mid) * area;
+    s.y += Math.sin(mid) * area;
+    s.area += area;
+    sums.set(h.front, s);
+  }
+  return [...sums].map(([front, s]) => ({ front, angle: Math.atan2(s.y, s.x), area: s.area }));
+}
+
+/* An arc to write a front's name along, reading left to right whichever
+   side of the disc it is on. */
+export function arcPath(angle, radius, span = 0.55) {
+  const bottom = Math.sin(angle) > 0;
+  const a0 = angle - span / 2;
+  const a1 = angle + span / 2;
+  return bottom
+    ? `M${at(radius, a1)}A${radius} ${radius} 0 0 0 ${at(radius, a0)}`
+    : `M${at(radius, a0)}A${radius} ${radius} 0 0 1 ${at(radius, a1)}`;
 }
