@@ -23,6 +23,7 @@ import {
   clampView, zoomAt, centreOn, placeLabels, labelSide,
 } from "./lib/galaxy.js";
 import { planetByName, biomeName, hazardName, loudHazards } from "./lib/scenario.js";
+import { untilText } from "./lib/war.js";
 
 const OSWALD = "'Oswald', sans-serif";
 
@@ -397,6 +398,44 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
         <MapButton label="Zoom out" onClick={() => zoomBy(1 / 1.6)} disabled={view.k <= 1}><Minus className="h-3.5 w-3.5" /></MapButton>
         <MapButton label="The whole galaxy" onClick={() => setView(HOME)} disabled={view.k <= 1}><Maximize2 className="h-3.5 w-3.5" /></MapButton>
       </div>
+    </div>
+  );
+}
+
+/**
+ * The Major Order, above the map, as context for where to go. Its briefing
+ * in the game's words, when it ends, and a bar per task in the colour of
+ * the front the task is on. Nothing here says what a task asks, because
+ * that is not published and the briefing already says it.
+ */
+export function MajorOrder({ order, fronts = {} }) {
+  if (!order) return null;
+  return (
+    <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2 text-left">
+      <p className="flex items-baseline justify-between gap-3">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-brand" style={{ fontFamily: OSWALD }}>
+          Major Order
+        </span>
+        <span className="text-[10px] text-base-500">{untilText(order.endsAt - Date.now())} left</span>
+      </p>
+      <p className="mt-1 text-xs leading-relaxed text-base-300">{order.briefing}</p>
+      {order.tasks.length ? (
+        <div className="mt-2 flex flex-col gap-1.5">
+          {order.tasks.map((t, i) => {
+            const f = t.front ? fronts[t.front] : null;
+            return (
+              <div key={i} className="flex items-center gap-2">
+                <span className="w-20 shrink-0 truncate text-[10px] text-base-400">{f ? f.label : `Task ${i + 1}`}</span>
+                <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-base-800">
+                  <span className={"block h-full rounded-full " + (f ? "" : "bg-brand")}
+                    style={{ width: `${Math.round(t.done * 100)}%`, ...(f ? { backgroundColor: f.hex } : {}) }} />
+                </span>
+                <span className="w-9 shrink-0 text-right text-[10px] text-base-400">{Math.round(t.done * 100)}%</span>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }

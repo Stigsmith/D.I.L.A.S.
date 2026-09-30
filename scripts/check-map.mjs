@@ -156,3 +156,20 @@ const sectorUnder = galaxy.placeLabels([
   { key: "sector:Planetary", name: "Planetary", x: 110, y: 100, side: "middle", priority: 4 },
 ], 1);
 ok(sectorUnder.has("Planet") && !sectorUnder.has("sector:Planetary"), "a sector's name steps aside for a planet's");
+
+/* The Major Order, as the browser reads it */
+const withOrder = { ...snapshot, order: {
+  title: "MAJOR ORDER",
+  briefing: "<i=1>Kill</i> the requisite   enemies.",
+  expiresAt: new Date(NOW + 30 * 3600000).toISOString(),
+  tasks: [{ race: 2, goal: 25000000, progress: 12759594 }, { race: 3, goal: 5000000, progress: 2114700 }, { race: 1, goal: 1, progress: 1 }, { race: 9, goal: 0, progress: 5 }],
+} };
+const mo = galaxy.cleanWar(withOrder, NOW).order;
+ok(mo && mo.briefing === "Kill the requisite enemies.", "the order's briefing loses the game's formatting tags");
+ok(mo.tasks.length === 3 && mo.tasks[0].front === "bugs" && mo.tasks[1].front === "bots" && mo.tasks[2].front === null,
+  "each task is on its front by the game's own number, Super Earth is no front, and a task with no goal is dropped");
+ok(Math.abs(mo.tasks[0].done - 0.51038376) < 1e-6, "a task's bar is its progress over its goal");
+const ended = galaxy.cleanWar({ ...withOrder, order: { ...withOrder.order, expiresAt: new Date(NOW - 1000).toISOString() } }, NOW);
+ok(ended.order === null, "an order that has ended is no order");
+ok(galaxy.cleanWar(withOrder, withOrder.fetchedAt + galaxy.WAR_TOO_OLD_MS + 1).order === null,
+  "an order read more than half an hour ago is not shown, the same as the map");

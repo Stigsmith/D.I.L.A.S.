@@ -134,7 +134,8 @@ export function About() {
           shipped with the tool, so the map draws with nothing fetched.
         </p>
         <p className="text-base-500">
-          Who holds each planet, where the fronts are and how they are going come from the same API, live. This
+          Who holds each planet, where the fronts are, how they are going and the Major Order come from the same
+          API, live. This
           tool's own server asks it every five minutes and keeps the answer, and your browser only ever asks this
           tool's server, never anybody else. Nothing about you goes with the question. An answer more than half an
           hour old is not drawn, because an out of date map looks exactly like a current one.

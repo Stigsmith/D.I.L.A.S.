@@ -32,7 +32,7 @@ import { scoreItem, scenarioIsSet } from "./lib/score.js";
 import { readBuild, explainScore } from "./lib/build.js";
 import { describeArmour, enemiesUpTo, arrivalsLine, EXPOSURE_GAP, enemySource } from "./lib/enemies.js";
 import TierBadgePlate from "./TierBadgePlate.jsx";
-import GalaxyMap from "./GalaxyMap.jsx";
+import GalaxyMap, { MajorOrder } from "./GalaxyMap.jsx";
 import { searchPlanets, unplaced, frontOf } from "./lib/galaxy.js";
 import { useWar, agoText } from "./lib/war.js";
 import { useBadgeStyle } from "./lib/badge.js";
@@ -595,6 +595,7 @@ export function PlanetChooser({ chosen, onChoose, none, autoFocus = true }) {
     <div className="flex flex-col gap-2.5">
       <SearchField placeholder={"Search " + planets.length + " planets or a sector"} query={query} setQuery={setQuery}
         autoFocus={autoFocus} />
+      <MajorOrder order={war ? war.order : null} fronts={FRONTS} />
       <GalaxyMap chosen={chosen} query={query} onChoose={choose} war={war} fronts={FRONTS} />
       <p className="text-center text-[10px] leading-relaxed text-base-600">
         {war && war.fresh ? (
