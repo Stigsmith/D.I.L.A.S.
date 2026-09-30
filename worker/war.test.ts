@@ -16,7 +16,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import worker from './index.ts'
 import * as schema from './schema.ts'
-import { type Fetcher, UPSTREAM, refreshWar, trimWar } from './war.ts'
+import { type Fetcher, UPSTREAM, refreshWar, trimOrder, trimWar } from './war.ts'
 
 const ORIGIN = 'https://dds.stigly-official.workers.dev'
 const db = drizzle(env.DB, { schema })
@@ -61,6 +61,23 @@ const CAMPAIGNS = [
   { id: 9, planet: PLANETS[4], type: 0, count: 1, faction: 'Illuminate' },
 ]
 
+/** The Major Order exactly as the real service sent it on 30 September 2026. */
+const ORDER = [{
+  id: 1715805482,
+  title: 'MAJOR ORDER',
+  briefing: 'Kill the requisite enemies to ensure early investors in the TD-110 Maelstrom Tanks receive their promised deluxe features.',
+  description: null,
+  expiration: '2026-10-01T19:30:02.5980151Z',
+  flags: 0,
+  progress: [12759594, 2114700],
+  tasks: [
+    { type: 3, values: [2, 0, 25000000, 2651633799, 0, 0, 0, 0, 0, 0], valueTypes: [1, 2, 3, 4, 6, 5, 8, 9, 11, 12] },
+    { type: 3, values: [3, 0, 5000000, 2664856027, 0, 0, 0, 0, 0, 0], valueTypes: [1, 2, 3, 4, 6, 5, 8, 9, 11, 12] },
+  ],
+  reward: { type: 1, amount: 40 },
+  rewards: [{ type: 1, amount: 40 }],
+}]
+
 type Call = { url: string; headers: Record<string, string> }
 
 /** A stand in for the upstream that answers from the fixtures and records what it was asked. */
@@ -74,6 +91,7 @@ function fake(answers: Partial<Record<string, () => Response>> = {}) {
     if (answer) return answer()
     if (path === '/api/v1/planets') return Response.json(PLANETS)
     if (path === '/api/v1/campaigns') return Response.json(CAMPAIGNS)
+    if (path === '/api/v1/assignments') return Response.json(ORDER)
     return new Response('not found', { status: 404 })
   }
   return { fetcher, calls }
@@ -125,6 +143,33 @@ describe('trimming the upstream answer', () => {
   })
 })
 
+describe('trimming the Major Order', () => {
+  it('reads the briefing, the end and each task\'s faction, goal and progress off the real shape', () => {
+    expect(trimOrder(ORDER)).toEqual({
+      title: 'MAJOR ORDER',
+      briefing: ORDER[0]?.briefing,
+      expiresAt: '2026-10-01T19:30:02.5980151Z',
+      tasks: [
+        { race: 2, goal: 25_000_000, progress: 12_759_594 },
+        { race: 3, goal: 5_000_000, progress: 2_114_700 },
+      ],
+    })
+  })
+
+  it('is nothing when there is no order, or what arrived is not one', () => {
+    expect(trimOrder([])).toBeNull()
+    expect(trimOrder(null)).toBeNull()
+    expect(trimOrder([{ title: 'MAJOR ORDER' }])).toBeNull()
+  })
+
+  it('bounds a strange one', () => {
+    const odd = trimOrder([{ briefing: 'x'.repeat(5000), expiration: '2026-10-01T00:00:00Z', tasks: Array(40).fill({ values: ['a'], valueTypes: [1] }) }])
+    expect(odd?.briefing.length).toBe(600)
+    expect(odd?.tasks).toHaveLength(8)
+    expect(odd?.tasks[0]).toEqual({ race: null, goal: 0, progress: 0 })
+  })
+})
+
 describe('fetching and serving the snapshot', () => {
   it('answers 503 until a fetch has ever worked', async () => {
     const response = await war()
@@ -140,18 +185,21 @@ describe('fetching and serving the snapshot', () => {
     expect(response.status).toBe(200)
     expect(response.headers.get('cache-control')).toBe('public, max-age=60')
     expect(response.headers.get('x-content-type-options')).toBe('nosniff')
-    const body = await response.json<{ fetchedAt: number; triedAt: number; ok: boolean; planets: { name: string }[] }>()
+    const body = await response.json<{ fetchedAt: number; triedAt: number; ok: boolean; planets: { name: string }[]; order: { tasks: unknown[] } | null }>()
     expect(body.fetchedAt).toBe(1_000_000)
     expect(body.triedAt).toBe(1_000_000)
     expect(body.ok).toBe(true)
     expect(body.planets.map((p) => p.name)).toEqual(['MALEVELON CREEK', 'BACKWATER', 'UNDER SIEGE'])
+    expect(body.order?.tasks).toHaveLength(2)
   })
 
   /** The service answers 400 to a request missing either header. Found against the real one. */
   it('names the tool and a contact to the upstream on both paths', async () => {
     const { fetcher, calls } = fake()
     await refreshWar(db, identity, fetcher)
-    expect(calls.map((c) => c.url).sort()).toEqual([`${UPSTREAM}/api/v1/campaigns`, `${UPSTREAM}/api/v1/planets`])
+    expect(calls.map((c) => c.url).sort()).toEqual([
+      `${UPSTREAM}/api/v1/assignments`, `${UPSTREAM}/api/v1/campaigns`, `${UPSTREAM}/api/v1/planets`,
+    ])
     expect(calls.every((c) => c.headers['x-super-client'] === 'dds.test')).toBe(true)
     expect(calls.every((c) => c.headers['x-super-contact'] === 'contact.test')).toBe(true)
   })
@@ -187,6 +235,16 @@ describe('fetching and serving the snapshot', () => {
     expect(row).toEqual({ ok: 0, error: 'connection reset' })
   })
 
+  /** The order is context. Losing it must not cost the map its colour. */
+  it('still lands the war when only the Major Order fails, with no order', async () => {
+    const orderDown = fake({ '/api/v1/assignments': () => new Response('busy', { status: 503 }) })
+    expect(await refreshWar(db, identity, orderDown.fetcher)).toEqual({ ok: true, planets: 3 })
+    const body = await (await war()).json<{ ok: boolean; planets: unknown[]; order: unknown }>()
+    expect(body.ok).toBe(true)
+    expect(body.planets).toHaveLength(3)
+    expect(body.order).toBeNull()
+  })
+
   it('never sends the failure reason to a browser', async () => {
     await refreshWar(db, identity, fake().fetcher)
     await refreshWar(db, identity, async () => { throw new Error('secret internal reason') })
@@ -211,7 +269,7 @@ describe('the Cron Trigger', () => {
     await worker.scheduled(createScheduledController({ cron: '*/5 * * * *' }), env)
 
     // The fake, and not the network, is what answered.
-    expect(spy).toHaveBeenCalledTimes(2)
+    expect(spy).toHaveBeenCalledTimes(3)
     const sent = new Headers(spy.mock.calls[0]?.[1]?.headers)
     expect(sent.get('x-super-client')).toBe(env.SUPER_CLIENT)
     expect(sent.get('x-super-contact')).toBe(env.SUPER_CONTACT)

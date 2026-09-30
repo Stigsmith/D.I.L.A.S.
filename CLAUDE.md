@@ -848,6 +848,8 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 >
 > **Choosing a planet with fighting on it sets the front too.** That is the other half of "the whole scenario fills itself": the attacker in a defence, otherwise whoever holds it. A quiet planet leaves the front alone. In a party the host's choice carries the front to everybody, since it is part of the scenario.
 >
+> **The Major Order sits above the map**: its briefing in the game's words, the time left, and a bar per task in the colour of the front it is on. Nothing says what a task asks, because task types are not published and the briefing already says it. **A task's front is read from the value the upstream marks as type 1, in the game's numbering, 2 Terminids, 3 Automatons, 4 Illuminate. That is an inference from one real answer on 30 September 2026**, recorded as one. If the order alone fails to fetch, the war still lands with no order; an order that has ended, or was read over half an hour ago, is not shown.
+>
 > **Fronts are emphasised, not enforced.** The roadmap said "only offering planets with an active campaign"; every planet stays choosable, because the scenario is also for pre building while nobody is online. Fronts come first in the search list. If the curator wants the rest hidden, it is one filter.
 
 > [!danger] The API decorates, it never carries, and the rules that make that true
@@ -863,14 +865,14 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > **`SUPER_CONTACT` in `wrangler.jsonc` is a placeholder**: the tool's own public address, because the service will not answer without something. It should be a project address, never a personal one, and **which one is stigly's to pick**: the published repository, or an address on the domain. `SUPER_CLIENT` is the tool's address and **changes with the domain**. `npm run wiki` sends the same two; it used to give the API's own organisation as our contact.
 
 > [!info] The numbers behind the schedule
-> Every five minutes is 576 upstream requests a day, two paths each run, whatever the traffic. The service publishes a limit of 5 requests in 10 seconds; this is 2 in 300. **Five Cron Triggers per account on the free plan, 10 ms of CPU each**, verified 29 September 2026; Enodia uses none. Parsing and trimming the 300 KB planet answer measured 1.5 ms. The timeout is 20 seconds, because waiting is not CPU and the service took 10 seconds to answer once.
+> Every five minutes is 864 upstream requests a day, three paths each run (planets, campaigns, the Major Order), whatever the traffic. The service publishes a limit of 5 requests in 10 seconds; this is 3 in 300. **Five Cron Triggers per account on the free plan, 10 ms of CPU each**, verified 29 September 2026; Enodia uses none. Parsing and trimming the 300 KB planet answer measured 1.5 ms. The timeout is 20 seconds, because waiting is not CPU and the service took 10 seconds to answer once.
 >
 > Locally, `wrangler dev --test-scheduled` (the `workers` entry in `.claude/launch.json` passes it) and then `curl "http://localhost:8788/cdn-cgi/handler/scheduled?cron=*/5+*+*+*+*"` runs one fetch by hand. That is a real request to the real service.
 
 > [!info] Names are placed, not just drawn
 > Every name that wants to show is placed in priority order and skipped if it would overlap one already placed: the chosen planet and search matches always, then fronts by how many Helldivers are on them, then any planet with room. `placeLabels` in `galaxy.js`. Thirty eight fronts named at once had run into each other in the dense clusters; now a name that does not fit waits for a closer zoom.
 
-**`npm run map`** checks the arithmetic against the shipped table: the right way up, every planet inside the disc, each supply line drawn once and none missing, search, that zooming holds the point under the cursor still, how the browser reads a war snapshot, and which names fit. Seven of its rules were broken on purpose on 29 and 30 September 2026 and each broke exactly its own check. The server half is in `worker/war.test.ts`, twelve tests with the upstream stood in for; six of its rules were broken the same way.
+**`npm run map`** checks the arithmetic against the shipped table: the right way up, every planet inside the disc, each supply line drawn once and none missing, search, that zooming holds the point under the cursor still, how the browser reads a war snapshot, and which names fit. Seven of its rules were broken on purpose on 29 and 30 September 2026 and each broke exactly its own check. The server half is in `worker/war.test.ts`, sixteen tests with the upstream stood in for, the Major Order fixture being the real answer; eight of its rules were broken the same way.
 
 ---
 
@@ -1415,7 +1417,7 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 npm run test:worker
 ```
 
-Fifty two tests, fifteen for accounts, twenty five for the live party and twelve for the live war, run **inside workerd against a real local D1**, never in node, where none of what matters is true. Each protection was seen failing before it was trusted: rate limiting left to the library default (two fail, and it reproduces Enodia's finding that better-auth does not limit on Workers by default), the address read from `x-forwarded-for` (two fail), the schema missing `issuer` (five fail), and the response hardening removed (one fails).
+Fifty six tests, fifteen for accounts, twenty five for the live party and sixteen for the live war, run **inside workerd against a real local D1**, never in node, where none of what matters is true. Each protection was seen failing before it was trusted: rate limiting left to the library default (two fail, and it reproduces Enodia's finding that better-auth does not limit on Workers by default), the address read from `x-forwarded-for` (two fail), the schema missing `issuer` (five fail), and the response hardening removed (one fails).
 
 ```bash
 npm run typecheck

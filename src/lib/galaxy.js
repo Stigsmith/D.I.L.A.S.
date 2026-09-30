@@ -198,6 +198,31 @@ const share = (part, whole) => {
   return Math.min(1, Math.max(0, p / w));
 };
 
+/* A task names its faction by the game's own number. Read off a real
+   answer on 30 September 2026; 1 is Super Earth and is no front. */
+const FRONT_OF_RACE = { 2: "bugs", 3: "bots", 4: "squids" };
+
+/* The Major Order: its briefing without the game's formatting tags, when
+   it ends, and each task as a share done and the front it is on, when it
+   names one. An order that has already ended is no order. What a task type
+   means is not published, so a task is a bar and nothing more. */
+function cleanOrder(raw, now) {
+  if (!raw || typeof raw !== "object") return null;
+  const briefing = typeof raw.briefing === "string"
+    ? raw.briefing.replace(/<\/?i(=\d+)?>/g, "").replace(/\s+/g, " ").trim().slice(0, 600)
+    : "";
+  const endsAt = typeof raw.expiresAt === "string" ? Date.parse(raw.expiresAt) : NaN;
+  if (!briefing || !Number.isFinite(endsAt) || endsAt <= now) return null;
+  const tasks = (Array.isArray(raw.tasks) ? raw.tasks : [])
+    .slice(0, 8)
+    .map((t) => ({
+      front: t && FRONT_OF_RACE[t.race] ? FRONT_OF_RACE[t.race] : null,
+      done: t ? share(t.progress, t.goal) : null,
+    }))
+    .filter((t) => t.done !== null);
+  return { briefing, endsAt, tasks };
+}
+
 export function cleanWar(raw, now = Date.now()) {
   if (!raw || typeof raw !== "object" || !Array.isArray(raw.planets)) return null;
   const fetchedAt = Number.isFinite(raw.fetchedAt) ? raw.fetchedAt : null;
@@ -239,7 +264,17 @@ export function cleanWar(raw, now = Date.now()) {
   }
 
   const age = Math.max(0, now - fetchedAt);
-  return { fetchedAt, age, fresh: age <= WAR_TOO_OLD_MS, planets, fronts: [...planets.values()].filter((p) => p.campaign).length };
+  const fresh = age <= WAR_TOO_OLD_MS;
+  return {
+    fetchedAt,
+    age,
+    fresh,
+    planets,
+    fronts: [...planets.values()].filter((p) => p.campaign).length,
+    /* Held to the same half hour as the map: an order read long ago may
+       have ended, or been replaced, since. */
+    order: fresh ? cleanOrder(raw.order, now) : null,
+  };
 }
 
 /* The front to fill in when a planet is chosen: who you would be

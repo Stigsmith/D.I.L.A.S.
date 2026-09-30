@@ -7,10 +7,11 @@
  *
  * A Cron Trigger calls `refreshWar` every five minutes (`wrangler.jsonc`), and
  * it keeps one trimmed row in D1. `GET /api/war` hands that row out with its
- * age. So the community API behind this is called 576 times a day, two paths
- * every five minutes, whether one person has the map open or a thousand, which
- * is the polite way to use a service somebody runs for free. Its published
- * limit is 5 requests in 10 seconds; this is 2 in 300.
+ * age. So the community API behind this is called 864 times a day, three
+ * paths every five minutes, whether one person has the map open or a thousand,
+ * which is the polite way to use a service somebody runs for free. Its
+ * published limit is 5 requests in 10 seconds; this is 3 in 300: the planets,
+ * the campaigns, and the Major Order.
  *
  * ## The API decorates, it never carries
  *
@@ -69,12 +70,27 @@ export type WarPlanet = {
   event: null | { faction: (typeof OWNERS)[number]; health: number; maxHealth: number; endTime: string }
 }
 
+/**
+ * The Major Order, trimmed. Its tasks are kept as numbers rather than read
+ * into sentences: `race` is the value the upstream marks with value type 1
+ * and `goal` the one marked 3, which is how its own answer labels them. What
+ * each task type means is not published, so nothing here guesses at it.
+ */
+export type WarOrder = {
+  title: string
+  briefing: string
+  expiresAt: string
+  tasks: { race: number | null; goal: number; progress: number }[]
+}
+
 export type Snapshot = {
   fetchedAt: number
   triedAt: number
   /** Whether the latest try worked. False with a payload means the payload is older than the try. */
   ok: boolean
   planets: WarPlanet[]
+  /** The Major Order as of the same fetch, or null when there is none or it could not be read. */
+  order: WarOrder | null
 }
 
 type DB = DrizzleD1Database<typeof schema>
@@ -135,6 +151,38 @@ export function trimWar(planets: unknown, campaigns: unknown): WarPlanet[] | nul
 }
 
 /**
+ * The first assignment, which is the Major Order, down to what the map shows.
+ * Pure. Null when there is none, or when what arrived is not one.
+ *
+ * Task values arrive as two parallel lists, the values and what kind each one
+ * is. Read on 30 September 2026 off a real answer: kind 1 is the faction (2
+ * Terminids, 3 Automatons, 4 Illuminate, the game's own numbering), kind 3 is
+ * the goal, and the order's `progress` list runs in step with its tasks.
+ */
+export function trimOrder(assignments: unknown): WarOrder | null {
+  if (!Array.isArray(assignments)) return null
+  const a = record(assignments[0])
+  if (!a) return null
+  const text = (v: unknown, cap: number) => (typeof v === 'string' ? v.slice(0, cap) : '')
+  const briefing = text(a.briefing, 600) || text(a.description, 600)
+  const expiresAt = text(a.expiration, 40)
+  if (!briefing || !expiresAt) return null
+  const progress = Array.isArray(a.progress) ? a.progress : []
+  const tasks = (Array.isArray(a.tasks) ? a.tasks : []).slice(0, 8).map((raw, i) => {
+    const t = record(raw)
+    const values = Array.isArray(t?.values) ? t.values : []
+    const kinds = Array.isArray(t?.valueTypes) ? t.valueTypes : []
+    const of = (kind: number) => {
+      const at = kinds.indexOf(kind)
+      return at >= 0 ? values[at] : undefined
+    }
+    const race = of(1)
+    return { race: typeof race === 'number' && Number.isInteger(race) ? race : null, goal: amount(of(3)), progress: amount(progress[i]) }
+  })
+  return { title: text(a.title, 80), briefing, expiresAt, tasks }
+}
+
+/**
  * The upstream refuses any request that does not name its client and a
  * contact, both, with a 400. Its README still calls the contact optional; the
  * service does not. `SUPER_CLIENT` and `SUPER_CONTACT` in `wrangler.jsonc`,
@@ -172,15 +220,20 @@ export async function refreshWar(
   now: number = Date.now(),
 ): Promise<{ ok: true; planets: number } | { ok: false; error: string }> {
   try {
-    const [planets, campaigns] = await Promise.all([
+    /* The Major Order is context. If it alone fails, the war still lands
+       and the order is simply absent, rather than the map losing its colour
+       over a paragraph of briefing. */
+    const [planets, campaigns, assignments] = await Promise.all([
       ask(fetcher, '/api/v1/planets', identity.client, identity.contact),
       ask(fetcher, '/api/v1/campaigns', identity.client, identity.contact),
+      ask(fetcher, '/api/v1/assignments', identity.client, identity.contact).catch(() => null),
     ])
     const trimmed = trimWar(planets, campaigns)
     if (!trimmed) throw new Error('the answer was not a list of planets and a list of campaigns')
+    const payload = JSON.stringify({ planets: trimmed, order: trimOrder(assignments) })
     await db.run(sql`
       insert into war_snapshot (id, payload, fetched_at, tried_at, ok, error)
-      values ('war', ${JSON.stringify(trimmed)}, ${now}, ${now}, 1, null)
+      values ('war', ${payload}, ${now}, ${now}, 1, null)
       on conflict(id) do update set
         payload = excluded.payload, fetched_at = excluded.fetched_at,
         tried_at = excluded.tried_at, ok = 1, error = null
@@ -203,11 +256,12 @@ export async function readWar(db: DB): Promise<Snapshot | null> {
     sql`select payload, fetched_at, tried_at, ok from war_snapshot where id = 'war'`,
   )
   if (!row || row.payload === null || row.fetched_at === null) return null
-  let planets: WarPlanet[]
+  let doc: { planets?: WarPlanet[]; order?: WarOrder | null }
   try {
-    planets = JSON.parse(row.payload) as WarPlanet[]
+    doc = JSON.parse(row.payload) as typeof doc
   } catch {
     return null
   }
-  return { fetchedAt: row.fetched_at, triedAt: row.tried_at, ok: row.ok === 1, planets }
+  if (!Array.isArray(doc.planets)) return null
+  return { fetchedAt: row.fetched_at, triedAt: row.tried_at, ok: row.ok === 1, planets: doc.planets, order: doc.order ?? null }
 }

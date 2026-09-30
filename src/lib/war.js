@@ -68,6 +68,16 @@ export function useWar(active = true) {
   return useMemo(() => cleanWar(raw, now), [raw, now]);
 }
 
+/* How long until, the way a person says it. */
+export function untilText(ms) {
+  const hours = Math.floor(ms / 3600000);
+  if (hours >= 48) return `${Math.floor(hours / 24)} days`;
+  if (hours >= 24) return hours - 24 === 0 ? "a day" : `a day and ${hours - 24} hour${hours - 24 === 1 ? "" : "s"}`;
+  if (hours >= 1) return hours === 1 ? "an hour" : `${hours} hours`;
+  const minutes = Math.max(1, Math.floor(ms / 60000));
+  return minutes === 1 ? "a minute" : `${minutes} minutes`;
+}
+
 /* How long ago, the way a person says it. */
 export function agoText(ms) {
   const minutes = Math.floor(ms / 60000);

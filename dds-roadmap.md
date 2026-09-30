@@ -338,7 +338,7 @@ The map moves **out of Phase 7 and into Phase 6a**, alongside the drop screen, b
 > | Only offering planets with an active campaign | **Emphasised, not enforced.** Fronts are larger, ringed, named and first in search; every planet stays choosable, for pre building while nobody is online. One filter away if the curator wants the rest hidden |
 > | Faction filled from who holds the planet | **Done.** The attacker in a defence, otherwise the owner. A quiet planet leaves the front alone |
 > | Active planet effects feeding the scoring engine | **Not yet.** The real prize, and the next step: the variant enemies in `enemies.json` are waiting for it |
-> | The Major Order as context | **Not yet** |
+> | The Major Order as context | **Done.** Above the map: briefing, time left, a bar per task in its front's colour |
 > | The map as its own surface, with history | **Not yet.** The component stands alone, so this is a route and a data source, not a rebuild |
 
 The live layer stays optional and can arrive whenever. It needs no account, so it is independent of v2.
