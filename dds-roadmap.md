@@ -339,6 +339,11 @@ The map moves **out of Phase 7 and into Phase 6a**, alongside the drop screen, b
 > | Faction filled from who holds the planet | **Done.** The attacker in a defence, otherwise the owner. A quiet planet leaves the front alone |
 > | Active planet effects feeding the scoring engine | **Not yet.** The real prize, and the next step: the variant enemies in `enemies.json` are waiting for it |
 > | The Major Order as context | **Done.** Above the map: briefing, time left, a bar per task in its front's colour |
+
+> [!warning] Planet effects have no steady source yet. Measured 30 September 2026
+> `api.helldivers2.dev`'s tidy endpoints, v1 and v2, carry no active planet effects, and its OpenAPI spec has no field for them. Only the raw pass-through to the game, `/raw/api/WarSeason/801/Status`, holds `planetActiveEffects`, and it answered **503 after 35 seconds**, and timed out twice at 30, while the tidy endpoints answered in under a tenth of a second. Note also the war number, 801, fixed in the path.
+>
+> **The definitions are the easy half**: `effects/planetEffects.json` in `helldivers-2/json`, 34 KB of names and descriptions keyed by effect id, patch data to ship like the planet table. **Which are active where is the hard half.** Before building: retry the raw status on a better day, look at DiveHarder again (the data spike could not resolve its host), and check whether the tidy API has grown a field. Then the scoring half is the curator's call with measurements in front of him, because it re-ranks lists.
 > | The map as its own surface, with history | **Not yet.** The component stands alone, so this is a route and a data source, not a rebuild |
 
 The live layer stays optional and can arrive whenever. It needs no account, so it is independent of v2.
