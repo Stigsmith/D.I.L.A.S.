@@ -173,3 +173,36 @@ const ended = galaxy.cleanWar({ ...withOrder, order: { ...withOrder.order, expir
 ok(ended.order === null, "an order that has ended is no order");
 ok(galaxy.cleanWar(withOrder, withOrder.fetchedAt + galaxy.WAR_TOO_OLD_MS + 1).order === null,
   "an order read more than half an hour ago is not shown, the same as the map");
+
+/* The drop planner */
+/* `table` is the shipped planet table, read at the top of this file. */
+ok(table.filter((p) => galaxy.hasCaves(p)).map((p) => p.name).sort().join(",") === "Omicron,Oshaune,Zagon Prime",
+  "the planets with caves are the three Hive Worlds the wiki names");
+ok(table.filter((p) => galaxy.megacitiesOn(p) > 0).length === 29, "29 planets have a megacity");
+const planWar = galaxy.cleanWar({
+  fetchedAt: NOW,
+  planets: [
+    { name: "OMICRON", owner: "Terminids", health: 900, maxHealth: 1000, players: 9000, campaign: true },
+    { name: "FENRIR III", owner: "Terminids", health: 500, maxHealth: 1000, players: 5000, campaign: true },
+    { name: "HELLMIRE", owner: "Terminids", health: 500, maxHealth: 1000, players: 300, campaign: true },
+    { name: "HEETH", owner: "Terminids", health: 500, maxHealth: 1000, players: 100, campaign: true },
+    { name: "MALEVELON CREEK", owner: "Automaton", health: 500, maxHealth: 1000, players: 99999, campaign: true },
+    { name: "ESTANU", owner: "Terminids", health: 500, maxHealth: 1000, players: 99999, campaign: false },
+  ],
+}, NOW);
+const busiest = galaxy.suggestFronts(planWar, { front: "bugs" });
+ok(busiest.picks.map((p) => p.name).join(",") === "Omicron,Fenrir III,Hellmire",
+  "with nothing to avoid, the busiest fronts on the chosen side come first, and a planet that is not a front is never suggested");
+const noCaves = galaxy.suggestFronts(planWar, { front: "bugs", avoidCaves: true });
+ok(!noCaves.fits.has("Omicron") && noCaves.hiddenForCaves === 1, "no caves hides the Hive World, and counts it");
+ok(galaxy.megacitiesOn(table.find((p) => p.name === "Fenrir III")) > 0, "Fenrir III has a megacity, which the next check leans on");
+const fewer = galaxy.suggestFronts(planWar, { front: "bugs", avoidCaves: true, fewerMegacities: true });
+ok(fewer.picks[fewer.picks.length - 1].name === "Fenrir III" && fewer.fits.has("Fenrir III"),
+  "fewer megacities pushes a megacity planet after every planet without one, and still suggests it");
+const hellmireHazards = table.find((p) => p.name === "Hellmire").hazards.filter((h) => h !== "normal_temp");
+const dodge = galaxy.suggestFronts(planWar, { front: "bugs", avoidCaves: true, avoidHazards: hellmireHazards });
+ok(hellmireHazards.length > 0 && dodge.picks[dodge.picks.length - 1].name === "Hellmire",
+  "a hazard you would rather avoid pushes its planet down rather than hiding it");
+ok(galaxy.suggestFronts(null, {}) === null && galaxy.suggestFronts({ ...planWar, fresh: false }, {}) === null,
+  "with no live war, or one too old to trust, there is nothing to suggest");
+ok(galaxy.suggestFronts(planWar, {}).picks[0].name === "Malevelon Creek", "with no side chosen, every front is in the running");

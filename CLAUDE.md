@@ -116,7 +116,7 @@ Data authority lives outside this repo, in the Helldivers 2 project files: `hell
 >
 > **Done returns you to the tab you left**, tracked by a ref in `App.jsx`. Adjusting from Stratagems and landing on Primaries is the kind of small wrong that makes a round trip feel like a detour.
 >
-> **It fits one desktop screen and the banners are what gives.** Their height is twice their width, so the cap is on width: `clamp(7rem, calc((100vh - 34rem) / 2), 13rem)`. Everything else on the screen is a fixed 34rem including the chrome. The 7rem floor is the width at which ILLUMINATE still fits; below about an 800px window it scrolls a little rather than clipping the names, which is the better of the two failures. The site footer is dropped on this screen and no other.
+> **The three tall faction banners are gone since 1.25.0.** The curator's point, 30 September 2026: with the galaxy map setting the front from the planet, opening on a choice of front was the long way round. The screen now leads with the drop planner and the map side by side, and the front is the planner's first question, as three compact buttons. See The Galaxy Map, "The drop planner". The site footer is still dropped on this screen and no other.
 
 > [!danger] The difficulty marks are the one UI art set that is not masked
 > Every other single colour mark in this project is painted with `currentColor` through a CSS mask so it takes the theme. **The difficulty marks are drawn as images instead**, because they carry the game's own colour ramp: grey `#4a494a` at 1, bronze `#ad7529` at 5, red `#8c0c10` at 7, near black `#310c10` at 10, with the white skull and chevrons over the top. Masking them collapsed ten distinct marks into one flat brand colour. The white sits on a coloured backing, so they read on the light themes too.
@@ -353,7 +353,7 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 | `ownership.json` | What you own. Ships empty |
 | `ownership.template.json` | Every warbond listed as not owned, ready to fill in |
 | `wiki-stats.json` | **Generated.** The stats the tables never had, for 195 items. Never edit by hand |
-| `planets.json` | **Generated.** 281 planets: biome, hazards, sector, and for 274 of them a place on the galaxy map and the supply lines to their neighbours. Read by the scenario and the map |
+| `planets.json` | **Generated.** 281 planets: biome, hazards, sector, their cities by size, and for 274 of them a place on the galaxy map and the supply lines to their neighbours. Read by the scenario, the map and the drop planner |
 | `enemies.json` | **Generated.** 80 enemies, 594 body parts, each with an armor value, plus the difficulty each enemy starts appearing at. What every penetration figure is measured against. Never edit by hand |
 | `context-rules.json` | The 34 rules that move one item rating. Read by `score.js`, checked by `npm run rules` |
 | `build-rules.json` | The 9 rules that move a whole build. Read by `build.js`, checked by `npm run builds` |
@@ -813,7 +813,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 
 | Where it appears | |
 |---|---|
-| **The scenario screen** | "Dropping on" opens the map where the list used to be. `PlanetChooser` in `Tiers.jsx` is the map plus its search, and both screens use it |
+| **The scenario screen** | Leads with it, beside the drop planner. `DropPlanner` in `Tiers.jsx` is the planner plus `PlanetChooser`, the map and its search, and both screens use it. "Dropping on" below it now opens only the by hand biome and hazards |
 | **Drop Bay** | **Opens onto the map while nothing says where you are dropping**, and folds it away once a planet is chosen. The brief's "change on the map" brings it back. In a party only the host gets it, because the host sets the scenario |
 
 > [!danger] The layout is patch data and the map needs no network
@@ -869,10 +869,29 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 >
 > Locally, `wrangler dev --test-scheduled` (the `workers` entry in `.claude/launch.json` passes it) and then `curl "http://localhost:8788/cdn-cgi/handler/scheduled?cron=*/5+*+*+*+*"` runs one fetch by hand. That is a real request to the real service.
 
+> [!success] The drop planner: "where would you like to play?" 1.25.0, 30 September 2026
+> The curator's idea: say what you are after and the tool says where to go, marked on the map. Three questions beside the map, then **Go here**, the top three fronts as buttons that choose the planet. On the map the picks carry a numbered ring in the brand colour, the other fronts that fit stay lit, and everything else steps back. `suggestFronts` in `galaxy.js`; the answers keep between visits in `hd2-planner`, out of the export.
+>
+> | Question | What it does |
+> |---|---|
+> | **1. Against** | **The scenario's own front**, where the three banners went. A planet with fighting on it answers it for you; this is the way to browse a front with no planet, and the only way when the live war is not here |
+> | **2. Kind of mission** | The eight mission traits. **Narrows the mission list, not the planets**: the data says which fronts offer which missions, not which planets do, and every front offers every kind except high value targets on the Illuminate, which is greyed out there |
+> | **3. Kind of planet** | **No caves hides the three Hive Worlds**, where the wiki puts the caves. **Fewer megacities pushes the 29 planets with one below every planet without**; the curator chose push down over hide. Hazards you would rather not have push down the same way, after megacities |
+>
+> **Busiest first** among what is left, the curator's call: where the war is and where a game is easiest to find. **Only fronts you can drop on, from a live war fresh enough to trust**; with no war, or an old one, Go here says so and the map still works.
+>
+> **Megacities are patch data now.** `npm run wiki` keeps each planet's city regions by size as `cities` in `planets.json`, which it used to throw away. 81 planets list cities, 29 of them a megacity. Caves are read from the biome, `bug_hiveworld`, per the wiki.
+
+> [!bug] A Terminid mission stayed chosen on an Automaton planet
+> Found by the curator on 30 September 2026. Changing front kept whatever mission was set, even one the new front does not have. `setFaction` in `scenario.js` now clears a mission the new front lacks. On an address with no live war (`npm run dev`, Netlify) a planet cannot tell the tool its front, so there the planner's first question is how you set it.
+
+> [!bug] The browser served a nineteen hour old war despite a one minute cache header
+> Found on 30 September 2026 in the browser pane: `/api/war` says `public, max-age=60`, and the pane's cache answered with yesterday's copy anyway. `useWar` now asks with `cache: "no-cache"`, so every poll goes to the server. The half hour rule would have refused to draw it either way; this makes sure the fresh copy is what arrives.
+
 > [!info] Names are placed, not just drawn
 > Every name that wants to show is placed in priority order and skipped if it would overlap one already placed: the chosen planet and search matches always, then fronts by how many Helldivers are on them, then any planet with room. `placeLabels` in `galaxy.js`. Thirty eight fronts named at once had run into each other in the dense clusters; now a name that does not fit waits for a closer zoom.
 
-**`npm run map`** checks the arithmetic against the shipped table: the right way up, every planet inside the disc, each supply line drawn once and none missing, search, that zooming holds the point under the cursor still, how the browser reads a war snapshot, and which names fit. Seven of its rules were broken on purpose on 29 and 30 September 2026 and each broke exactly its own check. The server half is in `worker/war.test.ts`, sixteen tests with the upstream stood in for, the Major Order fixture being the real answer; eight of its rules were broken the same way.
+**`npm run map`** checks the arithmetic against the shipped table: the right way up, every planet inside the disc, each supply line drawn once and none missing, search, that zooming holds the point under the cursor still, how the browser reads a war snapshot, which names fit, and what the planner suggests. Seven of its rules were broken on purpose on 29 and 30 September 2026 and each broke exactly its own check. The server half is in `worker/war.test.ts`, sixteen tests with the upstream stood in for, the Major Order fixture being the real answer; eight of its rules were broken the same way.
 
 ---
 

@@ -340,6 +340,17 @@ The map moves **out of Phase 7 and into Phase 6a**, alongside the drop screen, b
 > | Active planet effects feeding the scoring engine | **Not yet.** The real prize, and the next step: the variant enemies in `enemies.json` are waiting for it |
 > | The Major Order as context | **Done.** Above the map: briefing, time left, a bar per task in its front's colour |
 
+> [!success] Decided 30 September 2026: a drop planner beside the map
+> The curator's idea: "where would you like to play? Against what faction, what mission archetype, what kind of planet, no caves, less megacities, go do this planet and it marks the map." Built in 1.25.0. His three calls:
+>
+> | Question | Answer |
+> |---|---|
+> | **What happens to the three faction banners** | **They become the planner's first question.** Choosing a front first had become the long way round once the map could set it, but a front with no planet still has to be choosable, and it is the only way when the live war is not here |
+> | **Fewer megacities: hide or push down** | **Push down.** A megacity planet comes after every planet without one. No caves, by contrast, hides the Hive Worlds, as he put it |
+> | **Which fit is "go here"** | **Busiest first.** The Major Order and closeness to liberation were the alternatives |
+>
+> A mission kind narrows the mission list rather than the planets, because the data knows which fronts offer which missions and not which planets do. **If per planet mission lists ever turn up in a source, that is the next thing the planner should read.**
+
 > [!warning] Planet effects have no steady source yet. Measured 30 September 2026
 > `api.helldivers2.dev`'s tidy endpoints, v1 and v2, carry no active planet effects, and its OpenAPI spec has no field for them. Only the raw pass-through to the game, `/raw/api/WarSeason/801/Status`, holds `planetActiveEffects`, and it answered **503 after 35 seconds**, and timed out twice at 30, while the tidy endpoints answered in under a tenth of a second. Note also the war number, 801, fixed in the path.
 >

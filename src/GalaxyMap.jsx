@@ -47,8 +47,15 @@ const LANE_PATH = lanes.map(({ a, b }) => `M${a.x.toFixed(1)} ${a.y.toFixed(1)}L
  * `war` is the cleaned live snapshot from lib/war.js, or null. `fronts`
  * maps a front's id to its hex and its name, handed in by the caller so
  * this file does not import the tier list, which imports this file.
+ *
+ * `picks` and `fits` are the drop planner's answer: the planets it says to
+ * go to, in order, which get a numbered marker, and every planet that fits
+ * what you asked for, which stay lit while the rest step back. A search
+ * overrides both while you are typing.
  */
-export default function GalaxyMap({ chosen, onChoose, query = "", disabled = false, label, war = null, fronts = {} }) {
+export default function GalaxyMap({
+  chosen, onChoose, query = "", disabled = false, label, war = null, fronts = {}, picks = [], fits = null,
+}) {
   const svg = useRef(null);
   const [view, setView] = useState(HOME);
   const viewRef = useRef(view);
@@ -241,15 +248,17 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
        None of the last two is drawn over a name already placed. */
     const scale = ppu * view.k;
     const wanted = [];
+    const pickAt = new Map(matches ? [] : picks.map((name, i) => [name, i]));
     for (const p of placed) {
       const on = p.name === chosen;
-      const lit = matches ? matches.has(p.name) : false;
+      const lit = matches ? matches.has(p.name) : pickAt.has(p.name);
       const w = !matches && live ? live.get(p.name) : null;
       const front = Boolean(w && w.campaign);
       const roomy = !matches && roomFor.get(p.name) * scale >= NAME_ROOM;
-      const base = { name: p.name, x: p.x, y: p.y, offset: (front ? DOT * 1.5 : DOT) + 5, side: labelSide(p) };
+      const gap = pickAt.has(p.name) ? DOT * 1.5 + 12 : (front ? DOT * 1.5 : DOT) + 5;
+      const base = { name: p.name, x: p.x, y: p.y, offset: gap, side: labelSide(p) };
       if (on) wanted.push({ ...base, priority: 0, must: true });
-      else if (lit && namesMatches) wanted.push({ ...base, priority: 1, must: true });
+      else if (lit && (namesMatches || !matches)) wanted.push({ ...base, priority: 1, must: true });
       else if (front) wanted.push({ ...base, priority: 2, weight: w.players });
       else if (roomy) wanted.push({ ...base, priority: 3, weight: roomFor.get(p.name) });
     }
@@ -284,7 +293,11 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
         {placed.map((p) => {
           const on = p.name === chosen;
           const lit = matches ? matches.has(p.name) : false;
-          const dim = matches && !lit && !on;
+          /* The planner's fits stay lit and everything else steps back, the
+             way a search does, though less far: the rest of the war is still
+             worth seeing. */
+          const unfit = !matches && fits && !fits.has(p.name) && !on && !p.home;
+          const dim = (matches && !lit && !on) || unfit;
           /* With the war live: a planet somebody holds takes their colour, a
              front you can drop on is larger and ringed, and a quiet planet
              Super Earth holds steps back so the war reads first. */
@@ -300,7 +313,7 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
             : live ? "fill-base-600"
             : "fill-base-400";
           return (
-            <g key={p.name} opacity={dim ? 0.3 : 1}>
+            <g key={p.name} opacity={matches && dim ? 0.3 : unfit ? 0.4 : 1}>
               {on ? (
                 <circle cx={p.x} cy={p.y} r={r + 5 * u} className="fill-none stroke-brand" strokeWidth={1.6 * u} />
               ) : front && hex ? (
@@ -314,14 +327,37 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
           );
         })}
 
+        {/* The planner's picks, numbered in its order: a ring in the brand
+            colour and the number beside it. Drawn over the planets so a
+            pick is never hidden under a neighbour. */}
+        {matches ? null : picks.map((name, i) => {
+          const p = placeOf(name);
+          if (!p) return null;
+          const r = DOT * 1.5 * u;
+          return (
+            <g key={"pick-" + name} className="pointer-events-none">
+              <circle cx={p.x} cy={p.y} r={r + 8 * u} className="fill-none stroke-brand" strokeWidth={1.8 * u}
+                strokeDasharray={`${4 * u} ${2.5 * u}`} />
+              <circle cx={p.x - 9 * u} cy={p.y - 9 * u} r={6.5 * u} className="fill-brand" />
+              <text x={p.x - 9 * u} y={p.y - 9 * u} textAnchor="middle" dominantBaseline="central"
+                className="fill-brand-ink" style={{ fontFamily: OSWALD, fontSize: 9 * u, fontWeight: 700 }}>
+                {i + 1}
+              </text>
+            </g>
+          );
+        })}
+
         {placed.map((p) => {
           if (!named.has(p.name)) return null;
           const on = p.name === chosen;
-          const lit = matches ? matches.has(p.name) : false;
+          const pick = !matches && picks.includes(p.name);
+          const lit = matches ? matches.has(p.name) : pick;
           const front = Boolean(!matches && live && live.get(p.name) && live.get(p.name).campaign);
+          /* Clear of the pick's ring when it has one. */
+          const gap = pick ? DOT * 1.5 + 12 : (front ? DOT * 1.5 : DOT) + 5;
           return (
             <text key={p.name} dominantBaseline="middle" y={p.y}
-              x={labelSide(p) === "left" ? p.x - ((front ? DOT * 1.5 : DOT) + 5) * u : p.x + ((front ? DOT * 1.5 : DOT) + 5) * u}
+              x={labelSide(p) === "left" ? p.x - gap * u : p.x + gap * u}
               textAnchor={labelSide(p) === "left" ? "end" : "start"}
               className={"pointer-events-none stroke-base-950 " +
                 (on || lit ? "fill-brand" : front ? "fill-base-100" : "fill-base-300")}
@@ -333,7 +369,7 @@ export default function GalaxyMap({ chosen, onChoose, query = "", disabled = fal
         })}
       </>
     );
-  }, [view.k, ppu, chosen, matches, namesMatches, disabled, u, live, fronts]);
+  }, [view.k, ppu, chosen, matches, namesMatches, disabled, u, live, fronts, picks, fits]);
 
   const hovered = hover ? placeOf(hover) : null;
   const detail = hover ? planetByName.get(hover) : null;

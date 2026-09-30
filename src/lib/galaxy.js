@@ -329,3 +329,63 @@ export function placeLabels(candidates, scale) {
   }
   return shown;
 }
+
+/* ------------------------------------------------------------------ */
+/* The drop planner                                                    */
+/*                                                                     */
+/* "Where would you like to play?" Against which front, what kind of   */
+/* mission, what kind of planet, and the answer is a planet to go to,  */
+/* marked on the map. The curator's idea, 30 September 2026, and his   */
+/* three calls shape it:                                               */
+/*                                                                     */
+/* - **Only fronts you can drop on are suggested**, from a live war    */
+/*   fresh enough to trust. With no war there is nothing to suggest.   */
+/* - **No caves hides the Hive Worlds.** The wiki puts the cave        */
+/*   systems in that biome, which three planets have.                  */
+/* - **Fewer megacities pushes them down, it does not hide them.** A    */
+/*   planet with a megacity comes after every planet without one.      */
+/*   Hazards you would rather avoid push down the same way, after it.  */
+/* - **Busiest first** among what is left: where the war actually is,  */
+/*   and where a game is easiest to find.                              */
+/*                                                                     */
+/* A mission kind does not narrow the planets. The data says which     */
+/* fronts offer which missions, not which planets do, and every front  */
+/* offers every kind but one. It narrows the mission list instead.     */
+/* ------------------------------------------------------------------ */
+
+export const CAVE_BIOMES = new Set(["bug_hiveworld"]);
+export const hasCaves = (p) => Boolean(p && CAVE_BIOMES.has(p.biome));
+export const megacitiesOn = (p) => (p && p.cities && p.cities.megacity) || 0;
+
+const tableByName = new Map(all.map((p) => [p.name, p]));
+
+export function suggestFronts(war, { front = null, avoidCaves = false, fewerMegacities = false, avoidHazards = [] } = {}, limit = 3) {
+  if (!war || !war.fresh) return null;
+  const avoid = new Set(avoidHazards);
+  const fits = [];
+  let caves = 0;
+  for (const [name, w] of war.planets) {
+    if (!w.campaign || (front && w.front !== front)) continue;
+    const p = tableByName.get(name);
+    if (!p) continue;
+    if (avoidCaves && hasCaves(p)) {
+      caves += 1;
+      continue;
+    }
+    fits.push({
+      name,
+      front: w.front,
+      players: w.players,
+      liberation: w.liberation,
+      defence: w.defence,
+      clashes: (p.hazards || []).filter((h) => avoid.has(h)),
+      megacity: fewerMegacities ? megacitiesOn(p) : 0,
+    });
+  }
+  fits.sort((a, b) =>
+    Number(a.megacity > 0) - Number(b.megacity > 0) ||
+    a.clashes.length - b.clashes.length ||
+    b.players - a.players ||
+    a.name.localeCompare(b.name));
+  return { picks: fits.slice(0, limit), fits: new Set(fits.map((f) => f.name)), count: fits.length, hiddenForCaves: caves };
+}

@@ -32,12 +32,12 @@ import {
   Pencil, Rocket, UserPlus, RotateCcw, Flag, MapPin, Copy, LogOut, Crown, Radio, Loader2,
 } from "lucide-react";
 
-import { FACTIONS, FACTION_THEME, TierBadge, StratChip, FactionChooser, difficultyAt, PlanetChooser } from "./Tiers.jsx";
+import { FACTIONS, FACTION_THEME, TierBadge, StratChip, difficultyAt, DropPlanner } from "./Tiers.jsx";
 import { presets, heldGear } from "./lib/loadouts.js";
 import { readBuild } from "./lib/build.js";
 import { itemName } from "./lib/items.js";
 import { squadWarnings, isQuietBand, coverageIsQuiet } from "./lib/squad.js";
-import { missionByName, missionTraits, hazardName, hazardEffect, biomeName, loudHazards } from "./lib/scenario.js";
+import { missionByName, missionTraits, hazardName, hazardEffect, biomeName, loudHazards, usePlannerPrefs } from "./lib/scenario.js";
 import { SETTINGS, readDoc, writeDoc } from "./lib/storage.js";
 import {
   EMPTY_DROP, cleanDrop, readDrop, stampOf, dropPool, dropContext, withHeat, gateOf, unpackBuild,
@@ -695,6 +695,7 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
      where you are dropping, which is what makes Drop Bay open onto the
      map. Choosing a planet folds it away; the brief can open it again. */
   const [mapOpen, setMapOpen] = useState(null);
+  const [prefs, setPrefs] = usePlannerPrefs();
 
   /* Every build that exists, yours and the presets, with heat derived the
      same way the grid derives it. Resolved against all of it rather than
@@ -733,8 +734,40 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
 
   const closePicker = useCallback(() => setPicking(null), []);
 
+  /* A planet with fighting on it brings its front along, and choosing one
+     folds the map away. Answering the planner's questions does not: you
+     are still choosing. */
+  const choosePlanet = (name, front) => {
+    setPlanet(name);
+    if (front && front !== scenario.faction) setFaction(front);
+    setMapOpen(false);
+  };
+
+  const mapPanel = (closable) => (
+    <div className="rounded-lg border border-base-800 bg-base-900/60 p-3 sm:p-4">
+      <div className="mb-3 flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-bold text-base-200" style={OSWALD}>Where are you dropping</p>
+          <p className="mt-0.5 text-xs leading-relaxed text-base-500">
+            Click the planet where you clicked it in the game, and its front, biome and hazards come with it. Or say
+            what you are after and the planner marks where to go.
+          </p>
+        </div>
+        {closable ? (
+          <button onClick={() => setMapOpen(false)} title="Put the map away" aria-label="Put the map away"
+            className="shrink-0 rounded border border-base-800 p-1.5 text-base-400 hover:border-base-600 hover:text-base-100">
+            <X className="h-4 w-4" />
+          </button>
+        ) : null}
+      </div>
+      <DropPlanner scenario={scenario} setFaction={setFaction} onChoose={choosePlanet} prefs={prefs} setPrefs={setPrefs} />
+    </div>
+  );
+
+  /* No front yet: the planner is the way in, the way the three banners
+     used to be. Its first question is the front. */
   if (!scenario.faction) {
-    return <FactionChooser onChoose={setFaction} />;
+    return mapPanel(false);
   }
 
   /* A slot from another front says so rather than vanishing. It still
@@ -762,28 +795,7 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
   return (
     <div className="flex flex-col gap-4">
       <PartyPanel party={party} sync={sync} />
-      {showMap ? (
-        <div className="rounded-lg border border-base-800 bg-base-900/60 p-3 sm:p-4">
-          <div className="mb-3 flex items-start justify-between gap-3">
-            <div>
-              <p className="text-sm font-bold text-base-200" style={OSWALD}>Where are you dropping</p>
-              <p className="mt-0.5 text-xs leading-relaxed text-base-500">
-                Click the planet where you clicked it in the game. Its biome and hazards come with it.
-              </p>
-            </div>
-            <button onClick={() => setMapOpen(false)} title="Put the map away" aria-label="Put the map away"
-              className="shrink-0 rounded border border-base-800 p-1.5 text-base-400 hover:border-base-600 hover:text-base-100">
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          <PlanetChooser chosen={scenario.planet} autoFocus={false}
-            onChoose={(name, front) => {
-              setPlanet(name);
-              if (front && front !== scenario.faction) setFaction(front);
-              setMapOpen(false);
-            }} />
-        </div>
-      ) : null}
+      {showMap ? mapPanel(true) : null}
       {showMap && nowhere && !scenario.mission ? null : (
         <Brief scenario={scenario} onMap={canChoose && !showMap ? () => setMapOpen(true) : null}
           hostPicks={inParty && !party.isHost} />

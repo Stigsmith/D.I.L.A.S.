@@ -668,6 +668,18 @@ async function main() {
   const realHazard = (h) => h && h !== "none" && h !== "normal_temperature";
   const slugHazard = (name) => String(name).toLowerCase().replace(/[^a-z0-9]+/g, "_");
 
+  /* Region sizes as the API spells them, onto our lower case keys. A size */
+  /* it adds later is left out rather than guessed at.                    */
+  const CITY_SIZES = { MegaCity: "megacity", City: "city", Town: "town", Settlement: "settlement" };
+  const citiesOf = (m) => {
+    const counts = {};
+    for (const r of (m && Array.isArray(m.regions) ? m.regions : [])) {
+      const key = CITY_SIZES[r && r.size];
+      if (key) counts[key] = (counts[key] || 0) + 1;
+    }
+    return Object.keys(counts).length ? counts : null;
+  };
+
   /* Two hazard fields, and the useful one is the second. environmentals  */
   /* names the headline condition; weather_effects is everything the       */
   /* planet actually throws at you, which is where the temperature lives.  */
@@ -713,6 +725,12 @@ async function main() {
         links: m && Array.isArray(m.waypoints)
           ? m.waypoints.map((i) => nameOf.get(i)).filter(Boolean)
           : [],
+        /* The planet's cities by size, as the API lists its regions:      */
+        /* settlement, town, city and megacity. A city is a place, not the  */
+        /* war's state, so it ships like the position. The drop planner    */
+        /* reads the megacities, which the curator would rather fight      */
+        /* fewer of. Null when the API lists no city at all.               */
+        cities: citiesOf(m),
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));

@@ -151,9 +151,17 @@ export function useScenario() {
     }));
   }, []);
 
+  /* A mission belongs to the fronts it appears on. Changing front keeps
+     the mission only when the new front has it too; otherwise the scenario
+     would go on claiming a Terminid mission on an Automaton planet, which
+     is what the curator found on 30 September 2026. */
   const setFaction = useCallback((id) => {
     const next = isFaction(id) ? id : null;
-    setScenario((b) => ({ ...b, faction: next }));
+    setScenario((b) => {
+      const m = b.mission ? missionByName.get(b.mission) : null;
+      const keep = !next || !m || m.factions.includes(next);
+      return keep ? { ...b, faction: next } : saveEnv({ ...b, faction: next, mission: null });
+    });
     writeSetting(SETTINGS.scenario, next === null ? "" : next);
   }, []);
 
@@ -257,6 +265,46 @@ export function useScenario() {
    second column is that it knows where you are dropping, so that is the
    one worth ranking by until you say otherwise. */
 export const SORT_COLUMNS = ["dds", "ugg"];
+
+/* ------------------------------------------------------------------ */
+/* The drop planner's answers                                          */
+/*                                                                     */
+/* The front is not here: it is the scenario's own front, so answering */
+/* "against what" is choosing it. These are the rest, which describe   */
+/* how you like to play rather than where you are going, so they keep  */
+/* from one session to the next. Merged over a blank on read, the same */
+/* as the tier filters, so a field added later does not arrive as      */
+/* undefined.                                                          */
+/* ------------------------------------------------------------------ */
+
+export const BLANK_PLANNER = { kind: null, avoidCaves: false, fewerMegacities: false, avoidHazards: [] };
+
+export function usePlannerPrefs() {
+  const [prefs, setPrefs] = useState(BLANK_PLANNER);
+
+  useEffect(() => {
+    const saved = readDoc(SETTINGS.planner);
+    if (!saved || typeof saved !== "object") return;
+    setPrefs({
+      kind: typeof saved.kind === "string" && missionTraits[saved.kind] ? saved.kind : null,
+      avoidCaves: saved.avoidCaves === true,
+      fewerMegacities: saved.fewerMegacities === true,
+      avoidHazards: Array.isArray(saved.avoidHazards)
+        ? saved.avoidHazards.filter((h) => typeof h === "string" && hazardInfo[h])
+        : [],
+    });
+  }, []);
+
+  const patch = useCallback((changes) => {
+    setPrefs((prev) => {
+      const next = { ...prev, ...changes };
+      writeDoc(SETTINGS.planner, next);
+      return next;
+    });
+  }, []);
+
+  return [prefs, patch];
+}
 
 export function useTierSort() {
   const [sortBy, setSortBy] = useState("dds");

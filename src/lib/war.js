@@ -41,7 +41,13 @@ export function useWar(active = true) {
     async function load() {
       if (typeof document !== "undefined" && document.hidden) return again();
       try {
-        const res = await fetch("/api/war", { headers: { accept: "application/json" } });
+        /* "no-cache" makes the browser ask the server every time rather
+           than answer from its own cache. The server says a minute, and on
+           30 September 2026 the browser pane handed back a nineteen hour old
+           copy anyway, which is exactly the stale map this whole design
+           exists to never draw. Once a minute while a map is open costs
+           nothing. */
+        const res = await fetch("/api/war", { cache: "no-cache", headers: { accept: "application/json" } });
         /* Where there is no server the answer is the app's own page, so
            the content type is what tells a snapshot from a fallback. */
         const type = res.headers.get("content-type") || "";
