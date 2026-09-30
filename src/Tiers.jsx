@@ -26,14 +26,14 @@ import { BRAND } from "./lib/brand.js";
 import { PATCH } from "./lib/patch.js";
 import {
   planets, biomeInfo, hazardInfo, biomeName, hazardName, hazardEffect, QUIET_HAZARDS, loudHazards,
-  missionsFor, missionTraits, missionByName, traitsOf,
+  missionsFor, missionTraits, missionByName, traitsOf, planetByName, usePlannerPrefs,
 } from "./lib/scenario.js";
 import { scoreItem, scenarioIsSet } from "./lib/score.js";
 import { readBuild, explainScore } from "./lib/build.js";
 import { describeArmour, enemiesUpTo, arrivalsLine, EXPOSURE_GAP, enemySource } from "./lib/enemies.js";
 import TierBadgePlate from "./TierBadgePlate.jsx";
 import GalaxyMap, { MajorOrder } from "./GalaxyMap.jsx";
-import { searchPlanets, unplaced, frontOf } from "./lib/galaxy.js";
+import { searchPlanets, unplaced, frontOf, suggestFronts } from "./lib/galaxy.js";
 import { useWar, agoText } from "./lib/war.js";
 import { useBadgeStyle } from "./lib/badge.js";
 import {
@@ -420,7 +420,12 @@ function TierChips({ label, value, onChange }) {
    only one is ever open. Two stacked rows each with their own pane cost
    the height twice and let you open both, which made the screen taller
    than the thing it was picking. */
-function PlanetBar({ scenario, setPlanet, setFaction, setBiome, toggleHazard, setMission, clearEnvironment }) {
+/* `kind` is the drop planner's mission kind, which narrows the mission
+   list here; `onClearKind` lets you see every mission again. The planet
+   itself is picked on the map above this, so the place half of this bar
+   is for setting a biome and hazards by hand: a planet the map does not
+   have, or a what if. */
+function PlanetBar({ scenario, setBiome, toggleHazard, setMission, clearEnvironment, kind = null, onClearKind }) {
   /* null, "planet" or "mission". One value rather than two booleans is
      what makes opening one close the other, for free. */
   const [open, setOpen] = useState(null);
@@ -432,8 +437,12 @@ function PlanetBar({ scenario, setPlanet, setFaction, setBiome, toggleHazard, se
   };
 
 
+  const onFront = useMemo(
+    () => missionsFor(scenario.faction).filter((m) => !kind || m.traits.includes(kind)),
+    [scenario.faction, kind]
+  );
   const missionHits = useMemo(() => {
-    const all = missionsFor(scenario.faction);
+    const all = onFront;
     const q = query.trim().toLowerCase();
     if (!q) return all;
     return all.filter(
@@ -441,7 +450,7 @@ function PlanetBar({ scenario, setPlanet, setFaction, setBiome, toggleHazard, se
         m.name.toLowerCase().includes(q) ||
         m.traits.some((t) => ((missionTraits[t] || {}).name || t).toLowerCase().includes(q))
     );
-  }, [query, scenario.faction]);
+  }, [query, onFront]);
 
   const biomes = useMemo(
     () => Object.entries(biomeInfo).map(([slug, v]) => ({ slug, ...v })).sort((a, b) => a.name.localeCompare(b.name)),
@@ -460,10 +469,10 @@ function PlanetBar({ scenario, setPlanet, setFaction, setBiome, toggleHazard, se
   const placeSub = scenario.planet
     ? [biomeName(scenario.biome), loudHazards(scenario.hazards).length ? loudHazards(scenario.hazards).length + (loudHazards(scenario.hazards).length === 1 ? " hazard" : " hazards") : null]
         .filter(Boolean).join(" · ")
-    : byHand ? "set by hand" : planets.length + " to choose from";
+    : byHand ? "set by hand" : "pick it on the map, or set it by hand here";
   const missionSub = scenario.mission
     ? traitsOf(scenario.mission).map((t) => (missionTraits[t] || {}).name || t).join(" · ") || "no special demands"
-    : missionsFor(scenario.faction).length + " on this front";
+    : onFront.length + (kind ? " " + missionTraits[kind].name.toLowerCase() + " missions" : "") + " on this front";
 
   return (
     <div className="rounded-lg border border-base-800 bg-base-900/60 p-3">
@@ -502,19 +511,14 @@ function PlanetBar({ scenario, setPlanet, setFaction, setBiome, toggleHazard, se
       ) : null}
 
       {open === "planet" ? (
-        <div className="mt-2.5 flex flex-col gap-2.5 border-t border-base-800 pt-2.5">
-          <PlanetChooser chosen={scenario.planet}
-            onChoose={(name, front) => {
-              setPlanet(name);
-              if (front && setFaction && front !== scenario.faction) setFaction(front);
-              setOpen(null);
-            }}
-            none="No planet by that name. Try a sector, or set the biome by hand below." />
-
-          <div className="grid grid-cols-1 gap-3 border-t border-base-800 pt-3 sm:grid-cols-2">
+        <div className="mt-2.5 flex flex-col gap-2.5 border-t border-base-800 pt-2.5 text-left">
+          <p className="text-[11px] leading-relaxed text-base-500">
+            The map is the quick way. This is for a planet it does not have, or for asking what if.
+          </p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-base-500"
-                style={{ fontFamily: "'Oswald', sans-serif" }}>Or set the biome</span>
+                style={{ fontFamily: "'Oswald', sans-serif" }}>Set the biome</span>
               <select value={scenario.biome || ""} onChange={(e) => setBiome(e.target.value)}
                 className="w-full rounded border border-base-700 bg-base-900 px-2 py-1.5 text-xs text-base-200 outline-none focus:border-base-500">
                 <option value="">Not set</option>
@@ -543,8 +547,16 @@ function PlanetBar({ scenario, setPlanet, setFaction, setBiome, toggleHazard, se
       ) : null}
 
       {open === "mission" ? (
-        <Pane placeholder={"Search " + missionsFor(scenario.faction).length + " missions on this front"}
+        <Pane placeholder={"Search " + onFront.length + " missions on this front"}
           query={query} setQuery={setQuery}>
+          {kind ? (
+            <p className="flex flex-wrap items-center gap-x-2 px-2 pb-1 text-[11px] text-base-500">
+              Only {missionTraits[kind].name.toLowerCase()} missions, as the planner asked.
+              {onClearKind ? (
+                <button onClick={onClearKind} className="text-base-400 underline hover:text-base-100">show every mission</button>
+              ) : null}
+            </p>
+          ) : null}
           <PickRow on={!scenario.mission} onClick={() => { setMission(""); setOpen(null); }}
             title="Not set" sub="judge everything without a mission in mind" tags={[]} />
           {missionHits.length === 0 ? (
@@ -574,9 +586,8 @@ const FRONTS = Object.fromEntries(FACTIONS.map((f) => [f.id, { hex: f.hex, label
    planet according to the live war, or null when the war is not here, too
    old to trust, or quiet on that planet. The caller fills the scenario's
    front from it, which is the "whole scenario fills itself" half. */
-export function PlanetChooser({ chosen, onChoose, none, autoFocus = true }) {
+export function PlanetChooser({ chosen, onChoose, none, autoFocus = true, war = null, plan = null }) {
   const [query, setQuery] = useState("");
-  const war = useWar(true);
   const live = war && war.fresh ? war.planets : null;
 
   /* With the war live, a front you can drop on comes first in the list,
@@ -596,7 +607,8 @@ export function PlanetChooser({ chosen, onChoose, none, autoFocus = true }) {
       <SearchField placeholder={"Search " + planets.length + " planets or a sector"} query={query} setQuery={setQuery}
         autoFocus={autoFocus} />
       <MajorOrder order={war ? war.order : null} fronts={FRONTS} />
-      <GalaxyMap chosen={chosen} query={query} onChoose={choose} war={war} fronts={FRONTS} />
+      <GalaxyMap chosen={chosen} query={query} onChoose={choose} war={war} fronts={FRONTS}
+        picks={plan ? plan.picks.map((x) => x.name) : []} fits={plan && plan.count ? plan.fits : null} />
       <p className="text-center text-[10px] leading-relaxed text-base-600">
         {war && war.fresh ? (
           <>
@@ -629,6 +641,212 @@ export function PlanetChooser({ chosen, onChoose, none, autoFocus = true }) {
           })}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+/* ================================================================== */
+/* THE DROP PLANNER                                                   */
+/*                                                                    */
+/* "Where would you like to play?" The curator's idea, 30 September   */
+/* 2026: against what, what kind of mission, what kind of planet, and */
+/* the answer is a planet to go to, marked on the map beside it.      */
+/*                                                                    */
+/* The first question is the scenario's own front, which is where the */
+/* three banners went. Choosing a planet with fighting on it answers  */
+/* it for you, so it is the way to browse a front with no planet in   */
+/* mind, and the only way when the live war is not here. The rest is  */
+/* in usePlannerPrefs and keeps between visits. What it suggests is   */
+/* suggestFronts in galaxy.js, where the rules for it are written.    */
+/* ================================================================== */
+
+/* The kinds in the order the mission table lists them. */
+const MISSION_KINDS = Object.keys(missionTraits);
+
+/* The hazards worth avoiding, by name. */
+const AVOIDABLE = Object.entries(hazardInfo)
+  .filter(([slug]) => !QUIET_HAZARDS.has(slug))
+  .map(([slug, v]) => ({ slug, ...v }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+function PlanStep({ n, label, children }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-base-500"
+        style={{ fontFamily: "'Oswald', sans-serif" }}>
+        <span className="flex h-4 w-4 items-center justify-center rounded-full border border-base-600 text-[9px] text-base-300">{n}</span>
+        {label}
+      </span>
+      {children}
+    </div>
+  );
+}
+
+function PrefChip({ on, onClick, disabled, title, children }) {
+  return (
+    <button type="button" onClick={onClick} disabled={disabled} aria-pressed={on} title={title}
+      className={"rounded border px-2 py-1 text-[11px] transition-colors disabled:cursor-not-allowed disabled:opacity-35 " +
+        (on ? "border-base-200 bg-base-200 text-base-900"
+            : "border-base-700 bg-base-900 text-base-400 hover:border-base-500 hover:text-base-100")}>
+      {children}
+    </button>
+  );
+}
+
+function Planner({ scenario, setFaction, prefs, setPrefs, war, plan, onChoose }) {
+  const front = scenario.faction;
+  const f = FACTIONS.find((x) => x.id === front);
+  const onFront = missionsFor(front);
+  const offered = (kind) => onFront.some((m) => m.traits.includes(kind));
+  const kindCount = prefs.kind ? onFront.filter((m) => m.traits.includes(prefs.kind)).length : 0;
+  const toggleHazard = (slug) => setPrefs({
+    avoidHazards: prefs.avoidHazards.includes(slug)
+      ? prefs.avoidHazards.filter((h) => h !== slug)
+      : [...prefs.avoidHazards, slug],
+  });
+
+  return (
+    <div className="flex flex-col gap-3.5 rounded-lg border border-base-800 bg-base-900/60 p-3 text-left sm:p-4">
+      <p className="text-sm font-bold text-base-200" style={{ fontFamily: "'Oswald', sans-serif" }}>
+        Where would you like to play?
+      </p>
+
+      <PlanStep n={1} label="Against">
+        <div className="flex gap-2">
+          {FACTIONS.map((x) => (
+            <FactionPick key={x.id} faction={x} compact on={x.id === front} dimmed={Boolean(front) && x.id !== front}
+              onChoose={(id) => setFaction(id)} />
+          ))}
+        </div>
+      </PlanStep>
+
+      <PlanStep n={2} label="Kind of mission">
+        <div className="flex flex-wrap gap-1.5">
+          <PrefChip on={!prefs.kind} onClick={() => setPrefs({ kind: null })}>Any</PrefChip>
+          {MISSION_KINDS.map((k) => (
+            <PrefChip key={k} on={prefs.kind === k} disabled={!offered(k)}
+              title={offered(k) ? missionTraits[k].line : `The ${f ? f.label : "enemy"} have no ${missionTraits[k].name.toLowerCase()} missions`}
+              onClick={() => setPrefs({ kind: prefs.kind === k ? null : k })}>
+              {missionTraits[k].name}
+            </PrefChip>
+          ))}
+        </div>
+        {prefs.kind ? (
+          <p className="text-[11px] leading-relaxed text-base-500">
+            {kindCount
+              ? `${kindCount} ${missionTraits[prefs.kind].name.toLowerCase()} mission${kindCount === 1 ? "" : "s"} against the ${f ? f.label : "enemy"}, and the mission list below narrows to them.`
+              : `The ${f ? f.label : "enemy"} have none of these.`}{" "}
+            Every front offers nearly every kind, so this does not choose the planet.
+          </p>
+        ) : null}
+      </PlanStep>
+
+      <PlanStep n={3} label="Kind of planet">
+        <div className="flex flex-wrap gap-1.5">
+          <PrefChip on={prefs.avoidCaves} onClick={() => setPrefs({ avoidCaves: !prefs.avoidCaves })}
+            title="Hides the Hive Worlds, where the caves are">No caves</PrefChip>
+          <PrefChip on={prefs.fewerMegacities} onClick={() => setPrefs({ fewerMegacities: !prefs.fewerMegacities })}
+            title="Planets with a megacity come after every planet without one">Fewer megacities</PrefChip>
+        </div>
+        <span className="text-[10px] text-base-600">Rather not have</span>
+        <div className="flex flex-wrap gap-1.5">
+          {AVOIDABLE.map((h) => (
+            <PrefChip key={h.slug} on={prefs.avoidHazards.includes(h.slug)} title={h.description}
+              onClick={() => toggleHazard(h.slug)}>
+              {h.name}
+            </PrefChip>
+          ))}
+        </div>
+      </PlanStep>
+
+      <GoHere war={war} plan={plan} front={f} chosen={scenario.planet} onChoose={onChoose} />
+    </div>
+  );
+}
+
+/* The answer: the planets to go to, in order, each one a button that
+   chooses it. Says plainly when there is nothing to suggest and why. */
+function GoHere({ war, plan, front, chosen, onChoose }) {
+  const say = (text) => <p className="text-[11px] leading-relaxed text-base-500">{text}</p>;
+  return (
+    <div className="flex flex-col gap-1.5 border-t border-base-800 pt-3">
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-brand" style={{ fontFamily: "'Oswald', sans-serif" }}>
+        Go here
+      </span>
+      {!war ? say("The live war is not here, so there are no fronts to point you at. Every planet on the map still works.")
+        : !war.fresh ? say(`The live war was last read ${agoText(war.age)}, too long ago to point you anywhere.`)
+        : !plan || plan.count === 0 ? say(
+            (front ? `No front against the ${front.label} fits right now.` : "No front fits right now.") +
+            (plan && plan.hiddenForCaves ? ` The only ${plan.hiddenForCaves === 1 ? "one has" : "ones have"} caves.` : "")
+          )
+        : (
+          <>
+            <ol className="flex flex-col gap-1.5">
+              {plan.picks.map((p, i) => {
+                const fx = FACTIONS.find((x) => x.id === p.front);
+                const table = planetByName.get(p.name);
+                const state = p.defence
+                  ? `under attack${p.defence.progress !== null ? ", " + Math.round(p.defence.progress * 100) + "% defended" : ""}`
+                  : p.liberation !== null ? Math.round(p.liberation * 100) + "% liberated" : null;
+                const warns = [
+                  ...(p.megacity ? [p.megacity === 1 ? "a megacity" : p.megacity + " megacities"] : []),
+                  ...p.clashes.map(hazardName),
+                ];
+                return (
+                  <li key={p.name}>
+                    <button onClick={() => onChoose(p.name, p.front)}
+                      className={"flex w-full items-start gap-2.5 rounded border px-2.5 py-2 text-left transition-colors " +
+                        (p.name === chosen ? "border-brand bg-base-800/70" : "border-base-800 hover:border-base-600 hover:bg-base-800/50")}
+                      style={fx ? { borderLeftColor: fx.hex, borderLeftWidth: 3 } : undefined}>
+                      <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand text-[9px] font-bold text-brand-ink">
+                        {i + 1}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-baseline justify-between gap-2">
+                          <span className="truncate text-xs font-bold text-base-100" style={{ fontFamily: "'Oswald', sans-serif" }}>{p.name}</span>
+                          <span className="shrink-0 text-[10px] text-base-500">
+                            {p.players ? p.players.toLocaleString("en-GB") + " Helldivers" : "nobody there yet"}
+                          </span>
+                        </span>
+                        <span className="block truncate text-[10px] text-base-500">
+                          {[table && table.sector ? table.sector + " sector" : null, table ? biomeName(table.biome) : null, state]
+                            .filter(Boolean).join(" · ")}
+                        </span>
+                        {warns.length ? (
+                          <span className="mt-0.5 block text-[10px] text-accent-300">Has {warns.join(", ")}</span>
+                        ) : null}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ol>
+            {plan.count > plan.picks.length
+              ? say(`${plan.count - plan.picks.length} more ${plan.count - plan.picks.length === 1 ? "front fits" : "fronts fit"}, lit on the map.`)
+              : null}
+            {plan.hiddenForCaves
+              ? say(`${plan.hiddenForCaves} hidden for caves.`)
+              : null}
+          </>
+        )}
+    </div>
+  );
+}
+
+/* The planner and the map, side by side on a wide screen and stacked on a
+   narrow one. The live war is read once here and handed to both, so they
+   cannot disagree about where the fronts are. */
+export function DropPlanner({ scenario, setFaction, onChoose, prefs, setPrefs, autoFocus = false }) {
+  const war = useWar(true);
+  const plan = useMemo(
+    () => suggestFronts(war, { front: scenario.faction, ...prefs }),
+    [war, scenario.faction, prefs]
+  );
+  return (
+    <div className="grid w-full grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,23rem)_minmax(0,1fr)]">
+      <Planner scenario={scenario} setFaction={setFaction} prefs={prefs} setPrefs={setPrefs}
+        war={war} plan={plan} onChoose={onChoose} />
+      <PlanetChooser chosen={scenario.planet} onChoose={onChoose} war={war} plan={plan} autoFocus={autoFocus} />
     </div>
   );
 }
@@ -1464,7 +1682,9 @@ export const BLANK_FILTERS = {
 
 const factionArt = (id, shape) => uiArt(`faction_picker_${shape}_${id}`);
 
-function FactionPick({ faction: f, on, hero, dimmed, onChoose }) {
+/* `compact` is the planner's size: icon over name at every width, because
+   three of them share a narrow column there. */
+function FactionPick({ faction: f, on, hero, dimmed, onChoose, compact = false }) {
   /* The chooser has no chosen one, so dimming all three there would be  */
   /* three greyed out buttons asking to be pressed. Hero is always lit;  */
   /* the bar lights only the front you are on.                           */
@@ -1483,7 +1703,9 @@ function FactionPick({ faction: f, on, hero, dimmed, onChoose }) {
         "group relative flex flex-1 overflow-hidden rounded-lg border-2 transition-all duration-200 " +
         (hero
           ? "aspect-[1/2] max-w-[9rem] flex-col items-center justify-end gap-1.5 px-3 pb-4 hover:-translate-y-1 sm:max-w-[clamp(7rem,calc((100vh-34rem)/2),13rem)] sm:gap-2"
-          : "min-h-[3.25rem] flex-col items-center justify-center gap-1 px-2 py-2 sm:min-h-[3.5rem] sm:flex-row sm:gap-2.5") +
+          : compact
+            ? "min-h-[3.25rem] flex-col items-center justify-center gap-1 px-1 py-2"
+            : "min-h-[3.25rem] flex-col items-center justify-center gap-1 px-2 py-2 sm:min-h-[3.5rem] sm:flex-row sm:gap-2.5") +
         (on ? " -translate-y-0.5" : "") +
         (dimmed ? " opacity-60 saturate-50 hover:opacity-100 hover:saturate-100" : "") +
         (lit ? "" : " border-base-800 hover:-translate-y-0.5 hover:border-base-600")
@@ -1532,12 +1754,12 @@ function FactionPick({ faction: f, on, hero, dimmed, onChoose }) {
 
       <f.Icon
         className={"relative shrink-0 transition-all duration-200 " +
-          (hero ? "h-9 w-9 sm:h-12 sm:w-12" : "h-5 w-5 sm:h-6 sm:w-6") +
+          (hero ? "h-9 w-9 sm:h-12 sm:w-12" : compact ? "h-5 w-5" : "h-5 w-5 sm:h-6 sm:w-6") +
           (lit ? "" : " opacity-45 group-hover:opacity-80")}
         style={{ color: lit ? f.hex : "rgb(var(--base-400))" }} />
 
       <span className={"relative font-bold uppercase leading-none tracking-wider transition-colors " +
-          (hero ? "text-xs sm:text-base" : "text-[11px] sm:text-sm")}
+          (hero ? "text-xs sm:text-base" : compact ? "text-[10px]" : "text-[11px] sm:text-sm")}
         style={{ fontFamily: "'Oswald', sans-serif", color: lit ? f.hex : "rgb(var(--base-500))" }}>
         {f.label}
       </span>
@@ -1667,13 +1889,22 @@ function SquadPicker({ value, onChange }) {
  */
 export function ScenarioScreen({ scenario, setFaction, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment, onDone }) {
   const chosen = Boolean(scenario.faction);
+  const [prefs, setPrefs] = usePlannerPrefs();
+
+  /* A planet with fighting on it brings its front along. */
+  const choose = (name, front) => {
+    setPlanet(name);
+    if (front && front !== scenario.faction) setFaction(front);
+  };
 
   return (
-    /* Centred and capped. The whole point is that a desktop sees the      */
-    /* entire scenario at once: three banners, a difficulty, a place and   */
-    /* a mission, with nothing below the fold to go hunting for.           */
-    <div className="mx-auto flex max-w-3xl flex-col items-center gap-3 text-center">
-      <div className="relative flex w-full flex-col items-center">
+    /* The planner and the map lead, because the planet is the question and
+       the front follows from it. The three banners that used to open this
+       screen are the planner's first question now, smaller: choosing a
+       front first had become the long way round, the curator's point on
+       30 September 2026. */
+    <div className="mx-auto flex max-w-6xl flex-col gap-4">
+      <div className="relative flex w-full flex-col items-center text-center">
         {onDone ? (
           <button onClick={onDone} title="Back to the list"
             className="absolute left-0 top-0 rounded border border-base-800 p-1.5 text-base-400 hover:border-base-600 hover:text-base-100">
@@ -1681,43 +1912,31 @@ export function ScenarioScreen({ scenario, setFaction, setPlanet, setBiome, togg
           </button>
         ) : null}
         <p className="text-lg font-bold text-base-200" style={{ fontFamily: "'Oswald', sans-serif" }}>
-          {chosen ? "Where are you dropping" : "Which front are you dropping on"}
+          Where are you dropping
         </p>
         <p className="mt-1 max-w-xl text-[13px] leading-relaxed text-base-500">
           {chosen
             ? "One scenario for the whole tool. Change it here and every list and every rating follows, on every tab."
-            : "Every rating here is per front, and so is everything after it. Pick one and the list ranks for that war."}
+            : "Every rating here is per front. Say which below, or click a planet with fighting on it and the front comes with it."}
         </p>
       </div>
 
-      {/* The banners keep their shape and stop growing once the window is  */}
-      {/* short, because they are the tallest thing here and the screen is  */}
-      {/* supposed to fit. Height is twice the width, so capping the width  */}
-      {/* in viewport height units is what caps the height.                 */}
-      <div className="flex w-full items-stretch justify-center gap-3 sm:gap-5">
-        {FACTIONS.map((f) => (
-          <FactionPick key={f.id} faction={f} hero
-            on={f.id === scenario.faction}
-            dimmed={chosen && f.id !== scenario.faction}
-            onChoose={(id) => setFaction(id === scenario.faction ? null : id)} />
-        ))}
-      </div>
+      <DropPlanner scenario={scenario} setFaction={setFaction} onChoose={choose} prefs={prefs} setPrefs={setPrefs} />
 
       {chosen ? (
         <>
-          <div className="w-full rounded-lg border border-base-800 bg-base-900/60 px-4 py-3">
-            <DifficultyPicker value={scenario.difficulty} onChange={setDifficulty} faction={scenario.faction} />
-            <SquadPicker value={scenario.squad} onChange={setSquad} />
-          </div>
-
-          <div className="w-full">
-            <PlanetBar scenario={scenario} setPlanet={setPlanet} setFaction={setFaction} setBiome={setBiome}
-              toggleHazard={toggleHazard} setMission={setMission} clearEnvironment={clearEnvironment} />
+          <div className="grid w-full grid-cols-1 items-start gap-4 lg:grid-cols-2">
+            <div className="rounded-lg border border-base-800 bg-base-900/60 px-4 py-3 text-center">
+              <DifficultyPicker value={scenario.difficulty} onChange={setDifficulty} faction={scenario.faction} />
+              <SquadPicker value={scenario.squad} onChange={setSquad} />
+            </div>
+            <PlanetBar scenario={scenario} setBiome={setBiome} toggleHazard={toggleHazard} setMission={setMission}
+              clearEnvironment={clearEnvironment} kind={prefs.kind} onClearKind={() => setPrefs({ kind: null })} />
           </div>
 
           {onDone ? (
             <button onClick={onDone}
-              className="rounded border border-base-700 bg-base-900 px-6 py-2 text-sm font-bold uppercase tracking-wide text-base-200 hover:border-base-500 hover:text-base-100"
+              className="self-center rounded border border-base-700 bg-base-900 px-6 py-2 text-sm font-bold uppercase tracking-wide text-base-200 hover:border-base-500 hover:text-base-100"
               style={{ fontFamily: "'Oswald', sans-serif" }}>
               Done
             </button>

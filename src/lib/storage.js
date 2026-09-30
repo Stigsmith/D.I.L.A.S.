@@ -98,6 +98,10 @@ export const SETTINGS = {
      storage, and it only ever says which seat in one short-lived party is
      yours. Out of the export: it belongs to this browser. */
   party: "hd2-party",
+  /* What the drop planner last heard: the kind of mission, and what kind
+     of planet you would rather not be on. A preference about how you like
+     to play rather than anything you own, so it stays out of the export. */
+  planner: "hd2-planner",
 };
 
 /* Both scenario keys were spelled hd2-brief-* until 21 August 2026. A    */

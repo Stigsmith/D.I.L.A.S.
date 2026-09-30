@@ -210,7 +210,11 @@
         "TURING",
         "GACRUX",
         "PANDION-XXIV"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "city": 1
+      }
     },
     {
       "name": "Achernar Secundus",
@@ -230,7 +234,11 @@
         "URSICA XI",
         "DARIUS II",
         "ACRUX IX"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "city": 2
+      }
     },
     {
       "name": "Achird III",
@@ -249,7 +257,11 @@
       "links": [
         "TURING",
         "DARIUS II"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "city": 2
+      }
     },
     {
       "name": "Acrab XI",
@@ -267,7 +279,8 @@
       },
       "links": [
         "SKAASH"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Acrux IX",
@@ -286,7 +299,8 @@
         "ACRAB XI",
         "GEMMA",
         "GRAND ERRANT"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Acubens Prime",
@@ -301,7 +315,8 @@
         "x": 0.39494884,
         "y": -0.34418607
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Adhara",
@@ -321,7 +336,11 @@
       "links": [
         "MOG",
         "AFOYAY BAY"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "city": 1
+      }
     },
     {
       "name": "Aesir Pass",
@@ -336,7 +355,8 @@
         "x": -0.34874794,
         "y": 0.28628126
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Afoyay Bay",
@@ -356,7 +376,8 @@
         "ZEA RUGOSIA",
         "VALMOX",
         "AIN-5"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Ain-5",
@@ -374,7 +395,8 @@
       "links": [
         "NEW STOCKHOLM",
         "HERTHON SECUNDUS"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Alairt III",
@@ -394,7 +416,11 @@
         "NEW STOCKHOLM",
         "ALAMAK VII",
         "HERTHON SECUNDUS"
-      ]
+      ],
+      "cities": {
+        "town": 3,
+        "megacity": 1
+      }
     },
     {
       "name": "Alamak VII",
@@ -411,7 +437,13 @@
       },
       "links": [
         "NEW STOCKHOLM"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "city": 1,
+        "settlement": 1,
+        "megacity": 1
+      }
     },
     {
       "name": "Alaraph",
@@ -426,7 +458,10 @@
         "x": -0.03489475,
         "y": -0.54864734
       },
-      "links": []
+      "links": [],
+      "cities": {
+        "city": 2
+      }
     },
     {
       "name": "Alathfar XI",
@@ -446,7 +481,12 @@
         "ALARAPH",
         "ANDAR",
         "KARLIA"
-      ]
+      ],
+      "cities": {
+        "city": 1,
+        "town": 1,
+        "megacity": 1
+      }
     },
     {
       "name": "Alderidge Cove",
@@ -464,7 +504,8 @@
       "links": [
         "ELYSIAN MEADOWS",
         "BOTEIN"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Alta V",
@@ -485,7 +526,11 @@
         "SLIF",
         "CARAMOOR",
         "INARI"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "settlement": 1
+      }
     },
     {
       "name": "Andar",
@@ -500,7 +545,10 @@
         "x": -0.20094277,
         "y": -0.4955483
       },
-      "links": []
+      "links": [],
+      "cities": {
+        "megacity": 1
+      }
     },
     {
       "name": "Angel's Venture",
@@ -515,7 +563,8 @@
         "x": 0.4448446,
         "y": 0.1618837
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Arkturus",
@@ -531,7 +580,8 @@
         "x": 0.2559713,
         "y": 0.5260108
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Asperoth Prime",
@@ -550,7 +600,10 @@
       "links": [
         "ANDAR",
         "KEID"
-      ]
+      ],
+      "cities": {
+        "city": 2
+      }
     },
     {
       "name": "Atrama",
@@ -566,7 +619,8 @@
         "x": -0.25681943,
         "y": 0.030138722
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Aurora Bay",
@@ -583,7 +637,11 @@
       },
       "links": [
         "CHOOHE"
-      ]
+      ],
+      "cities": {
+        "city": 1,
+        "town": 1
+      }
     },
     {
       "name": "Azterra",
@@ -601,7 +659,8 @@
       },
       "links": [
         "TERREK"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Azur Secundus",
@@ -620,7 +679,8 @@
       },
       "links": [
         "OVERGOE PRIME"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Baldrick Prime",
@@ -640,7 +700,8 @@
       "links": [
         "OBARI",
         "ILDUNA PRIME"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Barabos",
@@ -658,7 +719,8 @@
       },
       "links": [
         "FENMIRE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Bashyr",
@@ -674,7 +736,8 @@
         "x": 0.32492584,
         "y": -0.26339266
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Basquine VIII",
@@ -691,7 +754,8 @@
       },
       "links": [
         "RD-4"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Bekvam III",
@@ -708,7 +772,11 @@
       },
       "links": [
         "JULHEIM"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "city": 1
+      }
     },
     {
       "name": "Bellatrix",
@@ -727,7 +795,8 @@
       "links": [
         "KHANDARK",
         "ALDERIDGE COVE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Big Rock",
@@ -743,7 +812,8 @@
         "x": 0.944,
         "y": 0.099
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Blistica",
@@ -763,7 +833,8 @@
       "links": [
         "MINTORIA",
         "ZZANIAH PRIME"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Bore Rock",
@@ -781,7 +852,8 @@
       },
       "links": [
         "BRILLIANCE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Borea",
@@ -799,7 +871,8 @@
       },
       "links": [
         "GUNVALD"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Botein",
@@ -817,7 +890,8 @@
       },
       "links": [
         "KHANDARK"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Brilliance",
@@ -832,7 +906,8 @@
         "x": 0.341,
         "y": 0.323
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Brink-2",
@@ -850,7 +925,8 @@
       },
       "links": [
         "KNETH PORT"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Bunda Secundus",
@@ -867,7 +943,8 @@
       },
       "links": [
         "CANOPUS"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Calypso",
@@ -887,7 +964,8 @@
         "OUTPOST 32",
         "ELYSIAN MEADOWS",
         "ANDAR"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Canopus",
@@ -907,7 +985,8 @@
       "links": [
         "LIBERTY RIDGE",
         "OSUPSAM"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Caph",
@@ -927,7 +1006,10 @@
         "DOLPH",
         "CASTOR",
         "LASTOFE"
-      ]
+      ],
+      "cities": {
+        "city": 3
+      }
     },
     {
       "name": "Caramoor",
@@ -944,7 +1026,10 @@
         "x": 0.32650283,
         "y": -0.12384212
       },
-      "links": []
+      "links": [],
+      "cities": {
+        "city": 3
+      }
     },
     {
       "name": "Castor",
@@ -960,7 +1045,8 @@
         "x": -0.56242514,
         "y": -0.11354032
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Cerberus IIIc",
@@ -977,7 +1063,8 @@
         "x": 0.001789452,
         "y": -0.18935835
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Charbal-VII",
@@ -997,7 +1084,10 @@
         "JULHEIM",
         "MORT",
         "CHOEPESSA IV"
-      ]
+      ],
+      "cities": {
+        "settlement": 1
+      }
     },
     {
       "name": "Charon Prime",
@@ -1018,7 +1108,8 @@
         "CHARBAL-VII",
         "CHOEPESSA IV",
         "MARTALE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Choepessa IV",
@@ -1036,7 +1127,13 @@
       "links": [
         "USTOTU",
         "VARYLIA 5"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "city": 1,
+        "megacity": 1,
+        "settlement": 1
+      }
     },
     {
       "name": "Choohe",
@@ -1056,7 +1153,8 @@
       "links": [
         "CHORT BAY",
         "MENKENT"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Chort Bay",
@@ -1075,7 +1173,8 @@
       "links": [
         "AURORA BAY",
         "MERAK"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Cirrus",
@@ -1092,7 +1191,8 @@
       },
       "links": [
         "AZTERRA"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Claorell",
@@ -1111,7 +1211,11 @@
       "links": [
         "IMBER",
         "CLASA"
-      ]
+      ],
+      "cities": {
+        "city": 2,
+        "megacity": 1
+      }
     },
     {
       "name": "Clasa",
@@ -1129,7 +1233,12 @@
       },
       "links": [
         "DEMIURG"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "town": 1,
+        "city": 1
+      }
     },
     {
       "name": "Crimsica",
@@ -1149,7 +1258,11 @@
         "ACAMAR IV",
         "ESTANU",
         "FORI PRIME"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "city": 1
+      }
     },
     {
       "name": "Crucible",
@@ -1166,7 +1279,12 @@
       },
       "links": [
         "VOLTERRA"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "town": 1,
+        "megacity": 2
+      }
     },
     {
       "name": "Curia",
@@ -1185,7 +1303,8 @@
       "links": [
         "BOREA",
         "AESIR PASS"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Cyberstan",
@@ -1202,7 +1321,13 @@
       },
       "links": [
         "MERGA IV"
-      ]
+      ],
+      "cities": {
+        "megacity": 1,
+        "settlement": 2,
+        "city": 2,
+        "town": 3
+      }
     },
     {
       "name": "Darius II",
@@ -1220,7 +1345,10 @@
       },
       "links": [
         "ACAMAR IV"
-      ]
+      ],
+      "cities": {
+        "city": 1
+      }
     },
     {
       "name": "Darrowsport",
@@ -1236,7 +1364,8 @@
         "x": 0.09485684,
         "y": -0.08101245
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Demiurg",
@@ -1251,7 +1380,8 @@
         "x": 0.061421014,
         "y": 0.6512196
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Deneb Secundus",
@@ -1266,7 +1396,8 @@
         "x": 0.09195879,
         "y": 0.7373349
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Diaspora X",
@@ -1285,7 +1416,8 @@
       },
       "links": [
         "GEMSTONE BLUFFS"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Diluvia",
@@ -1302,7 +1434,11 @@
       },
       "links": [
         "IRULTA"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "city": 2
+      }
     },
     {
       "name": "Dolph",
@@ -1320,7 +1456,8 @@
       },
       "links": [
         "OSLO STATION"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Draupnir",
@@ -1338,7 +1475,10 @@
       },
       "links": [
         "TIEN KWAN"
-      ]
+      ],
+      "cities": {
+        "city": 2
+      }
     },
     {
       "name": "Duma Tyr",
@@ -1356,7 +1496,8 @@
       "links": [
         "BOREA",
         "BEKVAM III"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Durgen",
@@ -1373,7 +1514,8 @@
         "x": -0.9146473,
         "y": -0.17310524
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "East Iridium Trading Bay",
@@ -1393,7 +1535,8 @@
         "EMORATH",
         "ELYSIAN MEADOWS",
         "BRINK-2"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Effluvia",
@@ -1413,7 +1556,8 @@
         "SEYSHEL BEACH",
         "SOLGHAST",
         "PARSH"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Electra Bay",
@@ -1429,7 +1573,8 @@
         "x": 0.2163721,
         "y": 0.7093697
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Elysian Meadows",
@@ -1445,7 +1590,8 @@
         "x": -0.25539273,
         "y": -0.3439258
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Emeria",
@@ -1464,7 +1610,10 @@
       "links": [
         "BARABOS",
         "BOREA"
-      ]
+      ],
+      "cities": {
+        "megacity": 1
+      }
     },
     {
       "name": "Emorath",
@@ -1481,7 +1630,12 @@
       },
       "links": [
         "VIRIDIA PRIME"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "settlement": 1,
+        "megacity": 1
+      }
     },
     {
       "name": "Enuliale",
@@ -1500,7 +1654,8 @@
       "links": [
         "EPSILON PHOENCIS VI",
         "DIASPORA X"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Epsilon Phoencis VI",
@@ -1518,7 +1673,8 @@
       },
       "links": [
         "GEMSTONE BLUFFS"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Erata Prime",
@@ -1539,7 +1695,11 @@
         "HELLMIRE",
         "BORE ROCK",
         "NIVEL 43"
-      ]
+      ],
+      "cities": {
+        "town": 2,
+        "settlement": 1
+      }
     },
     {
       "name": "Erson Sands",
@@ -1558,7 +1718,8 @@
       },
       "links": [
         "NIVEL 43"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Esker",
@@ -1578,7 +1739,8 @@
         "ERSON SANDS",
         "SOCORRO III",
         "BORE ROCK"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Estanu",
@@ -1595,7 +1757,8 @@
       },
       "links": [
         "FORI PRIME"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Eukoria",
@@ -1612,7 +1775,8 @@
       },
       "links": [
         "REGNUS"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Euphoria III",
@@ -1628,7 +1792,8 @@
         "x": 0.3191681,
         "y": 0.8730191
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Fenmire",
@@ -1647,7 +1812,11 @@
       "links": [
         "MASTIA",
         "CURIA"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "megacity": 2
+      }
     },
     {
       "name": "Fenrir III",
@@ -1665,7 +1834,11 @@
       },
       "links": [
         "FRONTERIA"
-      ]
+      ],
+      "cities": {
+        "town": 2,
+        "megacity": 1
+      }
     },
     {
       "name": "Fori Prime",
@@ -1684,7 +1857,8 @@
       "links": [
         "GACRUX",
         "OSHAUNE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Fornskogur II",
@@ -1700,7 +1874,8 @@
         "x": 0.15801243,
         "y": -0.09685686
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Fort Justice",
@@ -1715,7 +1890,8 @@
         "x": -0.07801243,
         "y": 0.10585686
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Fort Sanctuary",
@@ -1733,7 +1909,10 @@
       },
       "links": [
         "EUKORIA"
-      ]
+      ],
+      "cities": {
+        "megacity": 1
+      }
     },
     {
       "name": "Fort Union",
@@ -1751,7 +1930,12 @@
       },
       "links": [
         "CIRRUS"
-      ]
+      ],
+      "cities": {
+        "town": 2,
+        "city": 1,
+        "megacity": 1
+      }
     },
     {
       "name": "Freedom Peak",
@@ -1767,7 +1951,8 @@
         "x": -0.17010404,
         "y": -0.08865711
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Fronteria",
@@ -1786,7 +1971,8 @@
       "links": [
         "CRIMSICA",
         "HEETH"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Fury",
@@ -1805,7 +1991,8 @@
         "MORT",
         "CHOEPESSA IV",
         "USTOTU"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Gacrux",
@@ -1823,7 +2010,8 @@
       },
       "links": [
         "PANDION-XXIV"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Gaellivare",
@@ -1842,7 +2030,11 @@
       },
       "links": [
         "IMBER"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "megacity": 1
+      }
     },
     {
       "name": "Gar Haren",
@@ -1862,7 +2054,8 @@
         "ACHERNAR SECUNDUS",
         "GATRIA",
         "GRAND ERRANT"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Gatria",
@@ -1882,7 +2075,11 @@
         "PHACT BAY",
         "PHERKAD SECUNDUS",
         "LUXURIANT"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "city": 1
+      }
     },
     {
       "name": "Gemma",
@@ -1900,7 +2097,8 @@
       },
       "links": [
         "ACRAB XI"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Gemstone Bluffs",
@@ -1918,7 +2116,8 @@
       },
       "links": [
         "NABATEA SECUNDUS"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Genesis Prime",
@@ -1938,7 +2137,11 @@
         "OASIS",
         "OUTPOST 32",
         "ALARAPH"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "city": 1
+      }
     },
     {
       "name": "Grafmere",
@@ -1955,7 +2158,12 @@
       },
       "links": [
         "IRO"
-      ]
+      ],
+      "cities": {
+        "city": 1,
+        "settlement": 1,
+        "megacity": 1
+      }
     },
     {
       "name": "Grand Errant",
@@ -1976,7 +2184,8 @@
         "GEMMA",
         "PHERKAD SECUNDUS",
         "POLARIS PRIME"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Gunvald",
@@ -1992,7 +2201,8 @@
         "x": -0.349058,
         "y": 0.0568677
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Hadar",
@@ -2008,7 +2218,8 @@
         "x": 0.51897186,
         "y": -0.3859795
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Haka",
@@ -2023,7 +2234,8 @@
         "x": 0.5813272,
         "y": -0.45833483
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Haldus",
@@ -2041,7 +2253,8 @@
       },
       "links": [
         "ADHARA"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Halies Port",
@@ -2056,7 +2269,8 @@
         "x": 0.4808474,
         "y": -0.5826475
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Heeth",
@@ -2077,7 +2291,8 @@
         "FENRIR III",
         "ERATA PRIME",
         "BRILLIANCE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Hellmire",
@@ -2098,7 +2313,8 @@
         "FENRIR III",
         "ESTANU",
         "OSHAUNE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Herthon Secundus",
@@ -2118,7 +2334,11 @@
       "links": [
         "ZEA RUGOSIA",
         "HORT"
-      ]
+      ],
+      "cities": {
+        "town": 2,
+        "city": 1
+      }
     },
     {
       "name": "Hesoe Prime",
@@ -2136,7 +2356,8 @@
       },
       "links": [
         "RD-4"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Heze Bay",
@@ -2156,7 +2377,10 @@
       "links": [
         "ALAIRT III",
         "RIRGA BAY"
-      ]
+      ],
+      "cities": {
+        "city": 2
+      }
     },
     {
       "name": "Hort",
@@ -2175,7 +2399,10 @@
       "links": [
         "HESOE PRIME",
         "BASQUINE VIII"
-      ]
+      ],
+      "cities": {
+        "city": 3
+      }
     },
     {
       "name": "Hydrobius",
@@ -2192,7 +2419,8 @@
         "x": -0.409,
         "y": -0.681
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Hydrobius (Void)",
@@ -2206,7 +2434,8 @@
       ],
       "headline": "tremors",
       "position": null,
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Hydrofall Prime",
@@ -2222,7 +2451,8 @@
         "x": 0.13535836,
         "y": -0.03378948
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Igla",
@@ -2237,7 +2467,8 @@
         "x": -0.1728935,
         "y": 0.06970126
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Ilduna Prime",
@@ -2254,7 +2485,8 @@
       },
       "links": [
         "EMORATH"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Imber",
@@ -2271,7 +2503,8 @@
         "x": -0.060664836,
         "y": 0.44539174
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Inari",
@@ -2289,7 +2522,8 @@
       "links": [
         "VELD",
         "SKAASH"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Ingmar",
@@ -2307,7 +2541,11 @@
       },
       "links": [
         "MANTES"
-      ]
+      ],
+      "cities": {
+        "settlement": 2,
+        "megacity": 1
+      }
     },
     {
       "name": "Iridica",
@@ -2322,7 +2560,8 @@
         "x": 0.1129696,
         "y": 0.3345827
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Iro",
@@ -2341,7 +2580,8 @@
       "links": [
         "VALMOX",
         "NEW STOCKHOLM"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Irulta",
@@ -2361,7 +2601,12 @@
       "links": [
         "DILUVIA",
         "ELYSIAN MEADOWS"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "town": 1,
+        "city": 1
+      }
     },
     {
       "name": "Ivis",
@@ -2377,7 +2622,8 @@
         "x": 0.287884,
         "y": 0.1099696
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Julheim",
@@ -2396,7 +2642,10 @@
       "links": [
         "DOLPH",
         "DUMA TYR"
-      ]
+      ],
+      "cities": {
+        "megacity": 1
+      }
     },
     {
       "name": "K",
@@ -2414,7 +2663,8 @@
       "links": [
         "CHOEPESSA IV",
         "VARYLIA 5"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Karlia",
@@ -2433,7 +2683,10 @@
       },
       "links": [
         "SANGIS"
-      ]
+      ],
+      "cities": {
+        "city": 1
+      }
     },
     {
       "name": "Keid",
@@ -2453,7 +2706,8 @@
       "links": [
         "KARLIA",
         "SHETE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Kelvinor",
@@ -2469,7 +2723,8 @@
         "x": -0.14765465,
         "y": -0.030730395
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Kerth Secundus",
@@ -2488,7 +2743,11 @@
         "SEYSHEL BEACH",
         "MYRIUM",
         "GRAFMERE"
-      ]
+      ],
+      "cities": {
+        "town": 2,
+        "megacity": 1
+      }
     },
     {
       "name": "Khandark",
@@ -2507,7 +2766,8 @@
       "links": [
         "ASPEROTH PRIME",
         "SKAT BAY"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Kharst",
@@ -2523,7 +2783,8 @@
         "x": 0.26874065,
         "y": -0.21253327
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Kirrik",
@@ -2540,7 +2801,8 @@
         "x": 0.12954043,
         "y": 0.52342516
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Klaka 5",
@@ -2559,7 +2821,8 @@
       "links": [
         "OSUPSAM",
         "KNETH PORT"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Klen Dahth II",
@@ -2576,7 +2839,8 @@
         "x": 0.05373042,
         "y": 0.10565466
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Kneth Port",
@@ -2596,7 +2860,8 @@
       "links": [
         "BOTEIN",
         "SPHERION"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Krakabos",
@@ -2612,7 +2877,8 @@
         "x": 0.037842084,
         "y": 0.32250285
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Krakatwo",
@@ -2629,7 +2895,8 @@
       },
       "links": [
         "CRUCIBLE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Kraz",
@@ -2647,7 +2914,8 @@
       },
       "links": [
         "BUNDA SECUNDUS"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Kuma",
@@ -2663,7 +2931,8 @@
         "x": 0.03396134,
         "y": 0.9259823
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Kuper",
@@ -2679,7 +2948,8 @@
         "x": -0.46455657,
         "y": -0.09407307
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Lastofe",
@@ -2699,7 +2969,8 @@
       "links": [
         "PÖPLI IX",
         "TIEN KWAN"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Leng Secundus",
@@ -2719,7 +2990,8 @@
         "KLAKA 5",
         "KRAZ",
         "STOUT"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Lesath",
@@ -2738,7 +3010,12 @@
         "GAELLIVARE",
         "VOG-SOJOTH",
         "CHORT BAY"
-      ]
+      ],
+      "cities": {
+        "town": 2,
+        "city": 1,
+        "megacity": 1
+      }
     },
     {
       "name": "Liberty Ridge",
@@ -2757,7 +3034,11 @@
       "links": [
         "EMORATH",
         "BALDRICK PRIME"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "city": 1
+      }
     },
     {
       "name": "Luxuriant",
@@ -2772,7 +3053,8 @@
         "x": 0.874,
         "y": -0.07
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Maia",
@@ -2791,7 +3073,8 @@
       "links": [
         "MALEVELON CREEK",
         "VANDALON IV"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Malevelon Creek",
@@ -2810,7 +3093,11 @@
       "links": [
         "DURGEN",
         "DRAUPNIR"
-      ]
+      ],
+      "cities": {
+        "settlement": 2,
+        "town": 1
+      }
     },
     {
       "name": "Mantes",
@@ -2831,7 +3118,8 @@
         "PÖPLI IX",
         "DRAUPNIR",
         "MALEVELON CREEK"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Marfark",
@@ -2852,7 +3140,10 @@
         "AESIR PASS",
         "MARTALE",
         "MATAR BAY"
-      ]
+      ],
+      "cities": {
+        "settlement": 1
+      }
     },
     {
       "name": "Marre IV",
@@ -2869,7 +3160,8 @@
         "x": 0.2007717,
         "y": -0.1490952
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Martale",
@@ -2884,7 +3176,11 @@
         "x": -0.5379487,
         "y": 0.3338475
       },
-      "links": []
+      "links": [],
+      "cities": {
+        "settlement": 1,
+        "city": 1
+      }
     },
     {
       "name": "Martyr's Bay",
@@ -2899,7 +3195,8 @@
         "x": -0.099012464,
         "y": -0.11185683
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Mastia",
@@ -2919,7 +3216,8 @@
       "links": [
         "SHELT",
         "GAELLIVARE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Matar Bay",
@@ -2939,7 +3237,11 @@
         "CHOOHE",
         "MARTALE",
         "MEISSA"
-      ]
+      ],
+      "cities": {
+        "city": 1,
+        "town": 1
+      }
     },
     {
       "name": "Maw",
@@ -2956,7 +3258,8 @@
         "x": -0.33550286,
         "y": -0.05084203
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Meissa",
@@ -2976,7 +3279,8 @@
       "links": [
         "WASAT",
         "X-45"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Mekbuda",
@@ -2995,7 +3299,8 @@
       "links": [
         "AURORA BAY",
         "CYBERSTAN"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Menkent",
@@ -3016,7 +3321,8 @@
         "VERNEN WELLS",
         "CHORT BAY",
         "LESATH"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Merak",
@@ -3032,7 +3338,8 @@
         "x": -0.35206652,
         "y": 0.64499736
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Merga IV",
@@ -3050,7 +3357,8 @@
       },
       "links": [
         "MERAK"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Meridia",
@@ -3065,7 +3373,8 @@
         "x": 0.2965067,
         "y": 0.11628686
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Midasburg",
@@ -3080,7 +3389,8 @@
         "x": 0.06770126,
         "y": -0.1448935
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Minchir",
@@ -3096,7 +3406,8 @@
         "x": 0.084947325,
         "y": 0.8337918
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Mintoria",
@@ -3114,7 +3425,11 @@
       },
       "links": [
         "ZEFIA"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "town": 1
+      }
     },
     {
       "name": "Mog",
@@ -3132,7 +3447,8 @@
       },
       "links": [
         "VALMOX"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Moradesh",
@@ -3149,7 +3465,8 @@
         "x": 0.33707795,
         "y": 0.1548962
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Mordia 9",
@@ -3164,7 +3481,8 @@
         "x": 0.3105063,
         "y": 0.77156365
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Mort",
@@ -3182,7 +3500,10 @@
       "links": [
         "PÖPLI IX",
         "INGMAR"
-      ]
+      ],
+      "cities": {
+        "city": 1
+      }
     },
     {
       "name": "Mortax Prime",
@@ -3199,7 +3520,8 @@
         "x": 0.033894707,
         "y": 0.5456473
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Mox",
@@ -3217,7 +3539,8 @@
       "links": [
         "VARYLIA 5",
         "VEGA BAY"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Myradesh",
@@ -3234,7 +3557,8 @@
         "x": -0.2415232,
         "y": -0.033197638
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Myrium",
@@ -3253,7 +3577,11 @@
       "links": [
         "EUKORIA",
         "VALMOX"
-      ]
+      ],
+      "cities": {
+        "city": 2,
+        "town": 1
+      }
     },
     {
       "name": "Nabatea Secundus",
@@ -3271,7 +3599,8 @@
       },
       "links": [
         "NAVI VII"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Navi VII",
@@ -3288,7 +3617,8 @@
         "x": 0.77812827,
         "y": 0.3443502
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "New Haven",
@@ -3304,7 +3634,8 @@
         "x": 0.10280278,
         "y": 0.05765711
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "NEW INSIGHT",
@@ -3319,7 +3650,8 @@
         "x": 0,
         "y": 0
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "New Kiruna",
@@ -3335,7 +3667,8 @@
         "x": -0.12621213,
         "y": 0.11136782
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "New Stockholm",
@@ -3351,7 +3684,8 @@
         "x": 0.1470731,
         "y": -0.5095566
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Nivel 43",
@@ -3369,7 +3703,8 @@
       "links": [
         "ESKER",
         "ERSON SANDS"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Nublaria I",
@@ -3389,7 +3724,8 @@
         "FORT UNION",
         "SULFURA",
         "KRAKATWO"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Oasis",
@@ -3410,7 +3746,10 @@
         "GRAFMERE",
         "ALAMAK VII",
         "ALARAPH"
-      ]
+      ],
+      "cities": {
+        "city": 1
+      }
     },
     {
       "name": "Obari",
@@ -3428,7 +3767,8 @@
       },
       "links": [
         "VIRIDIA PRIME"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Okul VI",
@@ -3444,7 +3784,8 @@
         "x": -0.06158319,
         "y": -0.16488354
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Omicron",
@@ -3462,7 +3803,8 @@
       "links": [
         "OSHAUNE",
         "ZAGON PRIME"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Oshaune",
@@ -3477,7 +3819,8 @@
         "x": 0.633865,
         "y": 0.3955063
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Oslo Station",
@@ -3495,7 +3838,8 @@
       "links": [
         "GUNVALD",
         "DUMA TYR"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Osupsam",
@@ -3514,7 +3858,8 @@
       },
       "links": [
         "BRINK-2"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Outpost 32",
@@ -3531,7 +3876,8 @@
         "x": -0.13786763,
         "y": -0.40105802
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Overgoe Prime",
@@ -3549,7 +3895,8 @@
       },
       "links": [
         "BIG ROCK"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Pandion-XXIV",
@@ -3566,7 +3913,8 @@
       },
       "links": [
         "PHACT BAY"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Parsh",
@@ -3585,7 +3933,11 @@
       "links": [
         "KERTH SECUNDUS",
         "GENESIS PRIME"
-      ]
+      ],
+      "cities": {
+        "city": 1,
+        "megacity": 1
+      }
     },
     {
       "name": "Partion",
@@ -3606,7 +3958,8 @@
         "GACRUX",
         "OVERGOE PRIME",
         "PHACT BAY"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Pathfinder V",
@@ -3622,7 +3975,8 @@
         "x": 0.04664221,
         "y": 0.16758725
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Peacock",
@@ -3642,7 +3996,11 @@
         "PARTION",
         "BIG ROCK",
         "LUXURIANT"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "town": 1
+      }
     },
     {
       "name": "Penta",
@@ -3657,7 +4015,8 @@
         "x": -0.27880847,
         "y": 0.58735436
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Phact Bay",
@@ -3677,7 +4036,12 @@
       "links": [
         "DARIUS II",
         "GAR HAREN"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "city": 1,
+        "megacity": 1
+      }
     },
     {
       "name": "Pherkad Secundus",
@@ -3695,7 +4059,8 @@
       },
       "links": [
         "POLARIS PRIME"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Pilen V",
@@ -3712,7 +4077,8 @@
         "x": 0.15988354,
         "y": 0.043583166
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Pioneer II",
@@ -3728,7 +4094,8 @@
         "x": 0.28023794,
         "y": 0.6415732
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Polaris Prime",
@@ -3747,7 +4114,11 @@
       },
       "links": [
         "POLLUX 31"
-      ]
+      ],
+      "cities": {
+        "city": 2,
+        "town": 1
+      }
     },
     {
       "name": "Pollux 31",
@@ -3766,7 +4137,8 @@
       },
       "links": [
         "PRASA"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Pöpli IX",
@@ -3786,7 +4158,11 @@
       "links": [
         "DOLPH",
         "INGMAR"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "city": 1
+      }
     },
     {
       "name": "Prasa",
@@ -3802,7 +4178,11 @@
         "x": 0.66399485,
         "y": -0.5727729
       },
-      "links": []
+      "links": [],
+      "cities": {
+        "town": 1,
+        "city": 1
+      }
     },
     {
       "name": "Primordia",
@@ -3819,7 +4199,8 @@
         "x": 0.09383544,
         "y": 0.25608748
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Propus",
@@ -3836,7 +4217,8 @@
         "x": 0.58777285,
         "y": -0.676995
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Prosperity Falls",
@@ -3852,7 +4234,8 @@
         "x": -0.001789474,
         "y": -0.12535837
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Providence",
@@ -3868,7 +4251,8 @@
         "x": 0.030315775,
         "y": 0.2269306
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Ras Algethi",
@@ -3883,7 +4267,8 @@
         "x": 0.49028546,
         "y": -0.71661645
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Rasp",
@@ -3899,7 +4284,8 @@
         "x": 0.39501083,
         "y": -0.26197135
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Ratch",
@@ -3915,7 +4301,8 @@
         "x": 0.0441322,
         "y": 0.42626023
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "RD-4",
@@ -3934,7 +4321,8 @@
       "links": [
         "HESOE PRIME",
         "ROGUE 5"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Reaf",
@@ -3954,7 +4342,8 @@
         "PARSH",
         "IRULTA",
         "OUTPOST 32"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Regnus",
@@ -3973,7 +4362,11 @@
       },
       "links": [
         "MOG"
-      ]
+      ],
+      "cities": {
+        "town": 2,
+        "city": 1
+      }
     },
     {
       "name": "Rirga Bay",
@@ -3992,7 +4385,12 @@
       "links": [
         "HORT",
         "SEASSE"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "megacity": 1,
+        "city": 1
+      }
     },
     {
       "name": "Rogue 5",
@@ -4011,7 +4409,8 @@
       },
       "links": [
         "SEASSE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Sangis",
@@ -4026,7 +4425,8 @@
         "x": -0.15597135,
         "y": -0.75601083
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Seasse",
@@ -4043,7 +4443,8 @@
       },
       "links": [
         "SENGE 23"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Senge 23",
@@ -4059,7 +4460,8 @@
         "x": -0.402,
         "y": -0.793
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Senge 23 (Void)",
@@ -4072,7 +4474,8 @@
       ],
       "headline": "tremors",
       "position": null,
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Setia",
@@ -4092,7 +4495,8 @@
         "SANGIS",
         "HYDROBIUS",
         "SHETE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Seyshel Beach",
@@ -4110,7 +4514,13 @@
       "links": [
         "FORT SANCTUARY",
         "MYRIUM"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "settlement": 1,
+        "city": 1,
+        "megacity": 1
+      }
     },
     {
       "name": "Shallus",
@@ -4128,7 +4538,8 @@
       "links": [
         "MASTIA",
         "SHELT"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Shelt",
@@ -4145,7 +4556,8 @@
       },
       "links": [
         "IMBER"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Shete",
@@ -4163,7 +4575,10 @@
       },
       "links": [
         "SANGIS"
-      ]
+      ],
+      "cities": {
+        "city": 1
+      }
     },
     {
       "name": "Siemnot",
@@ -4181,7 +4596,8 @@
       },
       "links": [
         "SHETE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Sirius",
@@ -4199,7 +4615,8 @@
       },
       "links": [
         "SIEMNOT"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Skaash",
@@ -4217,7 +4634,8 @@
       },
       "links": [
         "CARAMOOR"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Skat Bay",
@@ -4235,7 +4653,8 @@
       "links": [
         "SIEMNOT",
         "SIRIUS"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Skitter",
@@ -4251,7 +4670,8 @@
         "x": 0.14810903,
         "y": 0.9233154
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Slif",
@@ -4271,7 +4691,8 @@
         "KRAKATWO",
         "VOLTERRA",
         "VELD"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Socorro III",
@@ -4289,7 +4710,8 @@
       },
       "links": [
         "ERSON SANDS"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Solghast",
@@ -4308,7 +4730,12 @@
       "links": [
         "DILUVIA",
         "REAF"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "town": 1,
+        "city": 1
+      }
     },
     {
       "name": "Spherion",
@@ -4327,7 +4754,8 @@
       },
       "links": [
         "SIRIUS"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Stor Tha Prime",
@@ -4345,7 +4773,8 @@
       "links": [
         "SPHERION",
         "STOUT"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Stout",
@@ -4361,7 +4790,8 @@
         "x": -0.6258253,
         "y": -0.40203378
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Sulfura",
@@ -4378,7 +4808,8 @@
       },
       "links": [
         "AZTERRA"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Super Earth",
@@ -4394,7 +4825,10 @@
         "x": 0,
         "y": 0
       },
-      "links": []
+      "links": [],
+      "cities": {
+        "megacity": 7
+      }
     },
     {
       "name": "Tarsh",
@@ -4413,7 +4847,10 @@
       "links": [
         "MASTIA",
         "CURIA"
-      ]
+      ],
+      "cities": {
+        "settlement": 3
+      }
     },
     {
       "name": "Termadon",
@@ -4431,7 +4868,8 @@
       },
       "links": [
         "STOR THA PRIME"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Terrek",
@@ -4451,7 +4889,8 @@
         "CIRRUS",
         "BORE ROCK",
         "BRILLIANCE"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "The Weir",
@@ -4467,7 +4906,8 @@
         "x": -0.42307508,
         "y": -0.029368328
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Tibit",
@@ -4484,7 +4924,8 @@
       },
       "links": [
         "UBANEA"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Tien Kwan",
@@ -4502,7 +4943,10 @@
       },
       "links": [
         "CASTOR"
-      ]
+      ],
+      "cities": {
+        "megacity": 2
+      }
     },
     {
       "name": "Trandor",
@@ -4520,7 +4964,11 @@
       "links": [
         "GATRIA",
         "PEACOCK"
-      ]
+      ],
+      "cities": {
+        "city": 2,
+        "settlement": 1
+      }
     },
     {
       "name": "Troost",
@@ -4537,7 +4985,8 @@
       },
       "links": [
         "VANDALON IV"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Turing",
@@ -4555,7 +5004,11 @@
       "links": [
         "ACAMAR IV",
         "FRONTERIA"
-      ]
+      ],
+      "cities": {
+        "city": 2,
+        "town": 1
+      }
     },
     {
       "name": "Ubanea",
@@ -4574,7 +5027,11 @@
       "links": [
         "DURGEN",
         "DRAUPNIR"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "city": 1
+      }
     },
     {
       "name": "Ursica XI",
@@ -4593,7 +5050,11 @@
         "INARI",
         "ACHIRD III",
         "ACRAB XI"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "city": 1
+      }
     },
     {
       "name": "Ustotu",
@@ -4613,7 +5074,8 @@
       "links": [
         "TROOST",
         "VANDALON IV"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "UVP ALPHA (Unused)",
@@ -4625,7 +5087,8 @@
       ],
       "headline": null,
       "position": null,
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "UVP Alpha (Void)",
@@ -4637,7 +5100,8 @@
       ],
       "headline": null,
       "position": null,
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "UVP Beta (Void)",
@@ -4649,7 +5113,8 @@
       ],
       "headline": null,
       "position": null,
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "UVP Delta (Void)",
@@ -4662,7 +5127,8 @@
       ],
       "headline": null,
       "position": null,
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "UVP Gamma (Void)",
@@ -4675,7 +5141,8 @@
       ],
       "headline": null,
       "position": null,
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Valgaard",
@@ -4691,7 +5158,8 @@
         "x": 0.1661038,
         "y": 0.40307793
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Valmox",
@@ -4709,7 +5177,11 @@
       },
       "links": [
         "MOG"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "city": 2
+      }
     },
     {
       "name": "Vandalon IV",
@@ -4728,7 +5200,8 @@
       "links": [
         "INGMAR",
         "MANTES"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Varylia 5",
@@ -4747,7 +5220,10 @@
       "links": [
         "USTOTU",
         "WEZEN"
-      ]
+      ],
+      "cities": {
+        "city": 1
+      }
     },
     {
       "name": "Vega Bay",
@@ -4767,7 +5243,11 @@
         "WASAT",
         "WEZEN",
         "X-45"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "town": 2
+      }
     },
     {
       "name": "Veil",
@@ -4782,7 +5262,8 @@
         "x": 0.23037383,
         "y": -0.0976583
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Veld",
@@ -4800,7 +5281,11 @@
       },
       "links": [
         "TURING"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "megacity": 1
+      }
     },
     {
       "name": "Vernen Wells",
@@ -4820,7 +5305,11 @@
         "TARSH",
         "AESIR PASS",
         "LESATH"
-      ]
+      ],
+      "cities": {
+        "settlement": 1,
+        "town": 2
+      }
     },
     {
       "name": "Vindemitarix Prime",
@@ -4837,7 +5326,8 @@
       },
       "links": [
         "MEKBUDA"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Viridia Prime",
@@ -4856,7 +5346,8 @@
       },
       "links": [
         "DILUVIA"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Vog-Sojoth",
@@ -4875,7 +5366,10 @@
       "links": [
         "CLAORELL",
         "CLASA"
-      ]
+      ],
+      "cities": {
+        "town": 1
+      }
     },
     {
       "name": "VOID SOURCE PLANET",
@@ -4890,7 +5384,8 @@
         "x": -0.323,
         "y": -0.606
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Volterra",
@@ -4909,7 +5404,11 @@
       "links": [
         "CARAMOOR",
         "ALTA V"
-      ]
+      ],
+      "cities": {
+        "town": 2,
+        "megacity": 1
+      }
     },
     {
       "name": "Wasat",
@@ -4925,7 +5424,11 @@
         "x": -0.6519177,
         "y": 0.45428553
       },
-      "links": []
+      "links": [],
+      "cities": {
+        "city": 1,
+        "megacity": 1
+      }
     },
     {
       "name": "WAYWARD",
@@ -4940,7 +5443,8 @@
         "x": 0,
         "y": 0
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Wezen",
@@ -4957,7 +5461,8 @@
         "x": -0.8741281,
         "y": 0.3473503
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Widow's Harbor",
@@ -4973,7 +5478,8 @@
         "x": 0.12536779,
         "y": 0.11821219
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Wilford Station",
@@ -4989,7 +5495,8 @@
         "x": 0.1969427,
         "y": 0.5865483
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Wraith",
@@ -5005,7 +5512,8 @@
         "x": -0.15065464,
         "y": 0.015730456
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "X-45",
@@ -5023,7 +5531,8 @@
       },
       "links": [
         "WASAT"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Yed Prior",
@@ -5043,7 +5552,8 @@
         "BLISTICA",
         "CLASA",
         "ZEFIA"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Zagon Prime",
@@ -5060,7 +5570,8 @@
       },
       "links": [
         "NIVEL 43"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Zea Rugosia",
@@ -5079,7 +5590,12 @@
       },
       "links": [
         "HALDUS"
-      ]
+      ],
+      "cities": {
+        "town": 1,
+        "settlement": 1,
+        "city": 1
+      }
     },
     {
       "name": "Zefia",
@@ -5096,7 +5612,8 @@
       },
       "links": [
         "CLASA"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Zegema Paradise",
@@ -5113,7 +5630,8 @@
         "x": -0.039789412,
         "y": 0.14535835
       },
-      "links": []
+      "links": [],
+      "cities": null
     },
     {
       "name": "Zosma",
@@ -5132,7 +5650,8 @@
       "links": [
         "MERGA IV",
         "ZZANIAH PRIME"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Zygos",
@@ -5152,7 +5671,8 @@
         "FORT UNION",
         "CIRRUS",
         "VELD"
-      ]
+      ],
+      "cities": null
     },
     {
       "name": "Zzaniah Prime",
@@ -5171,7 +5691,8 @@
       },
       "links": [
         "MINTORIA"
-      ]
+      ],
+      "cities": null
     }
   ]
 }
