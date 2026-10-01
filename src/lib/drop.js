@@ -20,7 +20,9 @@ import vocabulary from "../data/vocabulary.json";
 import { deriveHeat, loadoutItemIds, cleanLoadout } from "./loadouts.js";
 import { traitsOf } from "./scenario.js";
 import { readBuild, byReading } from "./build.js";
-import { usageOf } from "./history.js";
+import { usageOf, itemsDroppedWith, dropsOn, daysSince, ENOUGH_DROPS, STALE_DAYS } from "./history.js";
+import { scoreItem } from "./score.js";
+import { items as ALL_ITEMS } from "./items.js";
 
 /* In game the cap is four, and so is the screen. */
 export const SQUAD_CAP = 4;
@@ -279,4 +281,49 @@ export function whyFor(reading) {
   const gap = reading.notes.find((n) => n.severity === "red" || n.severity === "amber");
   if (gap) return { tone: "gap", item: null, text: gap.say };
   return null;
+}
+
+/* ------------------------------------------------------------------ */
+/* For a change                                                        */
+/*                                                                     */
+/* The curator's idea, 1 October 2026, and the reason the history was   */
+/* started first: remind somebody who has unlocked a lot and plays now  */
+/* and then of what they already have. Both stay quiet until there are  */
+/* ENOUGH_DROPS on this front, because before then "never" is just "not */
+/* yet".                                                                */
+/* ------------------------------------------------------------------ */
+
+/* Your best fitting build that you have not dropped with in STALE_DAYS,
+   or never, leaving out the ones already suggested. Null when there is
+   not enough history to say, or nothing qualifies. */
+export function forAChange(builds, scenario = {}, { lockedSet = new Set(), history = [], exclude = [], now = Date.now() } = {}) {
+  if (!scenario.faction || dropsOn(history, scenario.faction) < ENOUGH_DROPS) return null;
+  const skip = new Set(exclude);
+  const { shown } = dropPool(builds, scenario, { lockedSet, showLocked: false });
+  const candidates = shown
+    .filter((b) => !skip.has(b.id))
+    .map((build) => ({ build, reading: readBuild(build, scenario), usage: usageOf(history, build.id) }))
+    .filter((x) => x.reading.score !== null)
+    .filter((x) => {
+      const days = daysSince(x.usage, now);
+      return days === null || days >= STALE_DAYS;
+    })
+    .sort((a, b) => byReading(a.reading, b.reading));
+  return candidates[0] || null;
+}
+
+/* Gear that reads A or better for this drop, that you can field, and that
+   you have never brought against this front. Held weapons and stratagems
+   only: those are what a build is built around. Empty when there is not
+   enough history to say. */
+const GOOD = new Set(["S+", "S", "A"]);
+export function untriedHere(scenario = {}, { lockedSet = new Set(), history = [], limit = 3 } = {}) {
+  if (!scenario.faction || dropsOn(history, scenario.faction) < ENOUGH_DROPS) return [];
+  const carried = itemsDroppedWith(history, scenario.faction);
+  return ALL_ITEMS
+    .filter((it) => ["primary", "secondary", "stratagem"].includes(it.slot) && !lockedSet.has(it.id) && !carried.has(it.id))
+    .map((item) => ({ item, read: scoreItem(item, scenario) }))
+    .filter((x) => GOOD.has(x.read.tier))
+    .sort((a, b) => (b.read.score ?? 0) - (a.read.score ?? 0))
+    .slice(0, limit);
 }

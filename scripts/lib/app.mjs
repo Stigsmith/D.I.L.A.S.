@@ -81,6 +81,8 @@ src = inlineJson(read("src/lib/drop.js"), "vocabulary");
 src = swap(src, "loadouts", loadoutsUrl);
 src = swap(src, "build", buildUrl);
 src = swap(src, "history", historyUrl);
+src = swap(src, "score", scoreUrl);
+src = swap(src, "items", itemsUrl);
 const dropUrl = asModule(swap(src, "scenario", scenarioUrl));
 
 src = swap(read("src/lib/coverage.js"), "drop", dropUrl);

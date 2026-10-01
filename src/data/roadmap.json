@@ -133,10 +133,10 @@
     {
       "id": "nudges",
       "title": "Try this for a change",
-      "status": "next",
-      "version": null,
+      "status": "shipped",
+      "version": "1.25.0",
       "track": "solo",
-      "say": "Your drop history turned into nudges: builds you have not dropped with in a while, and weapons you have never brought against a front."
+      "say": "Once you have a few drops logged, Drop Bay suggests a build you have not taken in a while, and gear that is good here that you have never brought against that front."
     },
     {
       "id": "effects",
