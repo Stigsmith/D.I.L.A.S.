@@ -813,7 +813,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 
 | Where it appears | |
 |---|---|
-| **The scenario screen** | Leads with it, beside the drop planner. `DropPlanner` in `Tiers.jsx` is the planner plus `PlanetChooser`, the map and its search, and both screens use it. "Dropping on" below it now opens only the by hand biome and hazards |
+| **The scenario screen** | Leads with it, beside the drop planner. `DropPlanner` in `Tiers.jsx` is the planner plus `PlanetChooser`, the map and its search, and both screens use it. "Dropping on" below it only says where you are: the by hand biome and hazards were retired on 30 September 2026, once the map and planner covered them |
 | **Drop Bay** | **Opens onto the map while nothing says where you are dropping**, and folds it away once a planet is chosen. The brief's "change on the map" brings it back. In a party only the host gets it, because the host sets the scenario |
 
 > [!danger] The layout is patch data and the map needs no network
@@ -822,30 +822,27 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!danger] The data's y points up, and the flip lives in exactly one place
 > `project()` in `galaxy.js`. Cyberstan, the Automaton home world, sits up and to the left in game and does here; `npm run map` checks it, and a map drawn without the flip fails that check and nothing else.
 
-> [!info] Two skins: the chart, and the Galactic War table
-> **The chart** is the game's layout without its styling: grey dots, plain supply lines, sector names in small caps, the chosen planet ringed in the brand colour, colours from the theme. It was the only look until 30 September 2026, on the reasoning that a planning tool is read rather than admired.
+> [!success] Two views, the game's way. The curator's call, 30 September 2026
+> **The galaxy, and one sector.** In the galaxy, hovering names the sector under the cursor (holder, planets, fronts open) and a click, a scroll in or a pinch **glides into that sector**. Inside you pan, zoom in, and may zoom out a little; **past 60% of the sector's own zoom it glides back to the whole galaxy**, never stopping halfway. Escape and the "Galaxy / <sector>" crumb do the same. A click on another sector's ground moves there. Choosing from the planner, search or list glides into that planet's sector. `sectorView`, `leavesSector`, `glide` and `towards` in `galaxy.js`.
 >
-> **The Galactic War table** is the second skin, which the curator asked for on 30 September 2026 with screenshots of the game's own screen. A switch in the map's top left corner, remembered per browser in `hd2-map-skin`, out of the export. Its colours are the game's rather than the theme's, on purpose, because it is a picture of a place in the game; the faction hexes are still the locked three. `WarBackdrop` in `GalaxyMap.jsx` draws it; `TABLE`, `sectorHolders` and `frontArcs` in `galaxy.js` are its geometry.
+> **The wheel eases.** Each notch moves a target and the view catches up over about a tenth of a second (`towards`), so a spin reads as one zoom; the curator asked for "more glidey, less ticky". The buttons ease the same way. Reduced motion turns glides into cuts.
 >
-> | On the table | |
-> |---|---|
-> | **Space** | A dark disc with a fixed starfield and four soft nebulae, placed once from a seed so nothing moves between renders |
-> | **Sectors** | Stepped zones on a polar grid, held ones filled and hatched in the front's colour, brighter where there is a front to drop on |
-> | **The rim** | A dark band with ticks, and each front's name written into it at the middle of its territory |
-> | **Planets** | Small lit spheres in the colour of their world, Super Earth as a glowing globe at the centre, the game's target reticle over every front |
-> | **Names** | Under the planet in capitals, in the holder's colour, with a liberation bar under every front: blue for what Super Earth has taken back |
-> | **The hover card** | The game's bordered box in the holder's colour, with the liberation bar and "N% LIBERATED" leading on a front |
->
-> **The game's sector shapes are not published, so the zones are built from the planets.** Twelve rings, each cut into cells about as wide as they are deep, each cell given to the sector of the planet nearest its middle, runs of one sector merged: 183 wedges, every one of the 55 sectors on the table, and **254 of 271 planets inside their own sector's zone**. The stepped look is the game's; the exact borders are not, and nothing claims they are.
->
-> **A sector is held by the front holding at least half its planets**, from the live war only. No war, or one too old to trust, and the table is dark, the same rule the chart keeps. **The table shows no sector names**, as the game does not until you hover, and **no planet name reaches into the rim band**, which belongs to the fronts' names. **The Gloom and other planet effects are not drawn**: the game paints the Gloom as a yellow cloud, but no steady source says where it is, and inventing its place would be the stale map problem in a new coat.
+> **Sectors are blocks**, the curator's correction to a rounded hull: a polar grid of 12 rings, each cell given to the sector of the nearest planet (`TABLE`, `sectorZones`), and each sector drawn as **one block with only its outer edge** (`sectorOutlines`, which drops every line between a sector's own cells: 813 edges drawn instead of 1,464). A click anywhere inside a block is a click on that sector (`zoneAt`). The game's exact borders are not published; 254 of 271 planets land inside their own sector's block.
 
-> [!info] How it behaves
-> - **Marks keep their size on screen at every zoom.** Zooming in spreads the planets apart rather than inflating them, and **a planet's name appears once there is room for it**, measured against its own nearest neighbour, so the sparse rim labels itself early and the crowded core waits. Sector names show while you are zoomed out and step aside once planet names take over.
-> - **Drag to pan, the wheel or a pinch to zoom, a click to choose.** A press that moves more than five pixels is a drag and never a choice. The planet is read off the press, because the map captures the pointer.
-> - **The wheel lets go at either limit**, so scrolling past the map scrolls the page. **Fully zoomed out, a finger sliding up the map scrolls the page too**, since there is nothing to pan; zoomed in, the map takes every gesture.
-> - **Hover shows what a planet is before you commit**: sector, biome, and its hazards. Touch screens have no hover, and a tap chooses.
-> - **Search lights the matches up** and dims the rest, names them when there are few enough, and lists the first eight underneath. The list is the way in for a keyboard, and for **the nine planets with no place on the map**: seven Void entries with no position, and two placeholders in a sector called TBD parked exactly on Super Earth. Choosing from the list flies the map there; clicking the map does not move it, because you are already looking at the place.
+> [!info] Two looks, switched in the map's corner and remembered per browser in `hd2-map-skin`
+> **Tactical**, the default since 30 September 2026: sleek, in the theme's own colours. Every held sector is a block with a gentle glow of its holder's colour and a soft glowing edge, brighter where there is a front; a contested sector takes the colour of whoever the fighting is against (`against` in `sectorHolders`). **The hazard pinstripes show only inside a sector**, never in the galaxy, as in the game. Held planets carry a territory glow that **the radar sweep lights as it passes**: each rests at 70% and comes up to full the moment the sweep reaches its angle, then fades over the 20 second turn, on the SVG's one animation clock so the timing is exact (the curator's idea). Fronts pulse; inside a sector they carry a slow rotating ring and a liberation bar. Faction names sit on the rim. **Inside a sector the planets are the game's own renders.**
+>
+> **Chart**: plain dots and lines in theme colours, with an edge round each sector that has a front. The curator's browser was on Chart on 1 October 2026.
+>
+> **A half copy of the game's own screen was built and cut the same day**: exactly the game or clearly the tool's own, not something between. Do not rebuild the "Galactic War" table skin.
+
+> [!info] Planet renders, from the wiki. `npm run planet-art`
+> The curator approved fetching them on 30 September 2026. Each planet's "<Planet> Planet Icon.png" from helldivers.wiki.gg: **271 of 272 planets**, fetched as 128 pixel copies cut by the wiki's own thumbnailer into `Image Library/Planets/planet_<slug>.png`, 5.4 MB, and copied by `npm run images` into `src/assets/planets/`, read by `planetArt` in `assets.js`. **Both folders are gitignored**: extracted game art, and the repo is headed for public GitHub. **The full size set measures 374 MB**, not the 200 MB first quoted, so `-- --full` fetches it only on request and the curator has not yet said yes to the real figure. Inside a sector only the planets in view, and those of the sector being glided to, are drawn as renders.
+
+> [!danger] A file sync app watches this folder and renames what the build rewrites
+> On 30 September and 1 October 2026 it renamed every generated art folder, and once `dist/assets`, to copies named `... (# Name clash <date> <id> #)`, leaving the app with no art or no scripts. `.gitignore` carries `*Name clash*`. `npm run images` now **empties folders in place** rather than deleting and remaking them, which stopped it for the art; `vite build` still remakes `dist/assets` and nothing here can change that. **The fix is the curator's: exclude `dist`, `src/assets`, `node_modules` and `.wrangler` from the sync**, or move the repo out of the synced folder. The old clash folders are still on disk, duplicates of regenerable art, left for him to delete.
+>
+> A side effect worth knowing: while `dist/assets` was missing, the browser asked for the script, got the page instead, and **cached that page under the script's name for a year**, because `_headers` marks `/assets/*` immutable. A rebuild with unchanged code has the same file name, so the page stayed blank until that one file was fetched with `cache: "reload"`. In production a missing asset meets the same single page fallback; it only bites a URL that is later reused, which hashed names almost never are.
 
 > [!bug] An ordinary planet counted normal temperature as a hazard
 > Fixed alongside the map. The hazard table calls it `normal_temp`, and the scenario screen's filter looked for `normal_temperature`, so it never matched: every ordinary planet read "2 hazards", and Normal Temperature was offered as a hazard toggle. `QUIET_HAZARDS` and `loudHazards` in `scenario.js` are the one definition now; the drop screen's brief had its own copy, which was right, and uses the shared one.
@@ -891,7 +888,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > |---|---|
 > | **1. Against** | **The scenario's own front**, where the three banners went. A planet with fighting on it answers it for you; this is the way to browse a front with no planet, and the only way when the live war is not here |
 > | **2. Kind of mission** | The eight mission traits. **Narrows the mission list, not the planets**: the data says which fronts offer which missions, not which planets do, and every front offers every kind except high value targets on the Illuminate, which is greyed out there |
-> | **3. Kind of planet** | **No caves hides the three Hive Worlds**, where the wiki puts the caves. **Fewer megacities pushes the 29 planets with one below every planet without**; the curator chose push down over hide. Hazards you would rather not have push down the same way, after megacities |
+> | **3. Kind of planet** | **Caves: avoid, any or only**, the Hive Worlds being where the wiki puts them. **Megacities: fewer, any or more**, pushing the 29 planets with one below or above the rest rather than hiding them. Both three way since the curator's "sometimes you do want to do caves or megacities", 30 September 2026; the old yes or no answers carry across. Hazards you would rather not have push down, after megacities |
 >
 > **Busiest first** among what is left, the curator's call: where the war is and where a game is easiest to find. **Only fronts you can drop on, from a live war fresh enough to trust**; with no war, or an old one, Go here says so and the map still works.
 >

@@ -193,21 +193,25 @@ const planWar = galaxy.cleanWar({
 const busiest = galaxy.suggestFronts(planWar, { front: "bugs" });
 ok(busiest.picks.map((p) => p.name).join(",") === "Omicron,Fenrir III,Hellmire",
   "with nothing to avoid, the busiest fronts on the chosen side come first, and a planet that is not a front is never suggested");
-const noCaves = galaxy.suggestFronts(planWar, { front: "bugs", avoidCaves: true });
+const noCaves = galaxy.suggestFronts(planWar, { front: "bugs", caves: "avoid" });
 ok(!noCaves.fits.has("Omicron") && noCaves.hiddenForCaves === 1, "no caves hides the Hive World, and counts it");
 ok(galaxy.megacitiesOn(table.find((p) => p.name === "Fenrir III")) > 0, "Fenrir III has a megacity, which the next check leans on");
-const fewer = galaxy.suggestFronts(planWar, { front: "bugs", avoidCaves: true, fewerMegacities: true });
+const fewer = galaxy.suggestFronts(planWar, { front: "bugs", caves: "avoid", megacities: "fewer" });
 ok(fewer.picks[fewer.picks.length - 1].name === "Fenrir III" && fewer.fits.has("Fenrir III"),
   "fewer megacities pushes a megacity planet after every planet without one, and still suggests it");
 const hellmireHazards = table.find((p) => p.name === "Hellmire").hazards.filter((h) => h !== "normal_temp");
-const dodge = galaxy.suggestFronts(planWar, { front: "bugs", avoidCaves: true, avoidHazards: hellmireHazards });
+const dodge = galaxy.suggestFronts(planWar, { front: "bugs", caves: "avoid", avoidHazards: hellmireHazards });
+const onlyCaves = galaxy.suggestFronts(planWar, { front: "bugs", caves: "only" });
+ok(onlyCaves.count === 1 && onlyCaves.fits.has("Omicron"), "caves only suggests the Hive World and nothing else");
+const more = galaxy.suggestFronts(planWar, { front: "bugs", caves: "avoid", megacities: "more" });
+ok(more.picks[0].name === "Fenrir III", "more megacities puts the planet with one first, ahead of busier fronts without");
 ok(hellmireHazards.length > 0 && dodge.picks[dodge.picks.length - 1].name === "Hellmire",
   "a hazard you would rather avoid pushes its planet down rather than hiding it");
 ok(galaxy.suggestFronts(null, {}) === null && galaxy.suggestFronts({ ...planWar, fresh: false }, {}) === null,
   "with no live war, or one too old to trust, there is nothing to suggest");
 ok(galaxy.suggestFronts(planWar, {}).picks[0].name === "Malevelon Creek", "with no side chosen, every front is in the running");
 
-/* The war table */
+/* Sectors as blocks */
 const T = galaxy.TABLE;
 let ringsWhole = true;
 for (const ring of T.rings) {
@@ -223,10 +227,56 @@ ok(zoneless.length === 0, `every sector has ground on the table${zoneless.length
 const zonable = galaxy.placed.filter((p) => !p.home && p.sector !== "TBD");
 const inOwn = zonable.filter((p) => galaxy.zoneAt(p.x, p.y) === p.sector).length;
 ok(inOwn / zonable.length >= 0.85, `planets sit inside their own sector's zone: ${inOwn} of ${zonable.length}`);
+/* One outline per sector, with no lines inside it */
+ok(galaxy.sectors.every((s) => (galaxy.sectorOutlines.get(s.name) || "").length > 0),
+  "every sector has an outline");
+const wedgeEdges = T.runs.length * 4;
+const outlineEdges = [...galaxy.sectorOutlines.values()].reduce((n, d) => n + (d.match(/M/g) || []).length, 0);
+ok(outlineEdges < wedgeEdges * 2, `the outlines draw ${outlineEdges} edges where the wedges would draw ${wedgeEdges * 2} counting both sides: the lines inside sectors are gone`);
+const oneRingOwner = T.rings.find((ring) => new Set(T.runs.filter((r) => r.r0 === ring.r0).map((r) => r.sector)).size === 1);
+ok(!oneRingOwner || !(galaxy.sectorOutlines.get(T.runs.find((r) => r.r0 === oneRingOwner.r0).sector) || "").includes("L"),
+  "a sector holding a whole ring draws no side where its two halves meet");
+
+/* Who holds what */
 const holders = galaxy.sectorHolders(planWar);
 ok(galaxy.sectorHolders(null).size === 0 && galaxy.sectorHolders({ ...planWar, fresh: false }).size === 0,
   "with no live war, or one too old to trust, no sector is coloured");
 const creekSector = table.find((p) => p.name === "Malevelon Creek").sector;
 ok(holders.get(creekSector) && holders.get(creekSector).campaign, "a sector with a front in it is marked as one");
+const siege = galaxy.sectorHolders(galaxy.cleanWar({ fetchedAt: NOW, planets: [
+  { name: "CALYPSO", owner: "Humans", campaign: true, players: 10,
+    event: { faction: "Illuminate", health: 1, maxHealth: 2, endTime: new Date(NOW + 3600000).toISOString() } },
+] }, NOW)).get(table.find((p) => p.name === "Calypso").sector);
+ok(siege && siege.front === null && siege.against === "squids",
+  "a sector Super Earth holds but is defending shows the attacker's colour, not a blank");
 ok(galaxy.frontArcs(new Map([[creekSector, { front: "bots", share: 1, campaign: true }]]))[0].front === "bots",
   "a front's name goes where its territory is");
+
+/* Two levels: the galaxy and one sector */
+const everySectorFrames = [...galaxy.sectorMembers.keys()].every((s) => {
+  const v = galaxy.sectorView(s);
+  const tl = galaxy.toMap(v, { x: 0, y: 0 });
+  const br = galaxy.toMap(v, { x: VIEW, y: VIEW });
+  return v.k >= galaxy.SECTOR_MIN_ZOOM && v.k <= MAX_ZOOM &&
+    galaxy.sectorMembers.get(s).every((p) => p.x >= tl.x && p.x <= br.x && p.y >= tl.y && p.y <= br.y);
+});
+ok(everySectorFrames, `clicking any of the ${galaxy.sectorMembers.size} sectors frames all of its planets, zoomed in at least ${galaxy.SECTOR_MIN_ZOOM} times`);
+const onCreek = galaxy.sectorNear(creek);
+ok(onCreek === table.find((p) => p.name === "Malevelon Creek").sector, "a click on a planet opens that planet's sector");
+ok(galaxy.sectorNear({ x: 2, y: 2 }) === null, "a click on empty space far from any planet opens nothing");
+const k0 = galaxy.sectorView(onCreek).k;
+ok(!galaxy.leavesSector(k0 * 0.75, k0) && galaxy.leavesSector(k0 * 0.55, k0),
+  "zooming out a little stays in the sector, zooming out a lot goes back to the galaxy");
+const from = HOME;
+const to = galaxy.sectorView(onCreek);
+const start = galaxy.glide(from, to, 0);
+const end = galaxy.glide(from, to, 1);
+ok(near(start.k, from.k) && near(start.x, from.x) && near(start.y, from.y) && near(end.k, to.k) && near(end.x, to.x) && near(end.y, to.y),
+  "the glide starts exactly where the map is and ends exactly on the sector");
+const halfway = galaxy.glide(from, to, 0.5);
+ok(halfway.k > from.k && halfway.k < to.k, "halfway through the glide the zoom is between the two");
+let easing = { ...from };
+for (let i = 0; i < 60; i++) easing = galaxy.towards(easing, to, 0.2);
+ok(Math.abs(easing.k - to.k) < 1e-3 && Math.abs(easing.x - to.x) < 0.5, "the wheel's easing settles exactly where the wheel was taking it");
+ok(galaxy.zoneAt(creek.x, creek.y) === onCreek && galaxy.zoneAt(CENTRE, CENTRE) === null,
+  "a click inside a sector's blocks is a click on that sector, and Sol in the middle is nobody's");

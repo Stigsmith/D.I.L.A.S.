@@ -37,3 +37,9 @@ dds-20*.json
 # "items (# Name clash 2026-09-30 pmrvoiC #)". Found on 30 September 2026
 # holding 638 copies of the generated art, which must never reach the repo.
 *Name clash*
+
+# Planet renders from the wiki, fetched by npm run planet-art. Extracted
+# game art and about 200 MB of it at full size, so neither copy is kept
+# in the repo; a fresh clone draws the map without them.
+Image Library/Planets/
+src/assets/planets/

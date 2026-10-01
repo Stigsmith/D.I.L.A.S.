@@ -30,6 +30,15 @@ const WARBONDS = load(
 const UI = load(
   import.meta.glob("../assets/ui/*", { eager: true, query: "?url", import: "default" })
 );
+/* Planet renders from the wiki, by the planet name's slug. Fetched by
+   npm run planet-art and gitignored, so a fresh clone has none and the
+   map draws its own planets instead. */
+const PLANETS = load(
+  import.meta.glob("../assets/planets/*", { eager: true, query: "?url", import: "default" })
+);
+const planetSlug = (s) =>
+  s.toLowerCase().replace(/['’.]/g, "").replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
 /* Warbond skin art, keyed by theme id then file name. Two levels deep,   */
 /* so it is indexed by hand rather than through the shared loader.        */
@@ -78,8 +87,9 @@ export const themeArtNames = (themeId) => {
 export const itemArt = (id) => ITEMS.get(id) || null;
 export const warbondArt = (id) => WARBONDS.get(id) || null;
 export const uiArt = (name) => UI.get(name) || null;
+export const planetArt = (name) => (name ? PLANETS.get(planetSlug(name)) || null : null);
 
-export const artCounts = { items: ITEMS.size, warbonds: WARBONDS.size, ui: UI.size };
+export const artCounts = { items: ITEMS.size, warbonds: WARBONDS.size, ui: UI.size, planets: PLANETS.size };
 
 /* Named so a component does not have to know the file naming scheme. */
 export const SKULL = uiArt("ui_icon_booster_skull");

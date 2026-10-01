@@ -326,7 +326,9 @@ The game's interface is designed to look like military hardware. A planning tool
 > [!success] Reversed at the curator's request, 30 September 2026: a second skin that looks like the game
 > He asked for "a separate skin for the galaxy map resembling the actual one, with the zones and the effects", with screenshots of the game's Galactic War screen. So the chart above stays, and **a Galactic War table sits beside it as a switch**: polar sector zones hatched in the holder's colour, the rim with the fronts' names, spheres, reticles and liberation bars. Built in 1.25.0; `CLAUDE.md`, The Galaxy Map, has the detail.
 >
-> **Two gaps, both admitted on screen and in the docs.** The game's sector shapes are not published, so the zones are built from where the planets are. And the effects he mentioned, the Gloom's yellow cloud above all, need the same live planet effects nothing reliable publishes yet: see "Planet effects have no steady source yet" below. The day that source exists, the table is where they get drawn.
+> **Replaced the same day, at his request.** A half copy of the game's screen was neither the game nor clearly the tool, so the table went and a **Tactical** look took its place: blocks glowing in the holder's colour, a radar sweep, and the game's own planet renders inside a sector, with the game's two level navigation, galaxy then sector. The chart stays as the other look. `CLAUDE.md`, The Galaxy Map, has the detail.
+>
+> **Two gaps, both still true.** The game's sector shapes are not published, so the zones are built from where the planets are. And the effects he mentioned, the Gloom's yellow cloud above all, need the same live planet effects nothing reliable publishes yet: see "Planet effects have no steady source yet" below. The day that source exists, the Tactical look is where they get drawn.
 
 ### Order, revised
 

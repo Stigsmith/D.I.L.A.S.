@@ -36,10 +36,15 @@ export function useWar(active = true) {
     let stop = false;
     let timer = null;
     const again = () => {
-      if (!stop) timer = setTimeout(load, EVERY_MS);
+      clearTimeout(timer);
+      if (!stop) timer = setTimeout(() => load(false), EVERY_MS);
     };
-    async function load() {
-      if (typeof document !== "undefined" && document.hidden) return again();
+    /* The first ask always goes, hidden or not: a page opened in the
+       background and looked at a moment later should not wait a minute for
+       its colours, which is what it did until 1 October 2026. After that a
+       hidden page stops asking, and asks again the moment it is looked at. */
+    async function load(first) {
+      if (!first && typeof document !== "undefined" && document.hidden) return again();
       try {
         /* "no-cache" makes the browser ask the server every time rather
            than answer from its own cache. The server says a minute, and on
@@ -64,10 +69,15 @@ export function useWar(active = true) {
       if (!stop) setNow(Date.now());
       again();
     }
-    load();
+    const onShow = () => {
+      if (!document.hidden) load(true);
+    };
+    document.addEventListener("visibilitychange", onShow);
+    load(true);
     return () => {
       stop = true;
       clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onShow);
     };
   }, [active]);
 
