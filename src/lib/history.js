@@ -110,3 +110,25 @@ export function itemsDroppedWith(history, faction) {
   }
   return out;
 }
+
+/* ------------------------------------------------------------------ */
+/* Reading it back                                                     */
+/*                                                                     */
+/* "Never" only means something once there is a history to be never in. */
+/* Below this many drops on a front, nothing here says anything, rather */
+/* than calling every build untried on the first evening.               */
+/* ------------------------------------------------------------------ */
+
+export const ENOUGH_DROPS = 5;
+
+/* A build you have not dropped with in this long is worth a reminder. */
+export const STALE_DAYS = 30;
+
+export const dropsOn = (history, faction) => history.filter((e) => e.faction === faction).length;
+
+/* How long since a build was last dropped with, in days, or null for
+   never. */
+export function daysSince(usage, now = Date.now()) {
+  if (!usage || !usage.last) return null;
+  return Math.floor((now - Date.parse(usage.last)) / 86400000);
+}

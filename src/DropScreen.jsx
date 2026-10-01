@@ -50,10 +50,10 @@ import { missionByName, missionTraits, hazardName, hazardEffect, biomeName, loud
 import { SETTINGS, readDoc, writeDoc } from "./lib/storage.js";
 import {
   EMPTY_DROP, cleanDrop, readDrop, stampOf, dropPool, dropContext, withHeat, gateOf, unpackBuild,
-  rankByReading, suggestBuilds, whyFor,
+  rankByReading, suggestBuilds, whyFor, forAChange, untriedHere,
 } from "./lib/drop.js";
 import { SQUAD_CAP } from "./lib/party.js";
-import { entryFor, TAKE_BACK_MS } from "./lib/history.js";
+import { entryFor, TAKE_BACK_MS, daysSince } from "./lib/history.js";
 import { agoText } from "./lib/war.js";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
@@ -297,7 +297,53 @@ function nothingFits(cut) {
   return bits.length ? `Ruled out for this drop: ${bits.join(", ")}.` : "Nothing is built for this front yet.";
 }
 
-function Suggestions({ picks, fromPresets, current, onTake, cut, onStart }) {
+/* How long since, the way a person says it, for "for a change". */
+function sinceLine(usage) {
+  const days = daysSince(usage);
+  if (days === null) return "Never dropped with";
+  if (days < 60) return `Not dropped with in ${Math.max(1, Math.round(days / 7))} weeks`;
+  return `Not dropped with in ${Math.round(days / 30)} months`;
+}
+
+function SuggestionCard({ build, reading, usage, fromPresets, on, onTake, change }) {
+  const why = whyFor(reading);
+  const held = heldGear(build).map((it) => it.name);
+  return (
+    <div className={"flex flex-col gap-2 rounded border p-3 " +
+      (on ? "border-base-500 bg-base-800/60" : change ? "border-dashed border-brand/50 bg-base-900" : "border-base-800 bg-base-900")}>
+      {change ? (
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-brand" style={OSWALD}>For a change</p>
+      ) : null}
+      <div className="flex items-start gap-2">
+        {reading.tier ? <TierBadge tier={reading.tier} className="h-auto w-8 shrink-0" /> : null}
+        <div className="min-w-0">
+          <p className="truncate text-sm font-bold text-base-100" style={OSWALD}>{build.name}</p>
+          <p className="truncate text-[11px] text-base-500" style={MONO}>{held.join(" · ")}</p>
+        </div>
+      </div>
+      {why ? (
+        <p className={"flex items-start gap-1.5 text-[11px] leading-relaxed " + (why.tone === "up" ? "text-emerald-300" : "text-accent-300")}>
+          {why.tone === "up" ? <ArrowUp className="mt-px h-3 w-3 shrink-0" /> : <AlertTriangle className="mt-px h-3 w-3 shrink-0" />}
+          <span>{why.item ? <span className="text-base-300">{why.item}. </span> : null}{why.text}</span>
+        </p>
+      ) : (
+        <p className="text-[11px] text-base-500">Nothing about this drop moves it. It is what its gear is worth anywhere.</p>
+      )}
+      <div className="mt-auto flex items-center justify-between gap-2">
+        <span className="min-w-0 text-[10px] leading-snug text-base-600">
+          {change ? sinceLine(usage) : usageLine(usage) || (fromPresets ? "Curated preset" : "Not dropped with yet")}
+        </span>
+        {on ? (
+          <span className="shrink-0 text-[10px] uppercase tracking-wider text-base-400" style={OSWALD}>In your slot</span>
+        ) : (
+          <span className="shrink-0"><SlotButton onClick={() => onTake(build.id)} Icon={Rocket}>Take it</SlotButton></span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Suggestions({ picks, fromPresets, current, onTake, cut, onStart, change, untried, frontLabel, onBuildAround }) {
   /* Nothing to suggest is an answer too, and it says what to do next
      rather than leaving a gap where the panel was. */
   if (!picks.length) {
@@ -322,40 +368,34 @@ function Suggestions({ picks, fromPresets, current, onTake, cut, onStart }) {
           ? "From the curated presets, until you have builds of your own that fit. Ranked by what each is worth here."
           : "From your builds, ranked by what each is worth here. Everything that fits is in the picker too."}
       </p>
-      <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
-        {picks.map(({ build, reading, usage }) => {
-          const why = whyFor(reading);
-          const held = heldGear(build).map((it) => it.name);
-          const on = build.id === current;
-          return (
-            <div key={build.id} className={"flex flex-col gap-2 rounded border p-3 " + (on ? "border-base-500 bg-base-800/60" : "border-base-800 bg-base-900")}>
-              <div className="flex items-start gap-2">
-                {reading.tier ? <TierBadge tier={reading.tier} className="h-auto w-8 shrink-0" /> : null}
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-bold text-base-100" style={OSWALD}>{build.name}</p>
-                  <p className="truncate text-[11px] text-base-500" style={MONO}>{held.join(" · ")}</p>
-                </div>
-              </div>
-              {why ? (
-                <p className={"flex items-start gap-1.5 text-[11px] leading-relaxed " + (why.tone === "up" ? "text-emerald-300" : "text-accent-300")}>
-                  {why.tone === "up" ? <ArrowUp className="mt-px h-3 w-3 shrink-0" /> : <AlertTriangle className="mt-px h-3 w-3 shrink-0" />}
-                  <span>{why.item ? <span className="text-base-300">{why.item}. </span> : null}{why.text}</span>
-                </p>
-              ) : (
-                <p className="text-[11px] text-base-500">Nothing about this drop moves it. It is what its gear is worth anywhere.</p>
-              )}
-              <div className="mt-auto flex items-center justify-between gap-2">
-                <span className="text-[10px] text-base-600">{usageLine(usage) || (fromPresets ? "Curated preset" : "Not dropped with yet")}</span>
-                {on ? (
-                  <span className="text-[10px] uppercase tracking-wider text-base-400" style={OSWALD}>In your slot</span>
-                ) : (
-                  <SlotButton onClick={() => onTake(build.id)} Icon={Rocket}>Take it</SlotButton>
-                )}
-              </div>
-            </div>
-          );
-        })}
+      <div className={"grid grid-cols-1 gap-2 " + (change ? "md:grid-cols-2 xl:grid-cols-4" : "md:grid-cols-3")}>
+        {picks.map(({ build, reading, usage }) => (
+          <SuggestionCard key={build.id} build={build} reading={reading} usage={usage} fromPresets={fromPresets}
+            on={build.id === current} onTake={onTake} />
+        ))}
+        {change ? (
+          <SuggestionCard build={change.build} reading={change.reading} usage={change.usage}
+            on={change.build.id === current} onTake={onTake} change />
+        ) : null}
       </div>
+      {/* The curator's "you never dropped with a Railgun against bots":
+          gear that is good here, that you own, and that your history says
+          you have never brought against this front. */}
+      {untried && untried.length ? (
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-base-800 pt-3">
+          <span className="text-[11px] text-base-400">Never brought against {frontLabel}, and good here:</span>
+          {untried.map(({ item, read }) => (
+            <span key={item.id} className="flex items-center gap-1.5 rounded border border-base-700 bg-base-900 py-1 pl-1.5 pr-1">
+              <TierBadge tier={read.tier} className="h-auto w-5" />
+              <span className="text-[11px] text-base-200" style={MONO}>{item.name}</span>
+              <button onClick={() => onBuildAround(item.id)}
+                className="rounded px-1.5 py-0.5 text-[10px] text-base-400 hover:bg-base-800 hover:text-base-100">
+                Build around it
+              </button>
+            </span>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -851,9 +891,9 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
   /* The editor over this screen: { key, id, startWith }, or null. id is
      the build being adjusted, null for a new one. */
   const [editing, setEditing] = useState(null);
-  const openEditor = useCallback((id, startWith = null) => {
+  const openEditor = useCallback((id, startWith = null, seedItem = null) => {
     setPicking(null);
-    setEditing({ key: `${id || "new"}-${Date.now()}`, id, startWith });
+    setEditing({ key: `${id || "new"}-${Date.now()}`, id, startWith, seedItem });
   }, []);
 
   /* The page behind stays where it was while the editor covers it. */
@@ -919,11 +959,20 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
     if (!scenario.faction) return { picks: [], fromPresets: false, cut: null };
     const opts = { lockedSet: state.lockedSet, history: state.history, limit: 3 };
     const mineFirst = suggestBuilds(own, scenario, opts);
-    if (mineFirst.length) return { picks: mineFirst, fromPresets: false, cut: null };
+    if (mineFirst.length) {
+      const change = forAChange(own, scenario, { ...opts, exclude: mineFirst.map((p) => p.build.id) });
+      return { picks: mineFirst, fromPresets: false, cut: null, change };
+    }
     const presetPicks = suggestBuilds(everything.filter((l) => l.preset), scenario, opts);
     if (presetPicks.length) return { picks: presetPicks, fromPresets: true, cut: null };
     return { picks: [], fromPresets: false, cut: dropPool(everything, scenario, { lockedSet: state.lockedSet, showLocked: false }).cut };
   }, [own, everything, scenario, state.lockedSet, state.history]);
+  const untried = useMemo(
+    () => untriedHere(scenario, { lockedSet: state.lockedSet, history: state.history }),
+    [scenario, state.lockedSet, state.history]
+  );
+  const frontName = (FACTIONS.find((f) => f.id === scenario.faction) || {}).label;
+  const frontLabel = frontName ? `the ${frontName}` : "this front";
 
   const closePicker = useCallback(() => setPicking(null), []);
 
@@ -1022,7 +1071,9 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
 
       {confirmed ? null : (
         <Suggestions picks={suggestions.picks} fromPresets={suggestions.fromPresets}
-          current={drop.mine} onTake={takeMine} cut={suggestions.cut} onStart={() => openEditor(null, "primary")} />
+          current={drop.mine} onTake={takeMine} cut={suggestions.cut} onStart={() => openEditor(null, "primary")}
+          change={suggestions.change} untried={untried} frontLabel={frontLabel}
+          onBuildAround={(id) => openEditor(null, null, id)} />
       )}
 
       <div className={"grid grid-cols-1 gap-3 sm:grid-cols-2 " + (seats >= 4 ? "xl:grid-cols-4" : seats === 3 ? "xl:grid-cols-3" : "")}>
@@ -1104,7 +1155,7 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
         <div className="fixed inset-0 z-[60] overflow-y-auto bg-base-950" role="dialog" aria-modal="true" aria-label="Adjust a build">
           <div className="mx-auto max-w-6xl p-4 sm:p-6">
             <Builder key={editing.key} state={state} loadoutId={editing.id} navigate={navigate}
-              faction={scenario.faction} scenario={scenario} startWith={editing.startWith}
+              faction={scenario.faction} scenario={scenario} startWith={editing.startWith} seedItem={editing.seedItem}
               overlay={{
                 onClose: () => setEditing(null),
                 onSaved: (id) => { if (id) takeMine(id); setEditing(null); },

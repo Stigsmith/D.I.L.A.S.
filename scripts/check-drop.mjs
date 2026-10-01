@@ -142,3 +142,26 @@ const none = coverage.coverage([], {});
 ok(none.bots.every((r) => r.standing === "gap" || r.standing === "absent"), "with no builds every situation is a gap, and says so");
 const counts = ["bots", "bugs", "squids"].map((f) => `${f} ${cov[f].filter((r) => r.standing === "covered").length}/${cov[f].filter((r) => r.standing !== "absent").length}`);
 console.log(`  the presets cover: ${counts.join(", ")}`);
+
+/* ------------------------------------------------------------------ */
+/* For a change                                                        */
+/* ------------------------------------------------------------------ */
+const bots = { faction: "bots", difficulty: 7, squad: 4 };
+const botBuilds = drop.dropPool(all, bots).shown;
+ok(drop.forAChange(all, bots, { history: [] }) === null && drop.untriedHere(bots, { history: [] }).length === 0,
+  `with fewer than ${history.ENOUGH_DROPS} drops on a front, nothing is called untried`);
+const now = Date.parse("2026-10-01T20:00:00.000Z");
+const recent = botBuilds.slice(0, 5).map((b, i) => history.entryFor(b, bots, new Date(now - i * 86400000).toISOString()));
+const change = drop.forAChange(all, bots, { history: recent, now });
+ok(change && !recent.some((e) => e.build === change.build.id), "for a change is a build you have not dropped with lately");
+const old = [...recent, history.entryFor(botBuilds[6], bots, new Date(now - 40 * 86400000).toISOString())];
+const top = drop.forAChange(all, bots, { history: old, now, exclude: [] });
+ok(top && (top.usage.count === 0 || history.daysSince(top.usage, now) >= history.STALE_DAYS), `and one you last took over ${history.STALE_DAYS} days ago still counts`);
+const skipped = drop.forAChange(all, bots, { history: recent, now, exclude: [change.build.id] });
+ok(!skipped || skipped.build.id !== change.build.id, "a build already suggested is not suggested twice");
+const untried = drop.untriedHere(bots, { history: recent });
+const carried = history.itemsDroppedWith(recent, "bots");
+ok(untried.length > 0 && untried.every((u) => !carried.has(u.item.id) && ["S+", "S", "A"].includes(u.read.tier)),
+  "untried gear is good here and never carried against this front");
+const lockFirst = new Set([untried[0].item.id]);
+ok(!drop.untriedHere(bots, { history: recent, lockedSet: lockFirst }).some((u) => u.item.id === untried[0].item.id), "gear you have not unlocked is never offered");

@@ -293,7 +293,7 @@ Today's Drop Bay, kept: the grid, the cards, the filters, the favourites. `Loado
 
 ### What comes next on this track
 
-- **History into nudges.** "You have not dropped with this in two months", "you have never brought a Railgun against the Automatons", a fourth suggestion marked "for a change". The data has been recording since 1 October 2026; the reading is the work.
+- **History into nudges: the first two are built.** A fourth suggestion marked "for a change", and gear that is good here that you have never brought against this front, both silent below five drops on a front. Still to come: how your drops spread across fronts and missions, and a nudge in the Armoury for builds that have gathered dust.
 - **More scenario rules, from the curator's play.** Commando is the pattern: he describes a situation, the mechanics get sourced, the judgement is recorded as his. The Rules page is where he checks what each one did.
 - **Things the game refuses.** A reinforcement booster on a Commando mission reads B, because two tiers is the most a scenario may move anything. A ceiling would make it D, and a ceiling is a change of principle, so it waits for him.
 - **Switched off rules and the export.** Left out of the export for now. If he wants his tuned rule set to survive the address moves, it goes in.

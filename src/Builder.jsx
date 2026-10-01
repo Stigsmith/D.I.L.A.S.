@@ -33,6 +33,18 @@ import {
 } from "./lib/loadouts.js";
 import { shareUrl } from "./lib/share.js";
 
+/* A fresh build with one item already in its slot, for "build around
+   it" from Drop Bay: the curator's "you never tried this here". */
+const SLOT_KEY = { primary: "primary", secondary: "secondary", throwable: "grenade", armor: "armor", booster: "booster" };
+function seeded(build, id) {
+  const it = id ? getItem(id) : null;
+  if (!it) return build;
+  const named = { ...build, name: `Built around the ${it.name}` };
+  if (SLOT_KEY[it.slot]) return { ...named, [SLOT_KEY[it.slot]]: id };
+  if (it.slot === "stratagem") return { ...named, strats: [id, ...build.strats.slice(1)] };
+  return build;
+}
+
 /* Where the list is ranked for, in the words the scenario bar uses. */
 function rankedFor(factionMeta, scenario) {
   const where = [scenario.planet ? `on ${scenario.planet}` : null, scenario.mission || null].filter(Boolean);
@@ -339,7 +351,7 @@ const MultiToggle = ({ label, hint, options, value, onChange }) => (
  * picker straight away, which is how somebody with no builds yet starts
  * one from Drop Bay: the first thing they see is the list.
  */
-export default function Builder({ state, loadoutId, navigate, faction, scenario, overlay = null, startWith = null }) {
+export default function Builder({ state, loadoutId, navigate, faction, scenario, overlay = null, startWith = null, seedItem = null }) {
   const stored = state.loadouts.find((l) => l.id === loadoutId);
   const preset = presets.find((p) => p.id === loadoutId);
 
@@ -348,13 +360,13 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
     if (preset) return forkPreset(preset);
     /* A fresh build starts on the front you already told the tool you are */
     /* dropping on. You can still change it per build below.               */
-    return emptyLoadout(faction || undefined);
+    return seeded(emptyLoadout(faction || undefined), seedItem);
   });
   const [picking, setPicking] = useState(() => {
     const s = startWith ? SLOTS.find((x) => x.key === startWith) : null;
     return s ? { key: s.key, slot: s.slot, stratSlot: null } : null;
   });
-  const [dirty, setDirty] = useState(Boolean(preset && !stored));
+  const [dirty, setDirty] = useState(Boolean(preset && !stored) || Boolean(seedItem));
   const [justSaved, setJustSaved] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [copied, setCopied] = useState(false);
