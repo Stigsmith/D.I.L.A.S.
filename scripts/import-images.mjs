@@ -9,7 +9,7 @@
 /* this after adding art:  node scripts/import-images.mjs             */
 /* ================================================================== */
 
-import { readFileSync, writeFileSync, readdirSync, mkdirSync, copyFileSync, rmSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, mkdirSync, copyFileSync, rmSync, statSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, extname } from "node:path";
 
@@ -56,7 +56,10 @@ const slug = (s) =>
 const walk = (dir, out = []) => {
   for (const d of readdirSync(dir, { withFileTypes: true })) {
     if (d.isDirectory()) {
-      if (d.name.toLowerCase() === "themes") continue;
+      /* Themes and planets each have a pass of their own further down.
+         The planet folder also keeps full size originals under the same
+         names as the small copies, which must never be mistaken for them. */
+      if (d.name.toLowerCase() === "themes" || d.name.toLowerCase() === "planets") continue;
       walk(join(dir, d.name), out);
     } else {
       out.push({ name: d.name, path: join(dir, d.name) });
@@ -83,10 +86,22 @@ for (const file of files) {
   else generic.push(file);
 }
 
-for (const dir of ["items", "warbonds", "ui", "themes"]) {
-  rmSync(join(ASSETS, dir), { recursive: true, force: true });
-  mkdirSync(join(ASSETS, dir), { recursive: true });
-}
+/* Each art folder is emptied and refilled in place, never deleted and made
+   again. The repo sits in a folder a file sync app watches, and on 30
+   September and 1 October 2026 that app read every delete and remake as a
+   conflict and renamed the fresh folder to "items (# Name clash ...)",
+   leaving the app with no art at all. Emptying a folder it already knows
+   about is an ordinary change to it. */
+const emptyInPlace = (dir) => {
+  mkdirSync(dir, { recursive: true });
+  for (const d of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, d.name);
+    if (d.isDirectory()) emptyInPlace(path);
+    else rmSync(path, { force: true });
+  }
+};
+
+for (const dir of ["items", "warbonds", "ui", "themes"]) emptyInPlace(join(ASSETS, dir));
 
 const manifest = { items: {}, warbonds: {}, ui: [], themes: {} };
 const missingItems = [];
@@ -170,6 +185,20 @@ for (const file of generic) {
   manifest.ui.push(file);
 }
 
+/* Planet renders: the small copies npm run planet-art fetched, straight
+   from Image Library/Planets and never from its Originals folder. Named
+   by the planet's slug, the same slug the map looks them up by. */
+const PLANETS_SOURCE = join(SOURCE, "Planets");
+emptyInPlace(join(ASSETS, "planets"));
+let planetArt = 0;
+if (existsSync(PLANETS_SOURCE)) {
+  for (const d of readdirSync(PLANETS_SOURCE, { withFileTypes: true })) {
+    if (!d.isFile() || !/^planet_.+\.(png|jpe?g|webp)$/i.test(d.name)) continue;
+    copyFileSync(join(PLANETS_SOURCE, d.name), join(ASSETS, "planets", d.name.replace(/^planet_/, "")));
+    planetArt += 1;
+  }
+}
+
 /* Anything in the source that no id claimed. Not an error, but if a    */
 /* file is here it is doing nothing, which is usually a naming slip.    */
 const claimed = new Set([...Object.values(manifest.items), ...Object.values(manifest.warbonds), ...manifest.ui]);
@@ -208,6 +237,7 @@ try {
 console.log(`items with art:    ${Object.keys(manifest.items).length} of ${items.length}`);
 console.log(`warbonds with art: ${Object.keys(manifest.warbonds).length} of ${warbonds.length}`);
 console.log(`ui and other:      ${manifest.ui.length}`);
+console.log(`planets with art:  ${planetArt}${planetArt ? "" : " (npm run planet-art -- --write fetches them)"}`);
 if (missingItems.length) {
   console.log(`\nitems with no art (these fall back to text): ${missingItems.length}`);
   for (const m of missingItems) console.log(`  ${m.slot.padEnd(10)} ${m.id.padEnd(34)} ${m.name}`);

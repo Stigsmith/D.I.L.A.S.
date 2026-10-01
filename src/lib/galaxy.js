@@ -345,11 +345,14 @@ export function placeLabels(candidates, scale) {
 /*                                                                     */
 /* - **Only fronts you can drop on are suggested**, from a live war    */
 /*   fresh enough to trust. With no war there is nothing to suggest.   */
-/* - **No caves hides the Hive Worlds.** The wiki puts the cave        */
-/*   systems in that biome, which three planets have.                  */
-/* - **Fewer megacities pushes them down, it does not hide them.** A    */
-/*   planet with a megacity comes after every planet without one.      */
-/*   Hazards you would rather avoid push down the same way, after it.  */
+/* - **Caves: avoid, any, or only.** The wiki puts the cave systems in  */
+/*   the Hive World biome, which three planets have. Avoid hides them,  */
+/*   only hides everything else. Both ways round, because sometimes     */
+/*   the caves are what you came for: the curator, 30 September 2026.   */
+/* - **Megacities: fewer, any, or more.** It pushes rather than hides:  */
+/*   fewer puts a planet with a megacity after every planet without     */
+/*   one, more puts it before. Hazards you would rather avoid push down */
+/*   the same way, after it.                                            */
 /* - **Busiest first** among what is left: where the war actually is,  */
 /*   and where a game is easiest to find.                              */
 /*                                                                     */
@@ -364,17 +367,20 @@ export const megacitiesOn = (p) => (p && p.cities && p.cities.megacity) || 0;
 
 const tableByName = new Map(all.map((p) => [p.name, p]));
 
-export function suggestFronts(war, { front = null, avoidCaves = false, fewerMegacities = false, avoidHazards = [] } = {}, limit = 3) {
+export const CAVE_CHOICES = ["avoid", "any", "only"];
+export const MEGACITY_CHOICES = ["fewer", "any", "more"];
+
+export function suggestFronts(war, { front = null, caves = "any", megacities = "any", avoidHazards = [] } = {}, limit = 3) {
   if (!war || !war.fresh) return null;
   const avoid = new Set(avoidHazards);
   const fits = [];
-  let caves = 0;
+  let hidden = 0;
   for (const [name, w] of war.planets) {
     if (!w.campaign || (front && w.front !== front)) continue;
     const p = tableByName.get(name);
     if (!p) continue;
-    if (avoidCaves && hasCaves(p)) {
-      caves += 1;
+    if ((caves === "avoid" && hasCaves(p)) || (caves === "only" && !hasCaves(p))) {
+      hidden += 1;
       continue;
     }
     fits.push({
@@ -384,32 +390,42 @@ export function suggestFronts(war, { front = null, avoidCaves = false, fewerMega
       liberation: w.liberation,
       defence: w.defence,
       clashes: (p.hazards || []).filter((h) => avoid.has(h)),
-      megacity: fewerMegacities ? megacitiesOn(p) : 0,
+      megacity: megacitiesOn(p),
     });
   }
+  /* Which side of the line a megacity planet goes: after the rest for
+     fewer, before them for more, and no line at all for any. */
+  const cityRank = (f) => (megacities === "any" ? 0 : (f.megacity > 0) === (megacities === "fewer") ? 1 : 0);
   fits.sort((a, b) =>
-    Number(a.megacity > 0) - Number(b.megacity > 0) ||
+    cityRank(a) - cityRank(b) ||
     a.clashes.length - b.clashes.length ||
     b.players - a.players ||
     a.name.localeCompare(b.name));
-  return { picks: fits.slice(0, limit), fits: new Set(fits.map((f) => f.name)), count: fits.length, hiddenForCaves: caves };
+  return { picks: fits.slice(0, limit), fits: new Set(fits.map((f) => f.name)), count: fits.length, hiddenForCaves: hidden, caves, megacities };
 }
 
 /* ------------------------------------------------------------------ */
-/* The war table: the game's own look, as a second skin                */
+/* Who holds what, sector by sector                                    */
 /*                                                                     */
-/* The curator asked for a skin that looks like the game's Galactic    */
-/* War screen, 30 September 2026: sectors as stepped zones on a polar  */
-/* grid, filled and hatched in the colour of whoever holds them.       */
+/* Read from the live war and nothing else. The Tactical skin glows    */
+/* each held planet in its front's colour and writes each front's name */
+/* along the rim where its territory is; the chart colours the dots.   */
+/* ------------------------------------------------------------------ */
+
+const at = (r, a) => `${(CENTRE + r * Math.cos(a)).toFixed(1)} ${(CENTRE + r * Math.sin(a)).toFixed(1)}`;
+
+/* ------------------------------------------------------------------ */
+/* Sectors as blocks                                                   */
 /*                                                                     */
-/* **The game's sector shapes are not published**, so they are built    */
-/* here from the planets. The disc is cut into rings, each ring into   */
-/* cells about as wide as they are deep, and each cell goes to the     */
-/* sector of the planet nearest its middle. Runs of cells from one     */
-/* sector merge into one wedge. That gives the game's stepped polar    */
-/* look with borders drawn from where the planets actually are; they   */
-/* will not match the game's own line for line, and nothing claims     */
-/* they do. The middle disc is Sol, which is Super Earth alone.        */
+/* The game marks a sector as blocks on a polar grid, not as a mask    */
+/* round its planets: the curator's correction, 30 September 2026. The */
+/* game's own shapes are not published, so these are built from the    */
+/* planets. The disc is cut into rings, each ring into cells about as   */
+/* wide as they are deep, and each cell goes to the sector of the       */
+/* planet nearest its middle; runs of one sector merge into one wedge.  */
+/* The stepped look is the game's, the exact borders are not, and      */
+/* nothing claims they are. A click anywhere inside a block is a click  */
+/* on that sector, so the shape you see is the shape you click.         */
 /* ------------------------------------------------------------------ */
 
 export const TABLE = (() => {
@@ -463,7 +479,6 @@ export const TABLE = (() => {
   return { sol: SOL, outer: OUTER, rings, runs };
 })();
 
-const at = (r, a) => `${(CENTRE + r * Math.cos(a)).toFixed(1)} ${(CENTRE + r * Math.sin(a)).toFixed(1)}`;
 
 /* One wedge of a ring, as an SVG path. */
 export const wedgePath = ({ r0, r1, a0, a1 }) => {
@@ -476,6 +491,88 @@ export const wedgePath = ({ r0, r1, a0, a1 }) => {
 export const sectorZones = (() => {
   const paths = new Map();
   for (const run of TABLE.runs) paths.set(run.sector, (paths.get(run.sector) || "") + wedgePath(run));
+  return paths;
+})();
+
+/* Each sector's outline: only the edges it shares with another sector,
+   Sol or the rim, never the lines between its own blocks. The game draws
+   a sector as one shape with one edge, the curator's point on 30 September
+   2026, and a sector drawn as its wedges showed the grid inside it. Every
+   shared edge belongs to both sectors either side, so each draws it. */
+export const sectorOutlines = (() => {
+  const TAU = 2 * Math.PI;
+  const eps = 1e-9;
+  /* Each ring's wedges as angles within one turn, in order. */
+  const rings = TABLE.rings.map((ring) => {
+    const out = [];
+    for (const run of TABLE.runs.filter((r) => r.r0 === ring.r0)) {
+      const a0 = run.a0 % TAU;
+      const a1 = a0 + (run.a1 - run.a0);
+      if (a1 > TAU + eps) out.push({ sector: run.sector, a0, a1: TAU }, { sector: run.sector, a0: 0, a1: a1 - TAU });
+      else out.push({ sector: run.sector, a0, a1 });
+    }
+    return { ...ring, cells: out.sort((a, b) => a.a0 - b.a0) };
+  });
+  const sectorOf = (cells, a) => {
+    const x = ((a % TAU) + TAU) % TAU;
+    return (cells.find((c) => x >= c.a0 - eps && x < c.a1 - eps) || cells[cells.length - 1]).sector;
+  };
+  const paths = new Map();
+  const add = (sector, d) => paths.set(sector, (paths.get(sector) || "") + d);
+  const arc = (r, x, y) => {
+    if (y - x >= TAU - eps) return arc(r, x, x + Math.PI) + arc(r, x + Math.PI, y);
+    return `M${at(r, x)}A${r.toFixed(1)} ${r.toFixed(1)} 0 ${y - x > Math.PI ? 1 : 0} 1 ${at(r, y)}`;
+  };
+
+  rings.forEach((ring, i) => {
+    /* The sides between wedges, where two sectors meet in this ring. */
+    ring.cells.forEach((c) => {
+      const before = sectorOf(ring.cells, c.a0 - 1e-6);
+      if (before !== c.sector) {
+        const d = `M${at(ring.r0, c.a0)}L${at(ring.r1, c.a0)}`;
+        add(c.sector, d);
+        add(before, d);
+      }
+    });
+    /* The inner edge of the first ring meets Sol, the outer edge of the last
+       meets the rim: both always edges. */
+    if (i === 0) ring.cells.forEach((c) => add(c.sector, arc(ring.r0, c.a0, c.a1)));
+    if (i === rings.length - 1) {
+      ring.cells.forEach((c) => add(c.sector, arc(ring.r1, c.a0, c.a1)));
+      return;
+    }
+    /* Between this ring and the next: an edge wherever the sector below
+       differs from the sector above, merged into as few arcs as it takes. */
+    const above = rings[i + 1];
+    const cuts = [...new Set([...ring.cells.flatMap((c) => [c.a0, c.a1]), ...above.cells.flatMap((c) => [c.a0, c.a1])])]
+      .sort((a, b) => a - b);
+    let open = null;
+    const close = () => {
+      if (!open) return;
+      const d = arc(ring.r1, open.x, open.y);
+      add(open.below, d);
+      add(open.upper, d);
+      open = null;
+    };
+    for (let j = 0; j < cuts.length - 1; j++) {
+      const x = cuts[j];
+      const y = cuts[j + 1];
+      if (y - x < eps) continue;
+      const mid = (x + y) / 2;
+      const below = sectorOf(ring.cells, mid);
+      const upper = sectorOf(above.cells, mid);
+      if (below === upper) {
+        close();
+        continue;
+      }
+      if (open && open.below === below && open.upper === upper && Math.abs(open.y - x) < eps) open.y = y;
+      else {
+        close();
+        open = { x, y, below, upper };
+      }
+    }
+    close();
+  });
   return paths;
 })();
 
@@ -501,37 +598,46 @@ export function sectorHolders(war) {
   const tally = new Map();
   for (const p of placed) {
     if (p.home || !p.sector || p.sector === "TBD") continue;
-    const t = tally.get(p.sector) || { total: 0, by: {}, campaign: false };
+    const t = tally.get(p.sector) || { total: 0, by: {}, campaign: false, fighting: {} };
     t.total += 1;
     const w = war.planets.get(p.name);
     if (w && w.owner) t.by[w.owner] = (t.by[w.owner] || 0) + 1;
-    if (w && w.campaign) t.campaign = true;
+    if (w && w.campaign) {
+      t.campaign = true;
+      if (w.front) t.fighting[w.front] = (t.fighting[w.front] || 0) + 1 + w.players / 1e6;
+    }
     tally.set(p.sector, t);
   }
   for (const [sector, t] of tally) {
     const [front, count] = Object.entries(t.by).sort((a, b) => b[1] - a[1])[0] || [null, 0];
-    if (front && count * 2 >= t.total) out.set(sector, { front, share: count / t.total, campaign: t.campaign });
-    else if (t.campaign) out.set(sector, { front: null, share: 0, campaign: true });
+    /* Who the fighting in it is against: a sector nobody holds outright,
+       such as one of Super Earth's under attack, still shows its war in
+       that enemy's colour rather than as a blank. */
+    const fighting = Object.entries(t.fighting).sort((a, b) => b[1] - a[1])[0];
+    const against = fighting ? fighting[0] : null;
+    if (front && count * 2 >= t.total) out.set(sector, { front, share: count / t.total, campaign: t.campaign, against: against || front });
+    else if (t.campaign) out.set(sector, { front: null, share: 0, campaign: true, against });
   }
   return out;
 }
 
-/* Where each front's name goes on the rim: the middle of its territory,
-   weighted by area, the way the game writes AUTOMATONS across its red. */
+/* Where each front's name goes on the rim: the middle of the planets in
+   the sectors it holds, the way the game writes AUTOMATONS across its red. */
 export function frontArcs(holders) {
   const sums = new Map();
-  for (const run of TABLE.runs) {
-    const h = holders.get(run.sector);
+  for (const [sector, ps] of sectorMembers) {
+    const h = holders.get(sector);
     if (!h || !h.front) continue;
-    const area = (run.a1 - run.a0) * (run.r1 ** 2 - run.r0 ** 2);
-    const mid = (run.a0 + run.a1) / 2;
-    const s = sums.get(h.front) || { x: 0, y: 0, area: 0 };
-    s.x += Math.cos(mid) * area;
-    s.y += Math.sin(mid) * area;
-    s.area += area;
-    sums.set(h.front, s);
+    for (const p of ps) {
+      const a = Math.atan2(p.y - CENTRE, p.x - CENTRE);
+      const t = sums.get(h.front) || { x: 0, y: 0, n: 0 };
+      t.x += Math.cos(a);
+      t.y += Math.sin(a);
+      t.n += 1;
+      sums.set(h.front, t);
+    }
   }
-  return [...sums].map(([front, s]) => ({ front, angle: Math.atan2(s.y, s.x), area: s.area }));
+  return [...sums].map(([front, t]) => ({ front, angle: Math.atan2(t.y, t.x), planets: t.n }));
 }
 
 /* An arc to write a front's name along, reading left to right whichever
@@ -544,3 +650,85 @@ export function arcPath(angle, radius, span = 0.55) {
     ? `M${at(radius, a1)}A${radius} ${radius} 0 0 0 ${at(radius, a0)}`
     : `M${at(radius, a0)}A${radius} ${radius} 0 0 1 ${at(radius, a1)}`;
 }
+
+/* ------------------------------------------------------------------ */
+/* Two levels, the game's way                                          */
+/*                                                                     */
+/* The curator, 30 September 2026: in game you click a sector and it   */
+/* zooms straight in to planet level, you move around in there, and    */
+/* zooming out far enough takes you back to the whole galaxy rather    */
+/* than to some level in between. So the map has two views, not a      */
+/* dial: the galaxy, and one sector.                                   */
+/* ------------------------------------------------------------------ */
+
+/* The planets each sector holds, without Super Earth or the placeholders. */
+export const sectorMembers = (() => {
+  const m = new Map();
+  for (const p of placed) {
+    if (p.home || !p.sector || p.sector === "TBD") continue;
+    if (!m.has(p.sector)) m.set(p.sector, []);
+    m.get(p.sector).push(p);
+  }
+  return m;
+})();
+
+/* How far from a planet a point still counts as its sector. Past this the
+   click is on empty space, which in the galaxy is nobody's. */
+export const SECTOR_REACH = 70;
+
+export function sectorNear(point, reach = SECTOR_REACH) {
+  let best = null;
+  let bestD = reach * reach;
+  for (const [sector, ps] of sectorMembers) {
+    for (const p of ps) {
+      const d = (p.x - point.x) ** 2 + (p.y - point.y) ** 2;
+      if (d < bestD) {
+        bestD = d;
+        best = sector;
+      }
+    }
+  }
+  return best;
+}
+
+/* The view that frames a sector: its planets with room around them, at no
+   less than SECTOR_MIN_ZOOM, so even a sprawling sector is a clear step in
+   from the galaxy. */
+export const SECTOR_PAD = 60;
+export const SECTOR_MIN_ZOOM = 2.4;
+
+export function sectorView(sector) {
+  const ps = sectorMembers.get(sector);
+  if (!ps || !ps.length) return { ...HOME };
+  const xs = ps.map((p) => p.x);
+  const ys = ps.map((p) => p.y);
+  const w = Math.max(...xs) - Math.min(...xs);
+  const h = Math.max(...ys) - Math.min(...ys);
+  const k = Math.min(MAX_ZOOM, Math.max(SECTOR_MIN_ZOOM, Math.min(VIEW / (w + 2 * SECTOR_PAD), VIEW / (h + 2 * SECTOR_PAD))));
+  return centreOn({ x: (Math.min(...xs) + Math.max(...xs)) / 2, y: (Math.min(...ys) + Math.max(...ys)) / 2 }, k);
+}
+
+/* Inside a sector you may zoom out a little. Past this share of the
+   sector's own zoom the map goes back to the whole galaxy instead. */
+export const LEAVE_AT = 0.6;
+export const leavesSector = (k, sectorK) => k < sectorK * LEAVE_AT;
+
+/* One frame of the glide between two views. The zoom moves geometrically
+   and the middle of the frame in a straight line, which is what makes a
+   zoom feel even rather than lurching at one end. */
+export function glide(from, to, t) {
+  return towards(from, to, t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
+}
+
+/* A share of the way from one view to another, with no easing of its own.
+   The wheel calls this every frame with a small share, which is what makes
+   a spin of the wheel one smooth zoom rather than a notch at a time. */
+export function towards(from, to, share) {
+  const k = from.k * (to.k / from.k) ** share;
+  const a = toMap(from, { x: CENTRE, y: CENTRE });
+  const b = toMap(to, { x: CENTRE, y: CENTRE });
+  const cx = a.x + (b.x - a.x) * share;
+  const cy = a.y + (b.y - a.y) * share;
+  return { k, x: CENTRE - cx * k, y: CENTRE - cy * k };
+}
+

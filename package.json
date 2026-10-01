@@ -15,6 +15,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "wiki": "node scripts/fetch-wiki.mjs",
+    "planet-art": "node scripts/fetch-planet-art.mjs",
     "vehicles": "node scripts/add-vehicles.mjs",
     "rules": "node scripts/check-rules.mjs",
     "builds": "node scripts/check-builds.mjs",

@@ -157,7 +157,10 @@ export function About() {
         </p>
         <p className="text-base-500">
           Art is used for identification and reference. {artCounts.items} item illustrations and {artCounts.warbonds}{" "}
-          warbond covers. Every one of them is optional: with the art removed, every item still reads through its text.
+          warbond covers
+          {artCounts.planets ? `, and ${artCounts.planets} planet renders from helldivers.wiki.gg, shown inside a sector on the map` : ""}.
+          Every one of them is optional: with the art removed, every item still reads through its text and every planet is
+          drawn as a point of light.
         </p>
       </Panel>
     </div>

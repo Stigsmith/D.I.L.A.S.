@@ -277,7 +277,9 @@ export const SORT_COLUMNS = ["dds", "ugg"];
 /* undefined.                                                          */
 /* ------------------------------------------------------------------ */
 
-export const BLANK_PLANNER = { kind: null, avoidCaves: false, fewerMegacities: false, avoidHazards: [] };
+export const BLANK_PLANNER = { kind: null, caves: "any", megacities: "any", avoidHazards: [] };
+const CAVES = ["avoid", "any", "only"];
+const MEGACITIES = ["fewer", "any", "more"];
 
 export function usePlannerPrefs() {
   const [prefs, setPrefs] = useState(BLANK_PLANNER);
@@ -287,8 +289,11 @@ export function usePlannerPrefs() {
     if (!saved || typeof saved !== "object") return;
     setPrefs({
       kind: typeof saved.kind === "string" && missionTraits[saved.kind] ? saved.kind : null,
-      avoidCaves: saved.avoidCaves === true,
-      fewerMegacities: saved.fewerMegacities === true,
+      /* Each is a three way choice since 30 September 2026. The two old
+         yes or no answers it replaced are read across once: no caves is
+         avoid, fewer megacities is fewer. */
+      caves: CAVES.includes(saved.caves) ? saved.caves : saved.avoidCaves === true ? "avoid" : "any",
+      megacities: MEGACITIES.includes(saved.megacities) ? saved.megacities : saved.fewerMegacities === true ? "fewer" : "any",
       avoidHazards: Array.isArray(saved.avoidHazards)
         ? saved.avoidHazards.filter((h) => typeof h === "string" && hazardInfo[h])
         : [],

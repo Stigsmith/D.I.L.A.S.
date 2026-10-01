@@ -25,7 +25,7 @@ import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 import { BRAND } from "./lib/brand.js";
 import { PATCH } from "./lib/patch.js";
 import {
-  planets, biomeInfo, hazardInfo, biomeName, hazardName, hazardEffect, QUIET_HAZARDS, loudHazards,
+  planets, hazardInfo, biomeName, hazardName, hazardEffect, QUIET_HAZARDS, loudHazards,
   missionsFor, missionTraits, missionByName, traitsOf, planetByName, usePlannerPrefs,
 } from "./lib/scenario.js";
 import { scoreItem, scenarioIsSet } from "./lib/score.js";
@@ -421,13 +421,16 @@ function TierChips({ label, value, onChange }) {
    the height twice and let you open both, which made the screen taller
    than the thing it was picking. */
 /* `kind` is the drop planner's mission kind, which narrows the mission
-   list here; `onClearKind` lets you see every mission again. The planet
-   itself is picked on the map above this, so the place half of this bar
-   is for setting a biome and hazards by hand: a planet the map does not
-   have, or a what if. */
-function PlanetBar({ scenario, setBiome, toggleHazard, setMission, clearEnvironment, kind = null, onClearKind }) {
-  /* null, "planet" or "mission". One value rather than two booleans is
-     what makes opening one close the other, for free. */
+   list here; `onClearKind` lets you see every mission again.
+
+   The place half only says where you are. It used to open a biome and a
+   set of hazards to set by hand, for a planet the map did not have or a
+   what if; the curator retired it on 30 September 2026, once the map and
+   the planner covered both, and the search reaches the planets with no
+   place on the map. A scenario saved with a biome set by hand still reads
+   here and still clears. */
+function PlanetBar({ scenario, setMission, clearEnvironment, kind = null, onClearKind }) {
+  /* null or "mission". */
   const [open, setOpen] = useState(null);
   const [query, setQuery] = useState("");
 
@@ -452,24 +455,12 @@ function PlanetBar({ scenario, setBiome, toggleHazard, setMission, clearEnvironm
     );
   }, [query, onFront]);
 
-  const biomes = useMemo(
-    () => Object.entries(biomeInfo).map(([slug, v]) => ({ slug, ...v })).sort((a, b) => a.name.localeCompare(b.name)),
-    []
-  );
-  const hazards = useMemo(
-    () => Object.entries(hazardInfo)
-      .filter(([slug]) => !QUIET_HAZARDS.has(slug))
-      .map(([slug, v]) => ({ slug, ...v }))
-      .sort((a, b) => a.name.localeCompare(b.name)),
-    []
-  );
-
   const byHand = scenario.biome || scenario.hazards.length;
   const placeLabel = scenario.planet || (byHand ? biomeName(scenario.biome) || "Set by hand" : "Choose a planet");
   const placeSub = scenario.planet
     ? [biomeName(scenario.biome), loudHazards(scenario.hazards).length ? loudHazards(scenario.hazards).length + (loudHazards(scenario.hazards).length === 1 ? " hazard" : " hazards") : null]
         .filter(Boolean).join(" · ")
-    : byHand ? "set by hand" : "pick it on the map, or set it by hand here";
+    : byHand ? "set by hand" : "pick it on the map";
   const missionSub = scenario.mission
     ? traitsOf(scenario.mission).map((t) => (missionTraits[t] || {}).name || t).join(" · ") || "no special demands"
     : onFront.length + (kind ? " " + missionTraits[kind].name.toLowerCase() + " missions" : "") + " on this front";
@@ -477,9 +468,8 @@ function PlanetBar({ scenario, setBiome, toggleHazard, setMission, clearEnvironm
   return (
     <div className="rounded-lg border border-base-800 bg-base-900/60 p-3">
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <Picker label="Dropping on" icon={Globe2} open={open === "planet"}
-          value={placeLabel} sub={placeSub} chosen={Boolean(scenario.planet || byHand)}
-          onToggle={() => show("planet")} />
+        <Placed label="Dropping on" icon={Globe2} value={placeLabel} sub={placeSub}
+          chosen={Boolean(scenario.planet || byHand)} />
         <Picker label="Mission" icon={Crosshair} open={open === "mission"}
           value={scenario.mission || "Not set"} sub={missionSub} chosen={Boolean(scenario.mission)}
           onToggle={() => show("mission")} />
@@ -507,42 +497,6 @@ function PlanetBar({ scenario, setBiome, toggleHazard, setMission, clearEnvironm
               clear the planet
             </button>
           ) : null}
-        </div>
-      ) : null}
-
-      {open === "planet" ? (
-        <div className="mt-2.5 flex flex-col gap-2.5 border-t border-base-800 pt-2.5 text-left">
-          <p className="text-[11px] leading-relaxed text-base-500">
-            The map is the quick way. This is for a planet it does not have, or for asking what if.
-          </p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-base-500"
-                style={{ fontFamily: "'Oswald', sans-serif" }}>Set the biome</span>
-              <select value={scenario.biome || ""} onChange={(e) => setBiome(e.target.value)}
-                className="w-full rounded border border-base-700 bg-base-900 px-2 py-1.5 text-xs text-base-200 outline-none focus:border-base-500">
-                <option value="">Not set</option>
-                {biomes.map((b) => <option key={b.slug} value={b.slug}>{b.name}</option>)}
-              </select>
-            </div>
-            <div>
-              <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-base-500"
-                style={{ fontFamily: "'Oswald', sans-serif" }}>And the hazards</span>
-              <div className="flex flex-wrap gap-1.5">
-                {hazards.map((h) => {
-                  const on = scenario.hazards.includes(h.slug);
-                  return (
-                    <button key={h.slug} onClick={() => toggleHazard(h.slug)} aria-pressed={on} title={h.description}
-                      className={"rounded border px-2 py-1 text-[11px] transition-colors " +
-                        (on ? "border-accent-500 bg-accent-500 text-accent-950"
-                            : "border-base-700 bg-base-900 text-base-400 hover:border-base-500 hover:text-base-100")}>
-                      {h.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
         </div>
       ) : null}
 
@@ -621,7 +575,7 @@ export function PlanetChooser({ chosen, onChoose, none, autoFocus = true, war = 
             The live war was last read {agoText(war.age)}, too long ago to trust, so the map is not coloured in.
           </>
         ) : (
-          "Drag to move, scroll or pinch to zoom, and click a planet to drop there."
+          "Click a sector to go in, then a planet to drop there. Zoom out, or press Escape, to go back to the galaxy."
         )}
       </p>
       {query.trim() ? (
@@ -678,6 +632,25 @@ function PlanStep({ n, label, children }) {
         {label}
       </span>
       {children}
+    </div>
+  );
+}
+
+/* A choice in three, where the middle one means it makes no difference.
+   One row, so avoid, any and want read as one question. */
+function ThreeWay({ label, value, onChange, options }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="w-20 shrink-0 text-[11px] text-base-400">{label}</span>
+      <div className="flex overflow-hidden rounded border border-base-700" role="group" aria-label={label}>
+        {options.map(([id, name, title]) => (
+          <button key={id} type="button" onClick={() => onChange(id)} aria-pressed={value === id} title={title}
+            className={"border-l border-base-700 px-2.5 py-1 text-[11px] transition-colors first:border-l-0 " +
+              (value === id ? "bg-base-200 text-base-900" : "bg-base-900 text-base-400 hover:text-base-100")}>
+            {name}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -742,11 +715,19 @@ function Planner({ scenario, setFaction, prefs, setPrefs, war, plan, onChoose })
       </PlanStep>
 
       <PlanStep n={3} label="Kind of planet">
-        <div className="flex flex-wrap gap-1.5">
-          <PrefChip on={prefs.avoidCaves} onClick={() => setPrefs({ avoidCaves: !prefs.avoidCaves })}
-            title="Hides the Hive Worlds, where the caves are">No caves</PrefChip>
-          <PrefChip on={prefs.fewerMegacities} onClick={() => setPrefs({ fewerMegacities: !prefs.fewerMegacities })}
-            title="Planets with a megacity come after every planet without one">Fewer megacities</PrefChip>
+        <div className="flex flex-col gap-1.5">
+          <ThreeWay label="Caves" value={prefs.caves} onChange={(caves) => setPrefs({ caves })}
+            options={[
+              ["avoid", "Avoid", "Hides the Hive Worlds, where the caves are"],
+              ["any", "Any", "Caves or not, it makes no difference"],
+              ["only", "Only", "Only the Hive Worlds, for when the caves are what you came for"],
+            ]} />
+          <ThreeWay label="Megacities" value={prefs.megacities} onChange={(megacities) => setPrefs({ megacities })}
+            options={[
+              ["fewer", "Fewer", "Planets with a megacity come after every planet without one"],
+              ["any", "Any", "Megacities make no difference to the order"],
+              ["more", "More", "Planets with a megacity come before every planet without one"],
+            ]} />
         </div>
         <span className="text-[10px] text-base-600">Rather not have</span>
         <div className="flex flex-wrap gap-1.5">
@@ -777,7 +758,8 @@ function GoHere({ war, plan, front, chosen, onChoose }) {
         : !war.fresh ? say(`The live war was last read ${agoText(war.age)}, too long ago to point you anywhere.`)
         : !plan || plan.count === 0 ? say(
             (front ? `No front against the ${front.label} fits right now.` : "No front fits right now.") +
-            (plan && plan.hiddenForCaves ? ` The only ${plan.hiddenForCaves === 1 ? "one has" : "ones have"} caves.` : "")
+            (plan && plan.caves === "only" ? " None of its fronts is on a Hive World, where the caves are."
+              : plan && plan.hiddenForCaves ? ` The only ${plan.hiddenForCaves === 1 ? "one has" : "ones have"} caves.` : "")
           )
         : (
           <>
@@ -825,7 +807,9 @@ function GoHere({ war, plan, front, chosen, onChoose }) {
               ? say(`${plan.count - plan.picks.length} more ${plan.count - plan.picks.length === 1 ? "front fits" : "fronts fit"}, lit on the map.`)
               : null}
             {plan.hiddenForCaves
-              ? say(`${plan.hiddenForCaves} hidden for caves.`)
+              ? say(plan.caves === "only"
+                ? `Only Hive Worlds, where the caves are: ${plan.hiddenForCaves} other ${plan.hiddenForCaves === 1 ? "front" : "fronts"} left out.`
+                : `${plan.hiddenForCaves} hidden for caves.`)
               : null}
           </>
         )}
@@ -847,6 +831,23 @@ export function DropPlanner({ scenario, setFaction, onChoose, prefs, setPrefs, a
       <Planner scenario={scenario} setFaction={setFaction} prefs={prefs} setPrefs={setPrefs}
         war={war} plan={plan} onChoose={onChoose} />
       <PlanetChooser chosen={scenario.planet} onChoose={onChoose} war={war} plan={plan} autoFocus={autoFocus} />
+    </div>
+  );
+}
+
+/* The place, as a card that says rather than opens: the map above is
+   where it is chosen. Same shape as the mission picker beside it. */
+function Placed({ label, icon: Icon, value, sub, chosen }) {
+  return (
+    <div className="flex w-full items-center gap-2.5 rounded border border-base-800 bg-base-900 px-3 py-2 text-left">
+      <Icon className={"h-4 w-4 shrink-0 " + (chosen ? "text-base-300" : "text-base-600")} />
+      <span className="min-w-0 flex-1">
+        <span className="block text-[9px] font-semibold uppercase tracking-wider text-base-500"
+          style={{ fontFamily: "'Oswald', sans-serif" }}>{label}</span>
+        <span className={"block truncate text-xs " + (chosen ? "text-base-100" : "text-base-500")}
+          style={{ fontFamily: "'JetBrains Mono', monospace" }}>{value}</span>
+        <span className="block truncate text-[10px] text-base-600">{sub}</span>
+      </span>
     </div>
   );
 }
@@ -1930,7 +1931,7 @@ export function ScenarioScreen({ scenario, setFaction, setPlanet, setBiome, togg
               <DifficultyPicker value={scenario.difficulty} onChange={setDifficulty} faction={scenario.faction} />
               <SquadPicker value={scenario.squad} onChange={setSquad} />
             </div>
-            <PlanetBar scenario={scenario} setBiome={setBiome} toggleHazard={toggleHazard} setMission={setMission}
+            <PlanetBar scenario={scenario} setMission={setMission}
               clearEnvironment={clearEnvironment} kind={prefs.kind} onClearKind={() => setPrefs({ kind: null })} />
           </div>
 
