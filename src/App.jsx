@@ -17,7 +17,7 @@ import {
 import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser, ScenarioScreen, ScenarioBar } from "./Tiers.jsx";
 import { SKULL, themeArt } from "./lib/assets.js";
 import Builder from "./Builder.jsx";
-import ArmouryBuilds, { Coverage, ARMOURY_TABS } from "./Armoury.jsx";
+import ArmouryBuilds, { Coverage, History, ARMOURY_TABS } from "./Armoury.jsx";
 import DropScreen, { useDrop } from "./DropScreen.jsx";
 import Rules from "./Rules.jsx";
 import Shared from "./Shared.jsx";
@@ -621,9 +621,12 @@ export default function App() {
         return <DropScreen state={state} navigate={navigate} scenario={scored} setFaction={setFaction} setPlanet={setPlanet}
           setSquad={setSquad} drop={drop} update={updateDrop} party={party} sync={partySync} />;
       case "armoury":
-        return armouryTab === "coverage"
-          ? <Coverage state={state} navigate={navigate} scenario={scored} />
-          : <ArmouryBuilds state={state} navigate={navigate} faction={scenario.faction} setFaction={setFaction} scenario={scored} />;
+        if (armouryTab === "coverage") return <Coverage state={state} navigate={navigate} scenario={scored} />;
+        if (armouryTab === "history") {
+          return <History state={state} navigate={navigate}
+            onUseForDrop={(id) => { updateDrop((d) => ({ ...d, mine: id, confirmed: null })); navigate("bay"); }} />;
+        }
+        return <ArmouryBuilds state={state} navigate={navigate} faction={scenario.faction} setFaction={setFaction} scenario={scored} />;
       case "builder": {
         /* Browsing happens in the Armoury. The editor works on one build,
            so landing on it with nothing chosen starts a fresh one, and
