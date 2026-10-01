@@ -3,31 +3,37 @@
 /*                                                                    */
 /*   npm run planet-art                    report what is there       */
 /*   npm run planet-art -- --write         fetch the small copies     */
-/*   npm run planet-art -- --write --full  and the full size ones     */
+/*   npm run planet-art -- --write --full  and the full size ones,    */
+/*                                         then cut the map's copies  */
+/*   npm run planet-art -- --cut           cut them again, offline    */
 /*                                                                    */
 /* The planet renders the game shows on its galaxy map, from          */
 /* helldivers.wiki.gg, where each planet has a file named             */
 /* "<Planet> Planet Icon.png", about 700 pixels square. The curator   */
 /* asked for them on 30 September 2026.                               */
 /*                                                                    */
-/* Two copies of each, both gitignored, because this is extracted     */
-/* game art like the item images. The full size set measured 374 MB   */
-/* on 30 September 2026, so it is only fetched when asked for:        */
+/* All gitignored, because this is extracted game art like the item   */
+/* images. The full size set measured 374 MB on 30 September 2026 and */
+/* the curator said yes to it on 1 October:                           */
 /*                                                                    */
-/*   Image Library/Planets/Originals/planet_<slug>.png   full size    */
-/*   Image Library/Planets/planet_<slug>.png             128 pixels   */
+/*   Image Library/Planets/Originals/planet_<slug>.png  1720 pixels   */
+/*   Image Library/Planets/planet_<slug>.webp           256, the cut  */
+/*   Image Library/Planets/planet_<slug>.png            128, the wiki */
 /*                                                                    */
-/* The small one is what the map draws, cut by the wiki's own         */
-/* thumbnailer so this needs no image library of its own. Art is      */
-/* painted at the size it is displayed. npm run images copies the     */
-/* small ones into src/assets/planets like every other kind of art.   */
+/* The cut is what the map draws: 256 pixels, so a render stays sharp */
+/* drawn large in full screen, and as WebP about 18 KB, under half    */
+/* what the 128 pixel PNG weighs. Cut here from the original with     */
+/* sharp, which arrives with wrangler. Without the originals the      */
+/* wiki's own 128 pixel thumbnail is the fallback, which needs no     */
+/* image library at all. npm run images copies whichever is there     */
+/* into src/assets/planets, the cut first.                            */
 /*                                                                    */
 /* Polite on purpose: one file at a time, and a file already on disk  */
 /* is never fetched again. Nothing in the tool depends on any of it:  */
 /* a planet with no render is drawn the way it was before.            */
 /* ================================================================== */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -39,6 +45,11 @@ const AGENT = "dds (community loadout tool; dds.stigly-official.workers.dev)";
 const WIDTH = 128;
 const WRITE = process.argv.includes("--write");
 const FULL_TOO = process.argv.includes("--full");
+const CUT_ONLY = process.argv.includes("--cut");
+/* Art is painted at the size it is displayed: up to about 60 pixels on
+   the map in full screen and 80 in the hover card, doubled for a sharp
+   screen. */
+const CUT = 256;
 const ONLY = (() => {
   const i = process.argv.indexOf("--only");
   return i >= 0 ? Number(process.argv[i + 1]) : Infinity;
@@ -58,6 +69,46 @@ const wanted = planets
   .map((p) => ({ name: p.name, file: `File:${p.name} Planet Icon.png`, slug: slug(p.name) }));
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/* The map's copy of every original on disk, skipping any already cut
+   since its original last changed. No network. */
+async function cut() {
+  if (!existsSync(FULL)) {
+    console.log("  No originals here to cut. npm run planet-art -- --write --full fetches them.\n");
+    return;
+  }
+  let sharp;
+  try {
+    sharp = (await import("sharp")).default;
+  } catch {
+    console.log("  sharp is not installed, so nothing was cut. It arrives with wrangler: run npm install.\n");
+    return;
+  }
+  let made = 0;
+  let kept = 0;
+  let bytes = 0;
+  for (const name of readdirSync(FULL).filter((n) => /^planet_.+\.png$/i.test(n))) {
+    const from = join(FULL, name);
+    const to = join(SMALL, name.replace(/\.png$/i, ".webp"));
+    if (existsSync(to) && statSync(to).mtimeMs >= statSync(from).mtimeMs) {
+      kept += 1;
+      continue;
+    }
+    const buf = await sharp(from).resize(CUT, CUT, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .webp({ quality: 82, alphaQuality: 90, effort: 5 }).toBuffer();
+    writeFileSync(to, buf);
+    made += 1;
+    bytes += buf.length;
+  }
+  console.log(`  ${made} cut at ${CUT} pixels, ${(bytes / 1024 / 1024).toFixed(1)} MB, ${kept} already cut`);
+  console.log("  Run npm run images to bring them into the app.\n");
+}
+
+/* Cutting needs nothing from the wiki, so it asks it nothing. */
+if (CUT_ONLY && !WRITE) {
+  await cut();
+  process.exit(0);
+}
 
 async function info(batch) {
   const params = new URLSearchParams({
@@ -130,4 +181,5 @@ for (const f of found.slice(0, ONLY)) {
   await sleep(150);
 }
 console.log(`\n  ${fetched} fetched, ${skipped} already here, ${(bytes / 1024 / 1024).toFixed(1)} MB written`);
-console.log("  Run npm run images to bring the small ones into the app.\n");
+if (FULL_TOO || CUT_ONLY) await cut();
+else console.log("  Run npm run images to bring the small ones into the app.\n");

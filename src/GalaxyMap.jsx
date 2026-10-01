@@ -23,20 +23,27 @@
 /* Marks keep their size on screen at every zoom, so zooming in       */
 /* spreads the planets apart rather than inflating them, and a        */
 /* planet's name appears once there is room for it.                   */
+/*                                                                    */
+/* Full screen, the curator's ask of 1 October 2026, is the same map  */
+/* over the whole screen, tilted back like a table unless you flatten */
+/* it. The tilt is a CSS perspective, and lib/galaxy.js holds the     */
+/* same projection written out, so a click still lands on the planet  */
+/* drawn under it.                                                    */
 /* ================================================================== */
 
 import { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback, useId } from "react";
-import { Plus, Minus, ChevronLeft } from "lucide-react";
+import { createPortal } from "react-dom";
+import { Plus, Minus, ChevronLeft, Maximize2, Minimize2 } from "lucide-react";
 
 import {
   VIEW, CENTRE, RADIUS, MAX_ZOOM, HOME, placed, lanes, sectors, roomFor, placeOf, matchSet,
   clampView, zoomAt, toMap, placeLabels, labelSide,
   sectorHolders, frontArcs, arcPath, sectorMembers, sectorNear, sectorView, leavesSector, glide, towards, LEAVE_AT,
-  sectorZones, sectorOutlines, zoneAt,
+  sectorZones, sectorOutlines, zoneAt, stageFit, stageCover, stageTransform, onStage, offStage,
 } from "./lib/galaxy.js";
 import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 import { planetByName, biomeName, hazardName, loudHazards } from "./lib/scenario.js";
-import { untilText } from "./lib/war.js";
+import { untilText, agoText } from "./lib/war.js";
 import { planetArt } from "./lib/assets.js";
 
 const OSWALD = "'Oswald', sans-serif";
@@ -59,6 +66,10 @@ const WORLD_PX = 30;
 const FRONT_WORLD_PX = 36;
 /* How long a glide between the galaxy and a sector takes. */
 const GLIDE_MS = 480;
+/* Full screen draws every mark, name and render this much bigger, since
+   the map is twice the size, and keeps this many pixels clear round it. */
+const FULL_MARKS = 1.3;
+const FULL_MARGIN = 28;
 
 const LANE_PATH = lanes.map(({ a, b }) => `M${a.x.toFixed(1)} ${a.y.toFixed(1)}L${b.x.toFixed(1)} ${b.y.toFixed(1)}`).join("");
 
@@ -84,6 +95,21 @@ function useMapSkin() {
     writeSetting(SETTINGS.mapSkin, next);
   }, []);
   return [skin, choose];
+}
+
+/* Whether full screen lays the map back like a table. On unless turned
+   off, and remembered per browser. The map on the page stays flat: it is
+   small, and a tilt there costs room and legibility for nothing. */
+function useMapTilt() {
+  const [tilted, setTilted] = useState(true);
+  useEffect(() => {
+    setTilted(readSetting(SETTINGS.mapTilt, ["on", "off"], "on") === "on");
+  }, []);
+  const choose = useCallback((next) => {
+    setTilted(next);
+    writeSetting(SETTINGS.mapTilt, next ? "on" : "off");
+  }, []);
+  return [tilted, choose];
 }
 
 /* Everything that moves stops for somebody who asked their system for
@@ -136,16 +162,23 @@ export default function GalaxyMap({
      also fly the map to it. */
   const clicked = useRef(null);
 
-  /* Screen pixels per map unit at zoom 1. Measured rather than assumed,
-     because the map is 540 pixels wide on a desktop and 340 on a phone
-     and a name has to be readable on both. */
-  const [ppu, setPpu] = useState(0.54);
+  /* Full screen, and whether it is tilted. One map either way, so going
+     full screen keeps the sector you are in and where you are looking. */
+  const [expanded, setExpanded] = useState(false);
+  const [tilted, setTilted] = useMapTilt();
+
+  /* The box the map is drawn in: its square on the page, or the whole
+     screen. Measured rather than assumed, because the map is 540 pixels
+     wide on a desktop, 340 on a phone, and the screen in full screen, and
+     a name has to be readable on all of them. */
+  const stage = useRef(null);
+  const [box, setBox] = useState({ w: 0, h: 0 });
   useLayoutEffect(() => {
-    const el = svg.current;
+    const el = stage.current;
     if (!el) return undefined;
     const measure = () => {
-      const w = el.getBoundingClientRect().width;
-      if (w > 0) setPpu(w / VIEW);
+      const r = el.getBoundingClientRect();
+      setBox((b) => (b.w === r.width && b.h === r.height ? b : { w: r.width, h: r.height }));
     };
     measure();
     const ro = typeof ResizeObserver === "function" ? new ResizeObserver(measure) : null;
@@ -155,16 +188,34 @@ export default function GalaxyMap({
       if (ro) ro.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, []);
+  }, [expanded]);
 
-  /* A point on screen, in the view box's own units. The inverse of the
-     SVG's screen matrix, so letterboxing and page scroll cannot skew it. */
+  /* Where the map sits in that box and how it leans. */
+  const fit = useMemo(
+    () => stageFit(box.w, box.h, expanded ? { tilt: tilted, margin: FULL_MARGIN } : { fill: true }),
+    [box, expanded, tilted]);
+  const fitRef = useRef(fit);
+  fitRef.current = fit;
+
+  /* Screen pixels per map unit at zoom 1. Full screen draws every mark a
+     little bigger, and dividing it down here is all that takes. */
+  const ppu = fit.S > 0 ? fit.S / VIEW / (expanded ? FULL_MARKS : 1) : 0.54;
+
+  /* In full screen the drawing reaches past the map's own square to the
+     edges of the screen, in view box units on every side, so a sector
+     fills the screen instead of ending in a floating trapezoid. */
+  const pad = expanded ? stageCover(fit, box.w, box.h) : 0;
+  const padPx = (pad * fit.S) / VIEW;
+
+  /* A point on screen, in the view box's own units, through the same
+     projection that draws the map. The SVG's own screen matrix would do
+     on a flat map and is wrong on a tilted one, since it flattens a
+     perspective to a plain 2D matrix. */
   const toFrame = useCallback((clientX, clientY) => {
-    const el = svg.current;
-    const m = el && el.getScreenCTM();
-    if (!m) return { x: CENTRE, y: CENTRE };
-    const p = new DOMPoint(clientX, clientY).matrixTransform(m.inverse());
-    return { x: p.x, y: p.y };
+    const el = stage.current;
+    if (!el) return { x: CENTRE, y: CENTRE };
+    const r = el.getBoundingClientRect();
+    return offStage(fitRef.current, clientX - r.left, clientY - r.top);
   }, []);
 
   /* ---------------------------------------------------------------- */
@@ -257,18 +308,70 @@ export default function GalaxyMap({
 
   const focusK = focus ? sectorView(focus).k : 1;
 
-  /* Escape goes back to the galaxy, unless you are typing somewhere. */
+  /* Full screen: the browser's own where it allows it, and a layer over
+     the whole window either way, so it still works where the browser
+     says no. Leaving the browser's full screen, which Escape does there
+     whatever the page says, closes the layer with it. */
+  const viaBrowser = useRef(false);
+  const open = () => {
+    setHover(null);
+    setHoverSector(null);
+    setExpanded(true);
+    const root = document.documentElement;
+    if (root.requestFullscreen && !document.fullscreenElement) {
+      root.requestFullscreen().then(() => { viaBrowser.current = true; }).catch(() => {});
+    }
+  };
+  const close = useCallback(() => {
+    setHover(null);
+    setHoverSector(null);
+    setExpanded(false);
+    if (viaBrowser.current && document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+    viaBrowser.current = false;
+  }, []);
   useEffect(() => {
-    if (!focus) return undefined;
+    if (!expanded) return undefined;
+    const onChange = () => {
+      if (document.fullscreenElement || !viaBrowser.current) return;
+      viaBrowser.current = false;
+      setHover(null);
+      setHoverSector(null);
+      setExpanded(false);
+    };
+    document.addEventListener("fullscreenchange", onChange);
+    /* The page behind stays where it was while the map covers it. */
+    const html = document.documentElement;
+    const before = html.style.overflow;
+    html.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("fullscreenchange", onChange);
+      html.style.overflow = before;
+    };
+  }, [expanded]);
+  /* Drop Bay folds the map away once a planet is chosen, full screen or
+     not, so a map that goes away hands the screen back as it goes. */
+  useEffect(() => () => {
+    if (viaBrowser.current && document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+  }, []);
+
+  /* Escape goes back to the galaxy, and from the galaxy out of full
+     screen, unless you are typing somewhere. */
+  useEffect(() => {
+    if (!focus && !expanded) return undefined;
     const onKey = (e) => {
       if (e.key !== "Escape") return;
       const t = e.target;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
-      leave();
+      if (focusRef.current) leave();
+      else close();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [focus, leave]);
+  }, [focus, expanded, leave, close]);
 
   /* ---------------------------------------------------------------- */
   /* Dragging, pinching and the click                                  */
@@ -442,7 +545,8 @@ export default function GalaxyMap({
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-  }, [toFrame, enter, leave, easeTo]);
+    /* Going full screen draws a new SVG, which needs its own listener. */
+  }, [toFrame, enter, leave, easeTo, expanded]);
 
   const zoomBy = (factor) => {
     const from = target.current || viewRef.current;
@@ -503,7 +607,7 @@ export default function GalaxyMap({
     const judged = inSector && view.k < sectorView(focus).k * LEAVE_AT ? sectorView(focus) : view;
     const frameMap = { x0: -judged.x / judged.k, y0: -judged.y / judged.k, size: VIEW / judged.k };
     const inView = (p) => {
-      const m = frameMap.size * 0.35;
+      const m = frameMap.size * 0.35 + pad / judged.k;
       return p.x > frameMap.x0 - m && p.x < frameMap.x0 + frameMap.size + m &&
         p.y > frameMap.y0 - m && p.y < frameMap.y0 + frameMap.size + m;
     };
@@ -927,7 +1031,7 @@ export default function GalaxyMap({
       </>
     );
   }, [view.k, reach, ppu, chosen, matches, namesMatches, disabled, u, live, fronts, picks, fits, tactical, gid, focus,
-    hoverSector, holders, still]);
+    hoverSector, holders, still, pad]);
 
   /* The cards. In the galaxy the sector under the cursor, the way the game
      names a sector on hover; in a sector the planet under it. */
@@ -939,33 +1043,52 @@ export default function GalaxyMap({
     ? (hoverWar.defence ? hoverWar.defence.progress : hoverWar.liberation)
     : null;
   const art = detail ? planetArt(detail.name) : null;
-  const at = hovered
-    ? { left: ((hovered.x * view.k + view.x) / VIEW) * 100, top: ((hovered.y * view.k + view.y) / VIEW) * 100 }
-    : null;
+
+  /* A card sits beside the point it is about, through the tilt, kept clear
+     of the sides, and below the point when that is near the top. */
+  const edge = Math.min(150, box.w * 0.25);
+  const cardAt = (fx, fy) => {
+    const p = onStage(fit, fx, fy);
+    return { left: Math.min(Math.max(p.x, edge), Math.max(edge, box.w - edge)), top: p.y, below: p.y < box.h * 0.3 };
+  };
+  const at = hovered ? cardAt(hovered.x * view.k + view.x, hovered.y * view.k + view.y) : null;
 
   const sectorCard = !focus && hoverSector && hoverAt ? (() => {
     const h = holders.get(hoverSector);
     const f = h && h.front ? fronts[h.front] : null;
     const members = sectorMembers.get(hoverSector) || [];
-    const open = live
+    const openNow = live
       ? members.map((p) => ({ p, w: live.get(p.name) })).filter((x) => x.w && x.w.campaign)
         .sort((a, b) => b.w.players - a.w.players)
       : [];
-    return { f, members, open, left: (hoverAt.x / VIEW) * 100, top: (hoverAt.y / VIEW) * 100 };
+    return { f, members, openNow, ...cardAt(hoverAt.x, hoverAt.y) };
   })() : null;
 
   const focusHolder = focus ? holders.get(focus) : null;
   const focusFront = focusHolder && focusHolder.front ? fronts[focusHolder.front] : null;
+  const chosenPlace = chosen ? planetByName.get(chosen) : null;
 
-  return (
-    <div className="relative mx-auto aspect-square w-full max-w-[34rem] select-none">
-      <svg ref={svg} viewBox={`0 0 ${VIEW} ${VIEW}`} role="img"
+  /* Tailwind needs whole class names, so the corners are spelled out. */
+  const corner = expanded
+    ? { tl: "left-4 top-4", tr: "right-4 top-4", br: "bottom-4 right-4", bl: "bottom-4 left-4" }
+    : { tl: "left-2 top-2", tr: "right-2 top-2", br: "bottom-2 right-2", bl: "bottom-2 left-2" };
+
+  const map = (
+    <div ref={stage}
+      className={expanded ? "absolute inset-0" : "relative mx-auto aspect-square w-full max-w-[34rem] select-none"}>
+      <svg ref={svg} viewBox={`${-pad} ${-pad} ${VIEW + 2 * pad} ${VIEW + 2 * pad}`} role="img"
         aria-label={label || "The galaxy map. Click a sector to go in, then a planet to drop there, or search for it by name or sector."}
-        className={"block h-full w-full " + (focus ? (dragging ? "cursor-grabbing" : "cursor-grab") : "cursor-pointer")}
-        /* In the galaxy there is nothing to pan, so a finger sliding up the
-           map scrolls the page past it. In a sector the map takes every
-           gesture. Pinching and tapping are the map's either way. */
-        style={{ touchAction: focus ? "none" : "pan-y" }}
+        className={(fit.S > 0 ? "absolute block " : "block h-full w-full ") +
+          (focus ? (dragging ? "cursor-grabbing" : "cursor-grab") : "cursor-pointer")}
+        style={{
+          ...(fit.S > 0 ? { left: fit.left - padPx, top: fit.top - padPx, width: fit.S + 2 * padPx, height: fit.S + 2 * padPx } : {}),
+          transform: stageTransform(fit),
+          transformOrigin: "50% 50%",
+          /* In the galaxy on the page there is nothing to pan, so a finger
+             sliding up the map scrolls the page past it. In a sector, and in
+             full screen, the map takes every gesture. */
+          touchAction: focus || expanded ? "none" : "pan-y",
+        }}
         onPointerDown={onPointerDown} onPointerMove={onPointerMove}
         onPointerUp={(e) => release(e, false)} onPointerCancel={(e) => release(e, true)}
         onPointerLeave={() => {
@@ -989,14 +1112,15 @@ export default function GalaxyMap({
       {/* A planet, before you commit to it. Mouse only: on a touch screen
           there is no hover, and the tap is the choice. */}
       {detail && at ? (
-        <div className="pointer-events-none absolute z-10 flex w-max max-w-[17rem] gap-2.5 overflow-hidden rounded-md border border-base-700 bg-base-950/90 py-2 pl-3 pr-3 text-left shadow-xl backdrop-blur-sm"
+        <div className={"pointer-events-none absolute z-10 flex w-max gap-2.5 overflow-hidden rounded-md border border-base-700 bg-base-950/90 py-2 pl-3 pr-3 text-left shadow-xl backdrop-blur-sm " +
+          (expanded ? "max-w-[20rem]" : "max-w-[17rem]")}
           style={{
-            left: `${Math.min(Math.max(at.left, 22), 78)}%`,
-            top: `${at.top}%`,
-            transform: at.top < 30 ? "translate(-50%, 26px)" : "translate(-50%, calc(-100% - 26px))",
+            left: at.left,
+            top: at.top,
+            transform: at.below ? "translate(-50%, 26px)" : "translate(-50%, calc(-100% - 26px))",
             boxShadow: fight && fight.hex ? `inset 3px 0 0 ${fight.hex}, 0 10px 30px rgb(0 0 0 / 0.35)` : undefined,
           }}>
-          {art ? <img src={art} alt="" className="h-12 w-12 shrink-0 self-center" /> : null}
+          {art ? <img src={art} alt="" className={(expanded ? "h-20 w-20" : "h-12 w-12") + " shrink-0 self-center"} /> : null}
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-wider text-base-100" style={{ fontFamily: OSWALD }}>{detail.name}</p>
             <p className="text-[10px] text-base-500">
@@ -1030,9 +1154,9 @@ export default function GalaxyMap({
       {sectorCard ? (
         <div className="pointer-events-none absolute z-10 w-max max-w-[15rem] rounded-md border border-base-700 bg-base-950/90 px-3 py-2 text-left shadow-xl backdrop-blur-sm"
           style={{
-            left: `${Math.min(Math.max(sectorCard.left, 20), 80)}%`,
-            top: `${sectorCard.top}%`,
-            transform: sectorCard.top < 30 ? "translate(-50%, 22px)" : "translate(-50%, calc(-100% - 22px))",
+            left: sectorCard.left,
+            top: sectorCard.top,
+            transform: sectorCard.below ? "translate(-50%, 22px)" : "translate(-50%, calc(-100% - 22px))",
             boxShadow: sectorCard.f ? `inset 3px 0 0 ${sectorCard.f.hex}, 0 10px 30px rgb(0 0 0 / 0.35)` : undefined,
           }}>
           <p className="text-xs font-bold uppercase tracking-wider text-base-100" style={{ fontFamily: OSWALD }}>
@@ -1044,21 +1168,25 @@ export default function GalaxyMap({
               {sectorCard.f || live ? " · " : ""}{sectorCard.members.length} planet{sectorCard.members.length === 1 ? "" : "s"}
             </span>
           </p>
-          {sectorCard.open.length ? (
+          {sectorCard.openNow.length ? (
             <p className="mt-1 text-[10px] leading-snug text-base-300">
-              {sectorCard.open.slice(0, 4).map((x) => x.p.name).join(", ")}
-              {sectorCard.open.length > 4 ? ` and ${sectorCard.open.length - 4} more` : ""}
-              <span className="text-base-500"> {sectorCard.open.length === 1 ? "is" : "are"} open to drop on.</span>
+              {sectorCard.openNow.slice(0, 4).map((x) => x.p.name).join(", ")}
+              {sectorCard.openNow.length > 4 ? ` and ${sectorCard.openNow.length - 4} more` : ""}
+              <span className="text-base-500"> {sectorCard.openNow.length === 1 ? "is" : "are"} open to drop on.</span>
             </p>
           ) : null}
           <p className="mt-1 text-[10px] text-base-500">Click to go in</p>
         </div>
       ) : null}
 
-      {/* The look. The Tactical map for choosing, the chart for reading.
-          Same map, same clicks, remembered per browser. */}
-      <div className="absolute left-2 top-2 flex overflow-hidden rounded border border-base-700 bg-base-900/90 text-[10px]"
-        role="group" aria-label="How the map looks">
+      {/* The look, and in full screen the tilt. The Tactical map for
+          choosing, the chart for reading; same map, same clicks, both
+          remembered per browser. The Major Order sits under them in full
+          screen, where a wide screen has room beside the map for it. */}
+      <div className={"absolute flex flex-col items-start gap-3 " + corner.tl}>
+        <div className="flex gap-1.5">
+          <div className="flex overflow-hidden rounded border border-base-700 bg-base-900/90 text-[10px]"
+            role="group" aria-label="How the map looks">
         {[["tactical", "Tactical"], ["chart", "Chart"]].map(([id, name]) => (
           <button key={id} type="button" onClick={() => setSkin(id)} aria-pressed={skin === id}
             className={"px-2 py-1 uppercase tracking-wider transition-colors " +
@@ -1067,27 +1195,91 @@ export default function GalaxyMap({
             {name}
           </button>
         ))}
+          </div>
+          {expanded ? (
+            <button type="button" onClick={() => setTilted(!tilted)} aria-pressed={tilted}
+              title={tilted ? "Lay the map flat" : "Tilt the map back like a table"}
+              className={"rounded border px-2 py-1 text-[10px] uppercase tracking-wider transition-colors " +
+                (tilted ? "border-base-200 bg-base-200 text-base-900" : "border-base-700 bg-base-900/90 text-base-400 hover:text-base-100")}
+              style={{ fontFamily: OSWALD }}>
+              Tilt
+            </button>
+          ) : null}
+        </div>
+        {expanded && war && war.order ? (
+          <div className="hidden w-72 rounded bg-base-950/70 backdrop-blur-sm xl:block">
+            <MajorOrder order={war.order} fronts={fronts} />
+          </div>
+        ) : null}
       </div>
 
-      {/* Where you are, and the way back out. */}
-      {focus ? (
-        <button type="button" onClick={leave}
-          className="absolute right-2 top-2 flex items-center gap-1 rounded border border-base-700 bg-base-900/90 py-1 pl-1 pr-2 text-[10px] uppercase tracking-wider text-base-300 hover:border-base-500 hover:text-base-100"
-          style={{ fontFamily: OSWALD }} title="Back to the whole galaxy (Esc)">
-          <ChevronLeft className="h-3.5 w-3.5" />
-          <span className="text-base-500">Galaxy</span>
-          <span className="text-base-600">/</span>
-          <span style={focusFront ? { color: focusFront.hex } : undefined}>{focus}</span>
-        </button>
-      ) : null}
+      {/* Where you are, the way back out, and full screen. */}
+      <div className={"absolute flex items-center gap-1 " + corner.tr}>
+        {focus ? (
+          <button type="button" onClick={leave}
+            className="flex items-center gap-1 rounded border border-base-700 bg-base-900/90 py-1 pl-1 pr-2 text-[10px] uppercase tracking-wider text-base-300 hover:border-base-500 hover:text-base-100"
+            style={{ fontFamily: OSWALD }} title="Back to the whole galaxy (Esc)">
+            <ChevronLeft className="h-3.5 w-3.5" />
+            <span className="text-base-500">Galaxy</span>
+            <span className="text-base-600">/</span>
+            <span style={focusFront ? { color: focusFront.hex } : undefined}>{focus}</span>
+          </button>
+        ) : null}
+        <MapButton label={expanded ? "Leave full screen (Esc)" : "Full screen"} onClick={expanded ? close : open}>
+          {expanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+        </MapButton>
+      </div>
 
       {focus ? (
-        <div className="absolute bottom-2 right-2 flex flex-col gap-1">
+        <div className={"absolute flex flex-col gap-1 " + corner.br}>
           <MapButton label="Zoom in" onClick={() => zoomBy(1.5)} disabled={view.k >= MAX_ZOOM}><Plus className="h-3.5 w-3.5" /></MapButton>
           <MapButton label="Zoom out, and back to the galaxy past a point" onClick={() => zoomBy(1 / 1.5)}><Minus className="h-3.5 w-3.5" /></MapButton>
         </div>
       ) : null}
+
+      {/* Full screen hides the page, so what you have chosen and how fresh
+          the war is come with it. */}
+      {expanded ? (
+        <div className={"pointer-events-none absolute max-w-[20rem] text-left " + corner.bl}>
+          {chosenPlace ? (
+            <p className="text-xs">
+              <span className="text-base-500">Dropping on </span>
+              <span className="font-semibold uppercase tracking-wider text-base-100" style={{ fontFamily: OSWALD }}>{chosenPlace.name}</span>
+              {chosenPlace.sector ? <span className="text-base-500">, {chosenPlace.sector} sector</span> : null}
+            </p>
+          ) : (
+            <p className="text-xs text-base-500">Click a sector to go in, then a planet to drop there.</p>
+          )}
+          {war ? (
+            <p className="mt-0.5 text-[10px] text-base-600">
+              {war.fresh ? `The war is live, read ${agoText(war.age)}.` : `The war was last read ${agoText(war.age)}, too long ago to colour the map.`}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
     </div>
+  );
+
+  if (!expanded) return map;
+  return (
+    <>
+      {/* The map's place on the page, held while it is away. */}
+      <div className="relative mx-auto flex aspect-square w-full max-w-[34rem] flex-col items-center justify-center gap-2 rounded border border-dashed border-base-800 text-center">
+        <p className="text-xs text-base-500">The map is open full screen.</p>
+        <button type="button" onClick={close}
+          className="rounded border border-base-700 px-2.5 py-1 text-[11px] text-base-300 hover:border-base-500 hover:text-base-100">
+          Bring it back here
+        </button>
+      </div>
+      {createPortal(
+        <div className="fixed inset-0 z-[90] select-none overflow-hidden" role="dialog" aria-modal="true"
+          aria-label="The galaxy map, full screen"
+          style={{ background: "radial-gradient(ellipse at 50% 42%, rgb(var(--base-900)) 0%, rgb(var(--base-950)) 72%)" }}>
+          {map}
+        </div>,
+        document.body,
+      )}
+    </>
   );
 }
 

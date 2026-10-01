@@ -23,7 +23,9 @@
       "A new Tactical look for the map, now the default: sectors as blocks glowing in the colour of whoever holds them, the fronts pulsing, a radar sweep that lights each territory as it passes, and the game's own planet renders once you are inside a sector. The plain chart is still one click away.",
       "The planner's planet question works both ways: caves and megacities can each be avoided, ignored or asked for.",
       "The biome and hazards you could set by hand are gone; the map and the planner do that job now.",
-      "Building the tool now checks the result is whole, and a deploy refuses to upload one that is not, after a file sync app was caught renaming the freshly built scripts away."
+      "Building the tool now checks the result is whole, and a deploy refuses to upload one that is not, after a file sync app was caught renaming the freshly built scripts away.",
+      "The map has a full screen, from the button in its corner, tilted back like a table with a switch to lay it flat. It keeps the sector you were in, and shows the Major Order and where you are dropping beside it.",
+      "Planets on the map are sharper: each render is now cut from the wiki's full size original, twice the resolution of before at under half the download."
     ]
   },
   {

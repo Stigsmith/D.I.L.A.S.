@@ -280,3 +280,48 @@ for (let i = 0; i < 60; i++) easing = galaxy.towards(easing, to, 0.2);
 ok(Math.abs(easing.k - to.k) < 1e-3 && Math.abs(easing.x - to.x) < 0.5, "the wheel's easing settles exactly where the wheel was taking it");
 ok(galaxy.zoneAt(creek.x, creek.y) === onCreek && galaxy.zoneAt(CENTRE, CENTRE) === null,
   "a click inside a sector's blocks is a click on that sector, and Sol in the middle is nobody's");
+
+console.log("\nFull screen and the tilt");
+const stages = [[1600, 900], [1280, 720], [900, 1400], [390, 800]];
+let roundTrip = 0;
+let inside = true;
+let leansBack = true;
+for (const [w, h] of stages) {
+  const fit = galaxy.stageFit(w, h, { tilt: true, margin: 28 });
+  for (const p of [...galaxy.placed.slice(0, 60), { x: CENTRE, y: 30 }, { x: CENTRE, y: VIEW - 30 }, { x: 30, y: CENTRE }]) {
+    const s = galaxy.onStage(fit, p.x, p.y);
+    const back = galaxy.offStage(fit, s.x, s.y);
+    roundTrip = Math.max(roundTrip, Math.hypot(back.x - p.x, back.y - p.y));
+  }
+  for (let i = 0; i < 72; i++) {
+    const t = (i / 72) * 2 * Math.PI;
+    const s = galaxy.onStage(fit, CENTRE + RADIUS * Math.cos(t), CENTRE + RADIUS * Math.sin(t));
+    if (s.x < 27 || s.x > w - 27 || s.y < 27 || s.y > h - 27) inside = false;
+  }
+  /* The same span of map is narrower at the far edge than the near one. */
+  const far = galaxy.onStage(fit, CENTRE + 200, 150).x - galaxy.onStage(fit, CENTRE - 200, 150).x;
+  const nearSpan = galaxy.onStage(fit, CENTRE + 200, 850).x - galaxy.onStage(fit, CENTRE - 200, 850).x;
+  if (!(far < nearSpan)) leansBack = false;
+}
+ok(roundTrip < 1e-6, `a click converts back to exactly the point drawn under it, through the tilt (worst ${roundTrip.toExponential(1)})`);
+ok(inside, "the tilted disc fits inside the screen with its margin, on wide, tall and phone screens");
+ok(leansBack, "the tilt lays the map back: the far edge is narrower than the near one");
+const flatFit = galaxy.stageFit(540, 540, { fill: true });
+const flatPt = galaxy.offStage(flatFit, 135, 405);
+ok(galaxy.stageTransform(flatFit) === undefined && near(flatFit.S, 540) && near(flatPt.x, 250) && near(flatPt.y, 750),
+  "the map on the page is untouched: flat, filling its square, a click read exactly as before");
+const wideFlat = galaxy.stageFit(1600, 900, { margin: 28 });
+const wideTilt = galaxy.stageFit(1600, 900, { tilt: true, margin: 28 });
+ok(wideTilt.S > wideFlat.S, "on a wide screen the tilted map is drawn bigger than the flat one, since leaning back shortens it");
+let covers = true;
+for (const [w, h] of stages) {
+  const fit = galaxy.stageFit(w, h, { tilt: true, margin: 28 });
+  const pad = galaxy.stageCover(fit, w, h);
+  for (let i = 0; i <= 10; i++) {
+    for (const [x, y] of [[(w * i) / 10, 0], [(w * i) / 10, h], [0, (h * i) / 10], [w, (h * i) / 10]]) {
+      const p = galaxy.offStage(fit, x, y);
+      if (p.x < -pad || p.x > VIEW + pad || p.y < -pad || p.y > VIEW + pad) covers = false;
+    }
+  }
+}
+ok(covers, "in full screen the drawing reaches every edge of the screen, so a sector fills it rather than floating in the middle");
