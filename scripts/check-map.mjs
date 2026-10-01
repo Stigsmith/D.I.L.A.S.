@@ -325,3 +325,9 @@ for (const [w, h] of stages) {
   }
 }
 ok(covers, "in full screen the drawing reaches every edge of the screen, so a sector fills it rather than floating in the middle");
+{
+  const fit = galaxy.stageFit(1600, 900, { tilt: true, margin: 28 });
+  const flat = galaxy.stageFit(1600, 900, { margin: 28 });
+  ok(galaxy.stageDepth(flat, 500, 100) === 1 && galaxy.stageDepth(fit, 500, 100) < 1 && galaxy.stageDepth(fit, 500, 900) > 1 && Math.abs(galaxy.stageDepth(fit, 500, 500) - 1) < 1e-9,
+    "planets stand upright on the tilt: smaller toward the back, larger toward the front, true size in the middle and on a flat map");
+}

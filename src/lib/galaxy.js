@@ -752,10 +752,13 @@ export function towards(from, to, share) {
 /* which is what transform: perspective(d) rotateX(a) draws.          */
 /* ------------------------------------------------------------------ */
 
-/* Slight, as asked: enough to read as a table, not so much that the far
-   names are hard to read. The eye sits at DEPTH times the map's width. */
-export const TILT = (22 * Math.PI) / 180;
-export const DEPTH = 2.2;
+/* As steep as the game's own table, the curator's correction of 2
+   October 2026: 22 degrees read as barely tilted once he saw it beside
+   the game. Steepness costs nothing now that planets and names stand
+   upright on the ground rather than lying in it. The eye sits at DEPTH
+   times the map's width, close enough for the far side to recede. */
+export const TILT = (40 * Math.PI) / 180;
+export const DEPTH = 1.8;
 
 /* The disc and its rim, as a share of the view box from the centre. */
 const RIM = Math.min(0.5, (RADIUS + 30) / VIEW);
@@ -828,4 +831,14 @@ export function stageCover(fit, w, h) {
     over = Math.max(over, -p.x, p.x - VIEW, -p.y, p.y - VIEW);
   }
   return Math.ceil(Math.max(0, over) + 12);
+}
+
+/* How much bigger the tilt draws a point than the flat map would: under 1
+   toward the back, over 1 toward the front. What a planet standing upright
+   on the tilted ground is scaled by, so it keeps its depth without being
+   squashed into the plane. Exactly 1 on a flat map. */
+export function stageDepth(fit, fx, fy) {
+  if (!fit.a || !(fit.S > 0)) return 1;
+  const v = (fy / VIEW) * fit.S - fit.S / 2;
+  return 1 / (1 - (v * Math.sin(fit.a)) / fit.d);
 }

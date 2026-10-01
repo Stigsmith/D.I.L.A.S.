@@ -39,7 +39,7 @@ import {
   VIEW, CENTRE, RADIUS, MAX_ZOOM, HOME, placed, lanes, sectors, roomFor, placeOf, matchSet,
   clampView, zoomAt, toMap, placeLabels, labelSide,
   sectorHolders, frontArcs, arcPath, sectorMembers, sectorNear, sectorView, leavesSector, glide, towards, LEAVE_AT,
-  sectorZones, sectorOutlines, zoneAt, stageFit, stageCover, stageTransform, onStage, offStage,
+  sectorZones, sectorOutlines, zoneAt, stageFit, stageCover, stageTransform, onStage, offStage, stageDepth,
 } from "./lib/galaxy.js";
 import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 import { planetByName, biomeName, hazardName, loudHazards } from "./lib/scenario.js";
@@ -141,6 +141,9 @@ export default function GalaxyMap({
   chosen, onChoose, query = "", disabled = false, label, war = null, fronts = {}, picks = [], fits = null,
 }) {
   const svg = useRef(null);
+  /* What takes the gestures: the map and, when tilted, the upright
+     planets over it. */
+  const surface = useRef(null);
   const [skin, setSkin] = useMapSkin();
   const tactical = skin === "tactical";
   const still = useStill();
@@ -400,7 +403,7 @@ export default function GalaxyMap({
   const onPointerDown = (e) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
     stop();
-    const el = svg.current;
+    const el = surface.current;
     if (el && el.setPointerCapture) el.setPointerCapture(e.pointerId);
     const frame = toFrame(e.clientX, e.clientY);
     pointers.current.set(e.pointerId, { ...frame, cx: e.clientX, cy: e.clientY });
@@ -512,7 +515,7 @@ export default function GalaxyMap({
      the cursor and scrolling out is the page's. In a sector it zooms
      around the cursor, and zooming out far enough goes back out. */
   useEffect(() => {
-    const el = svg.current;
+    const el = surface.current;
     if (!el) return undefined;
     const onWheel = (e) => {
       if (performance.now() < quietUntil.current) {
@@ -597,7 +600,10 @@ export default function GalaxyMap({
   /* Redrawn when the zoom, the choice, the search or the war changes, and
      inside a sector when a pan moves the view a step. A pan otherwise only
      moves the group this sits in. */
-  const layer = useMemo(() => {
+  /* Who is named, and what every planet is doing, once per redraw. The
+     ground and the planets are drawn from this separately, because on a
+     tilted map they are drawn in two different places. */
+  const plan = useMemo(() => {
     const inSector = Boolean(focus);
     const worlds = tactical && inSector;
     /* Mid glide the view is still far out, and judged by it every planet
@@ -613,7 +619,6 @@ export default function GalaxyMap({
     };
     const scale = ppu * view.k;
     const hexOf = (w) => (w && w.front && fronts[w.front] ? fronts[w.front].hex : null);
-    const halo = { paintOrder: "stroke", strokeLinejoin: "round" };
     const pickAt = new Map(matches ? [] : picks.map((name, i) => [name, i]));
     const showSectors = !tactical && !inSector && scale < SECTOR_UNTIL;
 
@@ -648,6 +653,30 @@ export default function GalaxyMap({
       }
     }
     const named = placeLabels(wanted, scale);
+
+    const rows = placed.map((p) => {
+      const on = p.name === chosen;
+      const found = matches ? matches.has(p.name) : false;
+      const unfit = !matches && fits && !fits.has(p.name) && !on && !p.home;
+      const dim = (matches && !found && !on) || unfit;
+      const w = live ? live.get(p.name) : null;
+      const hex = hexOf(w);
+      const front = Boolean(w && w.campaign);
+      return {
+        p, on, found, unfit, dim, w, hex, front,
+        pulse: front && hex && !still ? (w.defence ? "1.5s" : "2.6s") : null,
+        world: worlds && inView(p),
+        /* Names read the war only when no search is running. */
+        nameLit: matches ? found : pickAt.has(p.name),
+        nameWar: !matches && live ? live.get(p.name) : null,
+      };
+    });
+    return { inSector, worlds, showSectors, named, pickAt, rows, hexOf };
+  }, [view.k, reach, ppu, chosen, matches, namesMatches, live, fronts, picks, fits, tactical, focus, pad, still]);
+
+  const layer = useMemo(() => {
+    const { inSector, showSectors, named } = plan;
+    const halo = { paintOrder: "stroke", strokeLinejoin: "round" };
 
     /* Sectors as blocks, the game's way, and the curator's description of
        it, 30 September 2026: one big block per sector with only its outer
@@ -816,132 +845,6 @@ export default function GalaxyMap({
             );
           })}
 
-          {placed.map((p) => {
-            const on = p.name === chosen;
-            const found = matches ? matches.has(p.name) : false;
-            const unfit = !matches && fits && !fits.has(p.name) && !on && !p.home;
-            const dim = (matches && !found && !on) || unfit;
-            const w = live ? live.get(p.name) : null;
-            const hex = hexOf(w);
-            const front = Boolean(w && w.campaign);
-            const pulse = front && hex && !still ? (w.defence ? "1.5s" : "2.6s") : null;
-
-            if (worlds && inView(p)) {
-              /* In a sector: the planet itself, as the game renders it. */
-              const size = (front ? FRONT_WORLD_PX : WORLD_PX) * u;
-              const art = planetArt(p.name);
-              return (
-                <g key={p.name} opacity={matches && dim ? 0.3 : unfit ? 0.45 : 1}>
-                  {p.home ? <circle cx={p.x} cy={p.y} r={size * 1.1} fill={`url(#${gid}-home)`} /> : null}
-                  {hex ? (
-                    <circle cx={p.x} cy={p.y} r={size * 0.62} fill="none" stroke={hex} strokeOpacity={0.55} strokeWidth={1.2 * u} />
-                  ) : null}
-                  {front && hex ? (
-                    <g>
-                      <circle cx={p.x} cy={p.y} r={size * 0.78} fill="none" stroke={hex} strokeOpacity={0.85} strokeWidth={1.3 * u}
-                        strokeDasharray={`${5 * u} ${4 * u}`} />
-                      {still ? null : (
-                        <animateTransform attributeName="transform" type="rotate"
-                          from={`0 ${p.x} ${p.y}`} to={`360 ${p.x} ${p.y}`} dur="14s" repeatCount="indefinite" />
-                      )}
-                    </g>
-                  ) : null}
-                  {pulse ? (
-                    <circle cx={p.x} cy={p.y} r={size * 0.5} fill="none" stroke={hex} strokeWidth={1.2 * u}>
-                      <animate attributeName="r" values={`${size * 0.5};${size * 1.25}`} dur={pulse} repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.7;0" dur={pulse} repeatCount="indefinite" />
-                    </circle>
-                  ) : null}
-                  {art ? (
-                    <image href={art} x={p.x - size / 2} y={p.y - size / 2} width={size} height={size}
-                      opacity={hex || p.home ? 1 : 0.8} />
-                  ) : (
-                    <circle cx={p.x} cy={p.y} r={size * 0.3} fill={hex || undefined} className={hex ? "" : "fill-base-400"} />
-                  )}
-                  {on ? (
-                    <circle cx={p.x} cy={p.y} r={size * 0.88} className="fill-none stroke-brand" strokeWidth={1.8 * u} />
-                  ) : null}
-                  <circle cx={p.x} cy={p.y} r={Math.max(HIT * u, size * 0.55)} fill="transparent" data-planet={p.name}
-                    className={disabled ? "" : "cursor-pointer"} />
-                </g>
-              );
-            }
-
-            /* In the galaxy: a point of light. */
-            if (p.home) {
-              return (
-                <g key={p.name}>
-                  <circle cx={p.x} cy={p.y} r={16 * u} fill={`url(#${gid}-home)`} />
-                  <circle cx={p.x} cy={p.y} r={3.6 * u} className="fill-base-50" />
-                  <circle cx={p.x} cy={p.y} r={HIT * u} fill="transparent" data-planet={p.name} />
-                </g>
-              );
-            }
-            const r = (front ? 3 : hex ? 2.3 : 1.7) * u;
-            return (
-              <g key={p.name} opacity={matches && dim ? 0.3 : unfit ? 0.4 : 1}>
-                {pulse ? (
-                  <circle cx={p.x} cy={p.y} r={r} fill="none" stroke={hex} strokeWidth={1.2 * u}>
-                    <animate attributeName="r" values={`${3 * u};${13 * u}`} dur={pulse} repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.75;0" dur={pulse} repeatCount="indefinite" />
-                  </circle>
-                ) : null}
-                {on ? <circle cx={p.x} cy={p.y} r={r + 5 * u} className="fill-none stroke-brand" strokeWidth={1.6 * u} /> : null}
-                <circle cx={p.x} cy={p.y} r={r}
-                  className={front ? "fill-base-50" : hex ? "" : found ? "fill-brand" : "fill-base-500"}
-                  fill={!front && hex ? hex : undefined}
-                  stroke={front ? hex : undefined} strokeWidth={front ? 1.4 * u : undefined}
-                  opacity={front || hex || found ? 1 : 0.75} />
-                <circle cx={p.x} cy={p.y} r={HIT * u} fill="transparent" data-planet={p.name}
-                  className={disabled ? "" : "cursor-pointer"} />
-              </g>
-            );
-          })}
-
-          <Picks picks={matches ? [] : picks} u={u} ring={worlds ? FRONT_WORLD_PX * 0.62 : DOT * 1.5 + 8} />
-
-          {placed.map((p) => {
-            if (!named.has(p.name)) return null;
-            const on = p.name === chosen;
-            const pick = !matches && picks.includes(p.name);
-            const found = matches ? matches.has(p.name) : pick;
-            const w = !matches && live ? live.get(p.name) : null;
-            const hex = hexOf(w);
-            const front = Boolean(w && w.campaign);
-            if (worlds && inView(p)) {
-              const gap = (front ? FRONT_WORLD_PX : WORLD_PX) / 2 + 3;
-              const done = w ? (w.defence ? w.defence.progress : w.liberation) : null;
-              const barW = 32 * u;
-              const barY = p.y + (gap + 15) * u;
-              return (
-                <g key={p.name} className="pointer-events-none">
-                  <text x={p.x} y={p.y + gap * u} textAnchor="middle" dominantBaseline="hanging"
-                    className={"stroke-base-950 " + (on || found ? "fill-brand" : hex ? "" : "fill-base-200")}
-                    fill={on || found || !hex ? undefined : hex} strokeWidth={3 * u}
-                    style={{ ...halo, fontFamily: OSWALD, fontSize: 10.5 * u, letterSpacing: 0.9 * u, textTransform: "uppercase" }}>
-                    {p.name}
-                  </text>
-                  {front && done !== null ? (
-                    <g>
-                      <rect x={p.x - barW / 2} y={barY} width={barW} height={2.5 * u} rx={1.2 * u} fill={hex || "#94a3b8"} opacity={0.35} />
-                      <rect x={p.x - barW / 2} y={barY} width={barW * done} height={2.5 * u} rx={1.2 * u} fill="#60a5fa" />
-                    </g>
-                  ) : null}
-                </g>
-              );
-            }
-            const gap = pick ? DOT * 1.5 + 12 : (front ? DOT * 1.5 : DOT) + 5;
-            return (
-              <text key={p.name} dominantBaseline="middle" y={p.y}
-                x={labelSide(p) === "left" ? p.x - gap * u : p.x + gap * u}
-                textAnchor={labelSide(p) === "left" ? "end" : "start"}
-                className={"pointer-events-none stroke-base-950 " + (on || found ? "fill-brand" : "fill-base-100")}
-                strokeWidth={3 * u}
-                style={{ ...halo, fontFamily: OSWALD, fontSize: NAME_PX * u, letterSpacing: 0.3 * u }}>
-                {p.name}
-              </text>
-            );
-          })}
         </>
       );
     }
@@ -969,69 +872,219 @@ export default function GalaxyMap({
             ))
           : null}
 
-        {placed.map((p) => {
-          const on = p.name === chosen;
-          const found = matches ? matches.has(p.name) : false;
-          /* The planner's fits stay lit and everything else steps back, the
-             way a search does, though less far: the rest of the war is still
-             worth seeing. */
-          const unfit = !matches && fits && !fits.has(p.name) && !on && !p.home;
-          const dim = (matches && !found && !on) || unfit;
-          /* With the war live: a planet somebody holds takes their colour, a
-             front you can drop on is larger and ringed, and a quiet planet
-             Super Earth holds steps back so the war reads first. */
-          const w = live ? live.get(p.name) : null;
-          const hex = hexOf(w);
-          const front = Boolean(w && w.campaign);
-          const r = (p.home ? HOME_DOT : front ? DOT * 1.5 : DOT) * u;
-          const painted = hex && !on && !found;
-          const fill = on || found ? "fill-brand"
-            : p.home ? "fill-base-100"
-            : painted ? ""
-            : dim ? "fill-base-700"
-            : live ? "fill-base-600"
-            : "fill-base-400";
-          return (
-            <g key={p.name} opacity={matches && dim ? 0.3 : unfit ? 0.4 : 1}>
-              {on ? (
-                <circle cx={p.x} cy={p.y} r={r + 5 * u} className="fill-none stroke-brand" strokeWidth={1.6 * u} />
-              ) : front && hex ? (
-                <circle cx={p.x} cy={p.y} r={r + 3.5 * u} fill="none" stroke={hex} strokeWidth={1.3 * u} />
-              ) : null}
-              <circle cx={p.x} cy={p.y} r={r} className={fill}
-                style={painted ? { fill: hex, fillOpacity: front ? 1 : 0.55 } : undefined} />
-              <circle cx={p.x} cy={p.y} r={HIT * u} fill="transparent" data-planet={p.name}
-                className={disabled ? "" : "cursor-pointer"} />
-            </g>
-          );
-        })}
-
-        <Picks picks={matches ? [] : picks} u={u} ring={DOT * 1.5 + 8} />
-
-        {placed.map((p) => {
-          if (!named.has(p.name)) return null;
-          const on = p.name === chosen;
-          const pick = !matches && picks.includes(p.name);
-          const found = matches ? matches.has(p.name) : pick;
-          const front = Boolean(!matches && live && live.get(p.name) && live.get(p.name).campaign);
-          /* Clear of the pick's ring when it has one. */
-          const gap = pick ? DOT * 1.5 + 12 : (front ? DOT * 1.5 : DOT) + 5;
-          return (
-            <text key={p.name} dominantBaseline="middle" y={p.y}
-              x={labelSide(p) === "left" ? p.x - gap * u : p.x + gap * u}
-              textAnchor={labelSide(p) === "left" ? "end" : "start"}
-              className={"pointer-events-none stroke-base-950 " +
-                (on || found ? "fill-brand" : front ? "fill-base-100" : "fill-base-300")}
-              strokeWidth={3 * u}
-              style={{ ...halo, fontFamily: OSWALD, fontSize: NAME_PX * u, letterSpacing: 0.3 * u }}>
-              {p.name}
-            </text>
-          );
-        })}
       </>
     );
-  }, [view.k, reach, ppu, chosen, matches, namesMatches, disabled, u, live, fronts, picks, fits, tactical, gid, focus,
-    hoverSector, holders, still, pad]);
+  }, [plan, u, live, fronts, tactical, gid, focus, hoverSector, holders, still, matches]);
+
+  /* ---------------------------------------------------------------- */
+  /* The planets, drawn round their own centre                         */
+  /*                                                                   */
+  /* In units of `uu` screen pixels, round the origin, so the same      */
+  /* drawing goes on the map (translated to the planet, uu being map    */
+  /* units per pixel) or upright over a tilted map (translated to where */
+  /* the tilt puts the planet, uu being 1). The curator's point, 1      */
+  /* October 2026: tilted with the ground, the renders squashed into    */
+  /* ovals and the names leaned like italics. A planet stands on the    */
+  /* table; it is not painted on it.                                    */
+  /* ---------------------------------------------------------------- */
+
+  const halo = { paintOrder: "stroke", strokeLinejoin: "round" };
+  const hit = (name, r) => (
+    <circle r={r} fill="transparent" data-planet={name} className={"pointer-events-auto " + (disabled ? "" : "cursor-pointer")} />
+  );
+
+  const drawMark = (row, uu) => {
+    const { p, on, found, unfit, dim, hex, front, pulse } = row;
+    const hovering = focus && hover === p.name && !on;
+    const hoverRing = hovering ? (
+      <circle r={(tactical ? FRONT_WORLD_PX * 0.6 : DOT + 4) * uu} className="pointer-events-none fill-none stroke-base-100" strokeWidth={1.2 * uu} />
+    ) : null;
+
+    if (!tactical) {
+      /* The chart: a planet somebody holds takes their colour, a front you
+         can drop on is larger and ringed, and a quiet planet Super Earth
+         holds steps back so the war reads first. */
+      const r = (p.home ? HOME_DOT : front ? DOT * 1.5 : DOT) * uu;
+      const painted = hex && !on && !found;
+      const fill = on || found ? "fill-brand"
+        : p.home ? "fill-base-100"
+        : painted ? ""
+        : dim ? "fill-base-700"
+        : live ? "fill-base-600"
+        : "fill-base-400";
+      return (
+        <g opacity={matches && dim ? 0.3 : unfit ? 0.4 : 1}>
+          {on ? (
+            <circle r={r + 5 * uu} className="fill-none stroke-brand" strokeWidth={1.6 * uu} />
+          ) : front && hex ? (
+            <circle r={r + 3.5 * uu} fill="none" stroke={hex} strokeWidth={1.3 * uu} />
+          ) : null}
+          <circle r={r} className={fill} style={painted ? { fill: hex, fillOpacity: front ? 1 : 0.55 } : undefined} />
+          {hoverRing}
+          {hit(p.name, HIT * uu)}
+        </g>
+      );
+    }
+
+    if (row.world) {
+      /* In a sector: the planet itself, as the game renders it. */
+      const size = (front ? FRONT_WORLD_PX : WORLD_PX) * uu;
+      const art = planetArt(p.name);
+      return (
+        <g opacity={matches && dim ? 0.3 : unfit ? 0.45 : 1}>
+          {p.home ? <circle r={size * 1.1} fill={`url(#${gid}-home)`} /> : null}
+          {hex ? <circle r={size * 0.62} fill="none" stroke={hex} strokeOpacity={0.55} strokeWidth={1.2 * uu} /> : null}
+          {front && hex ? (
+            <g>
+              <circle r={size * 0.78} fill="none" stroke={hex} strokeOpacity={0.85} strokeWidth={1.3 * uu}
+                strokeDasharray={`${5 * uu} ${4 * uu}`} />
+              {still ? null : (
+                <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="14s" repeatCount="indefinite" />
+              )}
+            </g>
+          ) : null}
+          {pulse ? (
+            <circle r={size * 0.5} fill="none" stroke={hex} strokeWidth={1.2 * uu}>
+              <animate attributeName="r" values={`${size * 0.5};${size * 1.25}`} dur={pulse} repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.7;0" dur={pulse} repeatCount="indefinite" />
+            </circle>
+          ) : null}
+          {art ? (
+            <image href={art} x={-size / 2} y={-size / 2} width={size} height={size} opacity={hex || p.home ? 1 : 0.8} />
+          ) : (
+            <circle r={size * 0.3} fill={hex || undefined} className={hex ? "" : "fill-base-400"} />
+          )}
+          {on ? <circle r={size * 0.88} className="fill-none stroke-brand" strokeWidth={1.8 * uu} /> : null}
+          {hoverRing}
+          {hit(p.name, Math.max(HIT * uu, size * 0.55))}
+        </g>
+      );
+    }
+
+    /* In the galaxy: a point of light. */
+    if (p.home) {
+      return (
+        <g>
+          <circle r={16 * uu} fill={`url(#${gid}-home)`} />
+          <circle r={3.6 * uu} className="fill-base-50" />
+          {hit(p.name, HIT * uu)}
+        </g>
+      );
+    }
+    const r = (front ? 3 : hex ? 2.3 : 1.7) * uu;
+    return (
+      <g opacity={matches && dim ? 0.3 : unfit ? 0.4 : 1}>
+        {pulse ? (
+          <circle r={r} fill="none" stroke={hex} strokeWidth={1.2 * uu}>
+            <animate attributeName="r" values={`${3 * uu};${13 * uu}`} dur={pulse} repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.75;0" dur={pulse} repeatCount="indefinite" />
+          </circle>
+        ) : null}
+        {on ? <circle r={r + 5 * uu} className="fill-none stroke-brand" strokeWidth={1.6 * uu} /> : null}
+        <circle r={r}
+          className={front ? "fill-base-50" : hex ? "" : found ? "fill-brand" : "fill-base-500"}
+          fill={!front && hex ? hex : undefined}
+          stroke={front ? hex : undefined} strokeWidth={front ? 1.4 * uu : undefined}
+          opacity={front || hex || found ? 1 : 0.75} />
+        {hoverRing}
+        {hit(p.name, HIT * uu)}
+      </g>
+    );
+  };
+
+  /* The planner's picks, numbered in its order: a ring in the brand colour
+     and the number beside it, drawn over the planets so a pick is never
+     hidden under a neighbour. */
+  const drawPick = (i, uu) => {
+    const ring = (plan.worlds ? FRONT_WORLD_PX * 0.62 : DOT * 1.5 + 8) * uu;
+    const off = ring * 0.72;
+    return (
+      <g className="pointer-events-none">
+        <circle r={ring} className="fill-none stroke-brand" strokeWidth={1.8 * uu} strokeDasharray={`${4 * uu} ${2.5 * uu}`} />
+        <circle cx={-off} cy={-off} r={6.5 * uu} className="fill-brand" />
+        <text x={-off} y={-off} textAnchor="middle" dominantBaseline="central"
+          className="fill-brand-ink" style={{ fontFamily: OSWALD, fontSize: 9 * uu, fontWeight: 700 }}>
+          {i + 1}
+        </text>
+      </g>
+    );
+  };
+
+  const drawName = (row, uu) => {
+    const { p, on, nameLit, nameWar } = row;
+    const hex = plan.hexOf(nameWar);
+    const front = Boolean(nameWar && nameWar.campaign);
+    const pick = plan.pickAt.has(p.name);
+    if (tactical && row.world) {
+      const gap = (front ? FRONT_WORLD_PX : WORLD_PX) / 2 + 3;
+      const done = nameWar ? (nameWar.defence ? nameWar.defence.progress : nameWar.liberation) : null;
+      const barW = 32 * uu;
+      const barY = (gap + 15) * uu;
+      return (
+        <g className="pointer-events-none">
+          <text y={gap * uu} textAnchor="middle" dominantBaseline="hanging"
+            className={"stroke-base-950 " + (on || nameLit ? "fill-brand" : hex ? "" : "fill-base-200")}
+            fill={on || nameLit || !hex ? undefined : hex} strokeWidth={3 * uu}
+            style={{ ...halo, fontFamily: OSWALD, fontSize: 10.5 * uu, letterSpacing: 0.9 * uu, textTransform: "uppercase" }}>
+            {p.name}
+          </text>
+          {front && done !== null ? (
+            <g>
+              <rect x={-barW / 2} y={barY} width={barW} height={2.5 * uu} rx={1.2 * uu} fill={hex || "#94a3b8"} opacity={0.35} />
+              <rect x={-barW / 2} y={barY} width={barW * done} height={2.5 * uu} rx={1.2 * uu} fill="#60a5fa" />
+            </g>
+          ) : null}
+        </g>
+      );
+    }
+    /* Clear of the pick's ring when it has one. */
+    const gap = pick ? DOT * 1.5 + 12 : (front ? DOT * 1.5 : DOT) + 5;
+    const left = labelSide(p) === "left";
+    return (
+      <text x={left ? -gap * uu : gap * uu} dominantBaseline="middle" textAnchor={left ? "end" : "start"}
+        className={"pointer-events-none stroke-base-950 " + (on || nameLit ? "fill-brand"
+          : tactical ? "fill-base-100" : front ? "fill-base-100" : "fill-base-300")}
+        strokeWidth={3 * uu}
+        style={{ ...halo, fontFamily: OSWALD, fontSize: NAME_PX * uu, letterSpacing: 0.3 * uu }}>
+        {p.name}
+      </text>
+    );
+  };
+
+  /* Marks, then picks over them, then names over everything. `place`
+     says where a planet goes, as an SVG transform, or null to skip it. */
+  const drawPlanets = (place, uu) => {
+    const marks = [];
+    const pickEls = [];
+    const names = [];
+    for (const row of plan.rows) {
+      const t = place(row.p);
+      if (!t) continue;
+      marks.push(<g key={row.p.name} transform={t}>{drawMark(row, uu)}</g>);
+      const pi = plan.pickAt.get(row.p.name);
+      if (pi !== undefined) pickEls.push(<g key={"pick-" + row.p.name} transform={t}>{drawPick(pi, uu)}</g>);
+      if (plan.named.has(row.p.name)) names.push(<g key={"name-" + row.p.name} transform={t}>{drawName(row, uu)}</g>);
+    }
+    return <>{marks}{pickEls}{names}</>;
+  };
+
+  /* Upright over the tilt in full screen, on the map otherwise. */
+  const upright = expanded && fit.a > 0;
+  const flatPlanets = useMemo(
+    () => (upright ? null : drawPlanets((q) => `translate(${q.x} ${q.y})`, u)),
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+    [upright, plan, u, hover, focus, gid, still, disabled, tactical, matches, live]
+  );
+  const uprightPlanets = upright
+    ? drawPlanets((q) => {
+        const fx = q.x * view.k + view.x;
+        const fy = q.y * view.k + view.y;
+        const at = onStage(fit, fx, fy);
+        if (at.x < -90 || at.y < -90 || at.x > box.w + 90 || at.y > box.h + 90) return null;
+        const k = FULL_MARKS * stageDepth(fit, fx, fy);
+        return `translate(${at.x.toFixed(1)} ${at.y.toFixed(1)}) scale(${k.toFixed(3)})`;
+      }, 1)
+    : null;
 
   /* The cards. In the galaxy the sector under the cursor, the way the game
      names a sector on hover; in a sector the planet under it. */
@@ -1076,14 +1129,12 @@ export default function GalaxyMap({
   const map = (
     <div ref={stage}
       className={expanded ? "absolute inset-0" : "relative mx-auto aspect-square w-full max-w-[34rem] select-none"}>
-      <svg ref={svg} viewBox={`${-pad} ${-pad} ${VIEW + 2 * pad} ${VIEW + 2 * pad}`} role="img"
-        aria-label={label || "The galaxy map. Click a sector to go in, then a planet to drop there, or search for it by name or sector."}
-        className={(fit.S > 0 ? "absolute block " : "block h-full w-full ") +
-          (focus ? (dragging ? "cursor-grabbing" : "cursor-grab") : "cursor-pointer")}
+      {/* The surface takes every gesture, for the map and for the upright
+          planets over it alike. The buttons in the corners are its
+          siblings, so pressing one is never mistaken for a drag. */}
+      <div ref={surface}
+        className={"absolute inset-0 " + (focus ? (dragging ? "cursor-grabbing" : "cursor-grab") : "cursor-pointer")}
         style={{
-          ...(fit.S > 0 ? { left: fit.left - padPx, top: fit.top - padPx, width: fit.S + 2 * padPx, height: fit.S + 2 * padPx } : {}),
-          transform: stageTransform(fit),
-          transformOrigin: "50% 50%",
           /* In the galaxy on the page there is nothing to pan, so a finger
              sliding up the map scrolls the page past it. In a sector, and in
              full screen, the map takes every gesture. */
@@ -1099,15 +1150,25 @@ export default function GalaxyMap({
           if (focus) zoomBy(2);
           else enter(sectorAt(toMap(viewRef.current, toFrame(e.clientX, e.clientY))));
         }}>
-        <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
-          {layer}
-          {hovered && hovered.name !== chosen ? (
-            <circle cx={hovered.x} cy={hovered.y}
-              r={(tactical ? FRONT_WORLD_PX * 0.6 : DOT + 4) * u}
-              className="pointer-events-none fill-none stroke-base-100" strokeWidth={1.2 * u} />
-          ) : null}
-        </g>
-      </svg>
+        <svg ref={svg} viewBox={`${-pad} ${-pad} ${VIEW + 2 * pad} ${VIEW + 2 * pad}`} role="img"
+          aria-label={label || "The galaxy map. Click a sector to go in, then a planet to drop there, or search for it by name or sector."}
+          className={fit.S > 0 ? "absolute block" : "block h-full w-full"}
+          style={{
+            ...(fit.S > 0 ? { left: fit.left - padPx, top: fit.top - padPx, width: fit.S + 2 * padPx, height: fit.S + 2 * padPx } : {}),
+            transform: stageTransform(fit),
+            transformOrigin: "50% 50%",
+          }}>
+          <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
+            {layer}
+            {flatPlanets}
+          </g>
+        </svg>
+        {upright ? (
+          <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox={`0 0 ${box.w || 1} ${box.h || 1}`} aria-hidden="true">
+            {uprightPlanets}
+          </svg>
+        ) : null}
+      </div>
 
       {/* A planet, before you commit to it. Mouse only: on a touch screen
           there is no hover, and the tap is the choice. */}
@@ -1281,27 +1342,6 @@ export default function GalaxyMap({
       )}
     </>
   );
-}
-
-/* The planner's picks, numbered in its order: a ring in the brand colour
-   and the number beside it, drawn over the planets so a pick is never
-   hidden under a neighbour. `ring` is the ring's radius in pixels. */
-function Picks({ picks, u, ring }) {
-  return picks.map((name, i) => {
-    const p = placeOf(name);
-    if (!p) return null;
-    return (
-      <g key={"pick-" + name} className="pointer-events-none">
-        <circle cx={p.x} cy={p.y} r={ring * u} className="fill-none stroke-brand" strokeWidth={1.8 * u}
-          strokeDasharray={`${4 * u} ${2.5 * u}`} />
-        <circle cx={p.x - (ring * 0.72) * u} cy={p.y - (ring * 0.72) * u} r={6.5 * u} className="fill-brand" />
-        <text x={p.x - (ring * 0.72) * u} y={p.y - (ring * 0.72) * u} textAnchor="middle" dominantBaseline="central"
-          className="fill-brand-ink" style={{ fontFamily: OSWALD, fontSize: 9 * u, fontWeight: 700 }}>
-          {i + 1}
-        </text>
-      </g>
-    );
-  });
 }
 
 /**
