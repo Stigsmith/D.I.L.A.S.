@@ -6,6 +6,8 @@
 /*   npm run planet-art -- --write --full  and the full size ones,    */
 /*                                         then cut the map's copies  */
 /*   npm run planet-art -- --cut           cut them again, offline    */
+/*   npm run planet-art -- --cut --force   and every one, not only    */
+/*                                         the ones that changed      */
 /*                                                                    */
 /* The planet renders the game shows on its galaxy map, from          */
 /* helldivers.wiki.gg, where each planet has a file named             */
@@ -46,6 +48,7 @@ const WIDTH = 128;
 const WRITE = process.argv.includes("--write");
 const FULL_TOO = process.argv.includes("--full");
 const CUT_ONLY = process.argv.includes("--cut");
+const FORCE = process.argv.includes("--force");
 /* Art is painted at the size it is displayed: up to about 60 pixels on
    the map in full screen and 80 in the hover card, doubled for a sharp
    screen. */
@@ -70,6 +73,42 @@ const wanted = planets
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/* Half the wiki's "originals" are not renders at all. Checked on 1
+   October 2026: 133 of 271 are 48 to 85 pixel crops of the game's own
+   galaxy map, and five more are full size on a solid ground, 138 with no
+   transparency between them. Drawn as they are, each sits in a dark
+   square. So an original with no alpha is cut round: a soft edged circle,
+   and the dark ground keyed out of its outer ring only, so a planet's own
+   night side is left alone. It is never enlarged either; a 48 pixel crop
+   blown up to 256 is blur, not detail. */
+async function opaqueToRound(sharp, from) {
+  const { data, info } = await sharp(from).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const W = info.width;
+  const H = info.height;
+  const at = (x, y) => (y * W + x) * 4;
+  /* The ground's colour, from the four corners. */
+  const ground = [0, 0, 0];
+  const corners = [[1, 1], [W - 2, 1], [1, H - 2], [W - 2, H - 2]];
+  for (const [x, y] of corners) for (let c = 0; c < 3; c += 1) ground[c] += data[at(x, y) + c] / corners.length;
+  const cx = (W - 1) / 2;
+  const cy = (H - 1) / 2;
+  const R = Math.min(W, H) / 2;
+  for (let y = 0; y < H; y += 1) {
+    for (let x = 0; x < W; x += 1) {
+      const i = at(x, y);
+      const d = Math.hypot(x - cx, y - cy) / R;
+      const edge = Math.max(0, Math.min(1, (1 - d) / 0.08));
+      const off = Math.max(Math.abs(data[i] - ground[0]), Math.abs(data[i + 1] - ground[1]), Math.abs(data[i + 2] - ground[2]));
+      const key = d > 0.62 ? Math.max(0, Math.min(1, (off - 6) / 22)) : 1;
+      data[i + 3] = Math.round(255 * edge * key);
+    }
+  }
+  /* Trimmed to the planet, so it fills its frame the way a real render
+     does and is not drawn smaller than its neighbours on the map. */
+  const round = await sharp(data, { raw: { width: W, height: H, channels: 4 } }).png().toBuffer();
+  return sharp(await sharp(round).trim({ threshold: 1 }).png().toBuffer());
+}
+
 /* The map's copy of every original on disk, skipping any already cut
    since its original last changed. No network. */
 async function cut() {
@@ -87,20 +126,30 @@ async function cut() {
   let made = 0;
   let kept = 0;
   let bytes = 0;
+  let rounded = 0;
   for (const name of readdirSync(FULL).filter((n) => /^planet_.+\.png$/i.test(n))) {
     const from = join(FULL, name);
     const to = join(SMALL, name.replace(/\.png$/i, ".webp"));
-    if (existsSync(to) && statSync(to).mtimeMs >= statSync(from).mtimeMs) {
+    if (!FORCE && existsSync(to) && statSync(to).mtimeMs >= statSync(from).mtimeMs) {
       kept += 1;
       continue;
     }
-    const buf = await sharp(from).resize(CUT, CUT, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    const meta = await sharp(from).metadata();
+    const source = meta.hasAlpha ? sharp(from) : await opaqueToRound(sharp, from);
+    if (!meta.hasAlpha) rounded += 1;
+    /* Sized from the source: a small crop is doubled with a sharp filter
+       rather than padded out to the full cut, which would leave the planet
+       a quarter of the size of every other one on the map. */
+    const side = Math.min(CUT, 2 * Math.max(meta.width, meta.height));
+    const buf = await source
+      .resize(side, side, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 }, kernel: "lanczos3" })
       .webp({ quality: 82, alphaQuality: 90, effort: 5 }).toBuffer();
     writeFileSync(to, buf);
     made += 1;
     bytes += buf.length;
   }
-  console.log(`  ${made} cut at ${CUT} pixels, ${(bytes / 1024 / 1024).toFixed(1)} MB, ${kept} already cut`);
+  console.log(`  ${made} cut at up to ${CUT} pixels, ${(bytes / 1024 / 1024).toFixed(1)} MB, ${kept} already cut`);
+  if (rounded) console.log(`  ${rounded} had no transparency, a crop of the game's map rather than a render, and were cut round`);
   console.log("  Run npm run images to bring them into the app.\n");
 }
 
