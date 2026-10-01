@@ -28,7 +28,8 @@ A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai a
 | **Settings** | `#/settings` | Built. Theme, export, import, reset |
 | **Support** | `#/support` | Built. Where the numbers come from |
 | **Roadmap** | `#/roadmap` | Built. One timeline, what is next and what it waits on |
-| **Exchange, Squad** | | v2 and v3. Shown in the sidebar, deliberately not reachable |
+| **Exchange** | | v3. Shown in the sidebar, deliberately not reachable |
+| **The party menu** | top right, every page | Built. The party's controls, and where friends and finding a group will live. See The Live Party |
 | **Account** | `#/account` | **Built and switched off.** Locked in the sidebar until `ACCOUNTS_LIVE` in `src/lib/account.js` is true. See Accounts |
 
 > [!info] Routing is hand rolled
@@ -798,7 +799,8 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 | **The two routes** | `worker/index.ts`. `POST /api/party` opens one and answers with its code; `GET /api/party/<code>` is the WebSocket, or, as a plain GET, the question "does this party exist" |
 | **The limits** | `worker/limit.ts` and the `api_rate_limit` table, ported from Enodia. 20 parties opened and 120 joins an hour per address |
 | **The browser half** | `src/lib/party.js`: `useParty` holds the connection, `usePartySync` keeps the party and this browser in step |
-| **The screen** | `src/DropScreen.jsx`: the party panel, the members' slots, open seats with the code in them |
+| **The menu** | `src/Party.jsx`: the button in the header, top right on every page, and its panel: open or join, the code, every member with their build or "Still deciding", host removal, Follow the party, Leave |
+| **The slots** | `src/DropScreen.jsx`: the members' slots and open seats, and one line naming the party and whose scenario you follow |
 | **The tests** | `worker/party.test.ts`, 25 of them, inside workerd against a real Durable Object |
 
 > [!danger] Three calls, all the curator's, and the code is shaped around them
@@ -809,6 +811,11 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 
 > [!info] Identity is a token per party, kept in `hd2-party`
 > The browser makes 32 random bytes per party and keeps them; the server stores only the SHA-256. **A reload, a dropped line or a second tab on the same address rejoins the same seat** rather than taking a new one. Members see each other by a prefix of that hash, never the token. `hd2-party` also keeps the name you go by, and stays out of the export: it belongs to this browser.
+
+> [!success] The party menu lives top right, on every page. The curator's call, 1 October 2026
+> It was a panel on Drop Bay. The party was always app wide underneath (your confirmed build reaches it from any page, the host's scenario reaches you anywhere), so its controls moved next to the profile switcher in the header, the way the game keeps your squad in a corner. The header button reads "Squad up" on your own, and the code with a dot per seat in a party. Drop Bay keeps one line that opens it. **The panel is fixed under the chrome rather than hanging from the header**, because the header clips its overflow for the masthead art. **Friends and finding a group will live behind this menu**, so the locked Squad entry left the sidebar the same day.
+>
+> **Seats and the party do not compete.** In a party the party decides how many of you there are; outside one, the seats on Drop Bay say it.
 
 > [!info] How a party behaves
 > - **Four seats.** A fifth person is refused with "That party is full", not queued.

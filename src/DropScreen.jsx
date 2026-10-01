@@ -38,7 +38,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import Builder from "./Builder.jsx";
 import {
   Users, Check, ChevronLeft, X, Search, Plus, Lock, Star, Snowflake, FilterX, AlertTriangle, Info,
-  Pencil, Rocket, UserPlus, RotateCcw, Flag, MapPin, Copy, LogOut, Crown, Radio, Loader2, Sparkles, ArrowUp,
+  Pencil, Rocket, UserPlus, RotateCcw, Flag, MapPin, Crown, Radio, Loader2, Sparkles, ArrowUp,
 } from "lucide-react";
 
 import { FACTIONS, FACTION_THEME, TierBadge, StratChip, difficultyAt, DropPlanner } from "./Tiers.jsx";
@@ -538,110 +538,37 @@ function RemoveButton({ name, onRemove }) {
 }
 
 /* ------------------------------------------------------------------ */
-/* The party panel                                                     */
+/* The party, in one line                                              */
 /*                                                                     */
-/* Squad up with a code. No account, by the curator's call: open a     */
-/* party, read the six characters out, and whoever types them in is   */
-/* in. The host sets the scenario and everybody else follows it.       */
+/* The party's own menu lives top right on every page since 1 October  */
+/* 2026, the curator's call. Drop Bay keeps one line: the way in when   */
+/* you are on your own, and whose scenario you are following when you   */
+/* are not.                                                             */
 /* ------------------------------------------------------------------ */
 
-const STATUS_LINE = {
-  opening: "Opening a party",
-  connecting: "Joining",
-  reconnecting: "Connection lost. Reconnecting",
-};
-
-function PartyPanel({ party, sync }) {
-  const [typed, setTyped] = useState("");
-  const [copied, setCopied] = useState(false);
-  const inParty = Boolean(party.code);
-  const busy = party.status === "opening" || party.status === "connecting";
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(party.code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      /* No clipboard here. The code is on screen to read out anyway. */
-    }
-  };
-
-  if (!inParty) {
+function PartyLine({ party, sync, onOpen }) {
+  if (!party.code) {
     return (
-      <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[14rem] flex-1">
-            <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-base-400" style={OSWALD}>
-              <Radio className="h-3.5 w-3.5" /> Squad up
-            </p>
-            <p className="mt-1 text-xs leading-relaxed text-base-500">
-              Open a party and read its code out, or type the code a friend gave you. Everybody's confirmed loadout lands
-              in their slot here. No account needed.
-            </p>
-          </div>
-          <label className="flex flex-col gap-1">
-            <span className="text-[10px] uppercase tracking-wider text-base-500">Your name</span>
-            <input value={party.name} onChange={(e) => party.setName(e.target.value)} placeholder="Helldiver" maxLength={24}
-              className="w-36 rounded border border-base-700 bg-base-900 px-2 py-1.5 text-xs text-base-100 placeholder-base-600 outline-none focus:border-base-500" />
-          </label>
-          <SlotButton primary onClick={party.open} Icon={busy ? Loader2 : Radio}>
-            {party.status === "opening" ? "Opening" : "Open a party"}
-          </SlotButton>
-          <form className="flex items-center gap-1.5" onSubmit={(e) => { e.preventDefault(); party.join(typed); }}>
-            <input value={typed} onChange={(e) => setTyped(e.target.value)} placeholder="CODE" maxLength={9} aria-label="Party code"
-              autoCapitalize="characters" spellCheck={false}
-              className="w-24 rounded border border-base-700 bg-base-900 px-2 py-1.5 text-xs uppercase tracking-widest text-base-100 placeholder-base-600 outline-none focus:border-base-500"
-              style={MONO} />
-            <button type="submit"
-              className="rounded border border-base-700 px-2.5 py-1.5 text-xs text-base-300 hover:border-base-500 hover:text-base-100">
-              Join
-            </button>
-          </form>
-        </div>
-        {party.problem ? (
-          <p className="mt-3 flex items-start gap-1.5 text-[11px] text-accent-400">
-            <AlertTriangle className="mt-px h-3.5 w-3.5 shrink-0" /><span className="flex-1">{party.problem}</span>
-            <button onClick={party.dismiss} aria-label="Dismiss" className="text-base-500 hover:text-base-200"><X className="h-3.5 w-3.5" /></button>
-          </p>
-        ) : null}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-base-800 bg-base-900/40 px-4 py-2.5">
+        <Radio className="h-4 w-4 shrink-0 text-base-500" />
+        <span className="min-w-[12rem] flex-1 text-xs text-base-500">
+          Dropping with friends who use the tool? Squad up, and their confirmed builds land in the slots below.
+        </span>
+        <SlotButton onClick={onOpen} Icon={Radio}>Squad up</SlotButton>
       </div>
     );
   }
-
-  const count = party.state ? party.state.members.length : 0;
-  const line = party.status === "live"
-    ? `${count} of ${SQUAD_CAP}. ` + (party.isHost
-      ? "You are the host, so the scenario is yours to set."
-      : party.host ? `Following ${party.host.name}'s scenario.` : "")
-    : `${STATUS_LINE[party.status] || "Connecting"}...`;
-
   return (
-    <div className="rounded-lg border border-base-700 bg-base-900/80 p-4">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-base-400" style={OSWALD}>
-          <Radio className={"h-3.5 w-3.5 " + (party.status === "live" ? "text-emerald-400" : "text-accent-400")} /> Party
-        </span>
-        <span className="text-2xl font-bold tracking-[0.25em] text-base-100" style={MONO}>{party.code}</span>
-        <SlotButton onClick={copy} Icon={copied ? Check : Copy}>{copied ? "Copied" : "Copy code"}</SlotButton>
-        <span className="text-xs text-base-500">{line}</span>
-        <span className="ml-auto">
-          <SlotButton danger onClick={party.leave} Icon={LogOut}>Leave</SlotButton>
-        </span>
-      </div>
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-base-700 bg-base-900/70 px-4 py-2.5">
+      <Radio className={"h-4 w-4 shrink-0 " + (party.status === "live" ? "text-emerald-400" : "text-accent-400")} />
+      <span className="min-w-[12rem] flex-1 text-xs text-base-400">
+        Party <span className="tracking-widest text-base-100" style={MONO}>{party.code}</span>. The slots below are its members
+        {party.isHost ? ", and the scenario is yours to set." : party.host ? `, following ${party.host.name}'s scenario.` : "."}
+      </span>
       {sync.drifted ? (
-        <p className="mt-3 flex flex-wrap items-center gap-2 text-[11px] text-accent-400">
-          <Info className="h-3.5 w-3.5 shrink-0" />
-          Your scenario differs from the host's, so what you see here may not match their screen.
-          <button onClick={sync.follow} className="underline hover:text-accent-300">Follow the party</button>
-        </p>
+        <button onClick={sync.follow} className="text-[11px] text-accent-400 underline hover:text-accent-300">Follow the party</button>
       ) : null}
-      {party.notice ? (
-        <p className="mt-2 flex items-start gap-1.5 text-[11px] text-base-400">
-          <Info className="mt-px h-3.5 w-3.5 shrink-0" /><span className="flex-1">{party.notice}</span>
-          <button onClick={party.dismiss} aria-label="Dismiss" className="text-base-500 hover:text-base-200"><X className="h-3.5 w-3.5" /></button>
-        </p>
-      ) : null}
+      <SlotButton onClick={onOpen} Icon={Users}>Party</SlotButton>
     </div>
   );
 }
@@ -885,7 +812,7 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted, inParty }
 
 /* ------------------------------------------------------------------ */
 
-export default function DropScreen({ state, navigate, scenario, setFaction, setPlanet, setSquad, drop, update, party, sync }) {
+export default function DropScreen({ state, navigate, scenario, setFaction, setPlanet, setSquad, drop, update, party, sync, onOpenParty }) {
   /* Which slot the picker is open for: "mine", a squadmate index, or null. */
   const [picking, setPicking] = useState(null);
   /* The editor over this screen: { key, id, startWith }, or null. id is
@@ -1050,7 +977,7 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
 
   return (
     <div className="flex flex-col gap-4">
-      <PartyPanel party={party} sync={sync} />
+      <PartyLine party={party} sync={sync} onOpen={onOpenParty} />
       {showMap ? mapPanel(true) : null}
       {showMap && nowhere && !scenario.mission ? null : (
         <Brief scenario={scenario} onMap={canChoose && !showMap ? () => setMapOpen(true) : null}

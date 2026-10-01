@@ -207,7 +207,7 @@ So the answer to "should the tier list have a difficulty slider, or should diffi
 Raised by the curator on 21 August 2026, none of them previously written down.
 
 1. **The map as its own surface**, not only Drop Bay's front door. Same component, but reachable directly, with **historical data** behind it: what this planet has been, who has held it, what has run here. The drop flow wants the map to be fast and one click; a standalone map can afford depth the flow would not want in the way.
-2. **A social surface.** Friends list and **LFG**, reachable on its own and as a panel inside the drop flow. Sits under the sidebar entry currently labelled Squad. Behind the auth and shared storage step like everything social, but the surface itself should be designed as a component from the start so it can appear in both places.
+2. **A social surface.** Friends list and **LFG**, reachable on its own and as a panel inside the drop flow. **Since 1 October 2026 it lives behind the party menu in the header's top right**, the curator's placement, rather than under a sidebar entry; the locked Squad entry was removed that day. It sat under the sidebar entry currently labelled Squad. Behind the auth and shared storage step like everything social, but the surface itself should be designed as a component from the start so it can appear in both places.
 3. **Saving a squadmate's build straight from the squad screen.** You see what someone is running, you keep it. Distinct from Exchange, which is browsing a library: this is grabbing the thing in front of you. Needs the same shared storage, and it wants Exchange's write path rather than a second one.
 
 ---
