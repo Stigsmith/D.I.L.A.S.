@@ -9,7 +9,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
-  Library, Swords, Rocket, Store, Users, User, Settings as SettingsIcon,
+  Library, Swords, Rocket, Store, User, Settings as SettingsIcon,
   LifeBuoy, Menu, X, Sun, Moon, Zap, Shield, Star, Lock, Download, Upload, AlertTriangle,
   Factory, Bug, PackageOpen, Trees, FileText, Crosshair, Radar, Shovel, Info, ScrollText, Milestone, Scale,
 } from "lucide-react";
@@ -21,6 +21,7 @@ import ArmouryBuilds, { Coverage, History, ARMOURY_TABS } from "./Armoury.jsx";
 import DropScreen, { useDrop } from "./DropScreen.jsx";
 import Rules from "./Rules.jsx";
 import Shared from "./Shared.jsx";
+import { PartyButton, PartyPanel } from "./Party.jsx";
 import { useRulesOff } from "./lib/rules.js";
 import { useParty, usePartySync } from "./lib/party.js";
 import Collection, { COLLECTION_TABS } from "./Collection.jsx";
@@ -56,10 +57,6 @@ const NAV = [
       { id: "collection", label: "Collection", Icon: Library },
       { id: "exchange", label: "Exchange", Icon: Store, release: "v3" },
     ],
-  },
-  {
-    group: "Squad",
-    items: [{ id: "squad", label: "Squad", Icon: Users, release: "v2" }],
   },
 ];
 
@@ -488,6 +485,8 @@ export default function App() {
   const { filters, patchFilters } = useTierFilters(BLANK_FILTERS, CATEGORIES.map((c) => c.id));
   const { sortBy, setSortBy } = useTierSort();
   const [menuOpen, setMenuOpen] = useState(false);
+  /* The party menu, top right on every page. */
+  const [partyOpen, setPartyOpen] = useState(false);
 
   /* Reachable but not in the menu. The scenario is a sub screen of the   */
   /* surfaces that read it, not a destination of its own: putting it in   */
@@ -619,7 +618,8 @@ export default function App() {
         return <Collection tab={collectionTab} state={state} />;
       case "bay":
         return <DropScreen state={state} navigate={navigate} scenario={scored} setFaction={setFaction} setPlanet={setPlanet}
-          setSquad={setSquad} drop={drop} update={updateDrop} party={party} sync={partySync} />;
+          setSquad={setSquad} drop={drop} update={updateDrop} party={party} sync={partySync}
+          onOpenParty={() => setPartyOpen(true)} />;
       case "armoury":
         if (armouryTab === "coverage") return <Coverage state={state} navigate={navigate} scenario={scored} />;
         if (armouryTab === "history") {
@@ -752,6 +752,9 @@ export default function App() {
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-3 text-[11px]">
+              {/* The party, on every page: the curator's placement, next to   */}
+              {/* who you are, the way the game keeps your squad in a corner. */}
+              <PartyButton party={party} open={partyOpen} onToggle={() => setPartyOpen((v) => !v)} />
               {/* Which player you are looking at. Always shown, even with */}
               {/* one profile, because every lock on every screen is about */}
               {/* this profile and that should never be a guess.           */}
@@ -800,6 +803,9 @@ export default function App() {
                 {labelFor(dest)}
               </span>
             )}
+            <span className="relative flex shrink-0 items-center pr-2">
+              <PartyButton compact party={party} open={partyOpen} onToggle={() => setPartyOpen((v) => !v)} />
+            </span>
           </div>
 
           <TopTabs className="hidden sm:flex" tabs={tabs} active={activeTab} onSelect={(id) => navigate(`${dest}/${id}`)} />
@@ -818,6 +824,10 @@ export default function App() {
           ) : null}
           </div>
 
+          {partyOpen ? (
+            <PartyPanel party={party} sync={partySync} onClose={() => setPartyOpen(false)}
+              onDropBay={() => { setPartyOpen(false); navigate("bay"); }} />
+          ) : null}
           <main className="p-4 sm:p-6">{surface}</main>
           {/* The scenario is a focused sub screen and the footer is the  */}
           {/* only thing keeping it off one desktop screen. Every other    */}
