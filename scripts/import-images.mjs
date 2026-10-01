@@ -9,9 +9,10 @@
 /* this after adding art:  node scripts/import-images.mjs             */
 /* ================================================================== */
 
-import { readFileSync, writeFileSync, readdirSync, mkdirSync, copyFileSync, rmSync, statSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, mkdirSync, copyFileSync, statSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, extname } from "node:path";
+import { emptyInPlace } from "./lib/empty-in-place.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = join(ROOT, "Image Library");
@@ -87,20 +88,8 @@ for (const file of files) {
 }
 
 /* Each art folder is emptied and refilled in place, never deleted and made
-   again. The repo sits in a folder a file sync app watches, and on 30
-   September and 1 October 2026 that app read every delete and remake as a
-   conflict and renamed the fresh folder to "items (# Name clash ...)",
-   leaving the app with no art at all. Emptying a folder it already knows
-   about is an ordinary change to it. */
-const emptyInPlace = (dir) => {
-  mkdirSync(dir, { recursive: true });
-  for (const d of readdirSync(dir, { withFileTypes: true })) {
-    const path = join(dir, d.name);
-    if (d.isDirectory()) emptyInPlace(path);
-    else rmSync(path, { force: true });
-  }
-};
-
+   again, so the sync app watching this folder does not rename it. See
+   scripts/lib/empty-in-place.mjs. */
 for (const dir of ["items", "warbonds", "ui", "themes"]) emptyInPlace(join(ASSETS, dir));
 
 const manifest = { items: {}, warbonds: {}, ui: [], themes: {} };

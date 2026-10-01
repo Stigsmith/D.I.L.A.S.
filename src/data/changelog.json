@@ -22,7 +22,8 @@
       "The map works the way the game's does: click a sector and it glides in to planet level, zoom out far enough and it glides back to the whole galaxy. The wheel zooms smoothly instead of a notch at a time.",
       "A new Tactical look for the map, now the default: sectors as blocks glowing in the colour of whoever holds them, the fronts pulsing, a radar sweep that lights each territory as it passes, and the game's own planet renders once you are inside a sector. The plain chart is still one click away.",
       "The planner's planet question works both ways: caves and megacities can each be avoided, ignored or asked for.",
-      "The biome and hazards you could set by hand are gone; the map and the planner do that job now."
+      "The biome and hazards you could set by hand are gone; the map and the planner do that job now.",
+      "Building the tool now checks the result is whole, and a deploy refuses to upload one that is not, after a file sync app was caught renaming the freshly built scripts away."
     ]
   },
   {
