@@ -174,16 +174,25 @@ for (const file of generic) {
   manifest.ui.push(file);
 }
 
-/* Planet renders: the small copies npm run planet-art fetched, straight
-   from Image Library/Planets and never from its Originals folder. Named
-   by the planet's slug, the same slug the map looks them up by. */
+/* Planet renders: the copies npm run planet-art made, straight from
+   Image Library/Planets and never from its Originals folder, which hold
+   3 MB apiece. One per planet, named by the slug the map looks it up by,
+   and the 256 pixel WebP cut wins over the wiki's 128 pixel PNG. */
 const PLANETS_SOURCE = join(SOURCE, "Planets");
 emptyInPlace(join(ASSETS, "planets"));
 let planetArt = 0;
 if (existsSync(PLANETS_SOURCE)) {
+  const rank = (ext) => (ext === "webp" ? 0 : 1);
+  const best = new Map();
   for (const d of readdirSync(PLANETS_SOURCE, { withFileTypes: true })) {
-    if (!d.isFile() || !/^planet_.+\.(png|jpe?g|webp)$/i.test(d.name)) continue;
-    copyFileSync(join(PLANETS_SOURCE, d.name), join(ASSETS, "planets", d.name.replace(/^planet_/, "")));
+    const m = d.isFile() ? /^planet_(.+)\.(png|jpe?g|webp)$/i.exec(d.name) : null;
+    if (!m) continue;
+    const ext = m[2].toLowerCase();
+    const had = best.get(m[1]);
+    if (!had || rank(ext) < rank(had.ext)) best.set(m[1], { name: d.name, ext });
+  }
+  for (const [key, { name, ext }] of best) {
+    copyFileSync(join(PLANETS_SOURCE, name), join(ASSETS, "planets", `${key}.${ext}`));
     planetArt += 1;
   }
 }

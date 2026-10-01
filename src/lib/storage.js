@@ -102,9 +102,12 @@ export const SETTINGS = {
      of planet you would rather not be on. A preference about how you like
      to play rather than anything you own, so it stays out of the export. */
   planner: "hd2-planner",
-  /* Which look the galaxy map wears: the plain chart, or the Galactic War
-     table from the game. A display preference, out of the export. */
+  /* Which look the galaxy map wears: Tactical, or the plain chart. A
+     display preference, out of the export. */
   mapSkin: "hd2-map-skin",
+  /* Whether the full screen map is tilted back like a table, "on" or
+     "off". A display preference, out of the export. */
+  mapTilt: "hd2-map-tilt",
 };
 
 /* Both scenario keys were spelled hd2-brief-* until 21 August 2026. A    */

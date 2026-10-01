@@ -732,3 +732,100 @@ export function towards(from, to, share) {
   return { k, x: CENTRE - cx * k, y: CENTRE - cy * k };
 }
 
+
+/* ------------------------------------------------------------------ */
+/* The stage, and the tilt                                            */
+/*                                                                    */
+/* Full screen lays the map back like a table, the curator's ask of  */
+/* 1 October 2026: the top recedes, the bottom comes towards you. The */
+/* tilt is a CSS perspective on the map's SVG, and these two          */
+/* functions are the same projection written out, so a click lands    */
+/* on the planet drawn under it. The SVG's own screen matrix cannot   */
+/* say this: it flattens a perspective to a plain 2D matrix.          */
+/*                                                                    */
+/* The projection about the SVG's centre, in pixels, for a point u, v */
+/* from that centre, with the plane rotated by a about the x axis and */
+/* seen from d away:                                                  */
+/*                                                                    */
+/*   w = 1 - v sin(a) / d      x = u / w      y = v cos(a) / w        */
+/*                                                                    */
+/* which is what transform: perspective(d) rotateX(a) draws.          */
+/* ------------------------------------------------------------------ */
+
+/* Slight, as asked: enough to read as a table, not so much that the far
+   names are hard to read. The eye sits at DEPTH times the map's width. */
+export const TILT = (22 * Math.PI) / 180;
+export const DEPTH = 2.2;
+
+/* The disc and its rim, as a share of the view box from the centre. */
+const RIM = Math.min(0.5, (RADIUS + 30) / VIEW);
+
+/**
+ * Where the map sits on a stage of w by h pixels, and how it is tilted.
+ * `fill` is the inline map, which fills its square box exactly. Otherwise
+ * the disc is fitted inside the stage with `margin` pixels to spare and
+ * centred, tilted or flat. The shape of a tilted disc does not depend on
+ * its size, because the eye moves back as the map grows, so it is measured
+ * once at size 1 and scaled.
+ */
+export function stageFit(w, h, { tilt = false, fill = false, margin = 0 } = {}) {
+  if (!(w > 0 && h > 0)) return { S: 0, left: 0, top: 0, a: 0, d: 1 };
+  if (fill) return { S: w, left: 0, top: 0, a: 0, d: DEPTH * w };
+  const a = tilt ? TILT : 0;
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (let i = 0; i < 180; i += 1) {
+    const t = (i / 180) * 2 * Math.PI;
+    const u = RIM * Math.cos(t);
+    const v = RIM * Math.sin(t);
+    const ww = 1 - (v * Math.sin(a)) / DEPTH;
+    const x = 0.5 + u / ww;
+    const y = 0.5 + (v * Math.cos(a)) / ww;
+    x0 = Math.min(x0, x); x1 = Math.max(x1, x);
+    y0 = Math.min(y0, y); y1 = Math.max(y1, y);
+  }
+  const S = Math.max(0, Math.min((w - 2 * margin) / (x1 - x0), (h - 2 * margin) / (y1 - y0)));
+  return { S, left: (w - (x0 + x1) * S) / 2, top: (h - (y0 + y1) * S) / 2, a, d: DEPTH * S };
+}
+
+/* The CSS that draws a fit, so the picture and the arithmetic share one
+   source. Nothing at all for a flat map. */
+export function stageTransform(fit) {
+  return fit.a ? `perspective(${fit.d.toFixed(1)}px) rotateX(${fit.a.toFixed(5)}rad)` : undefined;
+}
+
+/* A point in the view box to pixels on the stage. */
+export function onStage(fit, fx, fy) {
+  const c = fit.S / 2;
+  const u = (fx / VIEW) * fit.S - c;
+  const v = (fy / VIEW) * fit.S - c;
+  const w = 1 - (v * Math.sin(fit.a)) / fit.d;
+  return { x: fit.left + c + u / w, y: fit.top + c + (v * Math.cos(fit.a)) / w };
+}
+
+/* Pixels on the stage back to the view box: the same projection solved
+   the other way. */
+export function offStage(fit, x, y) {
+  if (!(fit.S > 0)) return { x: CENTRE, y: CENTRE };
+  const c = fit.S / 2;
+  const U = x - fit.left - c;
+  const V = y - fit.top - c;
+  const v = V / (Math.cos(fit.a) + (V * Math.sin(fit.a)) / fit.d);
+  const u = U * (1 - (v * Math.sin(fit.a)) / fit.d);
+  return { x: ((u + c) / fit.S) * VIEW, y: ((v + c) / fit.S) * VIEW };
+}
+
+/* How far past the view box's own square the drawing must reach, in view
+   box units on every side, for a fitted map to cover the whole stage.
+   Inside a sector the map fills the screen rather than ending at the edge
+   of its square, which tilted reads as a trapezoid floating in the middle.
+   Widening the drawing about the same centre with the same eye distance
+   leaves every point exactly where it was, so nothing else changes. */
+export function stageCover(fit, w, h) {
+  if (!(fit.S > 0)) return 0;
+  let over = 0;
+  for (const [x, y] of [[0, 0], [w, 0], [0, h], [w, h], [w / 2, 0], [w / 2, h], [0, h / 2], [w, h / 2]]) {
+    const p = offStage(fit, x, y);
+    over = Math.max(over, -p.x, p.x - VIEW, -p.y, p.y - VIEW);
+  }
+  return Math.ceil(Math.max(0, over) + 12);
+}
