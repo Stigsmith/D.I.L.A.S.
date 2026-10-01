@@ -20,6 +20,10 @@ export const KEYS = {
   /* left alone rather than deleted, which keeps a hand written recovery  */
   /* path open if a migration ever goes wrong.                            */
   profiles: "hd2-profiles",
+  /* Every drop you confirmed, oldest first, from history.js. A list, and
+     in the export: it is your record, and the address moves coming would
+     otherwise leave it behind. */
+  history: "hd2-drop-history",
 };
 
 /* null means the key was never written, which is not the same as an   */
@@ -108,6 +112,10 @@ export const SETTINGS = {
   /* Whether the full screen map is tilted back like a table, "on" or
      "off". A display preference, out of the export. */
   mapTilt: "hd2-map-tilt",
+  /* The rules switched off on the Rules page, as a list of rule ids.
+     This browser's view of the rules, not a fact about a drop: out of the
+     export, never sent to a party. */
+  rulesOff: "hd2-rules-off",
 };
 
 /* Both scenario keys were spelled hd2-brief-* until 21 August 2026. A    */

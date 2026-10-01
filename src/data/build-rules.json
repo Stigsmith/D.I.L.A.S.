@@ -5,6 +5,7 @@
   "rules": [
     {
       "id": "penetration-misses-the-front",
+      "name": "Nothing you aim gets through",
       "when": {},
       "match": {
         "number": [
@@ -26,6 +27,7 @@
     },
     {
       "id": "no-answer-to-armour",
+      "name": "No answer to armour",
       "when": {
         "faction": [
           "bots",
@@ -47,6 +49,7 @@
     },
     {
       "id": "no-answer-to-armour-squids",
+      "name": "No anti-tank against the Illuminate",
       "when": {
         "faction": [
           "squids"
@@ -67,6 +70,7 @@
     },
     {
       "id": "no-chaff-clear",
+      "name": "No crowd clear",
       "when": {
         "peril": {
           "gte": 12
@@ -84,6 +88,7 @@
     },
     {
       "id": "all-punch-no-volume",
+      "name": "All punch, no volume",
       "when": {
         "faction": [
           "bugs",
@@ -122,6 +127,7 @@
     },
     {
       "id": "nothing-closes-a-hole",
+      "name": "Nothing closes a hole",
       "when": {
         "mission": [
           "nest"
@@ -139,6 +145,7 @@
     },
     {
       "id": "quiet-kit-loud-drop",
+      "name": "A quiet kit on a hard bot drop",
       "when": {
         "faction": [
           "bots"
@@ -173,6 +180,7 @@
     },
     {
       "id": "half-built",
+      "name": "Half built",
       "when": {},
       "match": {
         "number": [
@@ -189,6 +197,7 @@
     },
     {
       "id": "answers-everything",
+      "name": "An answer to everything, in hand",
       "when": {
         "peril": {
           "gte": 12

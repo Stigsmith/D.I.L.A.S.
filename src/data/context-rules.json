@@ -5,6 +5,7 @@
   "rules": [
     {
       "id": "cold-vents-slower",
+      "name": "Cold lets heat weapons fire longer",
       "when": {
         "hazard": [
           "extreme_cold"
@@ -23,6 +24,7 @@
     },
     {
       "id": "hot-vents-faster",
+      "name": "Heat makes heat weapons overheat sooner",
       "when": {
         "hazard": [
           "intense_heat"
@@ -41,6 +43,7 @@
     },
     {
       "id": "cold-cuts-rate-of-fire",
+      "name": "Cold slows fast firing weapons",
       "when": {
         "hazard": [
           "extreme_cold"
@@ -59,6 +62,7 @@
     },
     {
       "id": "ion-storms-kill-stratagems",
+      "name": "Ion storms can stop a call-in arriving",
       "when": {
         "hazard": [
           "ion_storms"
@@ -72,6 +76,7 @@
     },
     {
       "id": "ion-storms-favour-what-you-carry",
+      "name": "Ion storms favour what you carry",
       "when": {
         "hazard": [
           "ion_storms"
@@ -89,6 +94,7 @@
     },
     {
       "id": "sandstorm-blinds-marksmen",
+      "name": "Sandstorms blind marksman rifles",
       "when": {
         "hazard": [
           "sandstorms"
@@ -104,6 +110,7 @@
     },
     {
       "id": "sandstorm-blinds-long-support",
+      "name": "Sandstorms blind long range support weapons",
       "when": {
         "hazard": [
           "sandstorms"
@@ -120,6 +127,7 @@
     },
     {
       "id": "sandstorm-favours-close",
+      "name": "Sandstorms favour close range",
       "when": {
         "hazard": [
           "sandstorms"
@@ -136,6 +144,7 @@
     },
     {
       "id": "blizzard-blinds-marksmen",
+      "name": "Blizzards blind marksman rifles",
       "when": {
         "hazard": [
           "blizzards"
@@ -151,6 +160,7 @@
     },
     {
       "id": "blizzard-blinds-long-support",
+      "name": "Blizzards blind long range support weapons",
       "when": {
         "hazard": [
           "blizzards"
@@ -167,6 +177,7 @@
     },
     {
       "id": "blizzard-favours-close",
+      "name": "Blizzards favour close range",
       "when": {
         "hazard": [
           "blizzards"
@@ -183,6 +194,7 @@
     },
     {
       "id": "fog-blinds-marksmen",
+      "name": "Fog dims marksman rifles",
       "when": {
         "hazard": [
           "thick_fog"
@@ -198,6 +210,7 @@
     },
     {
       "id": "fog-blinds-long-support",
+      "name": "Fog dims long range support weapons",
       "when": {
         "hazard": [
           "thick_fog"
@@ -214,6 +227,7 @@
     },
     {
       "id": "tremors-punish-standing-still",
+      "name": "Tremors punish a standing reload",
       "when": {
         "hazard": [
           "tremors"
@@ -229,6 +243,7 @@
     },
     {
       "id": "tremors-punish-emplacements",
+      "name": "Tremors punish emplacements",
       "when": {
         "hazard": [
           "tremors"
@@ -246,6 +261,7 @@
     },
     {
       "id": "fire-tornadoes-and-fire",
+      "name": "Fire tornadoes and fire kits",
       "when": {
         "hazard": [
           "fire_tornadoes"
@@ -259,6 +275,7 @@
     },
     {
       "id": "acid-storms-and-armor",
+      "name": "Acid storms weaken armour passives",
       "when": {
         "hazard": [
           "acid_storms"
@@ -272,6 +289,7 @@
     },
     {
       "id": "bugs-want-durable-damage",
+      "name": "Terminids reward durable damage",
       "when": {
         "faction": [
           "bugs"
@@ -290,6 +308,7 @@
     },
     {
       "id": "bugs-punish-chaff-only",
+      "name": "Terminids punish light damage",
       "when": {
         "faction": [
           "bugs"
@@ -309,6 +328,7 @@
     },
     {
       "id": "bugs-punish-slow-handling",
+      "name": "Terminids punish slow handling",
       "when": {
         "faction": [
           "bugs"
@@ -328,6 +348,7 @@
     },
     {
       "id": "squids-want-sustained",
+      "name": "The Illuminate reward sustained fire",
       "when": {
         "faction": [
           "squids"
@@ -347,6 +368,7 @@
     },
     {
       "id": "squids-punish-one-shot",
+      "name": "The Illuminate punish one shot weapons",
       "when": {
         "faction": [
           "squids"
@@ -366,6 +388,7 @@
     },
     {
       "id": "nest-wants-demolition",
+      "name": "Demolition missions reward demolition 40",
       "when": {
         "mission": [
           "nest",
@@ -385,6 +408,7 @@
     },
     {
       "id": "nest-wants-objective-role",
+      "name": "Demolition missions reward hole closers",
       "when": {
         "mission": [
           "nest",
@@ -401,6 +425,7 @@
     },
     {
       "id": "carry-punishes-two-handed-support",
+      "name": "Carrying punishes two handed support weapons",
       "when": {
         "mission": [
           "carry"
@@ -417,6 +442,7 @@
     },
     {
       "id": "evacuate-wants-smoke",
+      "name": "Escorts reward smoke",
       "when": {
         "mission": [
           "evacuate"
@@ -432,6 +458,7 @@
     },
     {
       "id": "wave-wants-emplacements",
+      "name": "Holding ground rewards emplacements",
       "when": {
         "mission": [
           "wave",
@@ -450,6 +477,7 @@
     },
     {
       "id": "hvt-wants-antitank",
+      "name": "High value targets reward anti-tank",
       "when": {
         "mission": [
           "hvt"
@@ -467,6 +495,7 @@
     },
     {
       "id": "blitz-wants-speed",
+      "name": "Blitz rewards fast demolition",
       "when": {
         "mission": [
           "blitz"
@@ -485,6 +514,7 @@
     },
     {
       "id": "carry-wants-sidearm",
+      "name": "Carrying rewards a one handed sidearm",
       "when": {
         "mission": [
           "carry"
@@ -498,6 +528,7 @@
     },
     {
       "id": "carry-wants-smg",
+      "name": "Carrying rewards a one handed SMG",
       "when": {
         "mission": [
           "carry"
@@ -513,6 +544,7 @@
     },
     {
       "id": "peril-bots-wants-quiet",
+      "name": "Hard bot drops reward suppressed weapons",
       "when": {
         "faction": [
           "bots"
@@ -536,6 +568,7 @@
     },
     {
       "id": "peril-bots-punishes-loud",
+      "name": "Hard bot drops punish loud weapons",
       "when": {
         "faction": [
           "bots"
@@ -559,6 +592,7 @@
     },
     {
       "id": "peril-storm-favours-stealth",
+      "name": "Storms on a hard bot drop favour stealth",
       "when": {
         "faction": [
           "bots"
@@ -583,6 +617,183 @@
       },
       "judgement": "Ours. Stacks with the plain quiet rule rather than replacing it, so a storm is worth extra on top rather than instead. Sized at about six tenths of a tier at peril 22.",
       "sayInverted": "A storm cuts your sight as much as theirs, and this drop is comfortable enough that the fight is one you can simply win. Trading reach for silence is the wrong trade here."
+    },
+    {
+      "id": "commando-no-reinforcement-boosters",
+      "name": "Commando missions refuse reinforcement boosters",
+      "when": {
+        "mission": [
+          "commando"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "increased-reinforcement-budget",
+          "flexible-reinforcement-budget"
+        ]
+      },
+      "delta": -28,
+      "say": "A Commando mission will not let you bring this. The game refuses reinforcement boosters on them, so the slot is spent on nothing.",
+      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026"
+    },
+    {
+      "id": "commando-repeat-call-ins-come-twice",
+      "name": "Commando missions punish call-ins that earn their keep by repeating",
+      "when": {
+        "mission": [
+          "commando"
+        ]
+      },
+      "match": {
+        "stratType": [
+          "orbital",
+          "sentry",
+          "emplacement",
+          "mines"
+        ],
+        "number": [
+          {
+            "path": "wiki.callIn.cooldown",
+            "lte": 120
+          }
+        ]
+      },
+      "delta": -10,
+      "say": "This earns its rating by coming back every minute or two. On a Commando mission every call-in waits for the Super Destroyer, which is overhead for one minute when you land and once more per Helldiver, so it comes twice at most.",
+      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026"
+    },
+    {
+      "id": "commando-long-cooldowns-cost-nothing",
+      "name": "Commando missions forgive a long cooldown",
+      "when": {
+        "mission": [
+          "commando"
+        ]
+      },
+      "match": {
+        "stratType": [
+          "orbital",
+          "sentry",
+          "emplacement"
+        ],
+        "number": [
+          {
+            "path": "wiki.callIn.cooldown",
+            "gte": 180
+          }
+        ]
+      },
+      "delta": 8,
+      "say": "Every call-in here waits for the same two windows, so a long cooldown costs nothing. What is left is how hard this hits when it lands.",
+      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026"
+    },
+    {
+      "id": "commando-expendables-come-twice",
+      "name": "Commando missions punish throwaway launchers",
+      "when": {
+        "mission": [
+          "commando"
+        ]
+      },
+      "match": {
+        "gameTags": [
+          "EXPENDABLE"
+        ]
+      },
+      "delta": -12,
+      "say": "A throwaway launcher is worth its rating because two more fall every minute. Here they fall only while the Super Destroyer is overhead, twice in the whole mission.",
+      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026"
+    },
+    {
+      "id": "commando-heat-weapons-need-no-ammo",
+      "name": "Commando missions reward heat weapons, which need no ammo",
+      "when": {
+        "mission": [
+          "commando"
+        ]
+      },
+      "match": {
+        "held": true,
+        "wiki.ammo.feed": [
+          "heat"
+        ]
+      },
+      "delta": 14,
+      "say": "Resupply is a call-in, and here call-ins come twice. This runs on heat rather than magazines: keep it from overheating and it never runs dry, long after everybody else's ammo is gone.",
+      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026",
+      "judgement": "That ammo runs short follows from resupply being a stratagem. That a weapon needing none is worth a full tier, and almost a given to bring, is the curator's call, 1 October 2026: the Quasar is S+ on these missions, not S."
+    },
+    {
+      "id": "commando-arc-weapons-need-no-ammo",
+      "name": "Commando missions reward arc weapons, which need no ammo",
+      "when": {
+        "mission": [
+          "commando"
+        ]
+      },
+      "match": {
+        "held": true,
+        "damageType": [
+          "arc"
+        ]
+      },
+      "delta": 14,
+      "say": "Resupply is a call-in, and here call-ins come twice. An arc weapon has no ammunition at all, so it keeps working long after everybody else's has run out.",
+      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026",
+      "judgement": "That ammo runs short follows from resupply being a stratagem. That a weapon needing none is worth a full tier, and almost a given to bring, is the curator's call, 1 October 2026: the Quasar is S+ on these missions, not S."
+    },
+    {
+      "id": "commando-supplies-are-the-resupply",
+      "name": "Commando missions reward bringing your own supplies",
+      "when": {
+        "mission": [
+          "commando"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "b-1-supply-pack",
+          "m-103-supply-frv"
+        ]
+      },
+      "delta": 10,
+      "say": "Resupply is a call-in, and here call-ins come twice. Supplies you brought with you are the resupply you will not otherwise get.",
+      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026",
+      "judgement": "Named by hand: nothing published marks an item as carrying supplies for the squad."
+    },
+    {
+      "id": "commando-rewards-suppressed",
+      "name": "Commando missions reward suppressed weapons",
+      "when": {
+        "mission": [
+          "commando"
+        ]
+      },
+      "match": {
+        "tags": [
+          "suppressed"
+        ]
+      },
+      "delta": 8,
+      "say": "Every time a bot calls for help the threat level climbs, and the whole map gets worse. A weapon they cannot hear keeps it down.",
+      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026"
+    },
+    {
+      "id": "commando-rewards-stealth-armour",
+      "name": "Commando missions reward stealth armour",
+      "when": {
+        "mission": [
+          "commando"
+        ]
+      },
+      "match": {
+        "traits": [
+          "stealth"
+        ]
+      },
+      "delta": 8,
+      "say": "Every time a bot calls for help the threat level climbs, and the whole map gets worse. Not being seen is the best answer to that this mission has.",
+      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026"
     }
   ],
   "knownGaps": [

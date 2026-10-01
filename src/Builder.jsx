@@ -1,16 +1,23 @@
 /* ================================================================== */
-/* LOADOUT BUILDER                                                    */
-/* The first surface where you author something the app has to keep.   */
+/* THE ARMOURY'S EDITOR                                               */
+/* Where a build is made, and the only place one is changed.           */
 /*                                                                    */
 /* Tapping a slot opens a picker over the whole screen, and that       */
-/* picker reuses the tier row so ratings, flags and provenance are in  */
-/* front of you at the moment you choose, rather than one screen away. */
+/* picker is the tier list: the same row, ranked by what each item is  */
+/* worth where you are dropping, with the vote beside it. Since 1      */
+/* October 2026 the tier list has no menu entry of its own, by the     */
+/* curator's call, so this is how most people meet it.                 */
+/*                                                                    */
+/* It opens on its own page from the Armoury, or over the drop screen  */
+/* from Drop Bay, the game's own two places: the armoury before, the   */
+/* drop screen right before. Over the drop screen, saving puts the     */
+/* build straight into your slot.                                      */
 /* ================================================================== */
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import {
   X, Search, Plus, Save, Copy, Trash2, Star, Lock, AlertTriangle, ArrowUp, ArrowDown,
-  Thermometer, Flame, ChevronLeft, Backpack,
+  Thermometer, Flame, ChevronLeft, Backpack, Link2, Check,
 } from "lucide-react";
 
 import {
@@ -24,6 +31,13 @@ import {
   presets, SLOTS, STRAT_SLOTS, emptyLoadout, forkPreset,
   deriveHeat, heatSources, deriveFire, backpackUsers, hasBackpackConflict, loadoutItemIds,
 } from "./lib/loadouts.js";
+import { shareUrl } from "./lib/share.js";
+
+/* Where the list is ranked for, in the words the scenario bar uses. */
+function rankedFor(factionMeta, scenario) {
+  const where = [scenario.planet ? `on ${scenario.planet}` : null, scenario.mission || null].filter(Boolean);
+  return `Ranked for ${factionMeta.label}${where.length ? ", " + where.join(", ") : ""}`;
+}
 
 /* ------------------------------------------------------------------ */
 /* Picker overlay                                                      */
@@ -43,13 +57,24 @@ function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, ta
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  /* Ranked for the faction the build is for, not averaged across all     */
-  /* three. A build says it is for bots, so the picker should lead with   */
-  /* what is good against bots rather than what is good on balance.       */
+  /* Ranked for where you are dropping, against the front the build is
+     for: our reading, the same number the slot shows once chosen. It
+     ranked by the vote until 1 October 2026, which made "already sorted
+     for my drop" untrue the moment a scenario said anything. The vote is
+     still on every row, beside it. */
+  const scored = useMemo(() => {
+    const category = CATEGORIES.find((c) => c.slot === slot);
+    const all = category ? category.items : [];
+    return new Map(all.map((it) => [it.id, scoreItem(it, { ...scenario, faction })]));
+  }, [slot, scenario, faction]);
+  const pointsOf = (it) => {
+    const r = scored.get(it.id);
+    return r && typeof r.score === "number" ? r.score : null;
+  };
+
   const pool = useMemo(() => {
     const category = CATEGORIES.find((c) => c.slot === slot);
     const all = category ? category.items : [];
-    const score = (it) => rank(it.ratings[faction].tier);
     return all
       .filter((it) => {
         /* You cannot bring the same stratagem twice, so anything already */
@@ -66,20 +91,20 @@ function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, ta
         if (aFav !== bFav) return aFav - bFav;
         /* Unrated sorts last but is never removed. Being seen is the    */
         /* only way a new warbond weapon ever gets tried.                */
-        const aNew = a.ratings[faction].tier ? 0 : 1;
-        const bNew = b.ratings[faction].tier ? 0 : 1;
-        if (aNew !== bNew) return aNew - bNew;
-        const d = score(b) - score(a);
-        if (d !== 0) return d;
+        const pa = pointsOf(a);
+        const pb = pointsOf(b);
+        if ((pa === null) !== (pb === null)) return pa === null ? 1 : -1;
+        if (pa !== pb) return pb - pa;
         return a.name.localeCompare(b.name);
       });
-  }, [slot, query, showLocked, lockedSet, favSet, faction, taken]);
+  }, [slot, query, showLocked, lockedSet, favSet, taken, scored]);
 
-  /* The best rating actually available in this slot for this faction, so */
-  /* "top pick" means top of what you can reach rather than a fixed tier. */
+  /* The best reading actually available in this slot, so "top pick" means
+     the top of what you can reach for this drop rather than a fixed tier. */
+  const tierOf = (it) => (scored.get(it.id) || {}).tier || null;
   const topRank = useMemo(
-    () => pool.reduce((best, it) => Math.max(best, rank(it.ratings[faction].tier)), 0),
-    [pool, faction]
+    () => pool.reduce((best, it) => Math.max(best, rank(tierOf(it))), 0),
+    [pool, scored]
   );
 
   const hiddenCount = useMemo(() => {
@@ -101,7 +126,7 @@ function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, ta
         <div className="min-w-0">
           <h2 className="text-lg font-bold leading-tight" style={{ fontFamily: "'Oswald', sans-serif" }}>{title}</h2>
           <p className="text-[11px]" style={{ color: factionMeta.hex }}>
-            Ranked for {factionMeta.label}
+            {rankedFor(factionMeta, scenario)}
           </p>
         </div>
         <div className="ml-auto flex items-center gap-2">
@@ -150,7 +175,7 @@ function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, ta
         ) : (
           <div className="mx-auto flex max-w-4xl flex-col gap-1.5">
             {pool.map((it) => {
-              const best = topRank > 0 && rank(it.ratings[faction].tier) === topRank;
+              const best = topRank > 0 && rank(tierOf(it)) === topRank;
               /* Warn before the pick, not after. Choosing this would be */
               /* the second thing wanting your back.                     */
               const clash = takenBackpack && (it.stratType === "backpack" || it.usesBackpackSlot === true);
@@ -160,7 +185,7 @@ function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, ta
                     <div className="mb-0.5 flex items-center gap-2 pl-1 text-[10px]">
                       {best ? (
                         <span className="font-semibold uppercase tracking-wider" style={{ color: factionMeta.hex }}>
-                          Top pick vs {factionMeta.short}
+                          Top pick for this drop
                         </span>
                       ) : null}
                       {clash ? (
@@ -307,7 +332,14 @@ const MultiToggle = ({ label, hint, options, value, onChange }) => (
   </div>
 );
 
-export default function Builder({ state, loadoutId, navigate, faction, scenario }) {
+/**
+ * `overlay` is set when the builder opens over the drop screen:
+ * { onClose, onSaved(id) }. Saving then hands the build back to the slot
+ * that opened it rather than moving the page. `startWith` opens one slot's
+ * picker straight away, which is how somebody with no builds yet starts
+ * one from Drop Bay: the first thing they see is the list.
+ */
+export default function Builder({ state, loadoutId, navigate, faction, scenario, overlay = null, startWith = null }) {
   const stored = state.loadouts.find((l) => l.id === loadoutId);
   const preset = presets.find((p) => p.id === loadoutId);
 
@@ -318,9 +350,14 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario 
     /* dropping on. You can still change it per build below.               */
     return emptyLoadout(faction || undefined);
   });
-  const [picking, setPicking] = useState(null);
+  const [picking, setPicking] = useState(() => {
+    const s = startWith ? SLOTS.find((x) => x.key === startWith) : null;
+    return s ? { key: s.key, slot: s.slot, stratSlot: null } : null;
+  });
   const [dirty, setDirty] = useState(Boolean(preset && !stored));
   const [justSaved, setJustSaved] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   /* Following a link to a different build swaps the draft rather than   */
   /* leaving you editing the previous one under a new title.             */
@@ -356,11 +393,68 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario 
     state.saveLoadout({ ...draft, heat });
     setDirty(false);
     setJustSaved(true);
-    if (!stored) navigate(`builder/${draft.id}`);
+    if (overlay) overlay.onSaved(draft.id);
+    else if (!stored) navigate(`builder/${draft.id}`);
+  };
+
+  /* Over the drop screen, your edit can become a new build instead, so
+     the one you made for another night is left as it was. */
+  const saveAsNew = () => {
+    const copy = state.duplicate({ ...draft, heat });
+    if (overlay) overlay.onSaved(copy.id);
+    else navigate(`builder/${copy.id}`);
+  };
+
+  /* Closing with unsaved changes takes two presses, the second one saying
+     what it throws away. */
+  const close = () => {
+    if (dirty && !leaving) { setLeaving(true); return; }
+    overlay.onClose();
+  };
+
+  const copyLink = async () => {
+    const url = shareUrl(draft, `${window.location.origin}${window.location.pathname}`);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      window.prompt("Copy this link to share the build", url);
+    }
   };
 
   return (
     <div className="flex flex-col gap-4">
+      {overlay ? (
+        <div className="flex flex-wrap items-center gap-3 border-b border-base-800 pb-3">
+          <button onClick={close} aria-label="Back to the drop"
+            className="rounded p-1.5 text-base-400 hover:bg-base-800 hover:text-base-100">
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <div className="min-w-0 flex-1">
+            <p className="text-lg font-bold leading-tight" style={{ fontFamily: "'Oswald', sans-serif" }}>
+              {stored ? "Adjust your build" : preset ? "Adjust a copy of this preset" : "A new build"}
+            </p>
+            <p className="text-[11px] text-base-500">
+              Saving puts it in your slot on the drop screen, still to confirm.
+            </p>
+          </div>
+          {leaving ? (
+            <span className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[11px] text-accent-400">Unsaved changes.</span>
+              <button onClick={() => overlay.onClose()}
+                className="rounded border border-red-700 bg-red-950/40 px-2.5 py-1 text-xs text-red-300 hover:border-red-500">
+                Throw them away
+              </button>
+              <button onClick={() => setLeaving(false)}
+                className="rounded border border-base-700 px-2.5 py-1 text-xs text-base-300 hover:border-base-500">
+                Keep editing
+              </button>
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+
       {/* The same control the tier list and Drop Bay carry, but bound to  */}
       {/* the build rather than to the scenario. A build is for a front and   */}
       {/* keeps that when you save it, so changing it here changes what    */}
@@ -432,16 +526,28 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario 
                   ? "border-base-200 bg-base-200 text-base-900 hover:bg-base-100"
                   : "border-base-800 bg-base-900 text-base-600 cursor-default")}>
               <Save className="h-3.5 w-3.5" />
-              {dirty ? "Save" : justSaved ? "Saved" : "No changes"}
+              {dirty ? (overlay ? "Save and use it" : "Save") : justSaved ? "Saved" : "No changes"}
             </button>
-            {stored ? (
+            {overlay && stored && dirty ? (
+              <button onClick={saveAsNew} title="Keep the original as it was and use a new copy with these changes"
+                className="flex items-center gap-1.5 rounded border border-base-700 px-3 py-1.5 text-xs text-base-300 hover:border-base-500 hover:text-base-100">
+                <Copy className="h-3.5 w-3.5" /> Save as a new build
+              </button>
+            ) : null}
+            <button onClick={copyLink} disabled={filled === 0}
+              title="Copy a link to this build. Whoever opens it can keep a copy"
+              className="flex items-center gap-1.5 rounded border border-base-700 px-2.5 py-1.5 text-xs text-base-300 hover:border-base-500 hover:text-base-100 disabled:opacity-40">
+              {copied ? <Check className="h-3.5 w-3.5" /> : <Link2 className="h-3.5 w-3.5" />}
+              {copied ? "Link copied" : "Share"}
+            </button>
+            {stored && !overlay ? (
               <>
                 <button onClick={() => { const c = state.duplicate(draft); navigate(`builder/${c.id}`); }}
                   title="Duplicate"
                   className="rounded border border-base-700 p-1.5 text-base-400 hover:border-base-500 hover:text-base-100">
                   <Copy className="h-3.5 w-3.5" />
                 </button>
-                <button onClick={() => { state.deleteLoadout(draft.id); navigate("bay/builds"); }}
+                <button onClick={() => { state.deleteLoadout(draft.id); navigate("armoury/builds"); }}
                   title="Delete"
                   className="rounded border border-base-700 p-1.5 text-base-400 hover:border-red-600 hover:text-red-400">
                   <Trash2 className="h-3.5 w-3.5" />
@@ -584,72 +690,5 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario 
         </div>
       </div>
     </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Picking something to open                                           */
-/* ------------------------------------------------------------------ */
-
-export function BuilderIndex({ state, navigate }) {
-  const mine = state.loadouts;
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <button onClick={() => navigate("builder/new")}
-          className="flex items-center gap-1.5 rounded border border-base-200 bg-base-200 px-3 py-1.5 text-xs text-base-900 hover:bg-base-100">
-          <Plus className="h-3.5 w-3.5" /> New loadout
-        </button>
-        <span className="text-[11px] text-base-500">{mine.length} of your own, {presets.length} curated presets</span>
-      </div>
-
-      <div>
-        <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-base-300"
-          style={{ fontFamily: "'Oswald', sans-serif" }}>Yours</h3>
-        {mine.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-base-700 px-4 py-8 text-center">
-            <p className="text-sm text-base-400">Nothing built yet.</p>
-            <p className="mt-1 text-xs text-base-600">
-              Start from scratch, or open a curated build below and fork it.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {mine.map((l) => <BuildLink key={l.id} loadout={l} onOpen={() => navigate(`builder/${l.id}`)} />)}
-          </div>
-        )}
-      </div>
-
-      <div>
-        <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-base-300"
-          style={{ fontFamily: "'Oswald', sans-serif" }}>Curated presets</h3>
-        <p className="mb-2 text-[11px] text-base-500">
-          Opening one forks it into a copy of your own. The originals never change.
-        </p>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {presets.map((l) => <BuildLink key={l.id} loadout={l} preset onOpen={() => navigate(`builder/${l.id}`)} />)}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function BuildLink({ loadout, preset, onOpen }) {
-  const theme = FACTION_THEME[loadout.faction];
-  const filled = loadoutItemIds(loadout).length;
-  return (
-    <button onClick={onOpen}
-      className="flex items-center gap-3 rounded-lg border border-base-800 bg-base-900 p-2.5 text-left hover:border-base-600">
-      <span className="h-8 w-1 shrink-0 rounded" style={{ backgroundColor: theme.hex }} />
-      <span className="min-w-0 flex-1">
-        <span className={`block truncate text-sm font-bold ${theme.text}`} style={{ fontFamily: "'Oswald', sans-serif" }}>
-          {loadout.name}
-        </span>
-        <span className="block truncate text-[11px] text-base-500">
-          {preset ? "Preset · " : ""}{filled} of 9 slots
-          {loadout.blurb ? ` · ${loadout.blurb}` : ""}
-        </span>
-      </span>
-    </button>
   );
 }

@@ -1953,7 +1953,7 @@ export function ScenarioScreen({ scenario, setFaction, setPlanet, setBiome, togg
  * being read, because a rating computed from a choice you have
  * forgotten making is worse than no rating at all.
  */
-export function ScenarioBar({ scenario, onAdjust }) {
+export function ScenarioBar({ scenario, onAdjust, rulesOff = 0, onRules }) {
   const f = FACTIONS.find((x) => x.id === scenario.faction);
   if (!f) return null;
   const d = difficultyAt(scenario.difficulty);
@@ -1973,9 +1973,19 @@ export function ScenarioBar({ scenario, onAdjust }) {
       <Chip icon={d ? <DifficultyIcon level={d.level} className="h-3.5 w-6" /> : null}>
         {d ? d.name : "any difficulty"}
       </Chip>
+      <Chip>{scenario.squad === 1 ? "solo" : scenario.squad ? `${scenario.squad} of you` : "squad not said"}</Chip>
+
+      {/* A switched off rule changes every rating on screen, so it is never
+          out of sight: the same rule the folded filter pane keeps. */}
+      {rulesOff ? (
+        <button onClick={onRules}
+          className="ml-auto shrink-0 rounded border border-accent-700/70 bg-accent-950/40 px-2 py-1 text-[11px] text-accent-300 hover:border-accent-500">
+          {rulesOff} {rulesOff === 1 ? "rule" : "rules"} off
+        </button>
+      ) : null}
 
       <button onClick={onAdjust}
-        className="ml-auto flex shrink-0 items-center gap-1.5 rounded border border-base-700 bg-base-900 px-2 py-1 text-[11px] text-base-300 hover:border-base-500 hover:text-base-100">
+        className={(rulesOff ? "" : "ml-auto ") + "flex shrink-0 items-center gap-1.5 rounded border border-base-700 bg-base-900 px-2 py-1 text-[11px] text-base-300 hover:border-base-500 hover:text-base-100"}>
         <SlidersHorizontal className="h-3.5 w-3.5" />
         Adjust scenario
       </button>
@@ -2512,11 +2522,13 @@ export function LoadoutCard({ loadout, isFavorite, onToggleFavorite, rankLabel, 
                 <Users className="w-4 h-4" />
               </button>
             ) : null}
-            <button onClick={() => onToggleFavorite(loadout.id)} aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"} className="rounded p-1.5 hover:bg-base-800">
-              <Star className={"w-5 h-5 " + (isFavorite ? "fill-accent-400 text-accent-400" : "text-base-600")} />
-            </button>
+            {onToggleFavorite ? (
+              <button onClick={() => onToggleFavorite(loadout.id)} aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"} className="rounded p-1.5 hover:bg-base-800">
+                <Star className={"w-5 h-5 " + (isFavorite ? "fill-accent-400 text-accent-400" : "text-base-600")} />
+              </button>
+            ) : null}
             {onOpen ? (
-              <button onClick={() => onOpen(loadout)} title="Open in builder" aria-label={`Open ${loadout.name} in the builder`}
+              <button onClick={() => onOpen(loadout)} title="Open in the Armoury" aria-label={`Open ${loadout.name} in the Armoury`}
                 className="rounded p-1.5 text-base-500 hover:bg-base-800 hover:text-base-100">
                 <Pencil className="w-4 h-4" />
               </button>

@@ -91,6 +91,54 @@
       "version": "1.25.0"
     },
     {
+      "id": "front-door",
+      "title": "Drop Bay is the front door",
+      "status": "shipped",
+      "version": "1.25.0",
+      "track": "solo",
+      "say": "The tool opens on Drop Bay, suggests from your own builds for where you are going, and lets you adjust one without leaving, with the tier list as the picker inside every build."
+    },
+    {
+      "id": "armoury",
+      "title": "The Armoury",
+      "status": "shipped",
+      "version": "1.25.0",
+      "track": "solo",
+      "say": "Your builds kept and named, and a coverage view that shows what you have for each occasion on each front, and where the gaps are."
+    },
+    {
+      "id": "rules",
+      "title": "The rules, out in the open",
+      "status": "shipped",
+      "version": "1.25.0",
+      "track": "solo",
+      "say": "Every rule behind our rating, what it moves where you are dropping, and a switch to turn any of it off and see what changes."
+    },
+    {
+      "id": "commando",
+      "title": "Commando missions",
+      "status": "shipped",
+      "version": "1.25.0",
+      "track": "solo",
+      "say": "Automaton Commando missions read the way they play: twelve reinforcements, every call-in twice at most, and weapons that need no ammo near the top."
+    },
+    {
+      "id": "share",
+      "title": "Share a build",
+      "status": "shipped",
+      "version": "1.25.0",
+      "track": "solo",
+      "say": "A link that carries the build itself, so a friend can keep a copy without either of you needing an account."
+    },
+    {
+      "id": "nudges",
+      "title": "Try this for a change",
+      "status": "next",
+      "version": null,
+      "track": "solo",
+      "say": "Your drop history turned into nudges: builds you have not dropped with in a while, and weapons you have never brought against a front."
+    },
+    {
       "id": "effects",
       "title": "Planet effects in the ratings",
       "status": "next",

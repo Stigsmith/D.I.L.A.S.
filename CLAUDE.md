@@ -18,10 +18,13 @@ A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai a
 
 | Destination | Route | State |
 |---|---|---|
-| **Tier Lists** | `#/tiers/:category` | Built. The primary experience. Six categories as top tabs, **one chosen front**, two rating columns, filters, search, locking, favorites, full row expansion |
+| **Drop Bay** | `#/bay` | Built. **The front door since 1 October 2026**: the page the tool opens on. The screen for the moment before you go. See The Drop Screen |
+| **Armoury** | `#/armoury/:tab` | Built. Your builds. Two tabs: **Builds**, the grid that browses every build at once, and **Coverage**, what your builds answer per front. See The Armoury |
 | **Collection** | `#/collection/:tab` | Built. Two tabs, Warbonds and Items, one per ownership axis |
-| **Loadout Builder** | `#/builder/:id?` | Built. Edits one build. With no id it starts a fresh one |
-| **Drop Bay** | `#/bay/:tab` | Built. Two tabs: **Drop**, the screen for the moment before you go, and **Builds**, the grid that browses every build at once. See The Drop Screen |
+| **Rules** | `#/rules` | Built. Every rule behind our rating, what it moves here, and a switch to turn it off. Bottom of the menu. See The Rules Page |
+| **Tier Lists** | `#/tiers/:category` | Built, **off the menu since 1 October 2026**. Lives on as the picker inside every build, and whole at this address, linked from the Armoury |
+| **The editor** | `#/builder/:id?` | Off the menu, lit as Armoury. Edits one build; `new` starts one, `new-bots` starts one for a front |
+| **Shared build** | `#/shared/:code` | Off the menu. A build carried in the link itself. See Drop History And Share Links |
 | **Settings** | `#/settings` | Built. Theme, export, import, reset |
 | **Support** | `#/support` | Built. Where the numbers come from |
 | **Roadmap** | `#/roadmap` | Built. One timeline, what is next and what it waits on |
@@ -34,6 +37,20 @@ A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai a
 
 > [!info] Who this is for
 > stigly, a returning power user whose game knowledge stops around December 2024. He curates the data and decides what the tool does. He did not write this code and does not read it. Describe changes in terms of what they do for the tool, not by identifier.
+
+> [!success] Drop Bay is the front door. The curator's call, 1 October 2026
+> The tool now follows the game's own two places: **the Armoury**, where builds are made and kept (the game's armoury, plus saving, naming and stratagems, which the game does not keep), and **Drop Bay**, the drop screen right before you go. The tier list left the menu: **it is the picker inside every build**, ranked by our reading for where you are dropping, and still whole at `#/tiers` for anyone who prefers it. The value proposition in his words: repeatability, and showing what you actually have for each occasion.
+>
+> | Landed the same day | |
+> |---|---|
+> | **Suggestions** | Drop Bay suggests three of your builds, ranked by the reading, each saying why. Ranking was "a decision nobody has made" until this |
+> | **The editor over the drop** | Adjusting a build opens the editor over Drop Bay; saving puts it in your slot, still to confirm |
+> | **Seats** | How many of you, asked on the drop screen as seats. An empty seat is a squadmate whose build you do not know |
+> | **Drop history** | Every Confirm is recorded, so "you have never dropped with a Railgun against bots" can be built on it |
+> | **Coverage** | The Armoury answers "do I have something for each occasion", per front |
+> | **The Rules page** | Every rule, what it moves here, and a switch |
+> | **Share links** | A build in the link itself, no server |
+> | **Commando missions** | Automaton only, with their own trait and eight rules: the reinforcement and call-in limits, from the wiki |
 
 What is agreed but not built lives in `dds-roadmap.md`: the accounts, Exchange and live squad dependency chain, the wider warning set, and the offline build authoring plan. Read it before starting anything that sounds like new scope.
 
@@ -249,7 +266,7 @@ Rename freely. Put the old name in that item's `aliases` array and nothing break
 
 ### The shape of the tool
 
-- **Tier browsing is the primary tool, not the picker.** He prefers evaluating individual items over accepting curated loadouts, because he may dislike half the S tiers and enjoy some A tiers.
+- **Tier browsing was the primary tool until 1 October 2026, and he reversed it himself.** He still prefers judging items over accepting packaged builds, which is why the tier list survives as the picker in every build, ranked for the drop, and stays whole at `#/tiers`. What changed is the front door: Drop Bay, then the Armoury, the game's own two places. Do not put the tier list back in the menu without asking.
 - **Curated loadouts are fixed and named, not generated.** Auto-calibration, pick a primary and have the rest adjust, was considered and declined. Do not rebuild it.
 - **Keep the loadout objects readable.** Tier rows are arrays, loadouts are objects, because he may edit loadouts by hand.
 
@@ -355,7 +372,8 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 | `wiki-stats.json` | **Generated.** The stats the tables never had, for 195 items. Never edit by hand |
 | `planets.json` | **Generated.** 281 planets: biome, hazards, sector, their cities by size, and for 274 of them a place on the galaxy map and the supply lines to their neighbours. Read by the scenario, the map and the drop planner |
 | `enemies.json` | **Generated.** 80 enemies, 594 body parts, each with an armor value, plus the difficulty each enemy starts appearing at. What every penetration figure is measured against. Never edit by hand |
-| `context-rules.json` | The 34 rules that move one item rating. Read by `score.js`, checked by `npm run rules` |
+| `context-rules.json` | The 43 rules that move one item rating, each with a `name` for the Rules page. Read by `score.js`, checked by `npm run rules` |
+| `missions.json` | The 70 missions by the game's names, the fronts each appears on, and the nine traits a rule keys on. Hand kept from the wiki; the names and fronts are the wiki's, the traits are ours |
 | `build-rules.json` | The 9 rules that move a whole build. Read by `build.js`, checked by `npm run builds` |
 
 ### Item shape
@@ -511,20 +529,23 @@ Every key is an id, not a name. The validator rejects an id that resolves to not
 
 # **Persistence, Backup And Transfer**
 
-State lives in `localStorage` under four keys.
+State lives in `localStorage`. **What you own and what you made is exported; what describes this browser or tonight's drop is not.** `KEYS` in `src/lib/storage.js` is the exported half, `SETTINGS` the rest.
 
-| Key | Holds |
-|---|---|
-| `hd2-loadout-favorites` | Starred loadouts |
-| `hd2-favorite-items` | Starred tier rows |
-| `hd2-locked-items` | Per-item locks |
-| `hd2-locked-warbonds` | Warbond locks |
+| Key | Holds | Exported |
+|---|---|---|
+| `hd2-loadout-favorites`, `hd2-favorite-items` | Starred builds and tier rows | Yes |
+| `hd2-profiles` | Lock state, per named profile. The older `hd2-locked-items` and `hd2-locked-warbonds` were folded into it and left alone | Yes |
+| `hd2-loadouts` | Your builds | Yes |
+| `hd2-drop-history` | Every drop you confirmed, since 1 October 2026 | Yes, and an import adds to it rather than replacing it |
+| `hd2-scenario-*`, `hd2-drop`, `hd2-party`, `hd2-planner` | Where you are going tonight, with whom | No |
+| `hd2-theme`, `hd2-filter-view`, `hd2-map-skin`, `hd2-map-tilt`, `hd2-rules-off` | How this browser shows things | No |
 
 A key that has never been written reads as null, which is what lets the ownership seed apply exactly once without ever fighting your own toggles.
 
-**Export** writes one JSON file holding all four, with a `schemaVersion`. **Import** accepts that file back, and also accepts an ownership file in the shape above, inverting it into lock state. The two shapes cannot be confused because they use different key names. Both live in Settings, along with the theme and a reset.
+**Export** writes one JSON file with a `schemaVersion`. **Import** accepts that file back, and also accepts an ownership file in the shape above, inverting it into lock state. The two shapes cannot be confused because they use different key names. Both live in Settings, along with the theme and a reset.
 
-Two more keys, `hd2-theme` and `hd2-filter-view`, are display preferences rather than collection data. They are kept out of the export deliberately: they describe this browser, not what you own.
+> [!warning] Switched off rules stay out of the export on purpose, and that may be the wrong call
+> They change every rating, which argues for keeping them; they are also an experiment, which argues for not carrying one between addresses by accident. Left out for now. Ask before changing it.
 
 > [!warning] A folded filter is still a filter
 > The tier list filter pane folds down to faction and tier, with an arrow at the bottom of the pane to unfold the rest. Anything still narrowing the list while its control is hidden gets named in the folded view with a one click clear. Hiding a control that is still filtering is how you end up staring at an empty list wondering what happened.
@@ -709,13 +730,13 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 >
 > **The caption keys on the points, not on the badge.** It chose its sentence on whether the tier moved at first, so a build that gained 8 points without crossing a band rendered "nothing about how this fits together changes what the gear is worth" directly above a green +8. Three states, three sentences: the badge moved, the points moved but the badge did not, and genuinely nothing happened.
 
-> [!warning] Drop Bay carries the scenario bar now
-> Added to `SCENARIO_SURFACES` in `App.jsx` when the cards started reading the scenario. A control that changes what is on screen has to be on screen, the same rule the folded filter pane keeps.
+> [!warning] Every surface that shows a reading carries the scenario bar
+> `SCENARIO_SURFACES` in `App.jsx`: Drop Bay, the Armoury, the editor, the tier list, the Rules page and a shared build. A control that changes what is on screen has to be on screen, the same rule the folded filter pane keeps. **The bar also says how many of you, and "N rules off" whenever a rule is switched off**, one click to the Rules page.
 >
-> **The Builds tab's own biome, mission and difficulty are still filters and still local.** The drop screen reads the scenario instead, which was Phase 6a's job and landed in 1.24.0. The grid kept its filters because it is on its way to becoming Exchange, and there they describe builds rather than a drop. The five internal mission ids against seventy real names are unchanged there.
+> **The Armoury's Builds grid keeps its own biome, mission and difficulty filters, local.** The drop screen reads the scenario instead. The grid kept its filters because it is on its way to becoming Exchange, and there they describe builds rather than a drop.
 
-> [!info] There is still no ranking in Drop Bay
-> `DropBay.jsx` says so in its header and it stays true: a plain grid, no scored picks. The score exists and `byReading` is exported for the day Exchange needs it, which is the thing `dds-roadmap.md` says loadout scoring was blocking. **Turning Drop Bay into a ranked list is a product decision nobody has made.**
+> [!success] Drop Bay ranks, since 1 October 2026. The curator's decision
+> This section used to say ranking builds was a product decision nobody had made. He made it: Drop Bay suggests from your builds. `suggestBuilds` and `rankByReading` in `src/lib/drop.js`, by the same reading every badge shows, so a suggestion and the badge beside it cannot disagree. The Armoury's grid is still unranked: it browses, it does not recommend.
 
 > [!tip] The scripts share one loader now
 > `scripts/lib/app.mjs` inlines the JSON imports and hands back the real `src/lib` modules, so a script measures the code that ships rather than a copy of it. `check-rules.mjs` and `check-builds.mjs` both use it.
@@ -750,10 +771,14 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > Builds needing gear you have not unlocked are hidden in your own slot's picker by default, with a toggle, the builder's precedent. **A squadmate's picker ignores your locks entirely**: your collection says nothing about what they own.
 
 > [!info] Stored as ids in `hd2-drop`, and out of the export
-> `{ mine, confirmed, mates }`, ids only, the way the old comparison was, so an edited build is re-read rather than held stale. A slot whose build was deleted reads as empty. It is what you are dropping with tonight, not what you own, so it stays out of the export like the scenario does.
+> `{ mine, confirmed, mates, logged }`, ids only, the way the old comparison was, so an edited build is re-read rather than held stale. A slot whose build was deleted reads as empty. `logged` is the history entry the last Confirm wrote. It is what you are dropping with tonight, not what you own, so it stays out of the export like the scenario does.
 
-> [!info] No ranking, still
-> The picker orders favourites, then yours, then the presets, the grid's order, and shows each build's reading badge so you can judge. **Ranking builds is still a product decision nobody has made.** See The Loadout Reading.
+> [!success] Suggestions, the editor over the screen, seats and history. 1 October 2026
+> - **Suggested for this drop**: three of your own builds, through the same gates as the picker and never one needing gear you have not unlocked, ranked by the reading. Each says why: the piece the scenario lifts most, in that rule's own words, or failing that the build's worst hole (`whyFor`). With nothing of yours fitting, the presets stand in and say so; with nothing at all, the panel says what ruled everything out and offers **Start a build for this drop**. Hidden once you have confirmed.
+> - **The picker ranks** favourites first, then by reading, the order the suggestions use.
+> - **Adjust and New open the editor over Drop Bay** rather than navigating away. Saving puts the build in your slot, still to confirm; **Save as a new build** keeps the original; closing with changes asks first. Somebody with no builds sees **Pick a primary** in their slot, which opens the editor straight onto the primary list, already ranked for this drop.
+> - **Seats.** "Dropping with: Not said, Solo, 2, 3, 4", one value with the scenario's squad, so the tier list and every reading follow. The slots shown match it. **An empty seat is a squadmate whose build you do not know**, which is how three randoms read; deriving squad size from filled slots would call that solo, the exact mistake the peril rules refuse to make. A build in a seat you take away is kept, not counted, and says so. In a party the party's member count decides, as before.
+> - **Confirm writes the drop to your history**, and "Change my mind" within 15 minutes takes it back out (`TAKE_BACK_MS`): that was a change of mind, not a drop.
 
 > [!tip] Done on the scenario screen returns to where you opened it
 > It remembered only the tier list's category until 1.24.0, so adjusting the scenario from the drop screen threw you onto a tier list. `lastSurface` in `App.jsx` now remembers any surface that reads the scenario, tab included.
@@ -956,6 +981,43 @@ lists of item ids, and a concept written down six times is a concept that drifts
 
 ---
 
+# **The Rules Page**
+
+> [!success] Built 1 October 2026, the curator's idea. `src/Rules.jsx`, `src/lib/rules.js`
+> Every rule behind our rating in one place, at the bottom of the menu with the pages about the tool: what each does, what it moves where you are dropping right now, and a switch to turn it off. His reasons: an overview of which rules exist, and a way for him and others to see what each one changes, so rules can keep being added without becoming a black box.
+
+| | |
+|---|---|
+| **Groups** | The front; how hard and how many of you; climate; weather and terrain; the mission; how a build fits together. **Derived from each rule's own `when`**, so a new rule files itself |
+| **A closed row** | The switch, the name, where it applies, a "judgement" tag on rules that are our call, and how many items it moves here, up and down |
+| **An open row** | The sentence, the inverted sentence, when it applies and what it looks at in plain words (`describeWhen`, `describeMatch`), its size against "a tier is about 14 points", its source and judgement, its id, and **every item or build it moves here, with the tier now and the tier the other way round** |
+| **Scale** | Search, folding groups, and two filters: changing something here, and switched off. Built for dozens of rules |
+
+> [!danger] A switched off rule is gone everywhere, and only in this browser
+> The set rides on the scenario every surface reads (`rulesOff`, a Set, built in `App.jsx`), and `score.js` and `build.js` skip it. **It is never on the scenario the party sends**: `usePartySync` gets the bare one. `hd2-rules-off`, out of the export. The scenario bar shows "N rules off" on every surface while any is off, the folded filter rule again. `npm run rules` proves that switching one off removes it from exactly the items it fired on and moves nothing else.
+
+> [!warning] Every rule carries a name now, and the validator demands one
+> Ninety characters at most. The validator also checks two things that used to fail silently: **a mission trait a rule gates on must exist in `missions.json`**, and **an armor trait a rule matches must exist in `vocabulary.json`**. Either typo made a rule that could never fire.
+
+> [!success] Commando missions, sourced. 1 October 2026
+> The wiki's Commando Missions page, read that day: **Automaton only**, three missions (Secure Black Box, Acquire Evidence, Extract Intel). Stratagems only while the Super Destroyer is overhead: 60 seconds on landing, and one return per Helldiver per mission. **Zero reinforcements until you activate the pods**, four sets of three, twelve in all whatever the squad size, and the reinforcement boosters cannot be chosen. Every bot that calls for help raises the threat level.
+>
+> `missions.json` listed all three on every front, tagged standard or carry; **they are Automaton only now, with a ninth trait, `commando`**. Eight rules key on it: reinforcement boosters (−28, the most a scenario may move anything), call-ins that earn their keep by repeating every two minutes or less (−10), long cooldowns (+8), throwaway launchers by the game's own EXPENDABLE tag (−12), **heat weapons and arc weapons, which need no ammo (+14 each)**, bringing your own supplies (+10), suppressed weapons and stealth armour (+8).
+>
+> **The +14 is the curator's call**: a weapon with unlimited ammo is "almost a given to bring" here, the Quasar is S+ not S. Heat feed and arc damage are two different signals in the data, hence two rules: the Quasar, Laser Cannon, Scythe, Sickles, Trident, Sai, Dagger and Talon on one, the Blitzer and Arc Thrower on the other. A booster the game refuses still reads B rather than D, because two tiers is the most any scenario may move a rating; its sentence says it cannot be brought. A ceiling would fix that and is a change of principle, so it waits for the curator.
+
+---
+
+# **Drop History And Share Links**
+
+> [!info] Every confirmed drop is recorded. `src/lib/history.js`
+> Which build, its items at that moment (a build is edited and deleted over time, and what you carried that night is the fact), the planet, mission, difficulty and squad. Oldest first, the newest thousand kept, exported. **Started before anything reads it much, on purpose**: the curator wants "you have never dropped with a Railgun against bots" and "try this for a change", and those need a history to exist first. Today the suggestions say how often and how lately you dropped with each build. `usageOf` and `itemsDroppedWith` are there for what comes next.
+
+> [!info] A build in a link. `src/lib/share.js`
+> `#/shared/<code>`: the build written into the link as base64url JSON with short keys, about 400 characters for a full build. No server, so it works on every address the tool lives on. **A link is anyone's text**: it is cleaned exactly like a party member's build (`unpackBuild`), and the front, difficulty bands and biomes are held to the lists the tool knows. A mangled link opens nothing and throws nothing. The editor's **Share** button copies one; the page it opens offers **Keep a copy in my Armoury** and **Keep it and drop with it**.
+
+---
+
 # **Role Tags And The Squad Panel**
 
 Three tags, `anti-armor`, `chaff` and `objective`, and a panel in Drop Bay that uses them to tell you what is going to hurt.
@@ -1004,9 +1066,14 @@ Every warning is conditioned on where you are dropping, which is what makes them
 
 ---
 
-# **The Loadout Builder**
+# **The Armoury**
 
-Nine slots. Tapping one opens a picker over the whole screen that reuses the tier row, so ratings, flags and provenance are in front of you at the moment you choose rather than one screen away. The picker hides unavailable gear by default with a toggle to show it, and pins favourites to the top.
+The Loadout Builder until 1 October 2026, renamed for the game's own armoury, the curator's word. `src/Armoury.jsx` holds the two tabs; `src/Builder.jsx` is the editor, at `#/builder/:id` on its own page or over Drop Bay. The Builds grid moved here from Drop Bay the same day, and an old `#/bay/builds` link lands on it.
+
+> [!info] Coverage: do you have something for each occasion
+> The curator's question, 1 October 2026: something to play solo on Super Helldive, something for a frozen planet, something for a Commando mission? `src/lib/coverage.js` reads fifteen situations per front (solo and four of you on Super Helldive, four on Hard, hot, frozen, sandstorms, ion storms, and each kind of mission) at Suicide Mission with four of you unless a row says otherwise, through the drop screen's gates and only with builds you can field. **A or better is covered, B is thin, nothing is a gap**, and a gap says what ruled your builds out and links to a new build for that front. With no builds of your own the presets stand in, and the page says so. They cover every situation on every front, which is why the useful reading is yours.
+
+Nine slots. Tapping one opens a picker over the whole screen that reuses the tier row, so ratings, flags and provenance are in front of you at the moment you choose rather than one screen away. **That picker is the tier list now**, for most people the only way they meet it. It hides unavailable gear by default with a toggle to show it, and pins favourites to the top.
 
 > [!danger] Opening a preset forks it
 > The 39 curated builds are stigly's and are never written to. Opening one in the builder hands you a copy carrying `forkedFrom`, and the banner says so. Saving stores the copy under `hd2-loadouts`; the original is untouched.
@@ -1037,7 +1104,7 @@ Nine slots. Tapping one opens a picker over the whole screen that reuses the tie
 
 ### The picker recommends
 
-It ranks by **the faction the build is for**, not by an average across all three, and says so in its header. A build declared for bots should lead with what beats bots. The best rating actually reachable in that slot gets a "top pick" marker, so it means top of what you can take rather than a fixed tier. Favourites still pin above everything.
+It ranks by **our reading for where you are dropping, against the front the build is for**, and says so in its header: "Ranked for the Automatons, on Merga IV, Commando: Extract Intel". It ranked by the vote until 1 October 2026, which made "already sorted for my drop" untrue the moment a scenario said anything. The vote is still on every row, beside our column. The best reading actually reachable in that slot gets a "top pick for this drop" marker, so it means top of what you can take rather than a fixed tier. Favourites still pin above everything, and unrated items sort last but are never removed.
 
 It also warns before the pick rather than after: an item that would be the second thing wanting your back is labelled with what it clashes with.
 
@@ -1280,7 +1347,7 @@ The two rule health reports. `rules` measures every item rule against the pool i
 npm run drop
 ```
 
-The drop screen's rules against the real builds. See The Drop Screen.
+The drop screen's rules against the real builds, plus suggestions, drop history, share links and coverage. See The Drop Screen.
 
 ```bash
 npm run map

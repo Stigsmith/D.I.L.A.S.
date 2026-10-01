@@ -273,6 +273,34 @@ Today's Drop Bay, kept: the grid, the cards, the filters, the favourites. `Loado
 
 ---
 
+## Drop Bay is the front door, and the tier list leaves the menu
+
+> [!success] Decided and built, 1 October 2026. The curator's call
+> The tool now follows the game's two places. **The Armoury** is where builds are made and kept: the game's armoury plus what the game lacks, a build saved, named and kept with its stratagems, so you never redo it or try to remember it. **Drop Bay** is the drop screen, the page the tool opens on. The tier list leaves the menu and lives on **as the picker inside every build**, already ranked for where you are dropping, and whole at `#/tiers` for anyone who prefers it. This reverses his own first locked decision, "tier browsing is the primary tool", and he made the reversal knowingly.
+
+**The value proposition, in his words**, is what every piece here answers to: repeatability (build once, reuse forever, never memorise seventy builds), seeing what you actually have for each occasion, being reminded of combinations you forgot, and a rating that knows a community S is not an S in every situation.
+
+| Built | |
+|---|---|
+| **Suggestions** | Three of your builds for this drop, ranked by the reading, each saying why. The ranking decision this file and CLAUDE.md had left open is made |
+| **The editor over the drop** | Adjust a build without leaving Drop Bay; saving puts it in your slot. With no builds yet, your slot opens the editor straight onto the ranked primary list |
+| **Seats** | How many of you, asked on the drop screen. An empty seat is a squadmate whose build you do not know, never an assumption that you are alone |
+| **Drop history** | Every Confirm recorded, exported, taken back by a change of mind within fifteen minutes |
+| **Coverage** | The Armoury answers "do I have something for each occasion", fifteen situations per front |
+| **The Rules page** | Every rule, what it moves here, and a switch to turn it off. His idea: an overview, and a way to see what each rule does to the list |
+| **Share links** | A build in the link itself. No server, so it works on every address |
+| **Commando missions** | Automaton only, a ninth mission trait, eight rules from the wiki's mechanics and his reading of them |
+
+### What comes next on this track
+
+- **History into nudges.** "You have not dropped with this in two months", "you have never brought a Railgun against the Automatons", a fourth suggestion marked "for a change". The data has been recording since 1 October 2026; the reading is the work.
+- **More scenario rules, from the curator's play.** Commando is the pattern: he describes a situation, the mechanics get sourced, the judgement is recorded as his. The Rules page is where he checks what each one did.
+- **Things the game refuses.** A reinforcement booster on a Commando mission reads B, because two tiers is the most a scenario may move anything. A ceiling would make it D, and a ceiling is a change of principle, so it waits for him.
+- **Switched off rules and the export.** Left out of the export for now. If he wants his tuned rule set to survive the address moves, it goes in.
+- **Shared builds on Exchange.** A share link is the no-server half of Exchange: the same build, passed by hand. Exchange is the browsable half and still waits on the server.
+
+---
+
 ## The live starmap, and when a runtime API call is justified
 
 > [!success] Revised 20 August 2026. The map is the entry to the drop screen, not a feature bolted beside it

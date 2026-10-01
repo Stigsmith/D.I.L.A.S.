@@ -25,7 +25,17 @@
       "The biome and hazards you could set by hand are gone; the map and the planner do that job now.",
       "Building the tool now checks the result is whole, and a deploy refuses to upload one that is not, after a file sync app was caught renaming the freshly built scripts away.",
       "The map has a full screen, from the button in its corner, tilted back like a table with a switch to lay it flat. It keeps the sector you were in, and shows the Major Order and where you are dropping beside it.",
-      "Planets on the map are sharper: each render is now cut from the wiki's full size original, twice the resolution of before at under half the download."
+      "Planets on the map are sharper: each render is now cut from the wiki's full size original, twice the resolution of before at under half the download.",
+      "Drop Bay is the front door now: the tool opens on it, and it suggests three of your own builds for where you are going, each saying why it fits.",
+      "Adjust a build without leaving Drop Bay. The editor opens over the drop screen and saving puts the build in your slot. With no builds yet, your slot starts one from the primary list, already ranked for the drop.",
+      "Say how many of you are dropping as seats on the drop screen. An empty seat is a squadmate whose build you do not know, never a guess that you are alone.",
+      "Every drop you confirm is recorded, and the suggestions say how often and how lately you dropped with each build. It goes in your backup file too.",
+      "The Loadout Builder is the Armoury now: your builds, and a new Coverage tab showing what you have for each occasion on each front, and where the gaps are.",
+      "The tier list has left the menu. It is the list you pick from in every build, ranked by what each item is worth where you are dropping, and still whole from a link in the Armoury.",
+      "A new Rules page shows every rule behind our rating, what it moves where you are dropping, and lets you switch any rule off to see what changes.",
+      "Share a build with a link. Whoever opens it can keep a copy, or keep it and drop with it.",
+      "Commando missions are Automaton only, as in the game, and read the way they play: reinforcement boosters cannot be brought, every call-in comes twice at most, and weapons that need no ammo, like the Quasar, rise.",
+      "The scenario bar shows how many of you are dropping, and how many rules you have switched off."
     ]
   },
   {

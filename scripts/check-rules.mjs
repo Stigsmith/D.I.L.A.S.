@@ -179,3 +179,26 @@ if (!dead.length && !loud.length) {
   console.log(`  ${rows.length} rules, all discriminating. Nothing is describing its own pool.`);
 }
 console.log("");
+
+/* Switching a rule off, from the Rules page. Off means its effect is gone
+   exactly, on every item, and nothing else moves. */
+{
+  const scenario = { faction: "bots", mission: "Commando: Extract Intel", difficulty: 7, squad: 4 };
+  const ruleId = "commando-expendables-come-twice";
+  const off = { ...scenario, rulesOff: new Set([ruleId]) };
+  let changed = 0;
+  let wrong = 0;
+  for (const it of items.items) {
+    const a = score.scoreItem(it, scenario);
+    const b = score.scoreItem(it, off);
+    const had = a.reasons.find((r) => r.id === ruleId);
+    if (b.reasons.some((r) => r.id === ruleId)) wrong += 1;
+    if (!had && (a.tier !== b.tier || a.reasons.length !== b.reasons.length)) wrong += 1;
+    if (had) changed += 1;
+  }
+  const line = wrong
+    ? `  FAIL  switching ${ruleId} off moved ${wrong} item(s) it never touched, or left its reason showing`
+    : `  Switching ${ruleId} off removes it from exactly the ${changed} items it fired on, and moves nothing else.`;
+  console.log(line);
+  if (wrong) process.exitCode = 1;
+}

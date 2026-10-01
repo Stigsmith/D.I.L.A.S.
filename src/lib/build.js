@@ -40,7 +40,7 @@
 import RULES from "../data/build-rules.json";
 import { statsFor } from "./items.js";
 import { loadoutItems, isHeldWeapon, backpackUsers } from "./loadouts.js";
-import { scoreItem, peril, applies, matches, numberTest, tierForScore, TIER_POINTS } from "./score.js";
+import { scoreItem, peril, applies, matches, numberTest, tierForScore, TIER_POINTS, rulesOffIn } from "./score.js";
 import { frontReading } from "./enemies.js";
 
 /* ------------------------------------------------------------------ */
@@ -241,7 +241,9 @@ export function readBuild(loadout, scenario = {}) {
   const notes = [];
   let points = 0;
 
+  const off = rulesOffIn(scenario);
   for (const rule of RULES.rules) {
+    if (off.has(rule.id)) continue;
     if (!applies(scenario, rule.when)) continue;
     if (!buildMatches(ctx, rule.match)) continue;
 

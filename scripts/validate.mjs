@@ -30,6 +30,7 @@ const wikiStats = load("wiki-stats.json");
 const enemies = load("enemies.json");
 const contextRules = load("context-rules.json");
 const buildRules = load("build-rules.json");
+const missions = load("missions.json");
 
 const problems = [];
 const fail = (msg, list) => {
@@ -320,6 +321,10 @@ for (const rule of rules) {
   seenRule.add(rule.id);
   /* A score that cannot explain itself is a score nobody should trust. */
   if (!rule.say) ruleProblems.push(`${rule.id} carries no say`);
+  /* The Rules page lists every rule by name, and dozens of ids are not
+     something a person can scan. A new rule names itself or stops here. */
+  if (typeof rule.name !== "string" || !rule.name.trim()) ruleProblems.push(`${rule.id} carries no name for the Rules page`);
+  else if (rule.name.length > 90) ruleProblems.push(`${rule.id} has a name longer than 90 characters, which the Rules page cannot fit`);
   /* A rule scaling off the scenario crosses zero and runs both ways. Its
      say was written for one direction, so without a sayInverted the tool
      explains a penalty using the sentence meant for a bonus. */
@@ -348,6 +353,16 @@ for (const rule of rules) {
      meant. Same silent shape as everything else checked here. */
   for (const k of Object.keys(rule.when || {})) {
     if (!WHEN_KEYS.has(k)) ruleProblems.push(`${rule.id} gates on "${k}", which the engine does not read`);
+  }
+
+  /* A mission trait nothing declares, or an armor trait nothing carries,
+     makes a rule that can never fire, and nothing would ever say so. */
+  for (const t of [].concat((rule.when && rule.when.mission) || [])) {
+    if (!missions.traits[t]) ruleProblems.push(`${rule.id} gates on mission trait "${t}", which missions.json does not declare`);
+  }
+  const refTraits = []; collect(rule.match || {}, refTraits, ["traits"]);
+  for (const t of refTraits) {
+    if (!TRAITS.has(t)) ruleProblems.push(`${rule.id} matches trait "${t}", which vocabulary.json does not declare`);
   }
 
   const refRoles = []; collect(rule, refRoles, ["roles"]);
