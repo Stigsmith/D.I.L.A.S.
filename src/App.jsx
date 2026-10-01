@@ -7,18 +7,21 @@
 /* they work.                                                          */
 /* ================================================================== */
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
-  Layers, Library, Wrench, Rocket, Store, Users, User, Settings as SettingsIcon,
+  Library, Swords, Rocket, Store, Users, User, Settings as SettingsIcon,
   LifeBuoy, Menu, X, Sun, Moon, Zap, Shield, Star, Lock, Download, Upload, AlertTriangle,
-  Factory, Bug, PackageOpen, Trees, FileText, Crosshair, Radar, Shovel, Info, ScrollText, Milestone,
+  Factory, Bug, PackageOpen, Trees, FileText, Crosshair, Radar, Shovel, Info, ScrollText, Milestone, Scale,
 } from "lucide-react";
 
 import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser, ScenarioScreen, ScenarioBar } from "./Tiers.jsx";
 import { SKULL, themeArt } from "./lib/assets.js";
 import Builder from "./Builder.jsx";
-import DropBay from "./DropBay.jsx";
+import ArmouryBuilds, { Coverage, ARMOURY_TABS } from "./Armoury.jsx";
 import DropScreen, { useDrop } from "./DropScreen.jsx";
+import Rules from "./Rules.jsx";
+import Shared from "./Shared.jsx";
+import { useRulesOff } from "./lib/rules.js";
 import { useParty, usePartySync } from "./lib/party.js";
 import Collection, { COLLECTION_TABS } from "./Collection.jsx";
 import Ambient, { Grain, Masthead } from "./Ambient.jsx";
@@ -39,19 +42,18 @@ import LOADOUTS from "./data/loadouts.json";
 /* Destinations                                                        */
 /* ------------------------------------------------------------------ */
 
+/* Drop Bay first, since 1 October 2026: the curator's call that it is the
+   front door, the game's own drop screen. The Armoury is the game's
+   armoury with saved builds. The tier list left the menu the same day and
+   lives on as the picker inside both, reachable at #/tiers for anyone who
+   prefers browsing it whole. */
 const NAV = [
-  {
-    group: "Browse",
-    items: [
-      { id: "tiers", label: "Tier Lists", Icon: Layers },
-      { id: "collection", label: "Collection", Icon: Library },
-    ],
-  },
   {
     group: "Loadouts",
     items: [
-      { id: "builder", label: "Loadout Builder", Icon: Wrench },
       { id: "bay", label: "Drop Bay", Icon: Rocket },
+      { id: "armoury", label: "Armoury", Icon: Swords },
+      { id: "collection", label: "Collection", Icon: Library },
       { id: "exchange", label: "Exchange", Icon: Store, release: "v3" },
     ],
   },
@@ -62,6 +64,9 @@ const NAV = [
 ];
 
 const NAV_FOOT = [
+  /* About the tool rather than a place you drop from, so it sits down here
+     with Settings and the Roadmap. The curator's placement. */
+  { id: "rules", label: "Rules", Icon: Scale },
   /* Tagged, and therefore locked and unroutable, until ACCOUNTS_LIVE in
      src/lib/account.js says otherwise. The tag is the switch's only effect. */
   { id: "account", label: "Account", Icon: User, ...(ACCOUNTS_LIVE ? {} : { release: "v2" }) },
@@ -80,13 +85,19 @@ const ALL_NAV = [...NAV.flatMap((g) => g.items), ...NAV_FOOT];
 /* Drop Bay joined on 22 August 2026, when loadout scoring landed and the
    cards started reading the scenario. A control that changes what is on
    screen has to be on screen: the same rule the folded filter pane keeps. */
-const SCENARIO_SURFACES = new Set(["tiers", "bay"]);
+/* The Armoury, the editor, the Rules page and a shared build joined on 1
+   October 2026: each shows readings that the scenario moves. */
+const SCENARIO_SURFACES = new Set(["tiers", "bay", "armoury", "builder", "rules", "shared"]);
 
-/* Routable, deliberately absent from the sidebar. */
-const OFF_MENU = new Set(["scenario"]);
+/* Routable, deliberately absent from the sidebar. The tier list joined on
+   1 October 2026: it is the picker inside the Armoury and Drop Bay now,
+   and still whole at #/tiers for anyone who likes to browse it. */
+const OFF_MENU = new Set(["scenario", "tiers", "builder", "shared"]);
 /* Off menu routes are not in ALL_NAV, so they need their title here or
    the header falls back to the brand name and stops saying where you are. */
-const OFF_MENU_LABEL = { scenario: "Scenario" };
+const OFF_MENU_LABEL = { scenario: "Scenario", tiers: "Tier Lists", builder: "Armoury", shared: "Shared build" };
+/* Which menu entry lights up for a page that has none of its own. */
+const MENU_FOR = { builder: "armoury", shared: "armoury" };
 const labelFor = (id) =>
   (ALL_NAV.find((d) => d.id === id) || {}).label || OFF_MENU_LABEL[id] || BRAND.short;
 
@@ -219,13 +230,7 @@ function SidebarLink({ item, active, onClick }) {
 
 /* A destination with tabs needs one named in the route, or the tab bar   */
 /* and the surface disagree about which one is open on a cold link.       */
-const LANDING = { tiers: "tiers/primary", collection: "collection/warbonds", bay: "bay/drop" };
-
-/* Drop Bay's two jobs, since 1.24.0. The drop is the moment before you
-   go; the builds are the grid it used to be, kept until Exchange has
-   somewhere to put other people's. The drop comes first because it is
-   what the destination is for. */
-const BAY_TABS = [{ id: "drop", label: "Drop" }, { id: "builds", label: "Builds" }];
+const LANDING = { tiers: "tiers/primary", collection: "collection/warbonds", bay: "bay", armoury: "armoury/builds" };
 
 function Sidebar({ destination, navigate, onNavigated }) {
   const go = (id) => { navigate(LANDING[id] || id); onNavigated(); };
@@ -239,7 +244,7 @@ function Sidebar({ destination, navigate, onNavigated }) {
           </p>
           <div className="flex flex-col gap-0.5">
             {g.items.map((item) => (
-              <SidebarLink key={item.id} item={item} active={destination === item.id} onClick={() => go(item.id)} />
+              <SidebarLink key={item.id} item={item} active={(MENU_FOR[destination] || destination) === item.id} onClick={() => go(item.id)} />
             ))}
           </div>
         </div>
@@ -465,9 +470,14 @@ function Settings({ theme, setTheme, state }) {
 export default function App() {
   const state = useCollectionState();
   const { theme, setTheme } = useTheme();
-  const { destination, param, navigate } = useRoute("tiers/primary");
+  const { destination, param, navigate } = useRoute("bay");
   /* Where you are dropping. Faction today, the rest of the scenario next. */
   const { scenario, setFaction, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment, replaceScenario } = useScenario();
+  /* The rules switched off on the Rules page, carried on the scenario every
+     surface reads so each honours them without being told twice. Never on
+     the scenario the party sends: that is the bare one, above. */
+  const [rulesOff, toggleRule, clearRules] = useRulesOff();
+  const scored = useMemo(() => ({ ...scenario, rulesOff }), [scenario, rulesOff]);
   /* The drop and the party live here rather than on the drop screen: what
      you confirmed has to reach the party, and the host's scenario has to
      reach you, while you are in the builder or on the tier list too. */
@@ -485,7 +495,13 @@ export default function App() {
   /* something you set.                                                   */
   const known =
     ALL_NAV.some((d) => d.id === destination && !d.release) || OFF_MENU.has(destination);
-  const dest = known ? destination : "tiers";
+  const dest = known ? destination : "bay";
+
+  /* The builds grid was Drop Bay's second tab until 1 October 2026, so an
+     old link to it lands in the Armoury rather than on a tab that is gone. */
+  useEffect(() => {
+    if (destination === "bay" && param === "builds") navigate("armoury/builds");
+  }, [destination, param, navigate]);
 
 
   /* The title and tabs stay put while a long list scrolls under them.    */
@@ -525,7 +541,7 @@ export default function App() {
   const favSet = new Set(state.favoriteItems);
   const catId = CATEGORIES.some((c) => c.id === param) ? param : "primary";
   const collectionTab = COLLECTION_TABS.some((t) => t.id === param) ? param : "warbonds";
-  const bayTab = BAY_TABS.some((t) => t.id === param) ? param : "drop";
+  const armouryTab = ARMOURY_TABS.some((t) => t.id === param) ? param : "builds";
 
   /* Where "Done" goes back to. Adjusting the scenario from Secondaries  */
   /* and being returned to Primaries is the kind of small wrong that     */
@@ -533,11 +549,13 @@ export default function App() {
   /* list until 1.24.0, so adjusting from Drop Bay threw you out of the  */
   /* drop and onto a list; it now remembers any surface that reads the   */
   /* scenario, tab included.                                             */
-  const lastSurface = useRef("tiers/primary");
+  const lastSurface = useRef("bay");
   useEffect(() => {
     if (dest === "tiers") lastSurface.current = `tiers/${catId}`;
-    if (dest === "bay") lastSurface.current = `bay/${bayTab}`;
-  }, [dest, catId, bayTab]);
+    if (dest === "bay") lastSurface.current = "bay";
+    if (dest === "armoury") lastSurface.current = `armoury/${armouryTab}`;
+    if (dest === "builder" || dest === "rules" || dest === "shared") lastSurface.current = param ? `${dest}/${param}` : dest;
+  }, [dest, catId, armouryTab, param]);
   const openScenario = useCallback(() => navigate("scenario"), [navigate]);
   const closeScenario = useCallback(() => navigate(lastSurface.current), [navigate]);
 
@@ -563,8 +581,8 @@ export default function App() {
             })),
             collectionTab,
           ]
-        : dest === "bay"
-          ? [BAY_TABS, bayTab]
+        : dest === "armoury"
+          ? [ARMOURY_TABS, armouryTab]
           : [null, null];
 
   const surface = (() => {
@@ -575,7 +593,7 @@ export default function App() {
             catId={catId}
             faction={scenario.faction}
             setFaction={setFaction}
-            scenario={scenario}
+            scenario={scored}
             setPlanet={setPlanet}
             setBiome={setBiome}
             toggleHazard={toggleHazard}
@@ -600,14 +618,27 @@ export default function App() {
       case "collection":
         return <Collection tab={collectionTab} state={state} />;
       case "bay":
-        return bayTab === "builds"
-          ? <DropBay state={state} navigate={navigate} faction={scenario.faction} setFaction={setFaction} scenario={scenario} />
-          : <DropScreen state={state} navigate={navigate} scenario={scenario} setFaction={setFaction} setPlanet={setPlanet}
-              drop={drop} update={updateDrop} party={party} sync={partySync} />;
-      case "builder":
-        /* Browsing happens in Drop Bay. The builder edits one build, so  */
-        /* landing on it with nothing chosen starts a fresh one.          */
-        return <Builder key={param || "new"} state={state} loadoutId={param && param !== "new" ? param : null} navigate={navigate} faction={scenario.faction} scenario={scenario} />;
+        return <DropScreen state={state} navigate={navigate} scenario={scored} setFaction={setFaction} setPlanet={setPlanet}
+          setSquad={setSquad} drop={drop} update={updateDrop} party={party} sync={partySync} />;
+      case "armoury":
+        return armouryTab === "coverage"
+          ? <Coverage state={state} navigate={navigate} scenario={scored} />
+          : <ArmouryBuilds state={state} navigate={navigate} faction={scenario.faction} setFaction={setFaction} scenario={scored} />;
+      case "builder": {
+        /* Browsing happens in the Armoury. The editor works on one build,
+           so landing on it with nothing chosen starts a fresh one, and
+           builder/new-bots starts one for a front, which is how a gap on
+           the Coverage tab opens a build for it. */
+        const newFront = param && param.startsWith("new-") ? param.slice(4) : null;
+        const id = param && param !== "new" && !newFront ? param : null;
+        return <Builder key={param || "new"} state={state} loadoutId={id} navigate={navigate}
+          faction={newFront || scenario.faction} scenario={scored} />;
+      }
+      case "rules":
+        return <Rules scenario={scored} rulesOff={rulesOff} toggleRule={toggleRule} clearRules={clearRules} state={state} />;
+      case "shared":
+        return <Shared code={param} state={state} scenario={scored} navigate={navigate}
+          onUseForDrop={(id) => { updateDrop((d) => ({ ...d, mine: id, confirmed: null })); navigate("bay"); }} />;
       case "settings":
         return <Settings theme={theme} setTheme={setTheme} state={state} />;
       case "support":
@@ -779,7 +810,8 @@ export default function App() {
           {/* have forgotten making is never on screen without the choice    */}
           {/* next to it.                                                    */}
           {SCENARIO_SURFACES.has(dest) && scenario.faction ? (
-            <ScenarioBar scenario={scenario} onAdjust={openScenario} />
+            <ScenarioBar scenario={scenario} onAdjust={openScenario}
+              rulesOff={rulesOff.size} onRules={() => navigate("rules")} />
           ) : null}
           </div>
 

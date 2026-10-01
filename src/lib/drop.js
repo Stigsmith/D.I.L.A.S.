@@ -19,6 +19,8 @@
 import vocabulary from "../data/vocabulary.json";
 import { deriveHeat, loadoutItemIds, cleanLoadout } from "./loadouts.js";
 import { traitsOf } from "./scenario.js";
+import { readBuild, byReading } from "./build.js";
+import { usageOf } from "./history.js";
 
 /* In game the cap is four, and so is the screen. */
 export const SQUAD_CAP = 4;
@@ -90,8 +92,9 @@ export function dropContext(scenario = {}) {
 /* for your own slot: the lock list is yours, and it says nothing       */
 /* about what a squadmate owns.                                         */
 /*                                                                     */
-/* No ranking. Favourites first, then yours, then the presets, which   */
-/* is the grid's order. Ranking builds is a decision nobody has made.  */
+/* This returns the grid's order, favourites first, then yours, then   */
+/* the presets. Ranking is suggestBuilds below and the picker's sort:  */
+/* the curator decided on 1 October 2026 that Drop Bay suggests.       */
 /* ------------------------------------------------------------------ */
 
 export function withHeat(builds) {
@@ -147,7 +150,7 @@ export function dropPool(builds, scenario = {}, { lockedSet = new Set(), favorit
 /* that confirmed version, so the two have to agree now.              */
 /* ------------------------------------------------------------------ */
 
-export const EMPTY_DROP = { mine: null, confirmed: null, mates: [null, null, null] };
+export const EMPTY_DROP = { mine: null, confirmed: null, mates: [null, null, null], logged: null };
 
 /* Whatever localStorage handed back, made safe to read. */
 export function cleanDrop(raw) {
@@ -160,6 +163,9 @@ export function cleanDrop(raw) {
        updatedAt, which is every preset, stamps as the empty string. */
     confirmed: typeof raw.confirmed === "string" ? raw.confirmed : null,
     mates: Array.from({ length: SQUAD_CAP - 1 }, (_, i) => id(mates[i])),
+    /* The history entry the last Confirm wrote, so "Change my mind" soon
+       after can take it back. */
+    logged: raw.logged && id(raw.logged.id) && id(raw.logged.at) ? { id: raw.logged.id, at: raw.logged.at } : null,
   };
 }
 
@@ -224,4 +230,53 @@ export function unpackBuild(raw) {
     diff: Array.isArray(raw.diff) ? raw.diff.filter((d) => typeof d === "string") : [],
     biomes: Array.isArray(raw.biomes) ? raw.biomes.filter((b) => typeof b === "string") : [],
   };
+}
+
+/* ------------------------------------------------------------------ */
+/* Suggesting                                                          */
+/*                                                                     */
+/* The curator's call, 1 October 2026: Drop Bay is the front door, and  */
+/* it suggests from your builds. Ranked by the reading, the same number */
+/* a build's badge shows everywhere, so a suggestion and the badge      */
+/* beside it can never disagree. Only builds the scenario allows and    */
+/* that need nothing you have not unlocked: a suggestion you cannot     */
+/* bring is not a suggestion.                                          */
+/*                                                                     */
+/* Nothing is hidden by it. The picker still lists everything that      */
+/* fits, ranked the same way.                                           */
+/* ------------------------------------------------------------------ */
+
+export function rankByReading(builds, scenario = {}, favorites = []) {
+  const fav = new Set(favorites);
+  return builds
+    .map((build) => ({ build, reading: readBuild(build, scenario) }))
+    .sort((a, b) => (fav.has(a.build.id) ? 0 : 1) - (fav.has(b.build.id) ? 0 : 1) || byReading(a.reading, b.reading));
+}
+
+export function suggestBuilds(builds, scenario = {}, { lockedSet = new Set(), history = [], limit = 3 } = {}) {
+  const { shown } = dropPool(builds, scenario, { lockedSet, showLocked: false });
+  return shown
+    .map((build) => ({ build, reading: readBuild(build, scenario), usage: usageOf(history, build.id) }))
+    .filter((x) => x.reading.score !== null)
+    .sort((a, b) => byReading(a.reading, b.reading))
+    .slice(0, limit);
+}
+
+/* Why a build suits this drop, in one line: the piece of it the scenario
+   lifts the most, in that rule's own words. Failing that, the most
+   serious hole in it, so a suggestion never hides its weak spot. Null
+   when the scenario has nothing to say about it either way. */
+export function whyFor(reading) {
+  if (!reading) return null;
+  const lifted = reading.parts
+    .filter((p) => p.delta > 0 && p.reasons && p.reasons.some((r) => r.delta > 0))
+    .sort((a, b) => b.delta - a.delta);
+  if (lifted.length) {
+    const p = lifted[0];
+    const r = p.reasons.find((x) => x.delta > 0);
+    return { tone: "up", item: p.item.name, text: r.say };
+  }
+  const gap = reading.notes.find((n) => n.severity === "red" || n.severity === "amber");
+  if (gap) return { tone: "gap", item: null, text: gap.say };
+  return null;
 }

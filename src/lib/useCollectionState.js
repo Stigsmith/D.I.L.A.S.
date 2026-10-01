@@ -17,6 +17,7 @@ import {
   cleanProfileDoc, blankProfile, profileId, DEFAULT_PROFILE_ID,
 } from "./ownership.js";
 import { cleanLoadout, duplicateLoadout } from "./loadouts.js";
+import { cleanHistory, mergeHistory } from "./history.js";
 
 /* State written before items had ids was keyed by display name. Both   */
 /* forms resolve, so old saved state survives the move and a list that  */
@@ -35,6 +36,7 @@ export function useCollectionState() {
   const [favorites, setFavorites] = useState([]);
   const [favoriteItems, setFavoriteItems] = useState([]);
   const [loadouts, setLoadouts] = useState([]);
+  const [history, setHistory] = useState([]);
   const [profileDoc, setProfileDoc] = useState(() => oneProfile([], []));
 
   /* A key that has never been written reads as null, and only then does  */
@@ -74,6 +76,7 @@ export function useCollectionState() {
     /* Your own builds. Anything referencing an item that no longer       */
     /* resolves has that slot emptied rather than the build discarded.    */
     setLoadouts((readList(KEYS.loadouts) || []).map(cleanLoadout).filter(Boolean));
+    setHistory(cleanHistory(readList(KEYS.history) || []));
   }, []);
 
   const persist = (key, value) => writeList(key, value);
@@ -254,6 +257,26 @@ export function useCollectionState() {
     return copy;
   }, []);
 
+  /* What you dropped with. Written on Confirm; a confirm taken back
+     within a quarter of an hour is removed again, since that was a change
+     of mind rather than a drop. */
+  const logDrop = useCallback((entry) => {
+    setHistory((prev) => {
+      const next = cleanHistory([...prev, entry]);
+      persist(KEYS.history, next);
+      return next;
+    });
+  }, []);
+
+  const unlogDrop = useCallback((id) => {
+    setHistory((prev) => {
+      if (!prev.some((e) => e.id === id)) return prev;
+      const next = prev.filter((e) => e.id !== id);
+      persist(KEYS.history, next);
+      return next;
+    });
+  }, []);
+
   /* One file, everything this tool persists, with a schemaVersion so a  */
   /* later shape change can be migrated rather than rejected. Version 3  */
   /* carries every profile. Version 2 carried one flat pair of lock      */
@@ -266,6 +289,7 @@ export function useCollectionState() {
       favoriteItems,
       profiles: profileDoc,
       loadouts,
+      history,
     };
     const url = URL.createObjectURL(new Blob([JSON.stringify(doc, null, 2)], { type: "application/json" }));
     const a = document.createElement("a");
@@ -275,7 +299,7 @@ export function useCollectionState() {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-  }, [favorites, favoriteItems, profileDoc, loadouts]);
+  }, [favorites, favoriteItems, profileDoc, loadouts, history]);
 
   /* Three shapes are accepted. A version 3 export carrying profiles, a   */
   /* version 2 export carrying one flat pair of lock lists, and an        */
@@ -325,7 +349,11 @@ export function useCollectionState() {
     const items = list(doc.lockedItems);
     const wbs = list(doc.lockedWarbonds);
 
-    if (!fav && !favItems && !builds && !hasProfiles && !items && !wbs) {
+    /* Added to what is here rather than replacing it: two browsers'
+       histories are both true, and an import should never forget a drop. */
+    const drops = Array.isArray(doc.history) ? cleanHistory(doc.history) : null;
+
+    if (!fav && !favItems && !builds && !hasProfiles && !items && !wbs && !drops) {
       return { ok: false, text: "That file is not a D.D.S. export or an ownership list." };
     }
     if (builds) { setLoadouts(builds); persist(KEYS.loadouts, builds); }
@@ -349,7 +377,17 @@ export function useCollectionState() {
       profileNote = " Lock state landed in a single Default profile.";
     }
 
-    return { ok: true, text: `Backup restored.${profileNote}` };
+    let dropNote = "";
+    if (drops && drops.length) {
+      setHistory((prev) => {
+        const next = mergeHistory(prev, drops);
+        persist(KEYS.history, next);
+        return next;
+      });
+      dropNote = ` ${drops.length} ${drops.length === 1 ? "drop" : "drops"} added to your history.`;
+    }
+
+    return { ok: true, text: `Backup restored.${profileNote}${dropNote}` };
   }, [saveProfiles, active]);
 
   /* Back to a first run, including the ownership seed. Export first.    */
@@ -360,6 +398,7 @@ export function useCollectionState() {
     setFavorites([]);
     setFavoriteItems([]);
     setLoadouts([]);
+    setHistory([]);
     saveProfiles(oneProfile(seedLockedItems(), seedLockedWarbonds()));
   }, [saveProfiles]);
 
@@ -370,13 +409,13 @@ export function useCollectionState() {
   );
 
   return {
-    favorites, favoriteItems, lockedItems, lockedWarbonds, loadouts,
+    favorites, favoriteItems, lockedItems, lockedWarbonds, loadouts, history,
     lockedSet, warbondLockedSet,
     profiles: profileDoc.profiles, activeProfileId: profileDoc.active, activeProfile: active,
     setActiveProfile, createProfile, renameProfile, deleteProfile,
     toggleFavorite, toggleFavItem, clearFavItems,
     toggleLock, clearItemLocks, setItemGroup, toggleWarbond, setWarbondGroup,
-    saveLoadout, deleteLoadout, duplicate,
+    saveLoadout, deleteLoadout, duplicate, logDrop, unlogDrop,
     exportState, importState, resetLocal,
   };
 }

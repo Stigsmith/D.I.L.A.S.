@@ -220,6 +220,13 @@ export function matches(ctx, match) {
       if (!asArray(want).some((r) => item.roles.includes(r))) return false;
       continue;
     }
+    /* What an armor passive or booster does, from vocabulary.json: the
+       stealth passives are what a Commando mission rewards. A list on the
+       item, so it is matched like tags rather than as a plain field. */
+    if (key === "traits") {
+      if (!asArray(want).some((t) => (item.traits || []).includes(t))) return false;
+      continue;
+    }
     if (key === "number") {
       for (const test of asArray(want)) {
         if (!numberTest(reach(ctx, test.path), test)) return false;
@@ -300,6 +307,15 @@ export function applies(scenario, when) {
  *   contextual whether the scenario said enough for any rule to fire
  * }
  */
+/* The rules somebody has switched off on the Rules page, carried on the
+   scenario so every surface that scores anything honours them without
+   being told twice. A Set, or anything that is not one counts as none.
+   Never saved with the scenario and never sent to a party: it is this
+   browser's own view of the rules, not a fact about the drop. */
+const NO_RULES_OFF = new Set();
+export const rulesOffIn = (scenario) =>
+  scenario && scenario.rulesOff instanceof Set ? scenario.rulesOff : NO_RULES_OFF;
+
 export function scoreItem(item, scenario = {}) {
   const faction = scenario.faction;
   const base = faction ? item.ratings[faction].tier : null;
@@ -326,7 +342,9 @@ export function scoreItem(item, scenario = {}) {
   let floor = null;
   let ceiling = null;
 
+  const off = rulesOffIn(scenario);
   for (const rule of RULES.rules) {
+    if (off.has(rule.id)) continue;
     if (!applies(scenario, rule.when)) continue;
     if (!matches(ctx, rule.match)) continue;
 

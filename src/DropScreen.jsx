@@ -2,8 +2,8 @@
 /* THE DROP                                                           */
 /*                                                                    */
 /* The moment before the drop: who is bringing what, where you are    */
-/* going, and what is going to hurt. Drop Bay's first tab. The grid   */
-/* of every build is its second, until Exchange inherits it.          */
+/* going, and what is going to hurt. Drop Bay itself since 1 October  */
+/* 2026; the grid of every build moved to the Armoury that day.       */
 /*                                                                    */
 /* Two stages, because picking a loadout and reading the squad are    */
 /* different activities and doing both in one view is what made the  */
@@ -24,12 +24,21 @@
 /* It opens onto the galaxy map while nothing says where you are      */
 /* dropping: click the planet where you clicked it in the game and    */
 /* the brief fills itself. The map folds away once you have chosen.   */
+/*                                                                    */
+/* Since 1 October 2026 this is the front door, the curator's call:   */
+/* the page the tool opens on. It suggests from your own builds,      */
+/* ranked for the drop. Adjusting a build opens the Armoury's editor  */
+/* over this screen rather than taking you away, and the editor's     */
+/* item list is the tier list, already ranked for where you are       */
+/* going. How many of you are dropping is asked here, as seats, and   */
+/* every Confirm is written to your drop history.                     */
 /* ================================================================== */
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import Builder from "./Builder.jsx";
 import {
   Users, Check, ChevronLeft, X, Search, Plus, Lock, Star, Snowflake, FilterX, AlertTriangle, Info,
-  Pencil, Rocket, UserPlus, RotateCcw, Flag, MapPin, Copy, LogOut, Crown, Radio, Loader2,
+  Pencil, Rocket, UserPlus, RotateCcw, Flag, MapPin, Copy, LogOut, Crown, Radio, Loader2, Sparkles, ArrowUp,
 } from "lucide-react";
 
 import { FACTIONS, FACTION_THEME, TierBadge, StratChip, difficultyAt, DropPlanner } from "./Tiers.jsx";
@@ -41,8 +50,11 @@ import { missionByName, missionTraits, hazardName, hazardEffect, biomeName, loud
 import { SETTINGS, readDoc, writeDoc } from "./lib/storage.js";
 import {
   EMPTY_DROP, cleanDrop, readDrop, stampOf, dropPool, dropContext, withHeat, gateOf, unpackBuild,
+  rankByReading, suggestBuilds, whyFor,
 } from "./lib/drop.js";
 import { SQUAD_CAP } from "./lib/party.js";
+import { entryFor, TAKE_BACK_MS } from "./lib/history.js";
+import { agoText } from "./lib/war.js";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 const MONO = { fontFamily: "'JetBrains Mono', monospace" };
@@ -186,7 +198,11 @@ function SlotButton({ onClick, Icon, children, primary, danger }) {
   );
 }
 
-function EmptySlot({ mine, label, onChoose }) {
+/* `onStart` is set when you have no builds of your own yet: the first
+   thing you see is then the list itself, already ranked for this drop,
+   rather than an empty picker. `seated` means the seat is part of the
+   squad you said, build known or not. */
+function EmptySlot({ mine, label, onChoose, onStart, seated }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-base-700 px-4 py-5 text-center sm:min-h-[18rem] sm:py-6">
       {mine ? <Rocket className="h-6 w-6 text-base-600" /> : <UserPlus className="h-6 w-6 text-base-600" />}
@@ -194,13 +210,152 @@ function EmptySlot({ mine, label, onChoose }) {
         <p className="text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>{label}</p>
         <p className="mx-auto mt-1 max-w-[16rem] text-xs leading-relaxed text-base-500">
           {mine
-            ? "Choose what you are dropping with, then confirm it."
-            : "Pick the build they told you they are bringing, or open a party above and they fill this in themselves."}
+            ? onStart
+              ? "You have no builds yet. Start one here: pick a primary, and the list is already ranked for this drop."
+              : "Choose what you are dropping with, then confirm it."
+            : seated
+              ? "Coming, build not known. Add theirs if they told you, or open a party above and they fill it in themselves."
+              : "Pick the build they told you they are bringing, or open a party above and they fill this in themselves."}
         </p>
       </div>
-      <SlotButton onClick={onChoose} Icon={mine ? Rocket : Plus} primary={mine}>
-        {mine ? "Choose a loadout" : "Add their build"}
-      </SlotButton>
+      <div className="flex flex-wrap justify-center gap-1.5">
+        {mine && onStart ? <SlotButton onClick={onStart} Icon={Plus} primary>Pick a primary</SlotButton> : null}
+        <SlotButton onClick={onChoose} Icon={mine ? Rocket : Plus} primary={mine && !onStart}>
+          {mine ? (onStart ? "Choose a preset" : "Choose a loadout") : "Add their build"}
+        </SlotButton>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* How many of you                                                     */
+/*                                                                     */
+/* Asked here as seats, the curator's point of 1 October 2026: the     */
+/* drop screen is where you know. A seat with no build in it is still  */
+/* a squadmate, somebody whose kit you do not know, which is how a      */
+/* game with three randoms reads. Not said is a real answer too, and    */
+/* the rules that depend on squad size stay quiet for it rather than    */
+/* assuming you are alone. One value with the scenario screen's, so     */
+/* the tier list and the readings follow.                               */
+/* ------------------------------------------------------------------ */
+
+function Seats({ value, onChange }) {
+  const n = Number(value) || 0;
+  const options = [[0, "Not said"], [1, "Solo"], [2, "2"], [3, "3"], [4, "4"]];
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>
+        Dropping with
+      </span>
+      <div className="flex gap-1">
+        {options.map(([k, label]) => (
+          <button key={k} onClick={() => onChange(k)} aria-pressed={n === k}
+            className={"rounded border px-2.5 py-1 text-[11px] transition-colors " +
+              (n === k
+                ? k ? "border-brand bg-brand/10 text-base-100" : "border-base-500 bg-base-800 text-base-100"
+                : "border-base-700 bg-base-900 text-base-500 hover:border-base-500 hover:text-base-200")}>
+            {label}
+          </button>
+        ))}
+      </div>
+      <span className="text-[11px] text-base-600">
+        {n === 1
+          ? "Just you. Nobody covers your reload."
+          : n
+            ? `${n} of you. An empty seat is a squadmate whose build you do not know.`
+            : "Say how many of you are going and every reading here scales to it."}
+      </span>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Suggested for this drop                                             */
+/*                                                                     */
+/* The curator's call, 1 October 2026: Drop Bay suggests from your own  */
+/* builds. Three, ranked by the same reading every badge shows, each    */
+/* with why in a rule's own words. Nothing is hidden by it: the picker  */
+/* still lists everything that fits, ranked the same way.              */
+/* ------------------------------------------------------------------ */
+
+function usageLine(usage) {
+  if (!usage || !usage.count) return null;
+  const when = agoText(Date.now() - Date.parse(usage.last));
+  return `Dropped with ${usage.count === 1 ? "once" : `${usage.count} times`}, last ${when}`;
+}
+
+/* Why nothing was suggested, from what the gates took out. */
+function nothingFits(cut) {
+  const c = cut || {};
+  const bits = [
+    c.band ? `${c.band} built for other difficulties` : null,
+    c.heat ? `${c.heat} vent${c.heat === 1 ? "s" : ""} heat on a hot planet` : null,
+    c.biome ? `${c.biome} built for other terrain` : null,
+    c.locked ? `${c.locked} need${c.locked === 1 ? "s" : ""} gear you have not unlocked` : null,
+  ].filter(Boolean);
+  return bits.length ? `Ruled out for this drop: ${bits.join(", ")}.` : "Nothing is built for this front yet.";
+}
+
+function Suggestions({ picks, fromPresets, current, onTake, cut, onStart }) {
+  /* Nothing to suggest is an answer too, and it says what to do next
+     rather than leaving a gap where the panel was. */
+  if (!picks.length) {
+    return (
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-dashed border-base-700 bg-base-900/40 px-4 py-3">
+        <Sparkles className="h-4 w-4 shrink-0 text-base-600" />
+        <div className="min-w-[14rem] flex-1">
+          <p className="text-xs text-base-300">Nothing to suggest for this drop.</p>
+          <p className="mt-0.5 text-[11px] leading-relaxed text-base-500">{nothingFits(cut)} The picker can still show them.</p>
+        </div>
+        <SlotButton onClick={onStart} Icon={Plus} primary>Start a build for this drop</SlotButton>
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
+      <p className="mb-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-base-400" style={OSWALD}>
+        <Sparkles className="h-3.5 w-3.5 text-brand" /> Suggested for this drop
+      </p>
+      <p className="mb-3 text-[11px] text-base-500">
+        {fromPresets
+          ? "From the curated presets, until you have builds of your own that fit. Ranked by what each is worth here."
+          : "From your builds, ranked by what each is worth here. Everything that fits is in the picker too."}
+      </p>
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+        {picks.map(({ build, reading, usage }) => {
+          const why = whyFor(reading);
+          const held = heldGear(build).map((it) => it.name);
+          const on = build.id === current;
+          return (
+            <div key={build.id} className={"flex flex-col gap-2 rounded border p-3 " + (on ? "border-base-500 bg-base-800/60" : "border-base-800 bg-base-900")}>
+              <div className="flex items-start gap-2">
+                {reading.tier ? <TierBadge tier={reading.tier} className="h-auto w-8 shrink-0" /> : null}
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-bold text-base-100" style={OSWALD}>{build.name}</p>
+                  <p className="truncate text-[11px] text-base-500" style={MONO}>{held.join(" · ")}</p>
+                </div>
+              </div>
+              {why ? (
+                <p className={"flex items-start gap-1.5 text-[11px] leading-relaxed " + (why.tone === "up" ? "text-emerald-300" : "text-accent-300")}>
+                  {why.tone === "up" ? <ArrowUp className="mt-px h-3 w-3 shrink-0" /> : <AlertTriangle className="mt-px h-3 w-3 shrink-0" />}
+                  <span>{why.item ? <span className="text-base-300">{why.item}. </span> : null}{why.text}</span>
+                </p>
+              ) : (
+                <p className="text-[11px] text-base-500">Nothing about this drop moves it. It is what its gear is worth anywhere.</p>
+              )}
+              <div className="mt-auto flex items-center justify-between gap-2">
+                <span className="text-[10px] text-base-600">{usageLine(usage) || (fromPresets ? "Curated preset" : "Not dropped with yet")}</span>
+                {on ? (
+                  <span className="text-[10px] uppercase tracking-wider text-base-400" style={OSWALD}>In your slot</span>
+                ) : (
+                  <SlotButton onClick={() => onTake(build.id)} Icon={Rocket}>Take it</SlotButton>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -459,7 +614,7 @@ function PartyPanel({ party, sync }) {
 /* line, because a list that silently shrinks reads as a bug.          */
 /* ------------------------------------------------------------------ */
 
-function BuildPicker({ title, forMine, everything, scenario, state, current, onPick, onClose, navigate }) {
+function BuildPicker({ title, forMine, everything, scenario, state, current, onPick, onClose, onNew }) {
   const [query, setQuery] = useState("");
   /* Hidden by default in your own slot, the builder's precedent: you are
      choosing what to actually drop with. Never applied to a squadmate's
@@ -482,10 +637,13 @@ function BuildPicker({ title, forMine, everything, scenario, state, current, onP
     [everything, scenario, forMine, state.lockedSet, state.favorites, showLocked, query]
   );
 
-  const readings = useMemo(
-    () => new Map(shown.map((l) => [l.id, readBuild(l, scenario)])),
-    [shown, scenario]
+  /* Ranked by the reading, favourites first: the order the suggestions
+     use, so the top of this list and the suggestions above it agree. */
+  const ranked = useMemo(
+    () => rankByReading(shown, scenario, state.favorites),
+    [shown, scenario, state.favorites]
   );
+  const readings = useMemo(() => new Map(ranked.map((r) => [r.build.id, r.reading])), [ranked]);
 
   const faction = FACTIONS.find((f) => f.id === scenario.faction) || FACTIONS[0];
   const d = difficultyAt(scenario.difficulty);
@@ -511,7 +669,7 @@ function BuildPicker({ title, forMine, everything, scenario, state, current, onP
         </div>
         <div className="ml-auto flex items-center gap-2">
           {forMine ? (
-            <button onClick={() => navigate("builder/new")}
+            <button onClick={onNew}
               className="flex items-center gap-1.5 rounded border border-base-700 px-2.5 py-1 text-xs text-base-300 hover:border-base-500 hover:text-base-100">
               <Plus className="h-3.5 w-3.5" /> New loadout
             </button>
@@ -559,10 +717,10 @@ function BuildPicker({ title, forMine, everything, scenario, state, current, onP
                   ? "Everything that fits needs gear you have not unlocked. Show those builds, or open Collection to fix what you own."
                   : forMine
                     ? "No build for this front survives the scenario. Start one for it, or loosen the scenario above."
-                    : "No build for this front survives the scenario. Loosen the scenario above, or build theirs in the builder first."}
+                    : "No build for this front survives the scenario. Loosen the scenario above, or build theirs in the Armoury first."}
             </p>
             {forMine && !query ? (
-              <button onClick={() => navigate("builder/new")}
+              <button onClick={onNew}
                 className="mx-auto mt-3 flex items-center gap-1.5 rounded border border-base-200 bg-base-200 px-3 py-1.5 text-xs text-base-900 hover:bg-base-100">
                 <Plus className="h-3.5 w-3.5" /> New loadout
               </button>
@@ -570,7 +728,7 @@ function BuildPicker({ title, forMine, everything, scenario, state, current, onP
           </div>
         ) : (
           <div className="mx-auto flex max-w-3xl flex-col gap-1.5">
-            {shown.map((l) => {
+            {ranked.map(({ build: l }) => {
               const reading = readings.get(l.id);
               /* What you carry: both guns, the support weapon and the pack.
                  The call-ins are in the slot once chosen; here they would
@@ -687,9 +845,25 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted, inParty }
 
 /* ------------------------------------------------------------------ */
 
-export default function DropScreen({ state, navigate, scenario, setFaction, setPlanet, drop, update, party, sync }) {
+export default function DropScreen({ state, navigate, scenario, setFaction, setPlanet, setSquad, drop, update, party, sync }) {
   /* Which slot the picker is open for: "mine", a squadmate index, or null. */
   const [picking, setPicking] = useState(null);
+  /* The editor over this screen: { key, id, startWith }, or null. id is
+     the build being adjusted, null for a new one. */
+  const [editing, setEditing] = useState(null);
+  const openEditor = useCallback((id, startWith = null) => {
+    setPicking(null);
+    setEditing({ key: `${id || "new"}-${Date.now()}`, id, startWith });
+  }, []);
+
+  /* The page behind stays where it was while the editor covers it. */
+  useEffect(() => {
+    if (!editing) return undefined;
+    const html = document.documentElement;
+    const before = html.style.overflow;
+    html.style.overflow = "hidden";
+    return () => { html.style.overflow = before; };
+  }, [editing]);
 
   /* The galaxy map. Null means decide for me: open while nothing says
      where you are dropping, which is what makes Drop Bay open onto the
@@ -709,7 +883,7 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
     [state.loadouts]
   );
   const byId = useMemo(() => new Map(everything.map((l) => [l.id, l])), [everything]);
-  const { mine, mates, confirmed, counted: handCounted } = useMemo(
+  const { mine, mates, confirmed } = useMemo(
     () => readDrop(drop, (id) => byId.get(id)),
     [drop, byId]
   );
@@ -728,9 +902,28 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
         return { ...m, build: build ? withHeat([build])[0] : null };
       });
   }, [party.state]);
+  /* Outside a party the seats you said decide how many squadmate slots
+     there are. A build filled into a seat you then took away is kept,
+     but it is not in the squad and is not counted. */
+  const seats = inParty ? SQUAD_CAP : Math.max(1, Number(scenario.squad) || SQUAD_CAP);
+  const seatedMates = mates.slice(0, seats - 1);
+  const parked = mates.slice(seats - 1).filter(Boolean).length;
   const counted = inParty
     ? [...(confirmed ? [mine] : []), ...others.filter((m) => m.build).map((m) => m.build)]
-    : handCounted;
+    : [...(confirmed ? [mine] : []), ...seatedMates.filter(Boolean)];
+
+  /* Your own builds first: a suggestion you made yourself beats a preset.
+     The presets only stand in while nothing of yours fits. */
+  const own = useMemo(() => everything.filter((l) => !l.preset), [everything]);
+  const suggestions = useMemo(() => {
+    if (!scenario.faction) return { picks: [], fromPresets: false, cut: null };
+    const opts = { lockedSet: state.lockedSet, history: state.history, limit: 3 };
+    const mineFirst = suggestBuilds(own, scenario, opts);
+    if (mineFirst.length) return { picks: mineFirst, fromPresets: false, cut: null };
+    const presetPicks = suggestBuilds(everything.filter((l) => l.preset), scenario, opts);
+    if (presetPicks.length) return { picks: presetPicks, fromPresets: true, cut: null };
+    return { picks: [], fromPresets: false, cut: dropPool(everything, scenario, { lockedSet: state.lockedSet, showLocked: false }).cut };
+  }, [own, everything, scenario, state.lockedSet, state.history]);
 
   const closePicker = useCallback(() => setPicking(null), []);
 
@@ -774,6 +967,20 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
      counts: it is what that person is bringing, whatever the scenario says. */
   const offFront = (b) => b && b.faction !== scenario.faction;
 
+  /* Confirming writes the drop to your history. Changing your mind soon
+     after takes it back again: that was a change of mind, not a drop. */
+  const confirm = () => {
+    const entry = entryFor(mine, scenario);
+    state.logDrop(entry);
+    update((d) => ({ ...d, confirmed: stampOf(mine), logged: { id: entry.id, at: entry.at } }));
+  };
+  const unconfirm = () => {
+    const logged = drop.logged;
+    if (logged && Date.now() - Date.parse(logged.at) < TAKE_BACK_MS) state.unlogDrop(logged.id);
+    update((d) => ({ ...d, confirmed: null, logged: null }));
+  };
+  const takeMine = (id) => update((d) => ({ ...d, mine: id, confirmed: null }));
+
   const pick = (id) => {
     if (picking === "mine") {
       /* Choosing is not confirming. Picking again after confirming puts you
@@ -801,20 +1008,38 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
           hostPicks={inParty && !party.isHost} />
       )}
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      {inParty ? null : (
+        <div className="rounded-lg border border-base-800 bg-base-900/40 px-4 py-2.5">
+          <Seats value={scenario.squad} onChange={setSquad} />
+          {parked ? (
+            <p className="mt-1.5 text-[11px] text-base-600">
+              {parked === 1 ? "One build you filled in sits" : `${parked} builds you filled in sit`} in a seat you took away.
+              Kept, not counted. Add the seat back and it returns.
+            </p>
+          ) : null}
+        </div>
+      )}
+
+      {confirmed ? null : (
+        <Suggestions picks={suggestions.picks} fromPresets={suggestions.fromPresets}
+          current={drop.mine} onTake={takeMine} cut={suggestions.cut} onStart={() => openEditor(null, "primary")} />
+      )}
+
+      <div className={"grid grid-cols-1 gap-3 sm:grid-cols-2 " + (seats >= 4 ? "xl:grid-cols-4" : seats === 3 ? "xl:grid-cols-3" : "")}>
         {mine ? (
           <FilledSlot label="You" build={mine} state={mineState} scenario={scenario} lockedSet={state.lockedSet}
             actions={confirmed ? (
-              <SlotButton onClick={() => update((d) => ({ ...d, confirmed: null }))} Icon={RotateCcw}>Change my mind</SlotButton>
+              <SlotButton onClick={unconfirm} Icon={RotateCcw}>Change my mind</SlotButton>
             ) : (
               <>
-                <SlotButton primary onClick={() => update((d) => ({ ...d, confirmed: stampOf(mine) }))} Icon={Check}>Confirm</SlotButton>
+                <SlotButton primary onClick={confirm} Icon={Check}>Confirm</SlotButton>
                 <SlotButton onClick={() => setPicking("mine")}>Choose another</SlotButton>
-                <SlotButton onClick={() => navigate(`builder/${mine.id}`)} Icon={Pencil}>{mine.preset ? "Edit a copy" : "Edit"}</SlotButton>
+                <SlotButton onClick={() => openEditor(mine.id)} Icon={Pencil}>{mine.preset ? "Adjust a copy" : "Adjust"}</SlotButton>
               </>
             )} />
         ) : (
-          <EmptySlot mine label="You" onChoose={() => setPicking("mine")} />
+          <EmptySlot mine label="You" onChoose={() => setPicking("mine")}
+            onStart={own.length ? null : () => openEditor(null, "primary")} />
         )}
 
         {inParty ? (
@@ -833,7 +1058,7 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
               <WaitingSlot key={`seat-${i}`} code={party.code} />
             ))}
           </>
-        ) : mates.map((b, i) =>
+        ) : seatedMates.map((b, i) =>
           b ? (
             <FilledSlot key={i} label={`Squadmate ${i + 2}`} build={b} state="manual" scenario={scenario} lockedSet={NO_LOCKS}
               actions={
@@ -843,12 +1068,12 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
                 </>
               } />
           ) : (
-            <EmptySlot key={i} label={`Squadmate ${i + 2}`} onChoose={() => setPicking(i)} />
+            <EmptySlot key={i} label={`Squadmate ${i + 2}`} onChoose={() => setPicking(i)} seated={Boolean(scenario.squad)} />
           )
         )}
       </div>
 
-      {[mine, ...(inParty ? others.map((m) => m.build) : mates)].some(offFront) ? (
+      {[mine, ...(inParty ? others.map((m) => m.build) : seatedMates)].some(offFront) ? (
         <p className="flex items-start gap-1.5 text-[11px] text-base-500">
           <Info className="mt-px h-3.5 w-3.5 shrink-0" />
           A build here was made for another front. It still counts, because it is what that person is bringing, but its
@@ -870,7 +1095,22 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
           current={picking === "mine" ? drop.mine : drop.mates[picking]}
           onPick={pick}
           onClose={closePicker}
-          navigate={navigate} />
+          onNew={() => openEditor(null)} />
+      ) : null}
+
+      {/* The Armoury's editor, over this screen. Saving puts the build in
+          your slot, still to confirm, and brings you back here. */}
+      {editing ? (
+        <div className="fixed inset-0 z-[60] overflow-y-auto bg-base-950" role="dialog" aria-modal="true" aria-label="Adjust a build">
+          <div className="mx-auto max-w-6xl p-4 sm:p-6">
+            <Builder key={editing.key} state={state} loadoutId={editing.id} navigate={navigate}
+              faction={scenario.faction} scenario={scenario} startWith={editing.startWith}
+              overlay={{
+                onClose: () => setEditing(null),
+                onSaved: (id) => { if (id) takeMine(id); setEditing(null); },
+              }} />
+          </div>
+        </div>
       ) : null}
     </div>
   );

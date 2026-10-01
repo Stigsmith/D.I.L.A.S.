@@ -34,6 +34,10 @@
     "hvt": {
       "name": "High value target",
       "line": "A set number of named heavies and nothing else counts. Anti-tank is the whole loadout question; chaff clear is only there so you can reach them."
+    },
+    "commando": {
+      "name": "Commando",
+      "line": "Behind enemy lines with almost no Super Destroyer. You get one minute to call stratagems when you land and one return per Helldiver after that, and zero reinforcements until you find the pods: twelve in all, however many of you there are. Bring what lasts, and stay quiet, because every bot that calls for help makes the whole map worse."
     }
   },
   "missions": [
@@ -189,36 +193,33 @@
     {
       "name": "Commando: Acquire Evidence",
       "factions": [
-        "bots",
-        "bugs",
-        "squids"
+        "bots"
       ],
       "traits": [
-        "standard"
-      ]
+        "commando"
+      ],
+      "note": "Automaton only, from a Commando Operation on a liberation campaign, per the wiki's Commando Missions page. It listed all three fronts until 1 October 2026."
     },
     {
       "name": "Commando: Extract Intel",
       "factions": [
-        "bots",
-        "bugs",
-        "squids"
+        "bots"
       ],
       "traits": [
-        "standard"
-      ]
+        "commando"
+      ],
+      "note": "Automaton only, from a Commando Operation on a liberation campaign, per the wiki's Commando Missions page. It listed all three fronts until 1 October 2026."
     },
     {
       "name": "Commando: Secure Black Box",
       "factions": [
-        "bots",
-        "bugs",
-        "squids"
+        "bots"
       ],
       "traits": [
+        "commando",
         "carry"
       ],
-      "note": "Small squad, quiet approach, and a box to carry out."
+      "note": "Small squad, quiet approach, and a box to carry out. Automaton only, from a Commando Operation on a liberation campaign, per the wiki's Commando Missions page. It listed all three fronts until 1 October 2026."
     },
     {
       "name": "Conduct Geological Survey",

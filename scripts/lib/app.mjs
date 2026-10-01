@@ -75,9 +75,19 @@ src = swap(src, "score", scoreUrl);
 src = swap(src, "squad", squadUrl);
 const buildUrl = asModule(swap(src, "enemies", enemiesUrl));
 
+const historyUrl = asModule(swap(read("src/lib/history.js"), "loadouts", loadoutsUrl));
+
 src = inlineJson(read("src/lib/drop.js"), "vocabulary");
 src = swap(src, "loadouts", loadoutsUrl);
+src = swap(src, "build", buildUrl);
+src = swap(src, "history", historyUrl);
 const dropUrl = asModule(swap(src, "scenario", scenarioUrl));
+
+src = swap(read("src/lib/coverage.js"), "drop", dropUrl);
+const coverageUrl = asModule(swap(src, "scenario", scenarioUrl));
+
+src = inlineJson(read("src/lib/share.js"), "vocabulary");
+const shareModuleUrl = asModule(swap(src, "drop", dropUrl));
 
 const galaxyUrl = asModule(inlineJson(read("src/lib/galaxy.js"), "planets"));
 
@@ -88,6 +98,9 @@ export const loadouts = await import(loadoutsUrl);
 export const squad = await import(squadUrl);
 export const build = await import(buildUrl);
 export const drop = await import(dropUrl);
+export const history = await import(historyUrl);
+export const share = await import(shareModuleUrl);
+export const coverage = await import(coverageUrl);
 export const galaxy = await import(galaxyUrl);
 
 export const FACTIONS = ["bots", "bugs", "squids"];
