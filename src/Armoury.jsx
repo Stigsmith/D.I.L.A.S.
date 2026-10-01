@@ -6,10 +6,11 @@
 /* framing and name, 1 October 2026; it was the Loadout Builder plus  */
 /* Drop Bay's second tab until then.                                   */
 /*                                                                    */
-/* Two tabs. Builds browses every build at once, yours and the        */
+/* Three tabs. Builds browses every build at once, yours and the      */
 /* curated presets, and is what Exchange inherits once there is       */
 /* somewhere for other people's builds to live. Coverage answers "do  */
-/* I have something for each occasion", per front.                    */
+/* I have something for each occasion", per front. History is every  */
+/* drop you confirmed, and the builds gathering dust.                 */
 /*                                                                    */
 /* It used to carry the squad comparison too, as a sticky panel over   */
 /* the grid. That moved to the drop screen in 1.24.0, where a squad   */
@@ -26,14 +27,28 @@
 /* ================================================================== */
 
 import { useMemo, useState } from "react";
-import { Plus, Star, FilterX, Snowflake, Info, Lock, AlertTriangle } from "lucide-react";
+import { Plus, Star, FilterX, Snowflake, Info, Lock, AlertTriangle, Rocket, History as HistoryIcon } from "lucide-react";
 
 import { LoadoutCard, FACTIONS, BIOMES, BIOME_THEME, MISSION_TYPES, FactionBar, FactionChooser, DifficultySlider, bandForLevel, TierBadge } from "./Tiers.jsx";
 import { presets, deriveHeat, loadoutItemIds } from "./lib/loadouts.js";
 import { withHeat } from "./lib/drop.js";
 import { coverage } from "./lib/coverage.js";
+import { usageOf, daysSince, STALE_DAYS } from "./lib/history.js";
+import { agoText } from "./lib/war.js";
+import { difficultyAt } from "./Tiers.jsx";
 
-export const ARMOURY_TABS = [{ id: "builds", label: "Builds" }, { id: "coverage", label: "Coverage" }];
+export const ARMOURY_TABS = [
+  { id: "builds", label: "Builds" },
+  { id: "coverage", label: "Coverage" },
+  { id: "history", label: "History" },
+];
+
+/* How often and how lately, on a card's label line. */
+function usageLabel(history, id) {
+  const u = usageOf(history, id);
+  if (!u.count) return null;
+  return `${u.count} ${u.count === 1 ? "drop" : "drops"}, last ${agoText(Date.now() - Date.parse(u.last))}`;
+}
 
 const ANY = { id: "any", label: "Any" };
 
@@ -234,7 +249,7 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
             <LoadoutCard key={l.id} loadout={l}
               isFavorite={state.favorites.includes(l.id)}
               onToggleFavorite={state.toggleFavorite}
-              rankLabel={l.preset ? "Curated preset" : "Yours"}
+              rankLabel={[l.preset ? "Curated preset" : "Yours", usageLabel(state.history, l.id)].filter(Boolean).join(" · ")}
               biome={biome}
               scenario={scenario}
               lockedSet={state.lockedSet}
@@ -400,6 +415,172 @@ export function Coverage({ state, navigate, scenario }) {
         A gap is worth a build, not an emergency. Every reading here is the tool's own, from the rules on the Rules page,
         and a rule you have switched off there is switched off here too.
       </p>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* History                                                             */
+/*                                                                     */
+/* Every drop you confirmed, since 1 October 2026. Where your evenings  */
+/* went, the builds you keep coming back to, and the ones gathering     */
+/* dust, which is the curator's "I completely forgot I had that" turned */
+/* into a list.                                                         */
+/* ------------------------------------------------------------------ */
+
+const FRONT_OF = Object.fromEntries(FACTIONS.map((f) => [f.id, f]));
+const day = (iso) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+
+function Count({ label, n, total, hex }) {
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      <span className="w-44 shrink-0 truncate text-base-300" title={label}>{label}</span>
+      <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-base-800">
+        <span className="block h-full rounded-full" style={{ width: `${total ? Math.round((n / total) * 100) : 0}%`, backgroundColor: hex || "rgb(var(--base-400))" }} />
+      </span>
+      <span className="w-8 shrink-0 text-right tabular-nums text-base-400">{n}</span>
+    </div>
+  );
+}
+
+export function History({ state, navigate, onUseForDrop }) {
+  const [showAll, setShowAll] = useState(false);
+  const history = state.history;
+  const byId = useMemo(() => new Map([...state.loadouts.map((l) => [l.id, l]), ...presets.map((p) => [p.id, p])]), [state.loadouts]);
+
+  const summary = useMemo(() => {
+    const fronts = new Map();
+    const missions = new Map();
+    const builds = new Map();
+    for (const e of history) {
+      fronts.set(e.faction, (fronts.get(e.faction) || 0) + 1);
+      if (e.mission) missions.set(e.mission, (missions.get(e.mission) || 0) + 1);
+      const b = builds.get(e.build) || { id: e.build, name: e.name, count: 0, last: null };
+      b.count += 1;
+      if (!b.last || e.at > b.last) { b.last = e.at; b.name = e.name; }
+      builds.set(e.build, b);
+    }
+    const top = [...builds.values()].sort((a, b) => b.count - a.count || (b.last > a.last ? 1 : -1)).slice(0, 5);
+    const topMissions = [...missions.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+    return { fronts, top, topMissions };
+  }, [history]);
+
+  /* Your own builds you have not taken in a while, or ever: the list he
+     wanted for "what cool combinations did I forget". */
+  const dust = useMemo(() => state.loadouts
+    .map((l) => ({ build: l, usage: usageOf(history, l.id) }))
+    .map((x) => ({ ...x, days: daysSince(x.usage) }))
+    .filter((x) => x.days === null || x.days >= STALE_DAYS)
+    .sort((a, b) => (b.days ?? 1e9) - (a.days ?? 1e9))
+    .slice(0, 8), [state.loadouts, history]);
+
+  if (!history.length) {
+    return (
+      <div className="mx-auto max-w-lg rounded-lg border border-dashed border-base-700 px-4 py-10 text-center">
+        <HistoryIcon className="mx-auto h-6 w-6 text-base-600" />
+        <p className="mt-2 text-sm text-base-300">No drops yet.</p>
+        <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-base-500">
+          Every time you confirm your loadout on Drop Bay it lands here: the build, the planet, the mission. After a few,
+          Drop Bay starts suggesting builds you have not taken in a while and gear you have never tried.
+        </p>
+        <button onClick={() => navigate("bay")}
+          className="mx-auto mt-3 flex items-center gap-1.5 rounded border border-base-200 bg-base-200 px-3 py-1.5 text-xs text-base-900 hover:bg-base-100">
+          <Rocket className="h-3.5 w-3.5" /> Go to Drop Bay
+        </button>
+      </div>
+    );
+  }
+
+  const newest = [...history].reverse();
+  const shown = showAll ? newest : newest.slice(0, 25);
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
+          <p className="mb-1 text-sm font-bold text-base-200" style={OSWALD}>{history.length} {history.length === 1 ? "drop" : "drops"}</p>
+          <p className="mb-3 text-[11px] text-base-500">Since {day(history[0].at)}. Every Confirm on Drop Bay.</p>
+          <div className="flex flex-col gap-1.5">
+            {FACTIONS.map((f) => <Count key={f.id} label={f.label} n={summary.fronts.get(f.id) || 0} total={history.length} hex={f.hex} />)}
+          </div>
+          {summary.topMissions.length ? (
+            <>
+              <p className="mb-1.5 mt-4 text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>Missions you play most</p>
+              <div className="flex flex-col gap-1.5">
+                {summary.topMissions.map(([name, n]) => <Count key={name} label={name} n={n} total={history.length} />)}
+              </div>
+            </>
+          ) : null}
+        </div>
+
+        <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
+          <p className="mb-3 text-sm font-bold text-base-200" style={OSWALD}>The builds you keep coming back to</p>
+          <div className="flex flex-col gap-1.5">
+            {summary.top.map((b) => {
+              const live = byId.get(b.id);
+              return (
+                <div key={b.id} className="flex items-center gap-2 text-xs">
+                  <span className="w-8 shrink-0 tabular-nums text-base-400">{b.count}x</span>
+                  {live ? (
+                    <button onClick={() => navigate(`builder/${b.id}`)} className="min-w-0 flex-1 truncate text-left text-base-200 hover:underline">{live.name}</button>
+                  ) : (
+                    <span className="min-w-0 flex-1 truncate text-base-500" title="This build has since been deleted">{b.name}</span>
+                  )}
+                  <span className="shrink-0 text-[10px] text-base-600">{agoText(Date.now() - Date.parse(b.last))}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
+          <p className="mb-1 text-sm font-bold text-base-200" style={OSWALD}>Gathering dust</p>
+          <p className="mb-3 text-[11px] text-base-500">Your builds you have not taken in {STALE_DAYS} days, or ever.</p>
+          {dust.length ? (
+            <div className="flex flex-col gap-1.5">
+              {dust.map(({ build, days }) => (
+                <div key={build.id} className="flex items-center gap-2 text-xs">
+                  <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: (FRONT_OF[build.faction] || {}).hex }} />
+                  <button onClick={() => navigate(`builder/${build.id}`)} className="min-w-0 flex-1 truncate text-left text-base-200 hover:underline">{build.name}</button>
+                  <span className="shrink-0 text-[10px] text-base-600">{days === null ? "never" : `${days} days`}</span>
+                  <button onClick={() => onUseForDrop(build.id)} title="Put it in your slot on Drop Bay"
+                    className="shrink-0 rounded border border-base-700 px-1.5 py-0.5 text-[10px] text-base-300 hover:border-base-500 hover:text-base-100">
+                    Drop with it
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-base-500">Nothing. Every build of yours has had an outing this month.</p>
+          )}
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-lg border border-base-800 bg-base-900/40">
+        <p className="border-b border-base-800 px-4 py-2.5 text-sm font-bold text-base-200" style={OSWALD}>Every drop, newest first</p>
+        <div className="divide-y divide-base-800">
+          {shown.map((e) => {
+            const f = FRONT_OF[e.faction];
+            const d = difficultyAt(e.difficulty);
+            const live = byId.get(e.build);
+            return (
+              <div key={e.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2 text-xs">
+                <span className="w-24 shrink-0 text-base-500">{day(e.at)}</span>
+                <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: f ? f.hex : undefined }} title={f ? f.label : ""} />
+                <span className={"min-w-0 flex-1 truncate " + (live ? "text-base-200" : "text-base-500")}>{e.name}{live ? "" : " (deleted)"}</span>
+                <span className="min-w-0 truncate text-[11px] text-base-500">
+                  {[e.planet, e.mission, d ? d.name : null, e.squad ? (e.squad === 1 ? "solo" : `${e.squad} of you`) : null].filter(Boolean).join(" · ")}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        {newest.length > shown.length ? (
+          <button onClick={() => setShowAll(true)} className="w-full border-t border-base-800 py-2 text-xs text-base-400 hover:text-base-100">
+            Show all {newest.length}
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }

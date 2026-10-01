@@ -1070,6 +1070,9 @@ Every warning is conditioned on where you are dropping, which is what makes them
 
 The Loadout Builder until 1 October 2026, renamed for the game's own armoury, the curator's word. `src/Armoury.jsx` holds the two tabs; `src/Builder.jsx` is the editor, at `#/builder/:id` on its own page or over Drop Bay. The Builds grid moved here from Drop Bay the same day, and an old `#/bay/builds` link lands on it.
 
+> [!info] History: where your evenings went
+> The Armoury's third tab, 1 October 2026. How many drops and how they spread across fronts and missions, the builds you keep coming back to, the ones **gathering dust** (not taken in thirty days, or ever, each with "Drop with it", which puts it in your Drop Bay slot), and every drop newest first, a deleted build shown by the name it had. The Builds grid's cards say "3 drops, last 2 days ago" on their label line. Empty until the first Confirm, and the empty state says so.
+
 > [!info] Coverage: do you have something for each occasion
 > The curator's question, 1 October 2026: something to play solo on Super Helldive, something for a frozen planet, something for a Commando mission? `src/lib/coverage.js` reads fifteen situations per front (solo and four of you on Super Helldive, four on Hard, hot, frozen, sandstorms, ion storms, and each kind of mission) at Suicide Mission with four of you unless a row says otherwise, through the drop screen's gates and only with builds you can field. **A or better is covered, B is thin, nothing is a gap**, and a gap says what ruled your builds out and links to a new build for that front. With no builds of your own the presets stand in, and the page says so. They cover every situation on every front, which is why the useful reading is yours.
 
