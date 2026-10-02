@@ -38,8 +38,14 @@ dds-20*.json
 # holding 638 copies of the generated art, which must never reach the repo.
 *Name clash*
 
-# Planet renders from the wiki, fetched by npm run planet-art. Extracted
-# game art and about 200 MB of it at full size, so neither copy is kept
-# in the repo; a fresh clone draws the map without them.
-Image Library/Planets/
+# The art. Everything in Image Library is extracted from shipped games
+# (Helldivers 2, and the Halo and Warhammer crossover skins) or drawn for
+# a theme from that art, so none of it goes in the public repository.
+# It stays on the curator's machine, where npm run images copies it into
+# src/assets for the build; a clone without it runs art free. Taken out
+# of the repo and its whole history on 2 October 2026.
+Image Library/
+
+# Planet renders from the wiki, fetched by npm run planet-art, copied
+# here from the library. Not kept either.
 src/assets/planets/

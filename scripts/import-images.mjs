@@ -19,6 +19,15 @@ const SOURCE = join(ROOT, "Image Library");
 const ASSETS = join(ROOT, "src", "assets");
 const DATA = join(ROOT, "src", "data");
 
+/* A clone from GitHub has no library: the art is extracted from the game
+   and stays on the curator's machine, out of the public repository. The
+   tool runs art free without it, every item read by its name, so this
+   says so and changes nothing rather than failing the build. */
+if (!existsSync(SOURCE)) {
+  console.log("\n  No Image Library here, so there is no art to copy. The tool runs art free: every item reads by its name.\n");
+  process.exit(0);
+}
+
 const read = (f) => JSON.parse(readFileSync(join(DATA, f), "utf8"));
 const items = read("items.json");
 const { warbonds } = read("warbonds.json");
