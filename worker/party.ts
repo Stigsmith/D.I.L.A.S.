@@ -3,7 +3,7 @@
  * each one's confirmed loadout, and the host's scenario, and pushing every
  * change to every open connection.
  *
- * Stage 7 of `dds-cloudflare-handover.md`, which Enodia never built, so there
+ * Stage 7 of `dilas-cloudflare-handover.md`, which Enodia never built, so there
  * was nothing to port. The shape is the one the handover sketched: a Durable
  * Object per party, WebSockets through the hibernation API, a join code.
  *

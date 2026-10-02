@@ -13,7 +13,7 @@ import { BRAND } from "./src/lib/brand.js";
 function emptyOutDirInPlace() {
   let outDir = null;
   return {
-    name: "dds-empty-out-dir-in-place",
+    name: "dilas-empty-out-dir-in-place",
     apply: "build",
     configResolved(config) {
       outDir = resolve(config.root, config.build.outDir);
@@ -29,7 +29,7 @@ function emptyOutDirInPlace() {
    before the app loads and in a link preview. */
 function brandTitle() {
   return {
-    name: "dds-brand-title",
+    name: "dilas-brand-title",
     transformIndexHtml(html) {
       return html.replace(/<title>[^<]*<\/title>/, `<title>${BRAND.short}</title>`);
     },

@@ -19,7 +19,7 @@
 /*                                                                    */
 /* The wiki is CC BY-NC-SA 4.0: attribution is required wherever this */
 /* data is shown, derived data carries the same licence, and          */
-/* commercial use is forbidden. See dds-data-spike.md.       */
+/* commercial use is forbidden. See dilas-data-spike.md.       */
 /* ================================================================== */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
@@ -83,7 +83,7 @@ async function pull(name, url) {
 
   const res = await fetch(url, {
     headers: {
-      "user-agent": "dds (community loadout tool)",
+      "user-agent": "dilas (community loadout tool)",
       /* helldivers2.dev refuses a request that does not name its client */
       /* and a contact. The same two the Worker sends, from wrangler.jsonc; */
       /* this used to give the API's own organisation as our contact.       */

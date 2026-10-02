@@ -897,7 +897,7 @@ function DifficultySlider({ value, onChange, label = "Difficulty", hint }) {
             onChange={(e) => onChange(Number(e.target.value))}
             aria-label={label}
             aria-valuetext={d ? `${d.level}, ${d.name}` : "Any difficulty"}
-            className="dds-range w-full"
+            className="dilas-range w-full"
             style={{ "--fill": `${pct}%` }} />
           {/* Ends only. Ten numbers under a ten step slider is the wall   */}
           {/* the slider was replacing.                                     */}
@@ -1307,7 +1307,7 @@ function RowDetail({ item, faction, scored, difficulty }) {
 /* --shell-chrome carries.                                              */
 const RATING_COLUMNS = [
   { id: "ugg", label: "u.gg", title: "u.gg community vote" },
-  { id: "dds", label: BRAND.short, title: "Our rating for the scenario you set" },
+  { id: "ours", label: BRAND.short, title: "Our rating for the scenario you set" },
 ];
 
 function RatingHeader({ faction, left, sortBy, setSortBy }) {
@@ -1399,7 +1399,7 @@ export function statSummary(item) {
 /* onSelect turns the row into a picker entry. The lock, favorite and    */
 /* expand controls inside it stop propagation so tapping them does not   */
 /* also choose the item.                                                 */
-function TierRow({ item, factionFilter, scenario, sortBy = "dds", isLocked, lockedByWarbond, toggleLock, isFav, toggleFav, open, onToggleOpen, onSelect }) {
+function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, lockedByWarbond, toggleLock, isFav, toggleFav, open, onToggleOpen, onSelect }) {
   const stop = (fn) => (e) => { e.stopPropagation(); fn(); };
   const { id, name, flag } = item;
   /* factionFilter is a real front now, never "all": the table does not   */
@@ -1520,7 +1520,7 @@ function TierRow({ item, factionFilter, scenario, sortBy = "dds", isLocked, lock
           </div>
           <div className="w-12 sm:w-16 flex items-center justify-center border-l px-1 py-1.5"
             style={{
-              backgroundColor: sortBy === "dds" ? factionMeta.hex + "14" : "transparent",
+              backgroundColor: sortBy === "ours" ? factionMeta.hex + "14" : "transparent",
               borderColor: factionMeta.hex + "33",
             }}
             title={scored && scored.reasons.length
@@ -1530,7 +1530,7 @@ function TierRow({ item, factionFilter, scenario, sortBy = "dds", isLocked, lock
               <PendingBadge />
             ) : (
               <span className="relative flex items-center">
-                <TierBadge tier={scored.tier} quiet={sortBy !== "dds"} className={ROW_BADGE} />
+                <TierBadge tier={scored.tier} quiet={sortBy !== "ours"} className={ROW_BADGE} />
                 {/* Top left, because that corner of the plate is square  */}
                 {/* and the top right is the chamfer. A round marker over  */}
                 {/* a cut corner reads as damage rather than as a badge.   */}
