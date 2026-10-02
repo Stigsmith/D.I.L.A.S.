@@ -331,3 +331,14 @@ ok(covers, "in full screen the drawing reaches every edge of the screen, so a se
   ok(galaxy.stageDepth(flat, 500, 100) === 1 && galaxy.stageDepth(fit, 500, 100) < 1 && galaxy.stageDepth(fit, 500, 900) > 1 && Math.abs(galaxy.stageDepth(fit, 500, 500) - 1) < 1e-9,
     "planets stand upright on the tilt: smaller toward the back, larger toward the front, true size in the middle and on a flat map");
 }
+{
+  const fit = galaxy.stageFit(1400, 800, { tilt: true, margin: 20, insets: { left: 360, bottom: 80 } });
+  let inside = true;
+  for (let i = 0; i < 72; i++) {
+    const t = (i / 72) * 2 * Math.PI;
+    const s = galaxy.onStage(fit, CENTRE + RADIUS * Math.cos(t), CENTRE + RADIUS * Math.sin(t));
+    if (s.x < 360 + 19 || s.x > 1400 - 19 || s.y < 19 || s.y > 800 - 80 - 19) inside = false;
+  }
+  const back = galaxy.offStage(fit, ...Object.values(galaxy.onStage(fit, 321, 654)));
+  ok(inside && Math.hypot(back.x - 321, back.y - 654) < 1e-9, "beside a panel the map fits the space that is left, and a click still lands exactly");
+}
