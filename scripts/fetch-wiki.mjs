@@ -87,8 +87,8 @@ async function pull(name, url) {
       /* helldivers2.dev refuses a request that does not name its client */
       /* and a contact. The same two the Worker sends, from wrangler.jsonc; */
       /* this used to give the API's own organisation as our contact.       */
-      "x-super-client": "dds.stigly-official.workers.dev",
-      "x-super-contact": "dds.stigly-official.workers.dev",
+      "x-super-client": "dilas.me",
+      "x-super-contact": "https://dilas.me",
     },
   });
   if (!res.ok) throw new Error(`${name}: ${res.status} ${res.statusText}`);

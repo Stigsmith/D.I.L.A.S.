@@ -8,7 +8,7 @@
  *
  * The gate is loose on purpose: **viewing is free, creating is free, saving
  * locally is free. An account is only needed to share or compete.** Nothing
- * that works in D.D.S. today starts asking who you are.
+ * that works in the tool today starts asking who you are.
  *
  * ## Why a factory rather than a module level instance
  *
@@ -56,7 +56,7 @@ export function createAuth(
   return betterAuth({
     secret,
     // Derived from the request rather than configured, because the same code
-    // serves dds.<subdomain>.workers.dev today and the bought domain later, and
+    // serves dilas.me and the old workers.dev address through the move, and
     // a baseURL that disagrees with the host breaks cookies rather than
     // erroring.
     baseURL: origin,

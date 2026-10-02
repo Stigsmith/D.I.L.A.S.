@@ -18,7 +18,7 @@ import worker from './index.ts'
 import * as schema from './schema.ts'
 import { type Fetcher, HISTORY_EVERY_MS, HISTORY_KEEP_MS, UPSTREAM, refreshWar, trimOrder, trimStats, trimWar } from './war.ts'
 
-const ORIGIN = 'https://dds.stigly-official.workers.dev'
+const ORIGIN = 'https://dilas.me'
 const db = drizzle(env.DB, { schema })
 
 /** Shaped like the upstream's own answer, trimmed to the fields that matter plus some that do not. */
@@ -393,7 +393,7 @@ describe('the Cron Trigger', () => {
     const sent = new Headers(spy.mock.calls[0]?.[1]?.headers)
     expect(sent.get('x-super-client')).toBe(env.SUPER_CLIENT)
     expect(sent.get('x-super-contact')).toBe(env.SUPER_CONTACT)
-    expect(env.SUPER_CLIENT).toBe('dds.stigly-official.workers.dev')
+    expect(env.SUPER_CLIENT).toBe('dilas.me')
     expect(env.SUPER_CONTACT).toBeTruthy()
 
     const body = await (await war()).json<{ ok: boolean; planets: unknown[] }>()

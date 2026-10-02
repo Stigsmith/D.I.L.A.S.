@@ -1,4 +1,4 @@
-# **D.D.S.: Claude Instructions**
+# **D.I.L.A.S.: Claude Instructions**
 
 > [!warning] The repo lives at `C:\Dev\dds` and nothing is called armory any more
 > Renamed 21 August 2026, folder included. `Armory.jsx` is `Tiers.jsx`, `useArmoryState.js` is `useCollectionState.js`, and the four `helldivers-2_armory-*.md` documents are `dds-*.md`. The original Claude.ai artifact is `original-artifact.jsx`.
@@ -11,8 +11,12 @@
 
 # **What This Is**
 
-> [!warning] The name is a working title and lives in exactly one file
-> **Democracy Deployment System**, shown as **D.D.S.** in the wordmark with the full name in small caps beneath it. It is in `src/lib/brand.js` and nowhere else: the sidebar, the mobile drawer, the browser tab, the footer and About all read from it. Renaming it again is one edit. Do not hardcode it anywhere.
+> [!warning] D.I.L.A.S. since 2 October 2026, and the name lives in one file
+> **D.I.L.A.S., the Democratic Intelligent Loadout & Armoury System**, shown as **D.I.L.A.S.** in the wordmark with the full name in small caps beneath it. It was **D.D.S., the Democracy Deployment System**, until every short `.me` address for it turned out to be gone; the curator bought **dilas.me** on Cloudflare and took the name to match. He also judged the old name wrong on its own terms: the tool is an armoury, not a deployment system.
+>
+> It is in `src/lib/brand.js` and nowhere else: the sidebar, the mobile drawer, the browser tab (written into `index.html` by a small plugin in `vite.config.js`; it was a hardcoded title until the rename found it), the footer, About and the backup file's name all read from it. **The one other copy is the reset email in `worker/email.ts`**, because the Worker's type check cannot import the app's JavaScript. Renaming again is those two edits. Do not hardcode it anywhere else.
+>
+> **The repo folder, the Worker, the D1 database and the `dds-*.md` documents keep `dds`.** They are infrastructure, not the brand: renaming the Worker moves its workers.dev address, and renaming the database orphans it.
 
 A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai artifact into a Vite and React project. Navigation is two levels: a persistent left sidebar for destinations, and a top tab bar scoped to whichever destination is open.
 
@@ -812,7 +816,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 | **The tests** | `worker/party.test.ts`, 25 of them, inside workerd against a real Durable Object |
 
 > [!danger] Three calls, all the curator's, and the code is shaped around them
-> **A code, not an account** (27 September 2026). Accounts cannot open before password reset, which needs a domain nobody has bought. A code needs only the Worker. **An unconfirmed slot shows "Still deciding" and nothing else**, so the browser sends null until you confirm and the server never holds a half picked kit. **The host sets the scenario** (28 September 2026), the way the host picks the mission in game; everybody else's scenario follows it.
+> **A code, not an account** (27 September 2026). Accounts cannot open before password reset, which needed a domain (dilas.me, bought 2 October 2026) and still needs mail. A code needs only the Worker. **An unconfirmed slot shows "Still deciding" and nothing else**, so the browser sends null until you confirm and the server never holds a half picked kit. **The host sets the scenario** (28 September 2026), the way the host picks the mission in game; everybody else's scenario follows it.
 
 > [!danger] The server has no opinion about what a build is
 > The handover's rule for published builds. A confirmed build is packed by the browser (`packBuild` in `drop.js`, which leaves the blurb at home) and handed to the others exactly as it came. **Every browser cleans what it receives against its own tables** (`unpackBuild`, `cleanScenario`), so an item in the wrong slot, or no item at all, is dropped rather than drawn. The server enforces only size, shape, rate and who may say what.
@@ -956,7 +960,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!warning] The upstream requires both headers, whatever its README says
 > `api.helldivers2.dev` answers **400 "The X-Super-Client and X-Super-Contact headers are required"** to a request missing either. Its README still calls the contact optional. Found on 30 September 2026 against the real service, after an eight second timeout had hidden it the first time.
 >
-> **`SUPER_CONTACT` in `wrangler.jsonc` is a placeholder**: the tool's own public address, because the service will not answer without something. It should be a project address, never a personal one, and **which one is stigly's to pick**: the published repository, or an address on the domain. `SUPER_CLIENT` is the tool's address and **changes with the domain**. `npm run wiki` sends the same two; it used to give the API's own organisation as our contact.
+> **`SUPER_CLIENT` is `dilas.me` and `SUPER_CONTACT` is `https://dilas.me`** since the domain was bought on 2 October 2026; both were the workers.dev address before. The contact is a project address, never a personal one. **A mailbox on the domain would be a better contact**, and which one is stigly's to pick; Cloudflare's email routing can forward one without a mail server. `npm run wiki` and `npm run planet-art` name the tool the same way; the wiki fetch used to give the API's own organisation as our contact.
 
 > [!info] The numbers behind the schedule
 > Every five minutes is 1,152 upstream requests a day, four paths each run (planets, campaigns, the Major Order, the war's totals), whatever the traffic. The service publishes a limit of 5 requests in 10 seconds; this is 4 in 300. **Five Cron Triggers per account on the free plan, 10 ms of CPU each**, verified 29 September 2026; Enodia uses none. Parsing and trimming the 300 KB planet answer measured 1.5 ms. The timeout is 20 seconds, because waiting is not CPU and the service took 10 seconds to answer once.
@@ -1430,7 +1434,7 @@ Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, t
 > [!tip] How stigly actually deploys it
 > File Explorer into `C:\Dev\dds`, click the address bar, type `cmd`, Enter. That opens a terminal already in the folder. Then `npm run deploy`, which builds and puts it on Cloudflare in one go. He does not use a terminal habitually, so give the path and the clicks, not just the command.
 >
-> **Until the domain exists, Netlify is still the address people use**, and `npm run build` then dragging `dist` onto Netlify still works exactly as before. See Hosting for why the two coexist.
+> **Until dilas.me is deployed and announced, Netlify is still the address people use**, and `npm run build` then dragging `dist` onto Netlify still works exactly as before. See Hosting for why the two coexist.
 
 > [!bug] PowerShell refuses to run npm
 > `npm : File C:\Program Files\nodejs\npm.ps1 cannot be loaded because running scripts is disabled on this system.` PowerShell blocks the npm script wrapper by default. **Use `cmd` in the address bar instead of `powershell`**, where plain `npm run build` works. From an already open PowerShell, `npm.cmd run build` skips the wrapper and works too. Neither needs a system change. `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` is the permanent fix but is not required, so do not run it on his behalf.
@@ -1468,7 +1472,7 @@ Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, t
 # **Hosting**
 
 > [!success] Served from Cloudflare since 1.21.0, 25 September 2026
-> **https://dds.stigly-official.workers.dev**, on the same Cloudflare account as Enodia. Stage 0 of `dds-cloudflare-handover.md` moved `dist/` here as static assets, and **Stage 1 added a Worker on `/api/*` and a D1 database for accounts**, switched off in the UI. See Accounts. Everything the tool does for somebody using it still happens in the browser. Read that handover before Stage 1; it carries eighteen pitfalls Enodia paid for.
+> **https://dilas.me** from the next deploy: bought on Cloudflare on 2 October 2026 and attached to the Worker as a custom domain in `wrangler.jsonc`, so the deploy creates its DNS record and certificate. Until then **https://dds.stigly-official.workers.dev**, which stays on through the move. Both on the same Cloudflare account as Enodia. Stage 0 of `dds-cloudflare-handover.md` moved `dist/` here as static assets, and **Stage 1 added a Worker on `/api/*` and a D1 database for accounts**, switched off in the UI. See Accounts. Everything the tool does for somebody using it still happens in the browser. Read that handover before Stage 1; it carries eighteen pitfalls Enodia paid for.
 
 | File | What it does |
 |---|---|
@@ -1488,7 +1492,7 @@ Builds, then deploys. From `cmd` in the address bar of `C:\Dev\dds`, the same as
 > [!danger] Local dev on the real host is port 8788, never 8787
 > `npx wrangler dev` serves the built `dist/` exactly as Cloudflare will, headers included. It needs `npm run build` first. The port is set in `wrangler.jsonc` so it belongs to the project.
 >
-> **Enodia's wrangler dev uses 8787 on this same machine.** On 25 September 2026 D.D.S. started on 8787 while Enodia was already running there, printed "Ready on 8787", and Enodia went on answering every request. Every header read back was Enodia's policy over an app that did not have D.D.S.'s files. Nothing errored. The tell was a policy containing `data:`, which D.D.S. deliberately does not allow.
+> **Enodia's wrangler dev uses 8787 on this same machine.** On 25 September 2026 this tool started on 8787 while Enodia was already running there, printed "Ready on 8787", and Enodia went on answering every request. Every header read back was Enodia's policy over an app that did not have this tool's files. Nothing errored. The tell was a policy containing `data:`, which this tool deliberately does not allow.
 >
 > Stopping a background `wrangler dev` on Windows can orphan its `workerd` and `esbuild` children. Check nothing from `C:\Dev\dds` is still listening before starting another.
 
@@ -1498,8 +1502,8 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 
 | Header | Value, and why |
 |---|---|
-| **Content-Security-Policy** | Nothing from any other address. `img-src 'self'` with **no `data:`**, tighter than Enodia, because nothing in D.D.S. draws a data URI: `assetsInlineLimit` is 0 and theme art is extracted to real files. `style-src` allows `'unsafe-inline'` for React's style attributes, which carry every faction colour. `connect-src 'self'` is what lets Stage 1's `/api/*` arrive without editing the policy |
-| **Strict-Transport-Security** | A year, `includeSubDomains`, **no `preload`**, which is a one way commitment and the domain is not bought yet |
+| **Content-Security-Policy** | Nothing from any other address. `img-src 'self'` with **no `data:`**, tighter than Enodia, because nothing in D.I.L.A.S. draws a data URI: `assetsInlineLimit` is 0 and theme art is extracted to real files. `style-src` allows `'unsafe-inline'` for React's style attributes, which carry every faction colour. `connect-src 'self'` is what lets Stage 1's `/api/*` arrive without editing the policy |
+| **Strict-Transport-Security** | A year, `includeSubDomains`, **no `preload`**, which is a one way commitment: every subdomain of dilas.me would be HTTPS only for good. stigly's call |
 | `X-Content-Type-Options`, `Referrer-Policy` | `nosniff`, `strict-origin-when-cross-origin` |
 | **Cache-Control** | `/assets/*` and `/fonts/*` immutable for a year, because every file there has a content hash in its name. The page revalidates on every visit, so a deploy reaches people the next time they open the tool |
 
@@ -1525,10 +1529,10 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 | Asset paths are absolute, `/assets/...` | Must be served from a domain root |
 | State is `localStorage` | Per origin. Nothing follows you between addresses, and nothing syncs between two people |
 
-> [!danger] Moving address empties everybody's collection, and there are two moves coming, not one
-> Profiles, locks, favorites and builds live in `localStorage`, scoped to the exact address. Netlify to `workers.dev` is one move; `workers.dev` to the bought domain is a second. **Telling anyone to use the `workers.dev` address now means Export and Import twice.**
+> [!danger] Moving address empties everybody's collection, and with dilas.me it is one move
+> Profiles, locks, favorites and builds live in `localStorage`, scoped to the exact address. **With the domain bought, everybody moves once**: from Netlify, or from `workers.dev` for the few who used it, straight to dilas.me. Export there, Import here.
 >
-> So Netlify stays the address people use until the domain exists. Then: one last Netlify build carrying a notice with the new address and "Export here, Import there", and Netlify left up for a while rather than deleted the same day. Both calls are stigly's. `_headers` travels in `dist/`, and Netlify reads the same file format, so that last Netlify build gets the security headers too.
+> The order, every step stigly's call: deploy, so dilas.me answers; one last Netlify build carrying a notice with the new address and "Export here, Import there"; Netlify and workers.dev left up for a while rather than switched off the same day. `_headers` travels in `dist/`, and Netlify reads the same file format, so that last Netlify build gets the security headers too.
 
 > [!success] The "no server" sentence was retired in 1.22.0, when Stage 1 landed
 > Support said "There is no account and no server behind this tool" (`Pages.jsx`, "Your data stays yours"). It went false the day the Worker deployed, so it said **"Nothing you do here is sent anywhere, and there are no accounts yet"**. **That went false in turn with the live party in 1.25.0**, and Support now says what a party sends, to whom, and when it is deleted. **The "no accounts yet" half goes false the day accounts open**, and must change with the switch. `roadmap.json` still says the solo track runs "with no account, no server and no network call", which describes that track's features and stays true. Enodia shipped the same kind of sentence past its expiry: "Nothing is tracked about you" outlived the day stats existed.
@@ -1587,7 +1591,7 @@ Sixty six tests, fifteen for accounts, twenty five for the live party and twenty
 npm run typecheck
 ```
 
-The Worker only. `tsconfig.worker.json` stands alone, because D.D.S. has no root tsconfig to extend.
+The Worker only. `tsconfig.worker.json` stands alone, because this project has no root tsconfig to extend.
 
 | Script | Does |
 |---|---|
@@ -1618,7 +1622,7 @@ The Worker only. `tsconfig.worker.json` stands alone, because D.D.S. has no root
 
 ### What is deliberately not here yet
 
-- **Password reset**, Stage 2, which needs the domain
+- **Password reset**, Stage 2. The domain it waited on exists since 2 October 2026; it still needs a mail sender (Resend, the handover's choice) and `MAIL_FROM` on dilas.me
 - **The account doing anything.** The "What an account does" panel says "Nothing yet". **It must change the day Stage 3 sync lands**, or it becomes a sentence that outlived its truth
 
 ---

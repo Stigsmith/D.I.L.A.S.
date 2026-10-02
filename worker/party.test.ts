@@ -19,7 +19,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { RULES } from './limit.ts'
 import { CLOSE, CODE_ALPHABET, CODE_LENGTH, LIMITS, SQUAD_CAP } from './party.ts'
 
-const ORIGIN = 'https://dds.stigly-official.workers.dev'
+const ORIGIN = 'https://dilas.me'
 
 type State = {
   type: 'state'

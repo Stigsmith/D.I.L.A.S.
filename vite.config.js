@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "node:path";
 import { emptyInPlace } from "./scripts/lib/empty-in-place.mjs";
+import { BRAND } from "./src/lib/brand.js";
 
 /* Vite's own emptyOutDir deletes dist/assets and makes it again, and the
    sync app watching this folder renamed the fresh one to a "Name clash"
@@ -23,8 +24,20 @@ function emptyOutDirInPlace() {
   };
 }
 
+/* The browser tab's title, from src/lib/brand.js, so the name lives in
+   one file. In the page itself rather than set by script, so it is right
+   before the app loads and in a link preview. */
+function brandTitle() {
+  return {
+    name: "dds-brand-title",
+    transformIndexHtml(html) {
+      return html.replace(/<title>[^<]*<\/title>/, `<title>${BRAND.short}</title>`);
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), emptyOutDirInPlace()],
+  plugins: [react(), emptyOutDirInPlace(), brandTitle()],
   build: {
     emptyOutDir: false,
     /* Vite inlines assets under 4KB as base64 by default. Most stratagem  */

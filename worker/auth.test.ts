@@ -17,7 +17,7 @@
 import { SELF, env } from 'cloudflare:test'
 import { beforeEach, describe, expect, it } from 'vitest'
 
-const ORIGIN = 'https://dds.stigly-official.workers.dev'
+const ORIGIN = 'https://dilas.me'
 
 /** Cloudflare sets this on every request and overwrites anything the caller sent. */
 const from = (ip: string) => ({ 'cf-connecting-ip': ip })

@@ -1,5 +1,5 @@
 {
-  // How D.D.S. is served. Replaces dragging dist/ onto Netlify.
+  // How D.I.L.A.S. is served, at dilas.me. Replaces dragging dist/ onto Netlify.
   //
   // Stage 1 of dds-cloudflare-handover.md: the static site, plus a Worker
   // script answering /api/* and nothing else, plus a D1 database for
@@ -28,18 +28,22 @@
   // to start rather than failing at a request, so it is not subtle.
   "compatibility_flags": ["nodejs_compat"],
 
-  // The address until stigly buys a domain. When he does, add
-  //   "routes": [{ "pattern": "<the domain>", "custom_domain": true }]
-  // and Cloudflare creates the DNS record and the certificate itself.
+  // dilas.me, bought by stigly on Cloudflare on 2 October 2026. A custom
+  // domain: the next deploy attaches it, and Cloudflare creates the DNS
+  // record and the certificate itself, since the zone is on this account.
+  //
+  // workers.dev stays on through the move, so anybody who used it can still
+  // reach their collection there and export it. Turn it off once nobody does.
+  "routes": [{ "pattern": "dilas.me", "custom_domain": true }],
   "workers_dev": true,
 
   // 8788, never wrangler's default 8787, because Enodia's wrangler dev uses
   // 8787 and the two run on the same machine.
   //
   // Found on 25 September 2026, the hard way: with Enodia already running,
-  // D.D.S.'s wrangler dev bound the same port on Windows and printed "Ready
+  // this tool's wrangler dev bound the same port on Windows and printed "Ready
   // on 8787" while Enodia's server kept answering. Every header read back
-  // was Enodia's policy, served over an app that did not have D.D.S.'s
+  // was Enodia's policy, served over an app that did not have this tool's
   // files. Nothing errored. Only reading the responses showed it.
   //
   // Set here rather than as a flag so the port belongs to the project, not
@@ -49,7 +53,7 @@
   "assets": {
     "directory": "./dist",
 
-    // Every route in D.D.S. is a hash, #/tiers/primary, which never reaches
+    // Every route in the tool is a hash, #/tiers/primary, which never reaches
     // the server, so today this only decides what a mistyped path shows: the
     // app, with a 200. It becomes load bearing the day short links like
     // /b/<id> exist, which is Stage 4.
@@ -125,17 +129,18 @@
   // X-Super-Contact headers are required" without it. Read off a real response
   // on 30 September 2026.
   //
-  // SUPER_CLIENT is who is asking: the tool's own address. **Change it with the
-  // domain.**
+  // SUPER_CLIENT is who is asking: the tool's own address, dilas.me since the
+  // domain was bought on 2 October 2026.
   //
-  // SUPER_CONTACT is **a placeholder**, the same public address, because the
-  // service will not answer without one. It should be a project address, never
-  // a personal one, and which is stigly's to pick: the published repository,
-  // or an address on the domain once there is one.
+  // SUPER_CONTACT is the tool's own page on its own domain for now, a project
+  // address and never a personal one. **A mailbox on the domain would be
+  // better**, and which one is stigly's call; Cloudflare's email routing can
+  // forward one without a mail server.
   //
-  // MAIL_FROM needs an address on a domain stigly owns, which is Stage 2.
+  // MAIL_FROM, for password reset, needs an address on dilas.me and a mail
+  // sender. That is Stage 2, which the domain unblocks.
   "vars": {
-    "SUPER_CLIENT": "dds.stigly-official.workers.dev",
-    "SUPER_CONTACT": "dds.stigly-official.workers.dev"
+    "SUPER_CLIENT": "dilas.me",
+    "SUPER_CONTACT": "https://dilas.me"
   }
 }

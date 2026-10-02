@@ -1,6 +1,6 @@
-# **D.D.S.: Roadmap**
+# **D.I.L.A.S.: Roadmap**
 
-> What is agreed but not built, what is blocked and on what, and the questions that must be answered rather than guessed when each session opens. Decisions that affect how the code works live in `CLAUDE.md`; this file is what comes next. The tool is now called Democracy Deployment System, D.D.S., a working title.
+> What is agreed but not built, what is blocked and on what, and the questions that must be answered rather than guessed when each session opens. Decisions that affect how the code works live in `CLAUDE.md`; this file is what comes next. The tool is called D.I.L.A.S., the Democratic Intelligent Loadout & Armoury System, at dilas.me, since 2 October 2026. It was D.D.S., the Democracy Deployment System, before that.
 
 ---
 
@@ -16,16 +16,16 @@ Everything below rests on one primitive: **data living somewhere that is not one
 >
 > | Stage | | Status |
 > |---|---|---|
-> | 0 | Hosting on Cloudflare, security headers, fonts vendored | **Done, 1.21.0.** Live at `dds.stigly-official.workers.dev` |
+> | 0 | Hosting on Cloudflare, security headers, fonts vendored | **Done, 1.21.0.** Live at `dds.stigly-official.workers.dev`; **dilas.me** attaches on the next deploy |
 > | 1 | Worker, D1 and accounts | **Built, 1.22.0, and switched off in the UI.** The backend is live; nobody can see it until `ACCOUNTS_LIVE` flips |
-> | 2 | Mail and password reset | **Blocked on the domain.** Resend only sends from a domain you own. `dds.me` was taken. Accounts stay shut until this works |
+> | 2 | Mail and password reset | **Unblocked: dilas.me was bought on 2 October 2026.** Resend only sends from a domain you own, and now there is one. Needs the Resend account, the domain verified with it, and `MAIL_FROM`. Accounts stay shut until this works |
 > | 3 | Sync between devices | Needs the profiles question answered |
 > | 4 | Publishing and short links | |
 > | 5 | Exchange, friends, leaderboards | Needs "what is a run and what is a clear" answered. **Friends split off and wait on accounts opening**, which waits on the domain |
 > | 6 | Live war state | **Built, 1.25.0, 30 September 2026, not yet deployed.** A Cron Trigger every five minutes, a snapshot in D1, the map coloured from it. See `CLAUDE.md`, The Galaxy Map |
 > | 7 | Live squad | **Built, 1.25.0, 29 September 2026, not yet deployed.** A party by code, no account. See `CLAUDE.md`, The Live Party |
 >
-> **Netlify stays the address people use until the domain is bought**, because each move of address empties everybody's collection and `workers.dev` to the domain would be a second move. See `CLAUDE.md`, Hosting.
+> **Netlify stays the address people use until dilas.me is deployed and announced**, because each move of address empties everybody's collection. With the domain bought, that is one move, straight there. See `CLAUDE.md`, Hosting.
 
 > [!success] Decided 27 September 2026: a party by code first, friends once accounts open
 > The curator asked for accounts and friends "so that we can get the drop bay working". Three calls came out of it, all his:
