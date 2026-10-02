@@ -138,7 +138,7 @@ function Skull({ className = "h-7 w-7", style }) {
 /* token the same way the skull does. Sizes follow the source aspect,   */
 /* wide for the aquila and square for the rest.                         */
 const THEME_MARK = {
-  "castellans-creed": { file: "study_aq", label: "Imperial Aquila", lg: "h-7 w-[72px]", sm: "h-5 w-[52px]" },
+  "castellans-creed": { file: "study_aq", label: "Imperial Aquila", lg: "h-[18px] w-[44px]", sm: "h-5 w-[52px]" },
   /* The Creek is where the Automatons are remembered, so the wordmark
      carries their eye rather than the Super Earth skull. The study ships
      its own cut of it, already on transparency, so it masks and takes the
@@ -171,6 +171,18 @@ const THEME_MARK = {
 /* ever arrives as a dark shape on an opaque light ground, the fix is     */
 /* filter: invert(1) with mix-blend-mode: screen, which is what the first */
 /* Bile Titan emblem needed before it was redrawn on transparency.        */
+/* The full name under the wordmark, in the two lines brand.js sets, each
+   kept on one line. Read aloud as the whole name. */
+function BrandName({ className = "" }) {
+  return (
+    <p className={"min-w-0 font-semibold uppercase leading-tight text-brand " + className} aria-label={BRAND.name}>
+      {BRAND.nameLines.map((line) => (
+        <span key={line} className="block whitespace-nowrap" aria-hidden="true">{line}</span>
+      ))}
+    </p>
+  );
+}
+
 function BrandMark({ theme, size = "lg" }) {
   const mark = THEME_MARK[theme];
   const art = mark ? themeArt(theme, mark.file) : null;
@@ -727,7 +739,7 @@ export default function App() {
             <BrandMark theme={theme} size="lg" />
             <div className="min-w-0">
               <h1 className="text-2xl font-bold leading-none tracking-tight" style={{ fontFamily: "'Oswald', sans-serif" }}>{BRAND.short}</h1>
-              <p className="mt-1 text-[10px] font-semibold uppercase leading-tight tracking-wider text-brand">{BRAND.name}</p>
+              <BrandName className="mt-1 text-[9px]" />
             </div>
           </div>
           {/* The remainder, worked out from the same token. This was a hard  */}
@@ -746,7 +758,7 @@ export default function App() {
                   <BrandMark theme={theme} size="sm" />
                   <span className="min-w-0">
                     <h1 className="text-lg font-bold leading-none" style={{ fontFamily: "'Oswald', sans-serif" }}>{BRAND.short}</h1>
-                    <p className="text-[9px] font-semibold uppercase leading-tight tracking-wider text-brand">{BRAND.name}</p>
+                    <BrandName className="text-[8.5px]" />
                   </span>
                 </span>
                 <button onClick={() => setMenuOpen(false)} aria-label="Close menu" className="rounded p-1 hover:bg-base-800">
