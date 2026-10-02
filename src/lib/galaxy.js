@@ -220,7 +220,39 @@ function cleanOrder(raw, now) {
       done: t ? share(t.progress, t.goal) : null,
     }))
     .filter((t) => t.done !== null);
-  return { briefing, endsAt, tasks };
+  return { briefing, endsAt, tasks, reward: cleanReward(raw.reward) };
+}
+
+/* What a Major Order pays. Type 1 is read as medals: the one real order
+   seen, on 30 September 2026, paid type 1 amount 40, and Major Orders pay
+   medals. An inference from one answer, so any other type is shown as
+   nothing rather than guessed at. */
+const REWARD_KINDS = { 1: "medals" };
+
+function cleanReward(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const kind = REWARD_KINDS[raw.type];
+  const amount = Number(raw.amount);
+  if (!kind || !Number.isFinite(amount) || amount <= 0) return null;
+  return { kind, amount: Math.round(amount) };
+}
+
+/* The war's running totals, as counts the war room can print. Only the
+   fields the server keeps, each a whole number or left out, so a total
+   that did not arrive is missing rather than shown as nothing. */
+const STATS = {
+  playerCount: "players", terminidKills: "bugs", automatonKills: "bots", illuminateKills: "squids",
+  deaths: "deaths", bulletsFired: "bullets", missionsWon: "won", missionsLost: "lost",
+};
+
+function cleanStats(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const out = {};
+  for (const [from, to] of Object.entries(STATS)) {
+    const n = Number(raw[from]);
+    if (Number.isFinite(n) && n > 0) out[to] = Math.round(n);
+  }
+  return Object.keys(out).length ? out : null;
 }
 
 export function cleanWar(raw, now = Date.now()) {
@@ -272,8 +304,10 @@ export function cleanWar(raw, now = Date.now()) {
     planets,
     fronts: [...planets.values()].filter((p) => p.campaign).length,
     /* Held to the same half hour as the map: an order read long ago may
-       have ended, or been replaced, since. */
+       have ended, or been replaced, since. The totals too: a player count
+       from yesterday reads exactly like today's. */
     order: fresh ? cleanOrder(raw.order, now) : null,
+    stats: fresh ? cleanStats(raw.stats) : null,
   };
 }
 

@@ -16,6 +16,7 @@
     "postbuild": "node scripts/check-dist.mjs",
     "preview": "vite preview",
     "wiki": "node scripts/fetch-wiki.mjs",
+    "difficulty": "node scripts/fetch-difficulty.mjs",
     "planet-art": "node scripts/fetch-planet-art.mjs",
     "vehicles": "node scripts/add-vehicles.mjs",
     "rules": "node scripts/check-rules.mjs",

@@ -24,15 +24,15 @@
 /* spreads the planets apart rather than inflating them, and a        */
 /* planet's name appears once there is room for it.                   */
 /*                                                                    */
-/* Full screen, the curator's ask of 1 October 2026, is the same map  */
-/* over the whole screen, tilted back like a table unless you flatten */
-/* it. The tilt is a CSS perspective, and lib/galaxy.js holds the     */
-/* same projection written out, so a click still lands on the planet  */
-/* drawn under it.                                                    */
+/* The war room, the curator's call of 2 October 2026, draws it over */
+/* the whole space right of the menu, tilted back like a table unless */
+/* you flatten it, with panels laid over it. The tilt is a CSS        */
+/* perspective, and lib/galaxy.js holds the same projection written   */
+/* out, so a click still lands on the planet drawn under it.          */
 /* ================================================================== */
 
 import { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback, useId } from "react";
-import { Plus, Minus, ChevronLeft } from "lucide-react";
+import { Plus, Minus, ChevronLeft, ChevronDown } from "lucide-react";
 
 import {
   VIEW, CENTRE, RADIUS, MAX_ZOOM, HOME, placed, lanes, sectors, roomFor, placeOf, matchSet,
@@ -96,9 +96,10 @@ function useMapSkin() {
   return [skin, choose];
 }
 
-/* Whether full screen lays the map back like a table. On unless turned
-   off, and remembered per browser. The map on the page stays flat: it is
-   small, and a tilt there costs room and legibility for nothing. */
+/* Whether the war room lays the map back like a table. On unless turned
+   off, and remembered per browser. A map drawn as a square on a page
+   stays flat: it is small, and a tilt there costs room and legibility
+   for nothing. */
 function useMapTilt() {
   const [tilted, setTilted] = useState(true);
   useEffect(() => {
@@ -181,7 +182,7 @@ export default function GalaxyMap({
 
   /* The box the map is drawn in: its square on the page, or the whole
      screen. Measured rather than assumed, because the map is 540 pixels
-     wide on a desktop, 340 on a phone, and the screen in full screen, and
+     wide on a desktop, 340 on a phone, and the whole room in the war room, and
      a name has to be readable on all of them. */
   const stage = useRef(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
@@ -210,11 +211,11 @@ export default function GalaxyMap({
   const fitRef = useRef(fit);
   fitRef.current = fit;
 
-  /* Screen pixels per map unit at zoom 1. Full screen draws every mark a
+  /* Screen pixels per map unit at zoom 1. The war room draws every mark a
      little bigger, and dividing it down here is all that takes. */
   const ppu = fit.S > 0 ? fit.S / VIEW / (expanded ? FULL_MARKS : 1) : 0.54;
 
-  /* In full screen the drawing reaches past the map's own square to the
+  /* In the war room the drawing reaches past the map's own square to the
      edges of the screen, in view box units on every side, so a sector
      fills the screen instead of ending in a floating trapezoid. */
   const pad = expanded ? stageCover(fit, box.w, box.h) : 0;
@@ -520,7 +521,7 @@ export default function GalaxyMap({
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-    /* Going full screen draws a new SVG, which needs its own listener. */
+    /* Entering the war room draws a new SVG, which needs its own listener. */
   }, [toFrame, enter, leave, easeTo, expanded]);
 
   const zoomBy = (factor) => {
@@ -1040,7 +1041,7 @@ export default function GalaxyMap({
     return <>{marks}{pickEls}{names}</>;
   };
 
-  /* Upright over the tilt in full screen, on the map otherwise. */
+  /* Upright over the tilt in the war room, on the map otherwise. */
   const upright = expanded && fit.a > 0;
   const flatPlanets = useMemo(
     () => (upright ? null : drawPlanets((q) => `translate(${q.x} ${q.y})`, u)),
@@ -1093,11 +1094,12 @@ export default function GalaxyMap({
   const focusFront = focusHolder && focusHolder.front ? fronts[focusHolder.front] : null;
 
   /* Where the controls go. On the page, the corners of the square. In the
-     war room, clear of the panels: the look at the top of the open space,
-     where you are at its top left, the zoom at its bottom right. */
+     war room, clear of the panels: where you are at the top left of the
+     open space, the look at its bottom left, the zoom at its bottom right,
+     so the top right is free for the Major Order laid over it. */
   const place = expanded
     ? {
-        look: { top: ins.top + 12, left: ins.left + Math.max(0, box.w - ins.left - ins.right) / 2, transform: "translateX(-50%)" },
+        look: { bottom: ins.bottom + 12, left: ins.left + 12 },
         crumb: { top: ins.top + 12, left: ins.left + 12 },
         zoom: { bottom: ins.bottom + 12, right: ins.right + 12 },
       }
@@ -1105,7 +1107,8 @@ export default function GalaxyMap({
 
   const map = (
     <div ref={stage}
-      className={expanded ? "absolute inset-0" : "relative mx-auto aspect-square w-full max-w-[34rem] select-none"}>
+      className={expanded ? "absolute inset-0 select-none overflow-hidden" : "relative mx-auto aspect-square w-full max-w-[34rem] select-none"}
+      style={expanded ? { overflow: "clip" } : undefined}>
       {/* The surface takes every gesture, for the map and for the upright
           planets over it alike. The buttons in the corners are its
           siblings, so pressing one is never mistaken for a drag. */}
@@ -1114,7 +1117,7 @@ export default function GalaxyMap({
         style={{
           /* In the galaxy on the page there is nothing to pan, so a finger
              sliding up the map scrolls the page past it. In a sector, and in
-             full screen, the map takes every gesture. */
+             the war room, the map takes every gesture. */
           touchAction: focus || expanded ? "none" : "pan-y",
         }}
         onPointerDown={onPointerDown} onPointerMove={onPointerMove}
@@ -1268,22 +1271,30 @@ export default function GalaxyMap({
 }
 
 /**
- * The Major Order, above the map, as context for where to go. Its briefing
- * in the game's words, when it ends, and a bar per task in the colour of
- * the front the task is on. Nothing here says what a task asks, because
- * that is not published and the briefing already says it.
+ * The Major Order, laid over the war room's map the way the game lays it
+ * over its own: its briefing in the game's words, when it ends, a bar per
+ * task in the colour of the front the task is on, and what it pays. Nothing
+ * here says what a task asks, because that is not published and the
+ * briefing already says it. Folds to its title and the time left.
  */
-export function MajorOrder({ order, fronts = {} }) {
+export function MajorOrder({ order, fronts = {}, open = true, onToggle = null }) {
   if (!order) return null;
+  const reward = order.reward;
   return (
-    <div className="rounded border border-base-800 bg-base-950/40 px-3 py-2 text-left">
-      <p className="flex items-baseline justify-between gap-3">
+    <div className="overflow-hidden rounded-md border border-base-700/80 bg-base-950/85 text-left shadow-xl backdrop-blur-sm">
+      <button type="button" onClick={onToggle || undefined} disabled={!onToggle} aria-expanded={open}
+        className="flex w-full items-baseline justify-between gap-3 px-3 py-2 text-left disabled:cursor-default">
         <span className="text-[10px] font-semibold uppercase tracking-wider text-brand" style={{ fontFamily: OSWALD }}>
           Major Order
         </span>
-        <span className="text-[10px] text-base-500">{untilText(order.endsAt - Date.now())} left</span>
-      </p>
-      <p className="mt-1 text-xs leading-relaxed text-base-300">{order.briefing}</p>
+        <span className="flex items-center gap-1.5 text-[10px] text-base-500">
+          {untilText(order.endsAt - Date.now())} left
+          {onToggle ? <ChevronDown className={"h-3 w-3 self-center transition-transform " + (open ? "rotate-180" : "")} /> : null}
+        </span>
+      </button>
+      {open ? (
+      <div className="border-t border-base-800 px-3 pb-2.5 pt-2">
+      <p className="text-xs leading-relaxed text-base-300">{order.briefing}</p>
       {order.tasks.length ? (
         <div className="mt-2 flex flex-col gap-1.5">
           {order.tasks.map((t, i) => {
@@ -1300,6 +1311,15 @@ export function MajorOrder({ order, fronts = {} }) {
             );
           })}
         </div>
+      ) : null}
+      {/* Read as medals from the one real order seen; any other kind of
+          reward is not shown, rather than named wrongly. */}
+      {reward ? (
+        <p className="mt-2 text-[10px] text-base-500">
+          Pays <span className="font-semibold text-base-200">{reward.amount.toLocaleString("en-GB")} {reward.kind}</span> to everybody who fought for it
+        </p>
+      ) : null}
+      </div>
       ) : null}
     </div>
   );

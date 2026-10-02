@@ -14,7 +14,8 @@ import {
   Factory, Bug, PackageOpen, Trees, FileText, Crosshair, Radar, Shovel, Info, ScrollText, Milestone, Scale,
 } from "lucide-react";
 
-import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser, ScenarioScreen, ScenarioBar } from "./Tiers.jsx";
+import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser, ScenarioBar } from "./Tiers.jsx";
+import WarRoom from "./WarRoom.jsx";
 import { SKULL, themeArt } from "./lib/assets.js";
 import Builder from "./Builder.jsx";
 import ArmouryBuilds, { Coverage, History, ARMOURY_TABS } from "./Armoury.jsx";
@@ -469,7 +470,7 @@ export default function App() {
   const { theme, setTheme } = useTheme();
   const { destination, param, navigate } = useRoute("bay");
   /* Where you are dropping. Faction today, the rest of the scenario next. */
-  const { scenario, setFaction, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment, replaceScenario } = useScenario();
+  const { scenario, ready: scenarioReady, setFaction, setPlanet, setMission, setDifficulty, setSquad, clearEnvironment, replaceScenario } = useScenario();
   /* The rules switched off on the Rules page, carried on the scenario every
      surface reads so each honours them without being told twice. Never on
      the scenario the party sends: that is the bare one, above. */
@@ -558,6 +559,17 @@ export default function App() {
   const openScenario = useCallback(() => navigate("scenario"), [navigate]);
   const closeScenario = useCallback(() => navigate(lastSurface.current), [navigate]);
 
+  /* The tier list and Drop Bay have nothing to show before a front is
+     chosen, so they send you to the war room, and Done brings you back.
+     A redirect rather than the war room drawn in their place, so choosing
+     the front does not swap the screen out from under you while the
+     planet and the mission are still to come. Declared after lastSurface
+     so the way back is recorded first, and only once storage has been
+     read, when no front means none rather than not loaded yet. */
+  useEffect(() => {
+    if (scenarioReady && !scenario.faction && (dest === "bay" || dest === "tiers")) navigate("scenario", { replace: true });
+  }, [scenarioReady, scenario.faction, dest, navigate]);
+
   /* Which tab bar the current destination gets, and what the active tab  */
   /* inside it is. Both surfaces put the tab in the route, so a Collection */
   /* tab is linkable and survives a reload the same way a category does.  */
@@ -584,22 +596,25 @@ export default function App() {
           ? [ARMOURY_TABS, armouryTab]
           : [null, null];
 
+  /* The war room is where the scenario is set. It fills the space right of
+     the menu, so its route drops the page's padding and footer. */
+  const inRoom = dest === "scenario";
+
   const surface = (() => {
+    if (inRoom) {
+      return (
+        <WarRoom scenario={scenario} setFaction={setFaction} setPlanet={setPlanet} setMission={setMission}
+          setDifficulty={setDifficulty} setSquad={setSquad} clearEnvironment={clearEnvironment}
+          onDone={closeScenario} party={party} />
+      );
+    }
     switch (dest) {
       case "tiers":
         return (
           <TierBrowser
             catId={catId}
             faction={scenario.faction}
-            setFaction={setFaction}
             scenario={scored}
-            setPlanet={setPlanet}
-            setBiome={setBiome}
-            toggleHazard={toggleHazard}
-            setMission={setMission}
-            setDifficulty={setDifficulty}
-            setSquad={setSquad}
-            clearEnvironment={clearEnvironment}
             filters={filters}
             patchFilters={patchFilters}
             sortBy={sortBy}
@@ -617,8 +632,8 @@ export default function App() {
       case "collection":
         return <Collection tab={collectionTab} state={state} />;
       case "bay":
-        return <DropScreen state={state} navigate={navigate} scenario={scored} setFaction={setFaction} setPlanet={setPlanet}
-          setSquad={setSquad} drop={drop} update={updateDrop} party={party} sync={partySync}
+        return <DropScreen state={state} navigate={navigate} scenario={scored}
+          drop={drop} update={updateDrop} party={party} sync={partySync}
           onOpenParty={() => setPartyOpen(true)} />;
       case "armoury":
         if (armouryTab === "coverage") return <Coverage state={state} navigate={navigate} scenario={scored} />;
@@ -654,21 +669,6 @@ export default function App() {
         return <Roadmap />;
       case "account":
         return <Account />;
-      case "scenario":
-        return (
-          <ScenarioScreen
-            scenario={scenario}
-            setFaction={setFaction}
-            setPlanet={setPlanet}
-            setBiome={setBiome}
-            toggleHazard={toggleHazard}
-            setMission={setMission}
-            setDifficulty={setDifficulty}
-            setSquad={setSquad}
-            clearEnvironment={clearEnvironment}
-            onDone={closeScenario}
-          />
-        );
       default:
         return null;
     }
@@ -828,11 +828,11 @@ export default function App() {
             <PartyPanel party={party} sync={partySync} onClose={() => setPartyOpen(false)}
               onDropBay={() => { setPartyOpen(false); navigate("bay"); }} />
           ) : null}
-          <main className="p-4 sm:p-6">{surface}</main>
-          {/* The scenario is a focused sub screen and the footer is the  */}
-          {/* only thing keeping it off one desktop screen. Every other    */}
-          {/* destination keeps it.                                        */}
-          {OFF_MENU.has(dest) ? null : <Footer />}
+          <main className={inRoom ? "" : "p-4 sm:p-6"}>{surface}</main>
+          {/* The war room fills the screen, and the other routes off the */}
+          {/* menu are focused sub screens. Every other destination keeps */}
+          {/* the footer.                                                 */}
+          {OFF_MENU.has(dest) || inRoom ? null : <Footer />}
         </div>
       </div>
     </div>

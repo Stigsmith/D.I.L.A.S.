@@ -93,6 +93,8 @@ const shareModuleUrl = asModule(swap(src, "drop", dropUrl));
 
 const galaxyUrl = asModule(inlineJson(read("src/lib/galaxy.js"), "planets"));
 
+const difficultyUrl = asModule(inlineJson(read("src/lib/difficulty.js"), "difficulty"));
+
 export const items = await import(itemsUrl);
 export const enemies = await import(enemiesUrl);
 export const score = await import(scoreUrl);
@@ -104,5 +106,6 @@ export const history = await import(historyUrl);
 export const share = await import(shareModuleUrl);
 export const coverage = await import(coverageUrl);
 export const galaxy = await import(galaxyUrl);
+export const difficulty = await import(difficultyUrl);
 
 export const FACTIONS = ["bots", "bugs", "squids"];
