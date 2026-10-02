@@ -11,11 +11,11 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
   Library, Swords, Rocket, Store, User, Settings as SettingsIcon,
   LifeBuoy, Menu, X, Sun, Moon, Zap, Shield, Star, Lock, Download, Upload, AlertTriangle,
-  Factory, Bug, PackageOpen, Trees, FileText, Crosshair, Radar, Shovel, Info, ScrollText, Milestone, Scale, Orbit,
+  Factory, Bug, PackageOpen, Trees, FileText, Crosshair, Radar, Shovel, Info, ScrollText, Milestone, Scale, Orbit, ListOrdered,
 } from "lucide-react";
 
 import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser, ScenarioBar } from "./Tiers.jsx";
-import WarRoom from "./WarRoom.jsx";
+import WarRoom, { ScenarioStrip } from "./WarRoom.jsx";
 import StarMap from "./StarMap.jsx";
 import { SKULL, themeArt } from "./lib/assets.js";
 import Builder from "./Builder.jsx";
@@ -59,6 +59,9 @@ const NAV = [
          setting up a drop. The war room is where a drop is set up. */
       { id: "map", label: "Star Map", Icon: Orbit },
       { id: "armoury", label: "Armoury", Icon: Swords },
+      /* Back in the menu since 3 October 2026, the curator's call: the
+         quickest way to see what a rule does is to watch the list move. */
+      { id: "tiers", label: "Tier Lists", Icon: ListOrdered },
       { id: "collection", label: "Collection", Icon: Library },
       { id: "exchange", label: "Exchange", Icon: Store, release: "v3" },
     ],
@@ -94,7 +97,7 @@ const SCENARIO_SURFACES = new Set(["tiers", "bay", "armoury", "builder", "rules"
 /* Routable, deliberately absent from the sidebar. The tier list joined on
    1 October 2026: it is the picker inside the Armoury and Drop Bay now,
    and still whole at #/tiers for anyone who likes to browse it. */
-const OFF_MENU = new Set(["scenario", "tiers", "builder", "shared"]);
+const OFF_MENU = new Set(["scenario", "builder", "shared"]);
 /* Off menu routes are not in ALL_NAV, so they need their title here or
    the header falls back to the brand name and stops saying where you are. */
 const OFF_MENU_LABEL = { scenario: "War Room", tiers: "Tier Lists", builder: "Armoury", shared: "Shared build" };
@@ -583,7 +586,7 @@ export default function App() {
      so the way back is recorded first, and only once storage has been
      read, when no front means none rather than not loaded yet. */
   useEffect(() => {
-    if (scenarioReady && !scenario.faction && (dest === "bay" || dest === "tiers")) navigate("scenario", { replace: true });
+    if (scenarioReady && !scenario.faction && dest === "bay") navigate("scenario", { replace: true });
   }, [scenarioReady, scenario.faction, dest, navigate]);
 
   /* Which tab bar the current destination gets, and what the active tab  */
@@ -650,6 +653,9 @@ export default function App() {
     switch (dest) {
       case "tiers":
         return (
+          <div className="flex flex-col gap-4">
+          <ScenarioStrip scenario={scenario} setFaction={setFaction} setDifficulty={setDifficulty} setSquad={setSquad}
+            party={party} onWarRoom={openScenario} />
           <TierBrowser
             catId={catId}
             faction={scenario.faction}
@@ -667,6 +673,7 @@ export default function App() {
             toggleFavItem={state.toggleFavItem}
             clearFavItems={state.clearFavItems}
           />
+          </div>
         );
       case "collection":
         return <Collection tab={collectionTab} state={state} />;

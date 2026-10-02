@@ -1729,7 +1729,9 @@ export function ScenarioBar({ scenario, onAdjust, rulesOff = 0, onRules }) {
       ) : null}
 
       <button onClick={onAdjust}
-        className={(rulesOff ? "" : "ml-auto ") + "flex shrink-0 items-center gap-1.5 rounded border border-base-700 bg-base-900 px-2 py-1 text-[11px] text-base-300 hover:border-base-500 hover:text-base-100"}>
+        /* Lit in the theme's own brand colour so it reads as the way in to
+           the war room, the curator's ask of 3 October 2026. */
+        className={(rulesOff ? "" : "ml-auto ") + "flex shrink-0 items-center gap-1.5 rounded border border-brand/70 bg-base-900 px-2.5 py-1 text-[11px] font-semibold text-brand shadow-[0_0_10px_rgb(var(--brand)/0.35)] transition-shadow hover:border-brand hover:shadow-[0_0_16px_rgb(var(--brand)/0.6)]"}>
         <SlidersHorizontal className="h-3.5 w-3.5" />
         Adjust scenario
       </button>
@@ -1900,9 +1902,15 @@ export function TierBrowser({ catId, faction, scenario, sortBy, setSortBy, filte
   const unratedInCategory = category.items.filter((it) => judgedTier(it, null) === null).length;
   const backpackHere = catId === "strat" ? category.items.filter(eatsBackpack).length : 0;
 
-  /* No front, no table. App.jsx sends you to the war room, so this is
-     only ever drawn for the moment before that. */
-  if (!faction) return null;
+  /* No front, no table: the strip above the list asks for one. */
+  if (!faction) {
+    return (
+      <p className="rounded-lg border border-dashed border-base-700 px-4 py-10 text-center text-sm text-base-500">
+        Pick a front above and the list ranks for that war. Everything after it, the planet, the difficulty and how many
+        of you, moves the ratings too.
+      </p>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">
