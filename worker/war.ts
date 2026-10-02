@@ -27,6 +27,13 @@
  * the same way the build-time fetch does. The server trims and bounds; the
  * browser cleans what it receives.
  *
+ * ## And over time
+ *
+ * Once an hour the same run also keeps a copy in `war_history`, thirty days
+ * of them, for the Star Map: how a front has moved, and how many were
+ * fighting. Nobody publishes the war's history, so it starts the day the
+ * server first ran. A failure there never costs the snapshot.
+ *
  * ## Ten milliseconds
  *
  * The free plan gives a Cron Trigger 10 ms of CPU. Parsing and trimming the
@@ -51,6 +58,15 @@ export const TIMEOUT_MS = 20_000
 
 /** The planet list is about 300 KB. Anything past this is not an answer to trust. */
 export const MAX_ANSWER = 2 * 1024 * 1024
+
+/**
+ * How often the history keeps a copy: an hour, less a few minutes, so a run
+ * on the five minute schedule that lands a moment early still counts.
+ */
+export const HISTORY_EVERY_MS = 57 * 60 * 1000
+
+/** How long the history keeps a copy. Thirty days of hourly rows is about seven megabytes. */
+export const HISTORY_KEEP_MS = 30 * 24 * 60 * 60 * 1000
 
 /** Who can hold a planet, as the upstream spells it. Anything else is not drawn. */
 export const OWNERS = ['Humans', 'Automaton', 'Terminids', 'Illuminate'] as const
@@ -272,7 +288,8 @@ export async function refreshWar(
     ])
     const trimmed = trimWar(planets, campaigns)
     if (!trimmed) throw new Error('the answer was not a list of planets and a list of campaigns')
-    const payload = JSON.stringify({ planets: trimmed, order: trimOrder(assignments), stats: trimStats(totals) })
+    const stats = trimStats(totals)
+    const payload = JSON.stringify({ planets: trimmed, order: trimOrder(assignments), stats })
     await db.run(sql`
       insert into war_snapshot (id, payload, fetched_at, tried_at, ok, error)
       values ('war', ${payload}, ${now}, ${now}, 1, null)
@@ -280,6 +297,9 @@ export async function refreshWar(
         payload = excluded.payload, fetched_at = excluded.fetched_at,
         tried_at = excluded.tried_at, ok = 1, error = null
     `)
+    /* The history is context too: if keeping it fails, the snapshot above
+       has already landed and stays. */
+    await keepHistory(db, now, trimmed, stats).catch(() => false)
     return { ok: true, planets: trimmed.length }
   } catch (e) {
     const error = (e instanceof Error ? e.message : String(e)).slice(0, 200)
@@ -290,6 +310,69 @@ export async function refreshWar(
     `)
     return { ok: false, error }
   }
+}
+
+/**
+ * One copy an hour of what a good fetch found, and the oldest past thirty
+ * days let go. Returns whether a copy was kept. The defence's end time is
+ * left out: a history row is read for how far along things were, and an end
+ * time from last week says nothing.
+ */
+export async function keepHistory(db: DB, now: number, planets: WarPlanet[], stats: WarStats | null): Promise<boolean> {
+  const last = await db.get<{ at: number | null }>(sql`select max(at) as at from war_history`)
+  if (last && last.at !== null && now - last.at < HISTORY_EVERY_MS) return false
+  const kept = planets.map((p) => ({
+    ...p,
+    event: p.event ? { faction: p.event.faction, health: p.event.health, maxHealth: p.event.maxHealth } : null,
+  }))
+  const payload = JSON.stringify({ planets: kept, stats })
+  await db.run(sql`insert or replace into war_history (at, payload) values (${now}, ${payload})`)
+  await db.run(sql`delete from war_history where at < ${now - HISTORY_KEEP_MS}`)
+  return true
+}
+
+/** One planet's hour in the history: the trimmed planet, without its name. */
+export type HistoryPoint = { at: number } & Omit<WarPlanet, 'name' | 'event'> & {
+  event: null | { faction: WarPlanet['owner']; health: number; maxHealth: number }
+}
+
+/**
+ * The history as `GET /api/war/history` sends it. With a planet, that
+ * planet's hours, oldest first, and only the hours something was happening
+ * there. Without one, the war's own: how many were fighting and how many
+ * fronts were open, each hour. `from` is the oldest copy kept, so a page can
+ * say how long the server has been watching. Null when nothing is kept yet.
+ */
+export async function readHistory(db: DB, planet: string | null):
+  Promise<null | { from: number; points: HistoryPoint[] } | { from: number; points: { at: number; players: number; fronts: number }[] }> {
+  const first = await db.get<{ at: number | null }>(sql`select min(at) as at from war_history`)
+  if (!first || first.at === null) return null
+  if (planet !== null) {
+    const rows = await db.all<{ at: number; planet: string }>(sql`
+      select h.at as at, j.value as planet
+      from war_history h, json_each(h.payload, '$.planets') j
+      where json_extract(j.value, '$.name') = ${planet}
+      order by h.at
+    `)
+    const points: HistoryPoint[] = []
+    for (const row of rows) {
+      try {
+        const { name: _name, ...rest } = JSON.parse(row.planet) as WarPlanet
+        points.push({ at: row.at, ...rest } as HistoryPoint)
+      } catch {
+        /* A row that does not parse is skipped, not served. */
+      }
+    }
+    return { from: first.at, points }
+  }
+  const rows = await db.all<{ at: number; players: number | null; fronts: number }>(sql`
+    select h.at as at,
+      json_extract(h.payload, '$.stats.playerCount') as players,
+      (select count(*) from json_each(h.payload, '$.planets') j where json_extract(j.value, '$.campaign') = 1) as fronts
+    from war_history h
+    order by h.at
+  `)
+  return { from: first.at, points: rows.map((r) => ({ at: r.at, players: amount(r.players), fronts: amount(r.fronts) })) }
 }
 
 /** The snapshot as `GET /api/war` sends it, or null when no fetch has ever worked. */

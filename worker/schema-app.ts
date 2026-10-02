@@ -66,3 +66,22 @@ export const warSnapshot = sqliteTable('war_snapshot', {
   /** Why it did not, in a sentence, for whoever reads the table. Never sent to a browser. */
   error: text('error'),
 })
+
+/**
+ * The war over time, for the Star Map: **one row an hour**, kept thirty
+ * days, written by the same Cron Trigger as the snapshot and read by
+ * `GET /api/war/history`.
+ *
+ * Nobody publishes the war's history, so the tool keeps its own from the day
+ * the server first ran. Each row is the trimmed planets and the totals of one
+ * fetch, as JSON, the same shape as the snapshot: a planet missing from an
+ * hour means nothing was happening there, which for a front means it fell or
+ * was taken. One row an hour rather than one per planet, because D1 on the
+ * free plan allows fifty queries a run and a hundred bound values a query.
+ */
+export const warHistory = sqliteTable('war_history', {
+  /** When the fetch behind this row was made, epoch ms. */
+  at: integer('at').primaryKey(),
+  /** `{ planets, stats }` as JSON, trimmed exactly as the snapshot is. */
+  payload: text('payload').notNull(),
+})

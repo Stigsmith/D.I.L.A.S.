@@ -16,7 +16,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import worker from './index.ts'
 import * as schema from './schema.ts'
-import { type Fetcher, UPSTREAM, refreshWar, trimOrder, trimStats, trimWar } from './war.ts'
+import { type Fetcher, HISTORY_EVERY_MS, HISTORY_KEEP_MS, UPSTREAM, refreshWar, trimOrder, trimStats, trimWar } from './war.ts'
 
 const ORIGIN = 'https://dds.stigly-official.workers.dev'
 const db = drizzle(env.DB, { schema })
@@ -115,6 +115,7 @@ const war = (headers: Record<string, string> = {}) => SELF.fetch(`${ORIGIN}/api/
 
 beforeEach(async () => {
   await env.DB.prepare('delete from war_snapshot').run()
+  await env.DB.prepare('delete from war_history').run()
 })
 
 afterEach(() => {
@@ -307,6 +308,75 @@ describe('fetching and serving the snapshot', () => {
     expect((await SELF.fetch(`${ORIGIN}/api/war`, { method: 'POST', headers: { origin: ORIGIN } })).status).toBe(405)
     expect((await war()).status).toBe(200)
     expect((await war({ origin: ORIGIN })).status).toBe(200)
+  })
+})
+
+describe('the history', () => {
+  const HOUR = 60 * 60 * 1000
+  const T0 = 1_790_000_000_000
+  const kept = async () =>
+    (await env.DB.prepare('select at from war_history order by at').all<{ at: number }>()).results.map((r) => r.at)
+  const history = (query = '', headers: Record<string, string> = {}) =>
+    SELF.fetch(`${ORIGIN}/api/war/history${query}`, { headers })
+  /** The Creek further taken, an hour on. */
+  const creekAt = (health: number) =>
+    fake({ '/api/v1/planets': () => Response.json(PLANETS.map((p) => (p.name === 'MALEVELON CREEK' ? { ...p, health } : p))) })
+
+  it('keeps a copy of a good fetch at most once an hour, and lets the oldest go after thirty days', async () => {
+    await env.DB.prepare('insert into war_history (at, payload) values (?, ?)').bind(T0 - HISTORY_KEEP_MS - 1, '{"planets":[],"stats":null}').run()
+    await refreshWar(db, identity, fake().fetcher, T0)
+    expect(await kept()).toEqual([T0])
+    await refreshWar(db, identity, fake().fetcher, T0 + 5 * 60 * 1000)
+    expect(await kept()).toEqual([T0])
+    await refreshWar(db, identity, fake().fetcher, T0 + HISTORY_EVERY_MS)
+    expect(await kept()).toEqual([T0, T0 + HISTORY_EVERY_MS])
+  })
+
+  it('keeps nothing from a failed fetch', async () => {
+    await refreshWar(db, identity, async () => { throw new Error('down') }, T0)
+    expect(await kept()).toEqual([])
+  })
+
+  /** History is context. A broken table must not cost the map its colour. */
+  it('still lands the snapshot when keeping the history fails', async () => {
+    await env.DB.prepare('drop table war_history').run()
+    try {
+      expect(await refreshWar(db, identity, fake().fetcher, T0)).toEqual({ ok: true, planets: 3 })
+      expect((await war()).status).toBe(200)
+    } finally {
+      await env.DB.prepare('create table war_history (at integer primary key not null, payload text not null)').run()
+    }
+  })
+
+  it('serves one planet\'s hours oldest first, without its name, and nothing of anywhere else', async () => {
+    await refreshWar(db, identity, creekAt(250_000).fetcher, T0)
+    await refreshWar(db, identity, creekAt(150_000).fetcher, T0 + HOUR)
+    const response = await history('?planet=Malevelon%20Creek')
+    expect(response.status).toBe(200)
+    expect(response.headers.get('cache-control')).toBe('public, max-age=300')
+    const body = await response.json<{ planet: string; from: number; points: { at: number; health: number; owner: string; name?: string }[] }>()
+    expect(body.planet).toBe('MALEVELON CREEK')
+    expect(body.from).toBe(T0)
+    expect(body.points.map((p) => [p.at, p.health, p.owner])).toEqual([[T0, 250_000, 'Automaton'], [T0 + HOUR, 150_000, 'Automaton']])
+    expect(body.points[0]?.name).toBeUndefined()
+    const siege = await (await history('?planet=UNDER%20SIEGE')).json<{ points: { event: unknown }[] }>()
+    expect(siege.points[0]?.event).toEqual({ faction: 'Illuminate', health: 600_000, maxHealth: 2_000_000 })
+    expect((await (await history('?planet=NOWHERE')).json<{ points: unknown[] }>()).points).toEqual([])
+  })
+
+  it('serves the war\'s own hours: how many were fighting and how many fronts were open', async () => {
+    await refreshWar(db, identity, fake().fetcher, T0)
+    const body = await (await history()).json<{ from: number; points: unknown[] }>()
+    expect(body).toEqual({ from: T0, points: [{ at: T0, players: 38398, fronts: 2 }] })
+  })
+
+  it('answers 503 before the first hour, and refuses a bad name, a foreign page and anything but a GET', async () => {
+    expect((await history()).status).toBe(503)
+    await refreshWar(db, identity, fake().fetcher, T0)
+    expect((await history('?planet=')).status).toBe(400)
+    expect((await history(`?planet=${'X'.repeat(81)}`)).status).toBe(400)
+    expect((await history('', { origin: 'https://elsewhere.example' })).status).toBe(403)
+    expect((await SELF.fetch(`${ORIGIN}/api/war/history`, { method: 'POST', headers: { origin: ORIGIN } })).status).toBe(405)
   })
 })
 

@@ -19,6 +19,7 @@ A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai a
 | Destination | Route | State |
 |---|---|---|
 | **Drop Bay** | `#/bay` | Built. **The front door since 1 October 2026**: the page the tool opens on. The screen for the moment before you go. See The Drop Screen |
+| **Star Map** | `#/map/:planet?` | Built, 2 October 2026. The galaxy map as its own place, for reading the war: the fronts, a planet's intel and its history, and Drop here. See The Galaxy Map, "The Star Map" |
 | **Armoury** | `#/armoury/:tab` | Built. Your builds. Two tabs: **Builds**, the grid that browses every build at once, and **Coverage**, what your builds answer per front. See The Armoury |
 | **Collection** | `#/collection/:tab` | Built. Two tabs, Warbonds and Items, one per ownership axis |
 | **Rules** | `#/rules` | Built. Every rule behind our rating, what it moves here, and a switch to turn it off. Bottom of the menu. See The Rules Page |
@@ -841,7 +842,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!info] Every party rule was broken on purpose to see its test fail
 > The squad cap, host only scenario, host only removal, the returning seat, the host handover and the loadout size cap, on 29 September 2026. Each broke exactly the test aimed at it. Do the same for any new rule.
 
-**Shipping it** is two steps, in this order, and both wait for the curator: `npx wrangler d1 migrations apply dds --remote` for the `api_rate_limit` and `war_snapshot` tables, then `npm run deploy`, which also creates the Durable Object class from the `v1` migration in `wrangler.jsonc` and registers the five minute Cron Trigger. Then open a party on the live address from two browsers, and after five minutes check `/api/war` answers 200, before calling it done.
+**Shipping it** is two steps, in this order, and both wait for the curator: `npx wrangler d1 migrations apply dds --remote` for the `api_rate_limit`, `war_snapshot` and `war_history` tables, then `npm run deploy`, which also creates the Durable Object class from the `v1` migration in `wrangler.jsonc` and registers the five minute Cron Trigger. Then open a party on the live address from two browsers, and after five minutes check `/api/war` answers 200, before calling it done.
 
 ---
 
@@ -852,7 +853,8 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 
 | Where it appears | |
 |---|---|
-| **The war room** | `#/scenario`, `src/WarRoom.jsx`, since 2 October 2026, and **the only place the map appears**. The map fills everything right of the menu, the planner and search fold out on the left, the Major Order and the war's totals sit over the top right, difficulty and how many of you along the bottom. See "The war room" below |
+| **The Star Map** | `#/map`, `src/StarMap.jsx`, in the menu since 2 October 2026. The same map for reading the war rather than setting up a drop. See "The Star Map" below |
+| **The war room** | `#/scenario`, `src/WarRoom.jsx`, since 2 October 2026, and **the one place a drop is set up on the map**. The map fills everything right of the menu, the planner and search fold out on the left, the Major Order and the war's totals sit over the top right, difficulty and how many of you along the bottom. See "The war room" below |
 | **Drop Bay** | **No map of its own since 2 October 2026.** With no front it sends you to the war room; with no planet its brief offers **Choose in the war room**. In a party only the host is offered it, because the host sets the scenario. The by hand biome and hazards were retired on 30 September 2026, once the map and planner covered them |
 
 > [!danger] The layout is patch data and the map needs no network
@@ -889,7 +891,22 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 >
 > **The room clips with `overflow: clip`, not hidden.** The drawing reaches past the room's edges so a tilted sector fills it, and a box that merely hides its overflow can still be scrolled by focus or by a script bringing something into view: found in the browser, where a click scrolled the whole room 325 pixels sideways. Every mark, name and render is drawn 1.3 times bigger there (`FULL_MARKS`), and the hover card's render grows to match.
 >
-> **The tilt is on by default in the war room, with a switch to lay it flat**, remembered per browser in `hd2-map-tilt`, out of the export. The map has no other home now, so the flat square on the page is unused; `room` false still draws it, for the next surface that wants a small map.
+> **The tilt is on by default in the war room, with a switch to lay it flat**, remembered per browser in `hd2-map-tilt`, out of the export. The war room and the Star Map are the map's two homes, both in `room` mode, so the flat square on the page is unused; `room` false still draws it, for the next surface that wants a small map.
+
+> [!success] The Star Map. The curator's ask, 21 August 2026, built 2 October
+> **The galaxy map as its own place, for reading the war rather than setting up a drop**, in the menu under Drop Bay. `src/StarMap.jsx`, the same room as the war room and the pieces it shares (`useSize`, `PlanetSearch`, `WarTotals`, exported from `WarRoom.jsx`).
+>
+> | | |
+> |---|---|
+> | **Left** | **The fronts**, grouped by who you would fight there, busiest first, with search. Choose one, on the list or the map, and the panel becomes **that planet's intel**: its render, who holds it and how far along, how many are there, **Drop here**, its history, the biome and hazards with what they do, its cities, and its supply lines, each one click to its own intel |
+> | **Top right** | The Major Order, and the war so far with **how many were fighting, hour by hour** |
+>
+> **A click here reads a planet rather than choosing it.** Choosing is Drop here, which sets the scenario's planet, and its front from the live war, and opens Drop Bay. A look around the war never moves where you are dropping. **The planet is in the address**, `#/map/<planet>`, so one can be linked and Back goes back; a map opened on one glides straight into its sector (`openOnChosen`).
+
+> [!info] The war's history is the tool's own. `war_history`, 2 October 2026
+> Nobody publishes the war's past, so **the Cron Trigger keeps a copy once an hour, for thirty days**, from the day the server first runs: the trimmed planets and the totals, the snapshot's own shape, one row an hour (`keepHistory` in `worker/war.ts`, migration `0003`). One row an hour rather than one per planet, because D1 on the free plan allows fifty queries a run and a hundred bound values a query. About seven megabytes at thirty days. **Only a good fetch is kept, and a failure keeping it never costs the snapshot**, tested by dropping the table.
+>
+> `GET /api/war/history?planet=<name>` answers that planet's hours, oldest first, only the hours something was happening there; without a planet, the war's own, players and open fronts. 503 until the first hour is kept, which the page reads as "nothing kept yet" and says so. **It starts empty on deploy and fills from there**; nothing before that day can be had. `cleanPlanetHistory` and `cleanWarTrend` in `galaxy.js` clean it like the snapshot.
 >
 > **Planets and names stand upright; only the ground tilts.** The curator's point, 1 October 2026: tilted with everything else, the renders squashed into ovals and the names leaned like italics. Planets, picks and names are drawn once round their own centre (`drawMark`, `drawPick`, `drawName`) and placed either on the map, when flat, or on an upright layer over the tilted ground at the point the tilt puts them, scaled by `stageDepth` so the far side is still smaller. The gestures sit on a surface round both layers, with the corner buttons outside it, so a press on a button is never a drag.
 >
@@ -1537,7 +1554,7 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 | `worker/auth.ts` | Every better-auth option, each with the reason. Nearly verbatim from Enodia |
 | `worker/email.ts` | The mail swap point. **Inert until Stage 2**: no domain, so no sender, so no reset |
 | `worker/schema.ts` | **Generated** by `npm run db:schema`. Never edit |
-| `worker/schema-app.ts` | Ours. The `api_rate_limit` table since the live party, and `war_snapshot` since the live war |
+| `worker/schema-app.ts` | Ours. The `api_rate_limit` table since the live party, `war_snapshot` since the live war, and `war_history` since the Star Map |
 | `worker/party.ts`, `worker/limit.ts` | The live party and the limiter for our own routes. See The Live Party |
 | `worker/war.ts` | The live war: the Cron Trigger's fetch, and what `GET /api/war` serves. See The Galaxy Map |
 | `migrations/` | Generated by `npm run db:generate`. Applied locally by `npm run db:migrate` |
@@ -1564,7 +1581,7 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 npm run test:worker
 ```
 
-Sixty tests, fifteen for accounts, twenty five for the live party and twenty for the live war, run **inside workerd against a real local D1**, never in node, where none of what matters is true. Each protection was seen failing before it was trusted: rate limiting left to the library default (two fail, and it reproduces Enodia's finding that better-auth does not limit on Workers by default), the address read from `x-forwarded-for` (two fail), the schema missing `issuer` (five fail), and the response hardening removed (one fails).
+Sixty six tests, fifteen for accounts, twenty five for the live party and twenty six for the live war and its history, run **inside workerd against a real local D1**, never in node, where none of what matters is true. Each protection was seen failing before it was trusted: rate limiting left to the library default (two fail, and it reproduces Enodia's finding that better-auth does not limit on Workers by default), the address read from `x-forwarded-for` (two fail), the schema missing `issuer` (five fail), and the response hardening removed (one fails).
 
 ```bash
 npm run typecheck

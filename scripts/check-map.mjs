@@ -378,3 +378,26 @@ ok(covers, "in full screen the drawing reaches every edge of the screen, so a se
   ok(difficulty.levelParts(10)[1].includes("giant") && difficulty.levelParts(1)[1] === "no outposts",
     "outposts read from none at Trivial to a giant now and then at Super Helldive");
 }
+
+/* The war over time, for the Star Map */
+{
+  const raw = { from: 1000, points: [
+    { at: 3000, owner: "Automaton", health: 250, maxHealth: 1000, players: 40, campaign: true, event: null },
+    { at: 2000, owner: "Automaton", health: 500, maxHealth: 1000, players: -4, campaign: true, event: null },
+    { at: 2500, owner: "Martians", health: 1, maxHealth: 2, players: 1, campaign: true, event: null },
+    { at: "soon", owner: "Automaton", health: 1, maxHealth: 2 },
+    { at: 4000, owner: "Humans", health: 1000, maxHealth: 1000, players: 9, campaign: true, event: { faction: "Illuminate", health: 600, maxHealth: 2000 } },
+  ] };
+  const h = galaxy.cleanPlanetHistory(raw);
+  ok(h && h.from === 1000 && h.points.map((p) => p.at).join(",") === "2000,3000,4000",
+    "a planet's history comes back oldest first, dropping an hour with an owner nobody has heard of or no time");
+  ok(near(galaxy.progressAt(h.points[0]), 0.5) && near(galaxy.progressAt(h.points[1]), 0.75) && h.points[0].players === 0,
+    "each hour reads how far the planet was taken back, and a strange player count reads as nobody");
+  ok(h.points[2].defence.front === "squids" && near(galaxy.progressAt(h.points[2]), 0.7) && h.points[2].liberation === null,
+    "an hour under attack reads how far it was defended, against whoever attacked");
+  ok(galaxy.cleanPlanetHistory(null) === null && galaxy.cleanPlanetHistory({ points: [] }) === null && galaxy.cleanPlanetHistory("<html>") === null,
+    "anything that is not a history is no history");
+  const t = galaxy.cleanWarTrend({ from: 5, points: [{ at: 9, players: 30, fronts: 2 }, { at: 7, players: "lots", fronts: -1 }, null] });
+  ok(t && t.points.length === 2 && t.points[0].at === 7 && t.points[0].players === 0 && t.points[1].fronts === 2,
+    "the war's own hours come back oldest first, with a strange count read as none");
+}

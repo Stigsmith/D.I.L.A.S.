@@ -91,6 +91,14 @@
       "version": "1.25.0"
     },
     {
+      "id": "star-map",
+      "title": "The Star Map",
+      "status": "shipped",
+      "version": "1.25.0",
+      "track": "solo",
+      "say": "The galaxy map as its own place for reading the war: every front, each planet's intel and how it has moved hour by hour, and one click to drop there."
+    },
+    {
       "id": "front-door",
       "title": "Drop Bay is the front door",
       "status": "shipped",

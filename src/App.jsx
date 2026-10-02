@@ -11,11 +11,12 @@ import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import {
   Library, Swords, Rocket, Store, User, Settings as SettingsIcon,
   LifeBuoy, Menu, X, Sun, Moon, Zap, Shield, Star, Lock, Download, Upload, AlertTriangle,
-  Factory, Bug, PackageOpen, Trees, FileText, Crosshair, Radar, Shovel, Info, ScrollText, Milestone, Scale,
+  Factory, Bug, PackageOpen, Trees, FileText, Crosshair, Radar, Shovel, Info, ScrollText, Milestone, Scale, Orbit,
 } from "lucide-react";
 
 import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser, ScenarioBar } from "./Tiers.jsx";
 import WarRoom from "./WarRoom.jsx";
+import StarMap from "./StarMap.jsx";
 import { SKULL, themeArt } from "./lib/assets.js";
 import Builder from "./Builder.jsx";
 import ArmouryBuilds, { Coverage, History, ARMOURY_TABS } from "./Armoury.jsx";
@@ -36,7 +37,7 @@ import { CATEGORIES, warbonds } from "./lib/items.js";
 import { useCollectionState } from "./lib/useCollectionState.js";
 import { useTheme, THEMES } from "./lib/theme.js";
 import { useRoute } from "./lib/router.js";
-import { useScenario, useTierFilters, useTierSort } from "./lib/scenario.js";
+import { useScenario, useTierFilters, useTierSort, planetByName } from "./lib/scenario.js";
 import { BRAND } from "./lib/brand.js";
 import LOADOUTS from "./data/loadouts.json";
 
@@ -54,6 +55,9 @@ const NAV = [
     group: "Loadouts",
     items: [
       { id: "bay", label: "Drop Bay", Icon: Rocket },
+      /* The galaxy map as its own place, for reading the war rather than
+         setting up a drop. The war room is where a drop is set up. */
+      { id: "map", label: "Star Map", Icon: Orbit },
       { id: "armoury", label: "Armoury", Icon: Swords },
       { id: "collection", label: "Collection", Icon: Library },
       { id: "exchange", label: "Exchange", Icon: Store, release: "v3" },
@@ -93,7 +97,7 @@ const SCENARIO_SURFACES = new Set(["tiers", "bay", "armoury", "builder", "rules"
 const OFF_MENU = new Set(["scenario", "tiers", "builder", "shared"]);
 /* Off menu routes are not in ALL_NAV, so they need their title here or
    the header falls back to the brand name and stops saying where you are. */
-const OFF_MENU_LABEL = { scenario: "Scenario", tiers: "Tier Lists", builder: "Armoury", shared: "Shared build" };
+const OFF_MENU_LABEL = { scenario: "War Room", tiers: "Tier Lists", builder: "Armoury", shared: "Shared build" };
 /* Which menu entry lights up for a page that has none of its own. */
 const MENU_FOR = { builder: "armoury", shared: "armoury" };
 const labelFor = (id) =>
@@ -596,11 +600,34 @@ export default function App() {
           ? [ARMOURY_TABS, armouryTab]
           : [null, null];
 
-  /* The war room is where the scenario is set. It fills the space right of
-     the menu, so its route drops the page's padding and footer. */
-  const inRoom = dest === "scenario";
+  /* The war room is where the scenario is set, and the Star Map is the same
+     map for reading the war. Both fill the space right of the menu, so their
+     routes drop the page's padding and footer. */
+  const inRoom = dest === "scenario" || dest === "map";
+  /* The Star Map names its planet in the address, so a planet can be linked
+     and Back goes back. A name this browser does not know is no planet. */
+  const mapPlanet = (() => {
+    if (dest !== "map" || !param) return null;
+    try {
+      const name = decodeURIComponent(param);
+      return planetByName.has(name) ? name : null;
+    } catch {
+      return null;
+    }
+  })();
 
   const surface = (() => {
+    if (dest === "map") {
+      return (
+        <StarMap selected={mapPlanet}
+          onSelect={(name) => navigate(name ? `map/${encodeURIComponent(name)}` : "map")}
+          onDropHere={(name, front) => {
+            setPlanet(name);
+            if (front) setFaction(front);
+            navigate("bay");
+          }} />
+      );
+    }
     if (inRoom) {
       return (
         <WarRoom scenario={scenario} setFaction={setFaction} setPlanet={setPlanet} setMission={setMission}

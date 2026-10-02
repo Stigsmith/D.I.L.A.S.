@@ -33,11 +33,12 @@
  *
  * ## The live war, Stage 6
  *
- *   GET /api/war   who holds what and where the fighting is, as last fetched
- *   scheduled      the Cron Trigger that fetches it, every five minutes
+ *   GET /api/war           who holds what and where the fighting is, as last fetched
+ *   GET /api/war/history   the war over time, hourly for thirty days, for the Star Map
+ *   scheduled              the Cron Trigger that fetches it, every five minutes
  *
- * `worker/war.ts`. No account and no limit of ours: it is one read of one row,
- * and nothing a caller sends reaches the upstream.
+ * `worker/war.ts`. No account and no limit of ours: each is a read of what
+ * the server already holds, and nothing a caller sends reaches the upstream.
  */
 
 import { drizzle } from 'drizzle-orm/d1'
@@ -46,7 +47,7 @@ import { createAuth } from './auth.ts'
 import { RULES, addressKey, take } from './limit.ts'
 import { cleanName, hashToken, newCode, normaliseCode, validToken } from './party.ts'
 import * as schema from './schema.ts'
-import { readWar, refreshWar } from './war.ts'
+import { readHistory, readWar, refreshWar } from './war.ts'
 
 /** The Durable Object class has to be exported from the entry point to exist. */
 export { Party } from './party.ts'
@@ -212,6 +213,26 @@ async function route(request: Request, env: Env): Promise<Response> {
     if (!snapshot) return json({ error: 'The war has not been fetched yet.' }, 503)
     const response = json(snapshot)
     response.headers.set('cache-control', 'public, max-age=60')
+    return response
+  }
+
+  /**
+   * The war over time, for the Star Map: one planet's hours with
+   * `?planet=<the upstream's name>`, or the war's own without. Hourly rows
+   * kept thirty days, so cacheable for five minutes. 503 until the server has
+   * kept its first hour, which is the browser's cue to say history starts
+   * when the server does.
+   */
+  if (url.pathname === '/api/war/history') {
+    if (request.method !== 'GET') return json({ error: 'Read the history with a GET.' }, 405)
+    if (!noForeignOrigin(request, url)) return json({ error: 'wrong origin' }, 403)
+    const raw = url.searchParams.get('planet')
+    const planet = raw === null ? null : raw.trim().toUpperCase()
+    if (planet !== null && (planet.length === 0 || planet.length > 80)) return json({ error: 'Name one planet.' }, 400)
+    const history = await readHistory(db, planet)
+    if (!history) return json({ error: 'No history kept yet.' }, 503)
+    const response = json(planet === null ? history : { planet, ...history })
+    response.headers.set('cache-control', 'public, max-age=300')
     return response
   }
 
