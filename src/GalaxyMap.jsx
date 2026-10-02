@@ -32,8 +32,7 @@
 /* ================================================================== */
 
 import { useState, useRef, useEffect, useLayoutEffect, useMemo, useCallback, useId } from "react";
-import { createPortal } from "react-dom";
-import { Plus, Minus, ChevronLeft, Maximize2, Minimize2 } from "lucide-react";
+import { Plus, Minus, ChevronLeft } from "lucide-react";
 
 import {
   VIEW, CENTRE, RADIUS, MAX_ZOOM, HOME, placed, lanes, sectors, roomFor, placeOf, matchSet,
@@ -43,7 +42,7 @@ import {
 } from "./lib/galaxy.js";
 import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 import { planetByName, biomeName, hazardName, loudHazards } from "./lib/scenario.js";
-import { untilText, agoText } from "./lib/war.js";
+import { untilText } from "./lib/war.js";
 import { planetArt } from "./lib/assets.js";
 
 const OSWALD = "'Oswald', sans-serif";
@@ -66,7 +65,7 @@ const WORLD_PX = 30;
 const FRONT_WORLD_PX = 36;
 /* How long a glide between the galaxy and a sector takes. */
 const GLIDE_MS = 480;
-/* Full screen draws every mark, name and render this much bigger, since
+/* The war room draws every mark, name and render this much bigger, since
    the map is twice the size, and keeps this many pixels clear round it. */
 const FULL_MARKS = 1.3;
 const FULL_MARGIN = 28;
@@ -137,8 +136,14 @@ function useStill() {
  * what you asked for, which stay lit while the rest step back. A search
  * overrides both while you are typing.
  */
+/**
+ * `room` is the war room: the map fills its parent, tilts if you let it,
+ * and keeps clear of the panels laid over it by `insets`, pixels from each
+ * side. Without it, the map is a square on the page.
+ */
 export default function GalaxyMap({
   chosen, onChoose, query = "", disabled = false, label, war = null, fronts = {}, picks = [], fits = null,
+  room = false, insets = null,
 }) {
   const svg = useRef(null);
   /* What takes the gestures: the map and, when tilted, the upright
@@ -165,10 +170,14 @@ export default function GalaxyMap({
      also fly the map to it. */
   const clicked = useRef(null);
 
-  /* Full screen, and whether it is tilted. One map either way, so going
-     full screen keeps the sector you are in and where you are looking. */
-  const [expanded, setExpanded] = useState(false);
+  /* The war room, and whether it is tilted. It was a full screen layer
+     over the page until 2 October 2026, when the curator asked for the map
+     to fill the space right of the menu instead and be the scenario screen
+     itself. */
+  const expanded = Boolean(room);
   const [tilted, setTilted] = useMapTilt();
+  const ins = { left: 0, right: 0, top: 0, bottom: 0, ...(insets || {}) };
+  const insetKey = `${ins.left}|${ins.right}|${ins.top}|${ins.bottom}`;
 
   /* The box the map is drawn in: its square on the page, or the whole
      screen. Measured rather than assumed, because the map is 540 pixels
@@ -195,8 +204,9 @@ export default function GalaxyMap({
 
   /* Where the map sits in that box and how it leans. */
   const fit = useMemo(
-    () => stageFit(box.w, box.h, expanded ? { tilt: tilted, margin: FULL_MARGIN } : { fill: true }),
-    [box, expanded, tilted]);
+    () => stageFit(box.w, box.h, expanded ? { tilt: tilted, margin: FULL_MARGIN, insets: ins } : { fill: true }),
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+    [box, expanded, tilted, insetKey]);
   const fitRef = useRef(fit);
   fitRef.current = fit;
 
@@ -311,70 +321,18 @@ export default function GalaxyMap({
 
   const focusK = focus ? sectorView(focus).k : 1;
 
-  /* Full screen: the browser's own where it allows it, and a layer over
-     the whole window either way, so it still works where the browser
-     says no. Leaving the browser's full screen, which Escape does there
-     whatever the page says, closes the layer with it. */
-  const viaBrowser = useRef(false);
-  const open = () => {
-    setHover(null);
-    setHoverSector(null);
-    setExpanded(true);
-    const root = document.documentElement;
-    if (root.requestFullscreen && !document.fullscreenElement) {
-      root.requestFullscreen().then(() => { viaBrowser.current = true; }).catch(() => {});
-    }
-  };
-  const close = useCallback(() => {
-    setHover(null);
-    setHoverSector(null);
-    setExpanded(false);
-    if (viaBrowser.current && document.fullscreenElement && document.exitFullscreen) {
-      document.exitFullscreen().catch(() => {});
-    }
-    viaBrowser.current = false;
-  }, []);
+  /* Escape goes back to the galaxy, unless you are typing somewhere. */
   useEffect(() => {
-    if (!expanded) return undefined;
-    const onChange = () => {
-      if (document.fullscreenElement || !viaBrowser.current) return;
-      viaBrowser.current = false;
-      setHover(null);
-      setHoverSector(null);
-      setExpanded(false);
-    };
-    document.addEventListener("fullscreenchange", onChange);
-    /* The page behind stays where it was while the map covers it. */
-    const html = document.documentElement;
-    const before = html.style.overflow;
-    html.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("fullscreenchange", onChange);
-      html.style.overflow = before;
-    };
-  }, [expanded]);
-  /* Drop Bay folds the map away once a planet is chosen, full screen or
-     not, so a map that goes away hands the screen back as it goes. */
-  useEffect(() => () => {
-    if (viaBrowser.current && document.fullscreenElement && document.exitFullscreen) {
-      document.exitFullscreen().catch(() => {});
-    }
-  }, []);
-
-  /* Escape goes back to the galaxy, and from the galaxy out of full
-     screen, unless you are typing somewhere. */
-  useEffect(() => {
-    if (!focus && !expanded) return undefined;
+    if (!focus) return undefined;
     const onKey = (e) => {
       if (e.key !== "Escape") return;
       const t = e.target;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
-      if (focusRef.current) leave();
-      else close();
+      leave();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [focus, expanded, leave, close]);
+  }, [focus, leave]);
 
   /* ---------------------------------------------------------------- */
   /* Dragging, pinching and the click                                  */
@@ -433,8 +391,14 @@ export default function GalaxyMap({
       const name = hit ? hit.getAttribute("data-planet") : null;
       if (focusRef.current) {
         setHover(name);
+      } else if (name && !sectorOfPlanet(name)) {
+        /* Super Earth, in the middle of the galaxy and in no sector: its
+           own card rather than a sector's. */
+        setHover(name);
+        setHoverSector(null);
       } else {
         const frame = toFrame(e.clientX, e.clientY);
+        setHover(null);
         setHoverSector((name && sectorOfPlanet(name)) || sectorAt(toMap(viewRef.current, frame)));
         setHoverAt(frame);
       }
@@ -490,7 +454,15 @@ export default function GalaxyMap({
       if (!cancelled && g && !g.moved && !g.done) {
         const at = toMap(viewRef.current, g.pts[0]);
         if (!focusRef.current) {
-          enter((g.planet && sectorOfPlanet(g.planet)) || sectorAt(at));
+          /* Super Earth belongs to no sector, so there is nothing to go
+             into: a click on it chooses it, the curator's point of 2
+             October 2026. It has been a battlefield. */
+          const s = (g.planet && sectorOfPlanet(g.planet)) || sectorAt(at);
+          if (s) enter(s);
+          else if (g.planet && !disabled) {
+            clicked.current = g.planet;
+            onChoose(g.planet);
+          }
         } else if (g.planet) {
           if (!disabled) {
             clicked.current = g.planet;
@@ -895,7 +867,7 @@ export default function GalaxyMap({
 
   const drawMark = (row, uu) => {
     const { p, on, found, unfit, dim, hex, front, pulse } = row;
-    const hovering = focus && hover === p.name && !on;
+    const hovering = hover === p.name && !on;
     const hoverRing = hovering ? (
       <circle r={(tactical ? FRONT_WORLD_PX * 0.6 : DOT + 4) * uu} className="pointer-events-none fill-none stroke-base-100" strokeWidth={1.2 * uu} />
     ) : null;
@@ -1088,7 +1060,7 @@ export default function GalaxyMap({
 
   /* The cards. In the galaxy the sector under the cursor, the way the game
      names a sector on hover; in a sector the planet under it. */
-  const hovered = focus && hover ? placeOf(hover) : null;
+  const hovered = hover && (focus || (placeOf(hover) || {}).home) ? placeOf(hover) : null;
   const detail = hovered ? planetByName.get(hover) : null;
   const fight = detail && live ? warLine(live.get(detail.name), fronts) : null;
   const hoverWar = detail && live ? live.get(detail.name) : null;
@@ -1119,12 +1091,17 @@ export default function GalaxyMap({
 
   const focusHolder = focus ? holders.get(focus) : null;
   const focusFront = focusHolder && focusHolder.front ? fronts[focusHolder.front] : null;
-  const chosenPlace = chosen ? planetByName.get(chosen) : null;
 
-  /* Tailwind needs whole class names, so the corners are spelled out. */
-  const corner = expanded
-    ? { tl: "left-4 top-4", tr: "right-4 top-4", br: "bottom-4 right-4", bl: "bottom-4 left-4" }
-    : { tl: "left-2 top-2", tr: "right-2 top-2", br: "bottom-2 right-2", bl: "bottom-2 left-2" };
+  /* Where the controls go. On the page, the corners of the square. In the
+     war room, clear of the panels: the look at the top of the open space,
+     where you are at its top left, the zoom at its bottom right. */
+  const place = expanded
+    ? {
+        look: { top: ins.top + 12, left: ins.left + Math.max(0, box.w - ins.left - ins.right) / 2, transform: "translateX(-50%)" },
+        crumb: { top: ins.top + 12, left: ins.left + 12 },
+        zoom: { bottom: ins.bottom + 12, right: ins.right + 12 },
+      }
+    : { look: { top: 8, left: 8 }, crumb: { top: 8, right: 8 }, zoom: { bottom: 8, right: 8 } };
 
   const map = (
     <div ref={stage}
@@ -1240,108 +1217,54 @@ export default function GalaxyMap({
         </div>
       ) : null}
 
-      {/* The look, and in full screen the tilt. The Tactical map for
+      {/* The look, and in the war room the tilt. The Tactical map for
           choosing, the chart for reading; same map, same clicks, both
-          remembered per browser. The Major Order sits under them in full
-          screen, where a wide screen has room beside the map for it. */}
-      <div className={"absolute flex flex-col items-start gap-3 " + corner.tl}>
-        <div className="flex gap-1.5">
-          <div className="flex overflow-hidden rounded border border-base-700 bg-base-900/90 text-[10px]"
-            role="group" aria-label="How the map looks">
-        {[["tactical", "Tactical"], ["chart", "Chart"]].map(([id, name]) => (
-          <button key={id} type="button" onClick={() => setSkin(id)} aria-pressed={skin === id}
-            className={"px-2 py-1 uppercase tracking-wider transition-colors " +
-              (skin === id ? "bg-base-200 text-base-900" : "text-base-400 hover:text-base-100")}
-            style={{ fontFamily: OSWALD }}>
-            {name}
-          </button>
-        ))}
-          </div>
-          {expanded ? (
-            <button type="button" onClick={() => setTilted(!tilted)} aria-pressed={tilted}
-              title={tilted ? "Lay the map flat" : "Tilt the map back like a table"}
-              className={"rounded border px-2 py-1 text-[10px] uppercase tracking-wider transition-colors " +
-                (tilted ? "border-base-200 bg-base-200 text-base-900" : "border-base-700 bg-base-900/90 text-base-400 hover:text-base-100")}
+          remembered per browser. */}
+      <div className="absolute z-10 flex gap-1.5" style={place.look}>
+        <div className="flex overflow-hidden rounded border border-base-700 bg-base-900/90 text-[10px]"
+          role="group" aria-label="How the map looks">
+          {[["tactical", "Tactical"], ["chart", "Chart"]].map(([id, name]) => (
+            <button key={id} type="button" onClick={() => setSkin(id)} aria-pressed={skin === id}
+              className={"px-2 py-1 uppercase tracking-wider transition-colors " +
+                (skin === id ? "bg-base-200 text-base-900" : "text-base-400 hover:text-base-100")}
               style={{ fontFamily: OSWALD }}>
-              Tilt
+              {name}
             </button>
-          ) : null}
+          ))}
         </div>
-        {expanded && war && war.order ? (
-          <div className="hidden w-72 rounded bg-base-950/70 backdrop-blur-sm xl:block">
-            <MajorOrder order={war.order} fronts={fronts} />
-          </div>
-        ) : null}
-      </div>
-
-      {/* Where you are, the way back out, and full screen. */}
-      <div className={"absolute flex items-center gap-1 " + corner.tr}>
-        {focus ? (
-          <button type="button" onClick={leave}
-            className="flex items-center gap-1 rounded border border-base-700 bg-base-900/90 py-1 pl-1 pr-2 text-[10px] uppercase tracking-wider text-base-300 hover:border-base-500 hover:text-base-100"
-            style={{ fontFamily: OSWALD }} title="Back to the whole galaxy (Esc)">
-            <ChevronLeft className="h-3.5 w-3.5" />
-            <span className="text-base-500">Galaxy</span>
-            <span className="text-base-600">/</span>
-            <span style={focusFront ? { color: focusFront.hex } : undefined}>{focus}</span>
+        {expanded ? (
+          <button type="button" onClick={() => setTilted(!tilted)} aria-pressed={tilted}
+            title={tilted ? "Lay the map flat" : "Tilt the map back like a table"}
+            className={"rounded border px-2 py-1 text-[10px] uppercase tracking-wider transition-colors " +
+              (tilted ? "border-base-200 bg-base-200 text-base-900" : "border-base-700 bg-base-900/90 text-base-400 hover:text-base-100")}
+            style={{ fontFamily: OSWALD }}>
+            Tilt
           </button>
         ) : null}
-        <MapButton label={expanded ? "Leave full screen (Esc)" : "Full screen"} onClick={expanded ? close : open}>
-          {expanded ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
-        </MapButton>
       </div>
 
+      {/* Where you are, and the way back out. */}
       {focus ? (
-        <div className={"absolute flex flex-col gap-1 " + corner.br}>
-          <MapButton label="Zoom in" onClick={() => zoomBy(1.5)} disabled={view.k >= MAX_ZOOM}><Plus className="h-3.5 w-3.5" /></MapButton>
-          <MapButton label="Zoom out, and back to the galaxy past a point" onClick={() => zoomBy(1 / 1.5)}><Minus className="h-3.5 w-3.5" /></MapButton>
-        </div>
+        <button type="button" onClick={leave}
+          className="absolute z-10 flex items-center gap-1 rounded border border-base-700 bg-base-900/90 py-1 pl-1 pr-2 text-[10px] uppercase tracking-wider text-base-300 hover:border-base-500 hover:text-base-100"
+          style={{ ...place.crumb, fontFamily: OSWALD }} title="Back to the whole galaxy (Esc)">
+          <ChevronLeft className="h-3.5 w-3.5" />
+          <span className="text-base-500">Galaxy</span>
+          <span className="text-base-600">/</span>
+          <span style={focusFront ? { color: focusFront.hex } : undefined}>{focus}</span>
+        </button>
       ) : null}
 
-      {/* Full screen hides the page, so what you have chosen and how fresh
-          the war is come with it. */}
-      {expanded ? (
-        <div className={"pointer-events-none absolute max-w-[20rem] text-left " + corner.bl}>
-          {chosenPlace ? (
-            <p className="text-xs">
-              <span className="text-base-500">Dropping on </span>
-              <span className="font-semibold uppercase tracking-wider text-base-100" style={{ fontFamily: OSWALD }}>{chosenPlace.name}</span>
-              {chosenPlace.sector ? <span className="text-base-500">, {chosenPlace.sector} sector</span> : null}
-            </p>
-          ) : (
-            <p className="text-xs text-base-500">Click a sector to go in, then a planet to drop there.</p>
-          )}
-          {war ? (
-            <p className="mt-0.5 text-[10px] text-base-600">
-              {war.fresh ? `The war is live, read ${agoText(war.age)}.` : `The war was last read ${agoText(war.age)}, too long ago to colour the map.`}
-            </p>
-          ) : null}
+      {focus ? (
+        <div className="absolute z-10 flex flex-col gap-1" style={place.zoom}>
+          <MapButton label="Zoom in" onClick={() => zoomBy(1.5)} disabled={view.k >= MAX_ZOOM}><Plus className="h-3.5 w-3.5" /></MapButton>
+          <MapButton label="Zoom out, and back to the galaxy past a point" onClick={() => zoomBy(1 / 1.5)}><Minus className="h-3.5 w-3.5" /></MapButton>
         </div>
       ) : null}
     </div>
   );
 
-  if (!expanded) return map;
-  return (
-    <>
-      {/* The map's place on the page, held while it is away. */}
-      <div className="relative mx-auto flex aspect-square w-full max-w-[34rem] flex-col items-center justify-center gap-2 rounded border border-dashed border-base-800 text-center">
-        <p className="text-xs text-base-500">The map is open full screen.</p>
-        <button type="button" onClick={close}
-          className="rounded border border-base-700 px-2.5 py-1 text-[11px] text-base-300 hover:border-base-500 hover:text-base-100">
-          Bring it back here
-        </button>
-      </div>
-      {createPortal(
-        <div className="fixed inset-0 z-[90] select-none overflow-hidden" role="dialog" aria-modal="true"
-          aria-label="The galaxy map, full screen"
-          style={{ background: "radial-gradient(ellipse at 50% 42%, rgb(var(--base-900)) 0%, rgb(var(--base-950)) 72%)" }}>
-          {map}
-        </div>,
-        document.body,
-      )}
-    </>
-  );
+  return map;
 }
 
 /**

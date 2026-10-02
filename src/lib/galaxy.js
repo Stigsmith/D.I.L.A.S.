@@ -771,7 +771,13 @@ const RIM = Math.min(0.5, (RADIUS + 30) / VIEW);
  * its size, because the eye moves back as the map grows, so it is measured
  * once at size 1 and scaled.
  */
-export function stageFit(w, h, { tilt = false, fill = false, margin = 0 } = {}) {
+/**
+ * `insets` keeps the map clear of panels laid over the stage, pixels from
+ * each side: the map is fitted and centred in what is left, and the
+ * drawing still runs on underneath them, the way the game lays its panels
+ * over the war table rather than beside it.
+ */
+export function stageFit(w, h, { tilt = false, fill = false, margin = 0, insets = null } = {}) {
   if (!(w > 0 && h > 0)) return { S: 0, left: 0, top: 0, a: 0, d: 1 };
   if (fill) return { S: w, left: 0, top: 0, a: 0, d: DEPTH * w };
   const a = tilt ? TILT : 0;
@@ -786,8 +792,17 @@ export function stageFit(w, h, { tilt = false, fill = false, margin = 0 } = {}) 
     x0 = Math.min(x0, x); x1 = Math.max(x1, x);
     y0 = Math.min(y0, y); y1 = Math.max(y1, y);
   }
-  const S = Math.max(0, Math.min((w - 2 * margin) / (x1 - x0), (h - 2 * margin) / (y1 - y0)));
-  return { S, left: (w - (x0 + x1) * S) / 2, top: (h - (y0 + y1) * S) / 2, a, d: DEPTH * S };
+  const ins = { left: 0, right: 0, top: 0, bottom: 0, ...(insets || {}) };
+  const freeW = Math.max(1, w - ins.left - ins.right);
+  const freeH = Math.max(1, h - ins.top - ins.bottom);
+  const S = Math.max(0, Math.min((freeW - 2 * margin) / (x1 - x0), (freeH - 2 * margin) / (y1 - y0)));
+  return {
+    S,
+    left: ins.left + (freeW - (x0 + x1) * S) / 2,
+    top: ins.top + (freeH - (y0 + y1) * S) / 2,
+    a,
+    d: DEPTH * S,
+  };
 }
 
 /* The CSS that draws a fit, so the picture and the arithmetic share one
