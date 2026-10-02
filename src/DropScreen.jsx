@@ -17,36 +17,39 @@
 /* reading once the answer is the second one. So they count confirmed */
 /* loadouts and nothing else. The curator's call, 27 September 2026.  */
 /*                                                                    */
-/* The squadmate slots are filled by hand, or by a live party from a  */
-/* code since 1.25.0. squad.js is a pure function over a list of      */
-/* builds and has never cared where they came from.                   */
-/*                                                                    */
-/* It opens onto the galaxy map while nothing says where you are      */
-/* dropping: click the planet where you clicked it in the game and    */
-/* the brief fills itself. The map folds away once you have chosen.   */
+/* The squadmate slots exist only in a live party, filled by each     */
+/* member's own confirmed build. The curator's call, 2 October 2026:  */
+/* nobody rebuilds three other people's loadouts in the thirty        */
+/* seconds before a drop, so outside a party Drop Bay is you alone.   */
+/* squad.js is a pure function over a list of builds and has never    */
+/* cared where they came from.                                        */
 /*                                                                    */
 /* Since 1 October 2026 this is the front door, the curator's call:   */
 /* the page the tool opens on. It suggests from your own builds,      */
 /* ranked for the drop. Adjusting a build opens the Armoury's editor  */
 /* over this screen rather than taking you away, and the editor's     */
 /* item list is the tier list, already ranked for where you are       */
-/* going. How many of you are dropping is asked here, as seats, and   */
-/* every Confirm is written to your drop history.                     */
+/* going. Every Confirm is written to your drop history.              */
+/*                                                                    */
+/* Where you are dropping is set in the war room, and with no front   */
+/* the war room stands in for this screen. The scenario bar above it  */
+/* is the one place that names the planet and mission; the brief here */
+/* only says what they do to you.                                     */
 /* ================================================================== */
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import Builder from "./Builder.jsx";
 import {
   Users, Check, ChevronLeft, X, Search, Plus, Lock, Star, Snowflake, FilterX, AlertTriangle, Info,
-  Pencil, Rocket, UserPlus, RotateCcw, Flag, MapPin, Crown, Radio, Loader2, Sparkles, ArrowUp,
+  Pencil, Rocket, UserPlus, RotateCcw, MapPin, Crown, Radio, Loader2, Sparkles, ArrowUp,
 } from "lucide-react";
 
-import { FACTIONS, FACTION_THEME, TierBadge, StratChip, difficultyAt, DropPlanner } from "./Tiers.jsx";
+import { FACTIONS, FACTION_THEME, TierBadge, StratChip, difficultyAt } from "./Tiers.jsx";
 import { presets, heldGear } from "./lib/loadouts.js";
 import { readBuild } from "./lib/build.js";
 import { itemName } from "./lib/items.js";
 import { squadWarnings, isQuietBand, coverageIsQuiet } from "./lib/squad.js";
-import { missionByName, missionTraits, hazardName, hazardEffect, biomeName, loudHazards, usePlannerPrefs } from "./lib/scenario.js";
+import { missionByName, missionTraits, hazardName, hazardEffect, biomeName, loudHazards } from "./lib/scenario.js";
 import { SETTINGS, readDoc, writeDoc } from "./lib/storage.js";
 import {
   EMPTY_DROP, cleanDrop, readDrop, stampOf, dropPool, dropContext, withHeat, gateOf, unpackBuild,
@@ -85,9 +88,11 @@ export function useDrop() {
 /* are the dataset's own descriptions. Nothing is invented for flavour. */
 /* ------------------------------------------------------------------ */
 
-/* `onMap` opens the galaxy map, and is null when you may not choose:
-   in a party the host sets the scenario, so a squadmate's brief says so
-   instead. */
+/* `onMap` opens the war room, and is null when you may not choose: in a
+   party the host sets the scenario, so a squadmate's brief says so
+   instead. The planet and the mission are named once, in the scenario bar
+   above, so this only says what they do: the curator's point of 2 October
+   2026, when the two said the same thing one above the other. */
 function Brief({ scenario, onMap, hostPicks }) {
   const mission = scenario.mission ? missionByName.get(scenario.mission) : null;
   const lines = mission ? mission.traits.map((t) => missionTraits[t]).filter(Boolean) : [];
@@ -102,52 +107,37 @@ function Brief({ scenario, onMap, hostPicks }) {
             ? "No mission and no planet yet. The host sets those, and this says what they will ask of you once they do."
             : "No mission and no planet yet. Choose them and this says what the mission asks for and what the planet does to you."}
         </span>
-        {onMap ? <SlotButton onClick={onMap} Icon={MapPin}>Choose the planet on the map</SlotButton> : null}
+        {onMap ? <SlotButton onClick={onMap} Icon={MapPin}>Choose in the war room</SlotButton> : null}
       </div>
     );
   }
 
+  if (!lines.length && !hazards.length) {
+    return (
+      <p className="rounded-lg border border-base-800 bg-base-900/40 px-4 py-2.5 text-xs text-base-500">
+        {mission && place
+          ? "Nothing about this mission or this planet changes what you should bring."
+          : mission
+            ? "Nothing about this mission changes what you should bring, and no planet is chosen."
+            : "Nothing permanent on this planet changes what you should bring, and no mission is chosen."}
+      </p>
+    );
+  }
+
+  const say = (key, name, text) => (
+    <p key={key} className="text-xs leading-relaxed text-base-300">
+      <span className="text-base-500">{name}. </span>{text}
+    </p>
+  );
   return (
-    <div className="grid grid-cols-1 gap-3 rounded-lg border border-base-800 bg-base-900/60 p-4 md:grid-cols-2">
-      <div>
-        <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>
-          <Flag className="h-3.5 w-3.5" /> {mission ? mission.name : "Any mission"}
-        </p>
-        {lines.length ? (
-          <div className="flex flex-col gap-1.5">
-            {lines.map((t) => (
-              <p key={t.name} className="text-xs leading-relaxed text-base-300">
-                <span className="text-base-500">{t.name}. </span>{t.line}
-              </p>
-            ))}
-          </div>
-        ) : (
-          <p className="text-xs text-base-500">No mission chosen, so nothing here is keyed to one.</p>
-        )}
+    <div className="grid grid-cols-1 gap-x-6 gap-y-1.5 rounded-lg border border-base-800 bg-base-900/60 px-4 py-3 md:grid-cols-2">
+      <div className="flex flex-col gap-1.5">
+        {lines.length ? lines.map((t) => say(t.name, t.name, t.line))
+          : <p className="text-xs text-base-500">{mission ? "Nothing about this mission changes what you should bring." : "No mission chosen, so nothing here is keyed to one."}</p>}
       </div>
-      <div>
-        <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>
-          <MapPin className="h-3.5 w-3.5" /> {place || "Any planet"}
-          {onMap ? (
-            <button onClick={onMap}
-              className="ml-auto text-[10px] font-normal normal-case tracking-normal text-base-500 underline hover:text-base-200">
-              {scenario.planet ? "change on the map" : "choose on the map"}
-            </button>
-          ) : null}
-        </p>
-        {hazards.length ? (
-          <div className="flex flex-col gap-1.5">
-            {hazards.map((h) => (
-              <p key={h} className="text-xs leading-relaxed text-base-300">
-                <span className="text-base-500">{hazardName(h)}. </span>{hazardEffect(h)}
-              </p>
-            ))}
-          </div>
-        ) : (
-          <p className="text-xs text-base-500">
-            {place ? "Nothing permanent on this planet changes what you should bring." : "No planet chosen."}
-          </p>
-        )}
+      <div className="flex flex-col gap-1.5">
+        {hazards.length ? hazards.map((h) => say(h, hazardName(h), hazardEffect(h)))
+          : <p className="text-xs text-base-500">{place ? "Nothing permanent on this planet changes what you should bring." : "No planet chosen."}</p>}
       </div>
     </div>
   );
@@ -178,11 +168,7 @@ function Status({ state }) {
       </span>
     );
   }
-  return (
-    <span className="shrink-0 rounded border border-base-700 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-base-500" style={OSWALD}>
-      Filled by hand
-    </span>
-  );
+  return null;
 }
 
 function SlotButton({ onClick, Icon, children, primary, danger }) {
@@ -198,74 +184,27 @@ function SlotButton({ onClick, Icon, children, primary, danger }) {
   );
 }
 
-/* `onStart` is set when you have no builds of your own yet: the first
-   thing you see is then the list itself, already ranked for this drop,
-   rather than an empty picker. `seated` means the seat is part of the
-   squad you said, build known or not. */
-function EmptySlot({ mine, label, onChoose, onStart, seated }) {
+/* Your slot, empty. `onStart` is set when you have no builds of your own
+   yet: the first thing you see is then the list itself, already ranked
+   for this drop, rather than an empty picker. */
+function EmptySlot({ onChoose, onStart }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-base-700 px-4 py-5 text-center sm:min-h-[18rem] sm:py-6">
-      {mine ? <Rocket className="h-6 w-6 text-base-600" /> : <UserPlus className="h-6 w-6 text-base-600" />}
+      <Rocket className="h-6 w-6 text-base-600" />
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>{label}</p>
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>You</p>
         <p className="mx-auto mt-1 max-w-[16rem] text-xs leading-relaxed text-base-500">
-          {mine
-            ? onStart
-              ? "You have no builds yet. Start one here: pick a primary, and the list is already ranked for this drop."
-              : "Choose what you are dropping with, then confirm it."
-            : seated
-              ? "Coming, build not known. Add theirs if they told you, or open a party above and they fill it in themselves."
-              : "Pick the build they told you they are bringing, or open a party above and they fill this in themselves."}
+          {onStart
+            ? "You have no builds yet. Start one here: pick a primary, and the list is already ranked for this drop."
+            : "Choose what you are dropping with, then confirm it."}
         </p>
       </div>
       <div className="flex flex-wrap justify-center gap-1.5">
-        {mine && onStart ? <SlotButton onClick={onStart} Icon={Plus} primary>Pick a primary</SlotButton> : null}
-        <SlotButton onClick={onChoose} Icon={mine ? Rocket : Plus} primary={mine && !onStart}>
-          {mine ? (onStart ? "Choose a preset" : "Choose a loadout") : "Add their build"}
+        {onStart ? <SlotButton onClick={onStart} Icon={Plus} primary>Pick a primary</SlotButton> : null}
+        <SlotButton onClick={onChoose} Icon={Rocket} primary={!onStart}>
+          {onStart ? "Choose a preset" : "Choose a loadout"}
         </SlotButton>
       </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* How many of you                                                     */
-/*                                                                     */
-/* Asked here as seats, the curator's point of 1 October 2026: the     */
-/* drop screen is where you know. A seat with no build in it is still  */
-/* a squadmate, somebody whose kit you do not know, which is how a      */
-/* game with three randoms reads. Not said is a real answer too, and    */
-/* the rules that depend on squad size stay quiet for it rather than    */
-/* assuming you are alone. One value with the scenario screen's, so     */
-/* the tier list and the readings follow.                               */
-/* ------------------------------------------------------------------ */
-
-function Seats({ value, onChange }) {
-  const n = Number(value) || 0;
-  const options = [[0, "Not said"], [1, "Solo"], [2, "2"], [3, "3"], [4, "4"]];
-  return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>
-        Dropping with
-      </span>
-      <div className="flex gap-1">
-        {options.map(([k, label]) => (
-          <button key={k} onClick={() => onChange(k)} aria-pressed={n === k}
-            className={"rounded border px-2.5 py-1 text-[11px] transition-colors " +
-              (n === k
-                ? k ? "border-brand bg-brand/10 text-base-100" : "border-base-500 bg-base-800 text-base-100"
-                : "border-base-700 bg-base-900 text-base-500 hover:border-base-500 hover:text-base-200")}>
-            {label}
-          </button>
-        ))}
-      </div>
-      <span className="text-[11px] text-base-600">
-        {n === 1
-          ? "Just you. Nobody covers your reload."
-          : n
-            ? `${n} of you. An empty seat is a squadmate whose build you do not know.`
-            : "Say how many of you are going and every reading here scales to it."}
-      </span>
     </div>
   );
 }
@@ -541,23 +480,14 @@ function RemoveButton({ name, onRemove }) {
 /* The party, in one line                                              */
 /*                                                                     */
 /* The party's own menu lives top right on every page since 1 October  */
-/* 2026, the curator's call. Drop Bay keeps one line: the way in when   */
-/* you are on your own, and whose scenario you are following when you   */
-/* are not.                                                             */
+/* 2026, the curator's call, and its Squad up is the way in. Drop Bay   */
+/* keeps one line while you are in one: whose scenario you follow. A    */
+/* second Squad up here was the same button twice, and went on 2        */
+/* October 2026.                                                        */
 /* ------------------------------------------------------------------ */
 
 function PartyLine({ party, sync, onOpen }) {
-  if (!party.code) {
-    return (
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-base-800 bg-base-900/40 px-4 py-2.5">
-        <Radio className="h-4 w-4 shrink-0 text-base-500" />
-        <span className="min-w-[12rem] flex-1 text-xs text-base-500">
-          Dropping with friends who use the tool? Squad up, and their confirmed builds land in the slots below.
-        </span>
-        <SlotButton onClick={onOpen} Icon={Radio}>Squad up</SlotButton>
-      </div>
-    );
-  }
+  if (!party.code) return null;
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-base-700 bg-base-900/70 px-4 py-2.5">
       <Radio className={"h-4 w-4 shrink-0 " + (party.status === "live" ? "text-emerald-400" : "text-accent-400")} />
@@ -581,12 +511,11 @@ function PartyLine({ party, sync, onOpen }) {
 /* line, because a list that silently shrinks reads as a bug.          */
 /* ------------------------------------------------------------------ */
 
-function BuildPicker({ title, forMine, everything, scenario, state, current, onPick, onClose, onNew }) {
+function BuildPicker({ title, everything, scenario, state, current, onPick, onClose, onNew }) {
   const [query, setQuery] = useState("");
-  /* Hidden by default in your own slot, the builder's precedent: you are
-     choosing what to actually drop with. Never applied to a squadmate's
-     slot, because your lock list says nothing about what they own. */
-  const [showLocked, setShowLocked] = useState(!forMine);
+  /* Builds needing gear you have not unlocked are hidden by default, the
+     builder's precedent: you are choosing what to actually drop with. */
+  const [showLocked, setShowLocked] = useState(false);
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose(); };
@@ -596,12 +525,12 @@ function BuildPicker({ title, forMine, everything, scenario, state, current, onP
 
   const { shown, cut, cold } = useMemo(
     () => dropPool(everything, scenario, {
-      lockedSet: forMine ? state.lockedSet : new Set(),
+      lockedSet: state.lockedSet,
       favorites: state.favorites,
       showLocked,
       query,
     }),
-    [everything, scenario, forMine, state.lockedSet, state.favorites, showLocked, query]
+    [everything, scenario, state.lockedSet, state.favorites, showLocked, query]
   );
 
   /* Ranked by the reading, favourites first: the order the suggestions
@@ -635,12 +564,10 @@ function BuildPicker({ title, forMine, everything, scenario, state, current, onP
           </p>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          {forMine ? (
-            <button onClick={onNew}
-              className="flex items-center gap-1.5 rounded border border-base-700 px-2.5 py-1 text-xs text-base-300 hover:border-base-500 hover:text-base-100">
-              <Plus className="h-3.5 w-3.5" /> New loadout
-            </button>
-          ) : null}
+          <button onClick={onNew}
+            className="flex items-center gap-1.5 rounded border border-base-700 px-2.5 py-1 text-xs text-base-300 hover:border-base-500 hover:text-base-100">
+            <Plus className="h-3.5 w-3.5" /> New loadout
+          </button>
           <button onClick={onClose} aria-label="Close"
             className="rounded p-1.5 text-base-400 hover:bg-base-800 hover:text-base-100">
             <X className="h-5 w-5" />
@@ -654,7 +581,7 @@ function BuildPicker({ title, forMine, everything, scenario, state, current, onP
           <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search your builds and the presets"
             className="w-full rounded border border-base-700 bg-base-900 py-1.5 pl-7 pr-2 text-xs text-base-100 placeholder-base-600 outline-none focus:border-base-500" />
         </div>
-        {forMine && (cut.locked > 0 || showLocked) ? (
+        {cut.locked > 0 || showLocked ? (
           <button onClick={() => setShowLocked((v) => !v)} aria-pressed={showLocked}
             className={"rounded border px-2.5 py-1.5 text-xs transition-colors " +
               (showLocked
@@ -682,11 +609,9 @@ function BuildPicker({ title, forMine, everything, scenario, state, current, onP
                 ? "Nothing matches that search. Clear it to see everything that fits."
                 : cut.locked > 0 && !showLocked
                   ? "Everything that fits needs gear you have not unlocked. Show those builds, or open Collection to fix what you own."
-                  : forMine
-                    ? "No build for this front survives the scenario. Start one for it, or loosen the scenario above."
-                    : "No build for this front survives the scenario. Loosen the scenario above, or build theirs in the Armoury first."}
+                  : "No build for this front survives the scenario. Start one for it, or loosen the scenario above."}
             </p>
-            {forMine && !query ? (
+            {!query ? (
               <button onClick={onNew}
                 className="mx-auto mt-3 flex items-center gap-1.5 rounded border border-base-200 bg-base-200 px-3 py-1.5 text-xs text-base-900 hover:bg-base-100">
                 <Plus className="h-3.5 w-3.5" /> New loadout
@@ -747,7 +672,9 @@ const SEVERITY = {
   grey: { Icon: Info, box: "border-base-700 bg-base-900", text: "text-base-400" },
 };
 
-function SquadReadout({ counted, context, waitingOnYou, mineUncounted, inParty }) {
+/* Only in a party: outside one there is no squad to read, only you, and
+   your own build's reading is on its card. */
+function SquadReadout({ counted, context, waitingOnYou, mineUncounted }) {
   const size = counted.length;
   const warnings = useMemo(() => squadWarnings(counted, context), [counted, context]);
 
@@ -758,12 +685,8 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted, inParty }
         {waitingOnYou
           ? "Confirm your loadout and this starts reading the squad. It only counts what somebody has committed to, so a half picked kit never sets off a false alarm."
           : size === 1
-            ? inParty
-              ? "One loadout is a loadout, not a squad. This starts reading the squad once somebody else confirms."
-              : "One loadout is a loadout, not a squad. Add a squadmate's build and this starts checking what the two of you are missing."
-            : inParty
-              ? "Nobody has confirmed anything yet. It fills in as each of you confirms."
-              : "Nobody has confirmed anything yet. Choose yours, confirm it, and add your squad."}
+            ? "One loadout is a loadout, not a squad. This starts reading the squad once somebody else confirms."
+            : "Nobody has confirmed anything yet. It fills in as each of you confirms."}
       </p>
     );
   } else if (coverageIsQuiet(context.level, size) ?? isQuietBand(context.difficulty)) {
@@ -802,9 +725,8 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted, inParty }
         </div>
       ) : null}
       <p className="mt-3 text-[10px] leading-relaxed text-base-600">
-        {inParty
-          ? "Advisory only. Counts confirmed loadouts only, the same on every screen in the party. Role tags are our own call, not a community vote."
-          : "Advisory only. Counts confirmed loadouts and the ones you filled in by hand. Role tags are our own call, not a community vote."}
+        Advisory only. Counts confirmed loadouts only, the same on every screen in the party. Role tags are our own
+        call, not a community vote.
       </p>
     </div>
   );
@@ -812,8 +734,8 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted, inParty }
 
 /* ------------------------------------------------------------------ */
 
-export default function DropScreen({ state, navigate, scenario, setFaction, setPlanet, setSquad, drop, update, party, sync, onOpenParty }) {
-  /* Which slot the picker is open for: "mine", a squadmate index, or null. */
+export default function DropScreen({ state, navigate, scenario, drop, update, party, sync, onOpenParty }) {
+  /* Whether the picker for your slot is open. */
   const [picking, setPicking] = useState(null);
   /* The editor over this screen: { key, id, startWith }, or null. id is
      the build being adjusted, null for a new one. */
@@ -832,12 +754,6 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
     return () => { html.style.overflow = before; };
   }, [editing]);
 
-  /* The galaxy map. Null means decide for me: open while nothing says
-     where you are dropping, which is what makes Drop Bay open onto the
-     map. Choosing a planet folds it away; the brief can open it again. */
-  const [mapOpen, setMapOpen] = useState(null);
-  const [prefs, setPrefs] = usePlannerPrefs();
-
   /* Every build that exists, yours and the presets, with heat derived the
      same way the grid derives it. Resolved against all of it rather than
      against what the scenario allows, so tightening the scenario never
@@ -850,7 +766,7 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
     [state.loadouts]
   );
   const byId = useMemo(() => new Map(everything.map((l) => [l.id, l])), [everything]);
-  const { mine, mates, confirmed } = useMemo(
+  const { mine, confirmed } = useMemo(
     () => readDrop(drop, (id) => byId.get(id)),
     [drop, byId]
   );
@@ -869,15 +785,11 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
         return { ...m, build: build ? withHeat([build])[0] : null };
       });
   }, [party.state]);
-  /* Outside a party the seats you said decide how many squadmate slots
-     there are. A build filled into a seat you then took away is kept,
-     but it is not in the squad and is not counted. */
-  const seats = inParty ? SQUAD_CAP : Math.max(1, Number(scenario.squad) || SQUAD_CAP);
-  const seatedMates = mates.slice(0, seats - 1);
-  const parked = mates.slice(seats - 1).filter(Boolean).length;
+  /* The squad is a party's: your confirmed build and theirs. Outside a
+     party there is nobody else to count. */
   const counted = inParty
     ? [...(confirmed ? [mine] : []), ...others.filter((m) => m.build).map((m) => m.build)]
-    : [...(confirmed ? [mine] : []), ...seatedMates.filter(Boolean)];
+    : [];
 
   /* Your own builds first: a suggestion you made yourself beats a preset.
      The presets only stand in while nothing of yours fits. */
@@ -903,41 +815,8 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
 
   const closePicker = useCallback(() => setPicking(null), []);
 
-  /* A planet with fighting on it brings its front along, and choosing one
-     folds the map away. Answering the planner's questions does not: you
-     are still choosing. */
-  const choosePlanet = (name, front) => {
-    setPlanet(name);
-    if (front && front !== scenario.faction) setFaction(front);
-    setMapOpen(false);
-  };
-
-  const mapPanel = (closable) => (
-    <div className="rounded-lg border border-base-800 bg-base-900/60 p-3 sm:p-4">
-      <div className="mb-3 flex items-start justify-between gap-3">
-        <div>
-          <p className="text-sm font-bold text-base-200" style={OSWALD}>Where are you dropping</p>
-          <p className="mt-0.5 text-xs leading-relaxed text-base-500">
-            Click the planet where you clicked it in the game, and its front, biome and hazards come with it. Or say
-            what you are after and the planner marks where to go.
-          </p>
-        </div>
-        {closable ? (
-          <button onClick={() => setMapOpen(false)} title="Put the map away" aria-label="Put the map away"
-            className="shrink-0 rounded border border-base-800 p-1.5 text-base-400 hover:border-base-600 hover:text-base-100">
-            <X className="h-4 w-4" />
-          </button>
-        ) : null}
-      </div>
-      <DropPlanner scenario={scenario} setFaction={setFaction} onChoose={choosePlanet} prefs={prefs} setPrefs={setPrefs} />
-    </div>
-  );
-
-  /* No front yet: the planner is the way in, the way the three banners
-     used to be. Its first question is the front. */
-  if (!scenario.faction) {
-    return mapPanel(false);
-  }
+  /* No front yet: App.jsx sends you to the war room. */
+  if (!scenario.faction) return null;
 
   /* A slot from another front says so rather than vanishing. It still
      counts: it is what that person is bringing, whatever the scenario says. */
@@ -957,44 +836,24 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
   };
   const takeMine = (id) => update((d) => ({ ...d, mine: id, confirmed: null }));
 
+  /* Choosing is not confirming. Picking again after confirming puts you
+     back to still deciding, because what you confirmed has changed. */
   const pick = (id) => {
-    if (picking === "mine") {
-      /* Choosing is not confirming. Picking again after confirming puts you
-         back to still deciding, because what you confirmed has changed. */
-      update((d) => ({ ...d, mine: id, confirmed: null }));
-    } else if (typeof picking === "number") {
-      update((d) => ({ ...d, mates: d.mates.map((m, i) => (i === picking ? id : m)) }));
-    }
+    update((d) => ({ ...d, mine: id, confirmed: null }));
     setPicking(null);
   };
 
   const mineState = mine ? (confirmed ? "confirmed" : "deciding") : null;
 
-  /* In a party the host sets the scenario, so only the host gets the map. */
+  /* In a party the host sets the scenario, so only the host is sent to
+     the war room to choose. */
   const canChoose = !inParty || party.isHost;
-  const nowhere = !scenario.planet && !scenario.biome && !(scenario.hazards || []).length;
-  const showMap = canChoose && (mapOpen === null ? nowhere : mapOpen);
 
   return (
     <div className="flex flex-col gap-4">
       <PartyLine party={party} sync={sync} onOpen={onOpenParty} />
-      {showMap ? mapPanel(true) : null}
-      {showMap && nowhere && !scenario.mission ? null : (
-        <Brief scenario={scenario} onMap={canChoose && !showMap ? () => setMapOpen(true) : null}
-          hostPicks={inParty && !party.isHost} />
-      )}
-
-      {inParty ? null : (
-        <div className="rounded-lg border border-base-800 bg-base-900/40 px-4 py-2.5">
-          <Seats value={scenario.squad} onChange={setSquad} />
-          {parked ? (
-            <p className="mt-1.5 text-[11px] text-base-600">
-              {parked === 1 ? "One build you filled in sits" : `${parked} builds you filled in sit`} in a seat you took away.
-              Kept, not counted. Add the seat back and it returns.
-            </p>
-          ) : null}
-        </div>
-      )}
+      <Brief scenario={scenario} onMap={canChoose ? () => navigate("scenario") : null}
+        hostPicks={inParty && !party.isHost} />
 
       {confirmed ? null : (
         <Suggestions picks={suggestions.picks} fromPresets={suggestions.fromPresets}
@@ -1003,7 +862,7 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
           onBuildAround={(id) => openEditor(null, null, id)} />
       )}
 
-      <div className={"grid grid-cols-1 gap-3 sm:grid-cols-2 " + (seats >= 4 ? "xl:grid-cols-4" : seats === 3 ? "xl:grid-cols-3" : "")}>
+      <div className={inParty ? "grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4" : "grid max-w-xl grid-cols-1 gap-3"}>
         {mine ? (
           <FilledSlot label="You" build={mine} state={mineState} scenario={scenario} lockedSet={state.lockedSet}
             actions={confirmed ? (
@@ -1011,12 +870,12 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
             ) : (
               <>
                 <SlotButton primary onClick={confirm} Icon={Check}>Confirm</SlotButton>
-                <SlotButton onClick={() => setPicking("mine")}>Choose another</SlotButton>
+                <SlotButton onClick={() => setPicking(true)}>Choose another</SlotButton>
                 <SlotButton onClick={() => openEditor(mine.id)} Icon={Pencil}>{mine.preset ? "Adjust a copy" : "Adjust"}</SlotButton>
               </>
             )} />
         ) : (
-          <EmptySlot mine label="You" onChoose={() => setPicking("mine")}
+          <EmptySlot onChoose={() => setPicking(true)}
             onStart={own.length ? null : () => openEditor(null, "primary")} />
         )}
 
@@ -1036,22 +895,10 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
               <WaitingSlot key={`seat-${i}`} code={party.code} />
             ))}
           </>
-        ) : seatedMates.map((b, i) =>
-          b ? (
-            <FilledSlot key={i} label={`Squadmate ${i + 2}`} build={b} state="manual" scenario={scenario} lockedSet={NO_LOCKS}
-              actions={
-                <>
-                  <SlotButton onClick={() => setPicking(i)}>Swap</SlotButton>
-                  <SlotButton danger onClick={() => update((d) => ({ ...d, mates: d.mates.map((m, j) => (j === i ? null : m)) }))} Icon={X}>Remove</SlotButton>
-                </>
-              } />
-          ) : (
-            <EmptySlot key={i} label={`Squadmate ${i + 2}`} onChoose={() => setPicking(i)} seated={Boolean(scenario.squad)} />
-          )
-        )}
+        ) : null}
       </div>
 
-      {[mine, ...(inParty ? others.map((m) => m.build) : seatedMates)].some(offFront) ? (
+      {[mine, ...(inParty ? others.map((m) => m.build) : [])].some(offFront) ? (
         <p className="flex items-start gap-1.5 text-[11px] text-base-500">
           <Info className="mt-px h-3.5 w-3.5 shrink-0" />
           A build here was made for another front. It still counts, because it is what that person is bringing, but its
@@ -1059,18 +906,19 @@ export default function DropScreen({ state, navigate, scenario, setFaction, setP
         </p>
       ) : null}
 
-      <SquadReadout counted={counted} context={context} inParty={inParty}
-        waitingOnYou={Boolean(mine) && !confirmed && counted.length < 2}
-        mineUncounted={Boolean(mine) && !confirmed} />
+      {inParty ? (
+        <SquadReadout counted={counted} context={context}
+          waitingOnYou={Boolean(mine) && !confirmed && counted.length < 2}
+          mineUncounted={Boolean(mine) && !confirmed} />
+      ) : null}
 
-      {picking !== null ? (
+      {picking ? (
         <BuildPicker
-          title={picking === "mine" ? "Your loadout" : `Squadmate ${picking + 2}`}
-          forMine={picking === "mine"}
+          title="Your loadout"
           everything={everything}
           scenario={scenario}
           state={state}
-          current={picking === "mine" ? drop.mine : drop.mates[picking]}
+          current={drop.mine}
           onPick={pick}
           onClose={closePicker}
           onNew={() => openEditor(null)} />

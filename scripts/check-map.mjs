@@ -11,7 +11,7 @@
 /* fail.                                                              */
 /* ================================================================== */
 
-import { galaxy, readJson } from "./lib/app.mjs";
+import { galaxy, difficulty, readJson } from "./lib/app.mjs";
 
 const { VIEW, CENTRE, RADIUS, MAX_ZOOM, HOME } = galaxy;
 const table = readJson("src/data/planets.json").planets;
@@ -173,6 +173,22 @@ const ended = galaxy.cleanWar({ ...withOrder, order: { ...withOrder.order, expir
 ok(ended.order === null, "an order that has ended is no order");
 ok(galaxy.cleanWar(withOrder, withOrder.fetchedAt + galaxy.WAR_TOO_OLD_MS + 1).order === null,
   "an order read more than half an hour ago is not shown, the same as the map");
+ok(mo.reward === null, "an order with no reward says nothing about one");
+const paid = (reward) => galaxy.cleanWar({ ...withOrder, order: { ...withOrder.order, reward } }, NOW).order.reward;
+ok(paid({ type: 1, amount: 40 }).kind === "medals" && paid({ type: 1, amount: 40 }).amount === 40,
+  "a reward of type 1 reads as medals, the one inference the order makes");
+ok(paid({ type: 7, amount: 40 }) === null && paid({ type: 1, amount: -3 }) === null && paid("40 medals") === null,
+  "a reward of any other type, or no amount, is shown as nothing rather than guessed at");
+
+/* The war's running totals */
+const totals = { playerCount: 38398, terminidKills: 226645807204, automatonKills: 119725368690, illuminateKills: 76977223083,
+  deaths: 9057442173, bulletsFired: 2026282813838, missionsWon: 1056414361, missionsLost: 102693485 };
+const st = galaxy.cleanWar({ ...snapshot, stats: totals }, NOW).stats;
+ok(st && st.players === 38398 && st.bots === 119725368690 && st.won === 1056414361, "the war's totals arrive under the war room's names");
+ok(galaxy.cleanWar({ ...snapshot, stats: { playerCount: "lots", deaths: -1 } }, NOW).stats === null && galaxy.cleanWar(snapshot, NOW).stats === null,
+  "totals that are missing or not counts are not shown at all");
+ok(galaxy.cleanWar({ ...snapshot, stats: totals }, snapshot.fetchedAt + galaxy.WAR_TOO_OLD_MS + 1).stats === null,
+  "totals read more than half an hour ago are not shown, the same as the map");
 
 /* The drop planner */
 /* `table` is the shipped planet table, read at the top of this file. */
@@ -341,4 +357,24 @@ ok(covers, "in full screen the drawing reaches every edge of the screen, so a se
   }
   const back = galaxy.offStage(fit, ...Object.values(galaxy.onStage(fit, 321, 654)));
   ok(inside && Math.hypot(back.x - 321, back.y - 654) < 1e-9, "beside a panel the map fits the space that is left, and a click still lands exactly");
+}
+
+/* The war room's difficulty bar, read off the wiki's Difficulty table */
+{
+  const vocab = readJson("src/data/vocabulary.json").difficulties;
+  const levels = readJson("src/data/difficulty.json").levels;
+  ok(levels.length === vocab.length && levels.every((l, i) => l.level === vocab[i].level),
+    "the Difficulty table has a row for every level the tool names, in order");
+  ok(levels.every((l) => l.medals.perMission.reduce((a, b) => a + b, 0) === l.medals.total && l.medals.perMission.length === l.missions),
+    "each level's medals add up, one figure per mission in the operation");
+  ok(difficulty.levelParts(0) === null && difficulty.levelParts(11) === null, "a level that is not said has no line");
+  const mods = vocab.map((d) => difficulty.levelFacts(d.level).modifiers);
+  ok(mods.join("") === "0000111222", "operation modifiers start at 5 and a second is added at 8, as the wiki says");
+  const samples = vocab.map((d) => difficulty.levelFacts(d.level).samples.length);
+  ok(samples.join("") === "1112233333", "rare samples from 4 and super samples from 6");
+  ok(difficulty.levelParts(7).join(" · ") ===
+    "3 missions an operation, 24 medals · 2 to 7 outposts, up to 2 heavy · common, rare and super samples · one operation modifier · +150% requisition and experience",
+    "Suicide Mission reads as the wiki's row for it");
+  ok(difficulty.levelParts(10)[1].includes("giant") && difficulty.levelParts(1)[1] === "no outposts",
+    "outposts read from none at Trivial to a giant now and then at Super Helldive");
 }

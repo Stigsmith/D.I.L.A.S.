@@ -247,7 +247,7 @@ A staging screen with two stages, because picking a loadout and reading the squa
 > | Planned | As built |
 > |---|---|
 > | The scenario across the top | The scenario bar the tier list already carries, plus a **brief**: what the mission asks for and what each planet hazard does, both from tables the tool already ships |
-> | One slot per member, confirmed gear | Four slots. Yours is chosen, then **confirmed**; confirming stamps the build, and editing it afterwards drops you back to still deciding. The other three are **filled by hand** until the party fills them |
+> | One slot per member, confirmed gear | Four slots. Yours is chosen, then **confirmed**; confirming stamps the build, and editing it afterwards drops you back to still deciding. The other three are **filled by hand** until the party fills them. **Hand filling went on 2 October 2026**, the curator's call: nobody rebuilds three other people's loadouts in the thirty seconds before a drop. Outside a party Drop Bay is you alone |
 > | Squad warnings and coverage | `squad.js`, unchanged, over **confirmed loadouts and hand filled slots only** |
 > | Mission information and tips | The mission's own lines. No invented tips |
 > | What other people are taking here | **Not built.** It needs data from other people, so it waits on Exchange |
@@ -284,7 +284,7 @@ Today's Drop Bay, kept: the grid, the cards, the filters, the favourites. `Loado
 |---|---|
 | **Suggestions** | Three of your builds for this drop, ranked by the reading, each saying why. The ranking decision this file and CLAUDE.md had left open is made |
 | **The editor over the drop** | Adjust a build without leaving Drop Bay; saving puts it in your slot. With no builds yet, your slot opens the editor straight onto the ranked primary list |
-| **Seats** | How many of you, asked on the drop screen. An empty seat is a squadmate whose build you do not know, never an assumption that you are alone |
+| **How many of you** | Seats on the drop screen for a day, then **one setting beside difficulty in the war room**, 2 October 2026, with the hand filled squadmates gone. Kept because solo and four of you rate gear differently; in a party the party counts |
 | **Drop history** | Every Confirm recorded, exported, taken back by a change of mind within fifteen minutes |
 | **Coverage** | The Armoury answers "do I have something for each occasion", fifteen situations per front |
 | **The Rules page** | Every rule, what it moves here, and a switch to turn it off. His idea: an overview, and a way to see what each rule does to the list |
@@ -366,14 +366,14 @@ The map moves **out of Phase 7 and into Phase 6a**, alongside the drop screen, b
 > The curator's call. No planet dropdown was built for the drop screen: it uses the scenario screen that already existed, so the double work this paragraph warns about does not happen. The map replaces that picker once the party works.
 
 > [!success] Built, 1.25.0, 29 and 30 September 2026, with the live layer, not yet deployed
-> The map replaced the planet list on the scenario screen, and Drop Bay opens onto it while nothing says where you are dropping. The live layer came in the same version: who holds each planet in the faction hexes, the fronts ringed and named, and **choosing a planet with fighting on it sets the front**. See `CLAUDE.md`, The Galaxy Map.
+> The map replaced the planet list on the scenario screen, and Drop Bay opened onto it while nothing said where you were dropping. **Since 2 October 2026 the scenario screen is the war room**, the map across everything right of the menu with the planner, the Major Order and difficulty laid over it, and the only place the map appears; Drop Bay sends you there. `CLAUDE.md`, The Galaxy Map, "The war room". The live layer came in the same version: who holds each planet in the faction hexes, the fronts ringed and named, and **choosing a planet with fighting on it sets the front**. See `CLAUDE.md`, The Galaxy Map.
 >
 > | "What live state adds" | As built |
 > |---|---|
 > | Only offering planets with an active campaign | **Emphasised, not enforced.** Fronts are larger, ringed, named and first in search; every planet stays choosable, for pre building while nobody is online. One filter away if the curator wants the rest hidden |
 > | Faction filled from who holds the planet | **Done.** The attacker in a defence, otherwise the owner. A quiet planet leaves the front alone |
 > | Active planet effects feeding the scoring engine | **Not yet.** The real prize, and the next step: the variant enemies in `enemies.json` are waiting for it |
-> | The Major Order as context | **Done.** Above the map: briefing, time left, a bar per task in its front's colour |
+> | The Major Order as context | **Done.** Over the war room's map: briefing, time left, a bar per task in its front's colour, and what it pays, read as medals from one real answer. The war's running totals sit under it since 2 October 2026 |
 
 > [!success] Decided 30 September 2026: a drop planner beside the map
 > The curator's idea: "where would you like to play? Against what faction, what mission archetype, what kind of planet, no caves, less megacities, go do this planet and it marks the map." Built in 1.25.0. His three calls:
@@ -388,6 +388,8 @@ The map moves **out of Phase 7 and into Phase 6a**, alongside the drop screen, b
 
 > [!warning] Planet effects have no steady source yet. Measured 30 September 2026
 > `api.helldivers2.dev`'s tidy endpoints, v1 and v2, carry no active planet effects, and its OpenAPI spec has no field for them. Only the raw pass-through to the game, `/raw/api/WarSeason/801/Status`, holds `planetActiveEffects`, and it answered **503 after 35 seconds**, and timed out twice at 30, while the tidy endpoints answered in under a tenth of a second. Note also the war number, 801, fixed in the path.
+>
+> **Retried 2 October 2026, and it answered at once**: 48 KB, with `planetActiveEffects` holding 120 entries, each a planet index and a `galacticEffectId`. One good day is not a steady source, and nothing was built on it; it is the first sign the hard half below may be gettable.
 >
 > **The definitions are the easy half**: `effects/planetEffects.json` in `helldivers-2/json`, 34 KB of names and descriptions keyed by effect id, patch data to ship like the planet table. **Which are active where is the hard half.** Before building: retry the raw status on a better day, look at DiveHarder again (the data spike could not resolve its host), and check whether the tidy API has grown a field. Then the scoring half is the curator's call with measurements in front of him, because it re-ranks lists.
 > | The map as its own surface, with history | **Not yet.** The component stands alone, so this is a route and a data source, not a rebuild |
@@ -524,11 +526,16 @@ They also stopped being dead weight in the bundle. The eight images were being f
 
 ---
 
-## The rest of the Difficulty page, deliberately not pulled
+## The rest of the Difficulty page
+
+> [!success] Pulled 2 October 2026, when the war room gave it somewhere to go
+> `npm run difficulty` reads the page's table into `src/data/difficulty.json`, and the war room's difficulty bar says one line of it per level: missions in an operation and their medals, outposts and the biggest kind, samples, operation modifiers, and the reward bonus. **It refuses a table that does not read cleanly**, and cross checks four facts the effects list states outright against the table's notes.
+>
+> **Not read, on purpose:** the enemy columns, which list names in unlabelled paragraphs that skip a front with nothing new, so which front a name belongs to is a guess there and a fact in `enemies.json`; and the structures and objective names, which nothing reads yet. Map size is kept and not shown.
 
 `helldivers.wiki.gg/wiki/Difficulty` carries more than the enemy list: **missions per operation, medal rewards, objective counts, outpost counts and their light, medium, heavy and giant composition, map size, operation modifiers, sample types, and a reward multiplier from 0% to 300%.**
 
-None of it is anywhere in this project and all of it is one page parse away. It was left out on purpose: **nothing reads it yet.** Outposts and samples describe a mission you are about to run, which is the drop screen's business, and the drop screen does not exist. Pull it in Phase 6a when there is a surface with somewhere to put it, not before.
+It was left out at first on purpose: **nothing read it.** Outposts and samples describe a mission you are about to run, and until the war room there was no surface with somewhere to put them.
 
 Two pieces of it are worth remembering when that happens. **Operation modifiers start at difficulty 5 and a second one is added at 8**, and the data spike recorded modifiers as being in none of its sources. This page is the source. And **the enemy footnote markers on that table are not explained in what was pasted**, so whatever 1, 2 and 3 mean is still unknown; marker 1 broadly tracks the variant strains but is wider than our exclusion list, so do not assume they are the same thing.
 

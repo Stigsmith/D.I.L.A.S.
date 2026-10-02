@@ -25,6 +25,7 @@ A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai a
 | **Tier Lists** | `#/tiers/:category` | Built, **off the menu since 1 October 2026**. Lives on as the picker inside every build, and whole at this address, linked from the Armoury |
 | **The editor** | `#/builder/:id?` | Off the menu, lit as Armoury. Edits one build; `new` starts one, `new-bots` starts one for a front |
 | **Shared build** | `#/shared/:code` | Off the menu. A build carried in the link itself. See Drop History And Share Links |
+| **The war room** | `#/scenario` | Built, 2 October 2026. Off the menu: the scenario bar's Adjust, and every surface that needs a front first, send you here. Where the scenario is set, the galaxy map across the screen. See The Galaxy Map, "The war room" |
 | **Settings** | `#/settings` | Built. Theme, export, import, reset |
 | **Support** | `#/support` | Built. Where the numbers come from |
 | **Roadmap** | `#/roadmap` | Built. One timeline, what is next and what it waits on |
@@ -46,7 +47,7 @@ A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai a
 > |---|---|
 > | **Suggestions** | Drop Bay suggests three of your builds, ranked by the reading, each saying why. Ranking was "a decision nobody has made" until this |
 > | **The editor over the drop** | Adjusting a build opens the editor over Drop Bay; saving puts it in your slot, still to confirm |
-> | **Seats** | How many of you, asked on the drop screen as seats. An empty seat is a squadmate whose build you do not know |
+> | **How many of you** | Seats on Drop Bay for a day; since 2 October 2026 one setting beside difficulty in the war room, and in a party the party counts. See The Drop Screen |
 > | **Drop history** | Every Confirm is recorded, so "you have never dropped with a Railgun against bots" can be built on it |
 > | **Coverage** | The Armoury answers "do I have something for each occasion", per front |
 > | **The Rules page** | Every rule, what it moves here, and a switch |
@@ -130,11 +131,11 @@ Data authority lives outside this repo, in the Helldivers 2 project files: `hell
 >
 > It used to be a panel repeated at the top of every tier list tab. Two problems in one coat: it ate the height the table wanted, and **repeating a control on every tab says that control is scoped to the tab**. It never was. `useScenario` is called once in `App.jsx` and the value is shared, so the UI was lying about its own behaviour.
 >
-> **The gate and the screen are the same component.** No front chosen renders `ScenarioScreen` with `onDone` null, because there is nothing to go back to yet. Once chosen it collapses to `ScenarioBar` and the full screen is one click away.
+> **The gate is a redirect, since 2 October 2026.** With no front chosen, the tier list and Drop Bay send you to `#/scenario`, the war room, replacing the history entry so Back does not bounce you there again, and **Done** brings you back once a front is chosen. Done is hidden until then, since it would only send you straight back. Drawing the war room in their place, the first version, swapped the whole screen out the moment a front was picked, with the planet and the mission still to come. **The redirect waits for `useScenario`'s `ready`**: before storage is read, no front means not loaded yet, and acting on it sent everybody to the war room on every load.
 >
 > **Done returns you to the tab you left**, tracked by a ref in `App.jsx`. Adjusting from Stratagems and landing on Primaries is the kind of small wrong that makes a round trip feel like a detour.
 >
-> **The three tall faction banners are gone since 1.25.0.** The curator's point, 30 September 2026: with the galaxy map setting the front from the planet, opening on a choice of front was the long way round. The screen now leads with the drop planner and the map side by side, and the front is the planner's first question, as three compact buttons. See The Galaxy Map, "The drop planner". The site footer is still dropped on this screen and no other.
+> **The three tall faction banners are gone since 1.25.0.** The curator's point, 30 September 2026: with the galaxy map setting the front from the planet, opening on a choice of front was the long way round. The front is the planner's first question, as three compact buttons. See The Galaxy Map, "The drop planner". **Since 2 October 2026 the screen is the war room**, the map across the space right of the menu with everything else laid over it; `ScenarioScreen`, `DropPlanner` and `PlanetChooser` are gone. See The Galaxy Map, "The war room".
 
 > [!danger] The difficulty marks are the one UI art set that is not masked
 > Every other single colour mark in this project is painted with `currentColor` through a CSS mask so it takes the theme. **The difficulty marks are drawn as images instead**, because they carry the game's own colour ramp: grey `#4a494a` at 1, bronze `#ad7529` at 5, red `#8c0c10` at 7, near black `#310c10` at 10, with the white skull and chevrons over the top. Masking them collapsed ten distinct marks into one flat brand colour. The white sits on a coloured backing, so they read on the light themes too.
@@ -160,7 +161,7 @@ Data authority lives outside this repo, in the Helldivers 2 project files: `hell
 >
 > **Zero means not set**, which is the absence of a difficulty rather than a low one, and it is what the slider already spelled. With it unset the whole front is judged and the panel says so.
 >
-> **The slider is `DifficultySlider`, the one Drop Bay already used**, not a second control. It sits in the open half of the scenario panel rather than behind the fold with biome and hazards, because it changes which enemies are counted and a hidden control that narrows what you are reading is the folded filter mistake in a new place.
+> **The slider is `DifficultySlider`, the one Drop Bay already used**, not a second control. It sits in the open half of the scenario panel rather than behind the fold with biome and hazards, because it changes which enemies are counted and a hidden control that narrows what you are reading is the folded filter mistake in a new place. **In the war room it is a stepper since 2 October 2026**, two arrows either side of the mark and the name, the way the game steps it, always in view along the bottom; the slider stays in the Armoury's filters.
 >
 > **It does not clear with the environment.** Changing planet does not mean you stopped playing at the level you play at.
 >
@@ -291,7 +292,7 @@ Rename freely. Put the old name in that item's `aliases` array and nothing break
 
 **The front is shared, and it is the same control everywhere.** The tier list and Drop Bay read one value from `src/lib/scenario.js`, so choosing a war in one place is choosing it in the other. The Loadout Builder carries the same bar but bound to `draft.faction`, because a build is *for* a front and keeps that when saved. Changing it there marks the build unsaved and does not move the scenario.
 
-**Difficulty is a slider with the game's names on it.** Ten levels, Trivial through Super Helldive, with the game's own icons painted through the theme. The four bands a build declares are unchanged underneath and the slider derives one, so nothing saved had to migrate. The names live in `vocabulary.json` under `difficulties`, which is also where the band mapping is.
+**Difficulty has the game's names and marks on it.** Ten levels, Trivial through Super Helldive, with the game's own icons: a stepper in the war room, a slider in the Armoury's filters. The four bands a build declares are unchanged underneath and the slider derives one, so nothing saved had to migrate. The names live in `vocabulary.json` under `difficulties`, which is also where the band mapping is.
 
 **Tier list filters live in the shell, not in `TierBrowser`.** Held in the component they were discarded every time you looked at Drop Bay. They are per category, persisted under `hd2-tier-filters`, and merged over a blank on read so a filter added later does not come back undefined.
 
@@ -376,6 +377,7 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 | `context-rules.json` | The 43 rules that move one item rating, each with a `name` for the Rules page. Read by `score.js`, checked by `npm run rules` |
 | `missions.json` | The 70 missions by the game's names, the fronts each appears on, and the nine traits a rule keys on. Hand kept from the wiki; the names and fronts are the wiki's, the traits are ours |
 | `build-rules.json` | The 9 rules that move a whole build. Read by `build.js`, checked by `npm run builds` |
+| `difficulty.json` | **Generated** by `npm run difficulty` from the table on the wiki's Difficulty page: per level, missions in an operation, medals, objectives, outposts by size, what the level introduces, and the reward multiplier. Read by the war room's difficulty bar through `src/lib/difficulty.js`. Never edit by hand |
 
 ### Item shape
 
@@ -755,8 +757,8 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 |---|---|
 | **The brief** | What the scenario's mission asks for and what each planet hazard does. Both come from tables the tool already ships; nothing is invented for flavour |
 | **Your slot** | Choose a build, then **Confirm**. Only then does it count |
-| **Three squadmate slots** | Filled by hand, from your builds and the presets. In a party they are the party's members instead. See The Live Party |
-| **The squad read** | `squadWarnings` over the builds that count |
+| **Squadmate slots** | **Only in a party**, each filled by that member's own confirmed build. See The Live Party |
+| **The squad read** | `squadWarnings` over the builds that count. Only in a party: outside one there is nobody else to read |
 
 > [!danger] An unconfirmed slot says "Still deciding" and nothing else, and does not count
 > **The curator's call, 27 September 2026.** The squad checks read confirmed loadouts and hand filled slots only, so a half picked kit never sets off a false alarm. Confirming stamps the build's `updatedAt`; **edit the build afterwards and the slot drops back to still deciding**, because what you confirmed is not what you now hold. The live party will publish that confirmed version, so the two must agree. Presets have no `updatedAt` and stamp as the empty string, which is why `confirmed` is null for not confirmed rather than falsy.
@@ -768,20 +770,25 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 >
 > **Hot comes from the `intense_heat` hazard**, the same thing the scoring rules read, through `gateBiome`. Cold is `extreme_cold`, foggy is `thick_fog`. Urban and cave have no hazard behind them, so the scenario never says either and a build declaring only those survives everywhere.
 
-> [!warning] Your lock list hides builds in your slot and never in a squadmate's
-> Builds needing gear you have not unlocked are hidden in your own slot's picker by default, with a toggle, the builder's precedent. **A squadmate's picker ignores your locks entirely**: your collection says nothing about what they own.
+> [!danger] No squad by hand. The curator's call, 2 October 2026
+> The three squadmate slots used to be filled by hand, from your builds and the presets, with seats saying how many of you there were. **Both are gone.** His reasoning: nobody rebuilds three other people's loadouts in the thirty seconds the game gives you in its own drop screen, which is barely enough for your own. Outside a party Drop Bay is you alone; the squad, its slots and its read exist only in a party, where each member's build arrives by itself. Do not bring hand filling back.
+>
+> **"How many of you" survives as one setting**, beside difficulty in the war room's bottom bar, because solo and four of you rate gear differently and a solo player is in no party to count. Nothing is built with it. In a party the party's count decides and the bar only says it.
+
+> [!info] Your lock list hides builds in your slot
+> Builds needing gear you have not unlocked are hidden in the picker by default, with a toggle, the builder's precedent. Party members' builds are drawn whatever your locks say: your collection says nothing about what they own.
 
 > [!info] Stored as ids in `hd2-drop`, and out of the export
-> `{ mine, confirmed, mates, logged }`, ids only, the way the old comparison was, so an edited build is re-read rather than held stale. A slot whose build was deleted reads as empty. `logged` is the history entry the last Confirm wrote. It is what you are dropping with tonight, not what you own, so it stays out of the export like the scenario does.
+> `{ mine, confirmed, mates, logged }`, ids only, the way the old comparison was, so an edited build is re-read rather than held stale. A slot whose build was deleted reads as empty. `logged` is the history entry the last Confirm wrote. **`mates` is read by nothing since hand filled slots went**, and stays in the shape so older storage cleans the same way. It is what you are dropping with tonight, not what you own, so it stays out of the export like the scenario does.
 
-> [!success] Suggestions, the editor over the screen, seats and history. 1 October 2026
+> [!success] Suggestions, the editor over the screen, and history. 1 October 2026
 > - **Suggested for this drop**: three of your own builds, through the same gates as the picker and never one needing gear you have not unlocked, ranked by the reading. Each says why: the piece the scenario lifts most, in that rule's own words, or failing that the build's worst hole (`whyFor`). With nothing of yours fitting, the presets stand in and say so; with nothing at all, the panel says what ruled everything out and offers **Start a build for this drop**. Hidden once you have confirmed.
 > - **The picker ranks** favourites first, then by reading, the order the suggestions use.
 > - **Adjust and New open the editor over Drop Bay** rather than navigating away. Saving puts the build in your slot, still to confirm; **Save as a new build** keeps the original; closing with changes asks first. Somebody with no builds sees **Pick a primary** in their slot, which opens the editor straight onto the primary list, already ranked for this drop.
-> - **Seats.** "Dropping with: Not said, Solo, 2, 3, 4", one value with the scenario's squad, so the tier list and every reading follow. The slots shown match it. **An empty seat is a squadmate whose build you do not know**, which is how three randoms read; deriving squad size from filled slots would call that solo, the exact mistake the peril rules refuse to make. A build in a seat you take away is kept, not counted, and says so. In a party the party's member count decides, as before.
+> - **One copy of everything, 2 October 2026.** The curator saw the scenario said twice, Squad up twice and a squad picker beside a party. Now: **one Squad up**, in the header; **the scenario bar is the one place that names the planet and mission**, and the brief under it only says what they do; **no seats and no hand filled squadmates** (see the danger block above). With no planet, the brief offers **Choose in the war room**.
 > - **Confirm writes the drop to your history**, and "Change my mind" within 15 minutes takes it back out (`TAKE_BACK_MS`): that was a change of mind, not a drop.
 
-> [!tip] Done on the scenario screen returns to where you opened it
+> [!tip] Done in the war room returns to where you opened it
 > It remembered only the tier list's category until 1.24.0, so adjusting the scenario from the drop screen threw you onto a tier list. `lastSurface` in `App.jsx` now remembers any surface that reads the scenario, tab included.
 
 **`npm run drop`** checks it against the real builds: both hard gates, what counts as the squad, that editing a confirmed build un-confirms it, and that a real mission name reaches the demolition warning. It exits non zero on a fail. `scripts/lib/app.mjs` loads `drop.js` like the other libs, so it measures the shipped code.
@@ -813,9 +820,9 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > The browser makes 32 random bytes per party and keeps them; the server stores only the SHA-256. **A reload, a dropped line or a second tab on the same address rejoins the same seat** rather than taking a new one. Members see each other by a prefix of that hash, never the token. `hd2-party` also keeps the name you go by, and stays out of the export: it belongs to this browser.
 
 > [!success] The party menu lives top right, on every page. The curator's call, 1 October 2026
-> It was a panel on Drop Bay. The party was always app wide underneath (your confirmed build reaches it from any page, the host's scenario reaches you anywhere), so its controls moved next to the profile switcher in the header, the way the game keeps your squad in a corner. The header button reads "Squad up" on your own, and the code with a dot per seat in a party. Drop Bay keeps one line that opens it. **The panel is fixed under the chrome rather than hanging from the header**, because the header clips its overflow for the masthead art. **Friends and finding a group will live behind this menu**, so the locked Squad entry left the sidebar the same day.
+> It was a panel on Drop Bay. The party was always app wide underneath (your confirmed build reaches it from any page, the host's scenario reaches you anywhere), so its controls moved next to the profile switcher in the header, the way the game keeps your squad in a corner. The header button reads "Squad up" on your own, and the code with a dot per seat in a party. **Drop Bay keeps one line, and only in a party**: whose scenario you follow. Its own Squad up card went on 2 October 2026, as the same button twice. **The panel is fixed under the chrome rather than hanging from the header**, because the header clips its overflow for the masthead art. **Friends and finding a group will live behind this menu**, so the locked Squad entry left the sidebar the same day.
 >
-> **Seats and the party do not compete.** In a party the party decides how many of you there are; outside one, the seats on Drop Bay say it.
+> **The party counts.** In a party the member count decides how many of you there are, and the war room's bar says so rather than offering buttons; outside one, that bar's "How many of you" says it.
 
 > [!info] How a party behaves
 > - **Four seats.** A fifth person is refused with "That party is full", not queued.
@@ -823,7 +830,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > - **Twelve quiet hours and nobody connected, and the party is deleted** by its own alarm. An open tab keeps it alive.
 > - **The host's squad size follows the party.** The scenario's "how many of you" is set to the member count, since that is the true answer and the peril rules read it.
 > - **Following is not enforcing.** A squadmate who adjusts their own scenario keeps it until the host's next change, and the party panel says so with a one click "Follow the party".
-> - **While in a party, the hand filled squadmate slots step aside** and come back on leaving. Party slots are members only.
+> - **Party slots are members only**, and outside a party there are none.
 
 > [!bug] A same-site GET carries no Origin header, and the first version demanded one
 > Found in the browser on 29 September 2026. A socket that fails to open tells the page nothing, so the party asks over a plain GET whether the code exists. That GET arrived with no Origin, the same-origin check refused it with a 403, the page read the 403 as a dropped line, and it retried a dead code forever. **Origin is now required on a POST and a WebSocket, where browsers always send it, and only refused on a plain GET when it is present and foreign.** Reproduced in `party.test.ts` against the unfixed server first.
@@ -845,8 +852,8 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 
 | Where it appears | |
 |---|---|
-| **The scenario screen** | Leads with it, beside the drop planner. `DropPlanner` in `Tiers.jsx` is the planner plus `PlanetChooser`, the map and its search, and both screens use it. "Dropping on" below it only says where you are: the by hand biome and hazards were retired on 30 September 2026, once the map and planner covered them |
-| **Drop Bay** | **Opens onto the map while nothing says where you are dropping**, and folds it away once a planet is chosen. The brief's "change on the map" brings it back. In a party only the host gets it, because the host sets the scenario |
+| **The war room** | `#/scenario`, `src/WarRoom.jsx`, since 2 October 2026, and **the only place the map appears**. The map fills everything right of the menu, the planner and search fold out on the left, the Major Order and the war's totals sit over the top right, difficulty and how many of you along the bottom. See "The war room" below |
+| **Drop Bay** | **No map of its own since 2 October 2026.** With no front it sends you to the war room; with no planet its brief offers **Choose in the war room**. In a party only the host is offered it, because the host sets the scenario. The by hand biome and hazards were retired on 30 September 2026, once the map and planner covered them |
 
 > [!danger] The layout is patch data and the map needs no network
 > Positions and supply lines ship in `planets.json`, fetched once by `npm run wiki` from `api.helldivers2.dev`. A planet does not move. **The map draws, pans and fills the scenario with nothing fetched at run time.** Who holds what is live and arrives separately, if it arrives: it decorates the map and never carries it. **Never ship ownership**; a stale territory map is worse than an uncoloured one. `dds-roadmap.md`, "The live starmap".
@@ -859,6 +866,8 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 >
 > **The wheel eases.** Each notch moves a target and the view catches up over about a tenth of a second (`towards`), so a spin reads as one zoom; the curator asked for "more glidey, less ticky". The buttons ease the same way. Reduced motion turns glides into cuts.
 >
+> **Super Earth is in no sector**, so there is nothing to glide into: in the galaxy a click on it chooses it, and hovering shows its own card. The curator's point, 2 October 2026; it has been a battlefield.
+>
 > **Sectors are blocks**, the curator's correction to a rounded hull: a polar grid of 12 rings, each cell given to the sector of the nearest planet (`TABLE`, `sectorZones`), and each sector drawn as **one block with only its outer edge** (`sectorOutlines`, which drops every line between a sector's own cells: 813 edges drawn instead of 1,464). A click anywhere inside a block is a click on that sector (`zoneAt`). The game's exact borders are not published; 254 of 271 planets land inside their own sector's block.
 
 > [!info] Two looks, switched in the map's corner and remembered per browser in `hd2-map-skin`
@@ -868,10 +877,19 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 >
 > **A half copy of the game's own screen was built and cut the same day**: exactly the game or clearly the tool's own, not something between. Do not rebuild the "Galactic War" table skin.
 
-> [!success] Full screen, tilted back like a table. The curator's ask, 1 October 2026
-> A button in the map's corner opens the same map over the whole screen: the browser's own full screen where it allows it, and a layer over the window either way. **It keeps the sector you are in and where you are looking.** Escape leaves a sector first, then full screen; in the browser's full screen Escape always leaves at once, which is the browser's rule, and the layer closes with it. The Major Order sits in the left margin on screens 1280 and wider, and what you are dropping on and how fresh the war is sit bottom left, since the page is hidden. Every mark, name and render is drawn 1.3 times bigger there (`FULL_MARKS`), and the hover card's render grows to match.
+> [!success] The war room. The curator's call, 2 October 2026
+> The scenario screen, laid out like the game's Galactic War screen: **the galaxy map fills everything right of the menu** (`GalaxyMap` with `room`), and the rest sits over it. It replaced a full screen layer over the page, built the day before, whose Major Order and difficulty overlapped the map; the curator asked for "the whole part right of the menu" instead, with "Where would you like to play?" as a fold out bar on the left.
 >
-> **The tilt is on by default in full screen, with a switch to lay it flat**, remembered per browser in `hd2-map-tilt`, out of the export. The map on the page is always flat: it is small, and a tilt there costs room and legibility for nothing. Turning it on there too is one line if the curator wants it.
+> | | |
+> |---|---|
+> | **Left** | "Where would you like to play?": the planet search with its results, the planner and Go here, then what you are dropping on and the mission. **On a wide room it takes its width off the map**, passed as `insets` to `stageFit`, so the galaxy is never drawn under it. On a room under 900 pixels it lays over the map, starts folded, and folds again once you choose a planet. Folded, it is a tab on the left edge |
+> | **Top right** | The Major Order and **the war so far**, each folding to its title. Laid over the map rather than taking room from it, the way the game lays its own |
+> | **Bottom** | Difficulty as a stepper, with what the level brings off the wiki and how many of the front's enemies the ratings count; **How many of you**, or the party's count in a party; and **Done** once a front is chosen. Its measured height is the map's bottom inset |
+> | **The map's own controls** | Where you are at the top left of the open space, the look and the tilt at its bottom left, the zoom at its bottom right, so the top right is free for the Major Order |
+>
+> **The room clips with `overflow: clip`, not hidden.** The drawing reaches past the room's edges so a tilted sector fills it, and a box that merely hides its overflow can still be scrolled by focus or by a script bringing something into view: found in the browser, where a click scrolled the whole room 325 pixels sideways. Every mark, name and render is drawn 1.3 times bigger there (`FULL_MARKS`), and the hover card's render grows to match.
+>
+> **The tilt is on by default in the war room, with a switch to lay it flat**, remembered per browser in `hd2-map-tilt`, out of the export. The map has no other home now, so the flat square on the page is unused; `room` false still draws it, for the next surface that wants a small map.
 >
 > **Planets and names stand upright; only the ground tilts.** The curator's point, 1 October 2026: tilted with everything else, the renders squashed into ovals and the names leaned like italics. Planets, picks and names are drawn once round their own centre (`drawMark`, `drawPick`, `drawName`) and placed either on the map, when flat, or on an upright layer over the tilted ground at the point the tilt puts them, scaled by `stageDepth` so the far side is still smaller. The gestures sit on a surface round both layers, with the corner buttons outside it, so a press on a button is never a drag.
 >
@@ -880,12 +898,12 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!info] Planet renders, from the wiki. `npm run planet-art`
 > **Half the wiki's "originals" are crops of the game's own map, not renders**: 133 of 271 are 48 to 85 pixels on the map's dark ground, five more are full size on a solid ground, 138 with no transparency in all. Drawn as they were, each sat in a dark square. `npm run planet-art -- --cut` now cuts any original without transparency round, keys the dark ground out of its outer ring only (a planet's night side is left alone), trims it to the planet, and sizes it from its own source, doubled with a sharp filter rather than padded out to 256, which had drawn them a quarter of their neighbours' size. Add `--force` to recut everything.
 >
-> The curator approved the small copies on 30 September 2026 and **the full size originals on 1 October**: each planet's "<Planet> Planet Icon.png" from helldivers.wiki.gg, **271 of 272 planets, 1720 pixels square, 350 MB** in `Image Library/Planets/Originals/`. **Nothing that size reaches a browser.** `npm run planet-art -- --cut` cuts a **256 pixel WebP** from each original with sharp, offline, 2.1 MB for all 271: twice the resolution of the 128 pixel PNG it replaces at under half the weight, which is what keeps a render sharp drawn large in full screen. The wiki's own 128 pixel thumbnails stay as the fallback where there are no originals, and `npm run images` takes the cut over them. **sharp arrives with wrangler** rather than as a dependency of ours; without it the cut says so and changes nothing. **Everything under `Image Library/Planets/` and `src/assets/planets/` is gitignored**: extracted game art, and the repo is headed for public GitHub. Inside a sector only the planets in view, and those of the sector being glided to, are drawn as renders.
+> The curator approved the small copies on 30 September 2026 and **the full size originals on 1 October**: each planet's "<Planet> Planet Icon.png" from helldivers.wiki.gg, **271 of 272 planets, 1720 pixels square, 350 MB** in `Image Library/Planets/Originals/`. **Nothing that size reaches a browser.** `npm run planet-art -- --cut` cuts a **256 pixel WebP** from each original with sharp, offline, 2.1 MB for all 271: twice the resolution of the 128 pixel PNG it replaces at under half the weight, which is what keeps a render sharp drawn large in the war room. The wiki's own 128 pixel thumbnails stay as the fallback where there are no originals, and `npm run images` takes the cut over them. **sharp arrives with wrangler** rather than as a dependency of ours; without it the cut says so and changes nothing. **Everything under `Image Library/Planets/` and `src/assets/planets/` is gitignored**: extracted game art, and the repo is headed for public GitHub. Inside a sector only the planets in view, and those of the sector being glided to, are drawn as renders.
 
 > [!danger] A file sync app watches this folder and renames what the build rewrites
 > On 30 September and 1 October 2026 it renamed every generated art folder, and once `dist/assets`, to copies named `... (# Name clash <date> <id> #)`, leaving the app with no art or no scripts. `.gitignore` carries `*Name clash*`. **Both the image importer and the build now empty their folders in place** rather than deleting and remaking them (`scripts/lib/empty-in-place.mjs`; the build's half is a small plugin in `vite.config.js` with Vite's own `emptyOutDir` off). Since then no build has been renamed. **`scripts/check-dist.mjs` runs after every build and again inside `npm run deploy` just before the upload**, and refuses if a file the page asks for is missing or a clash copy sits in `dist`.
 >
-> It reaches further than build output. **It renamed a source file** after an edit made with `sed -i`, which writes a new file and swaps it in: edit files in this repo in place, never by replace. **It has renamed files inside `.git`**: a copy of the index and three of the branch logs, from 29 and 30 September. Checked on 1 October 2026 and the repository is intact, every branch and commit present, but a rename landing on a branch file could lose that branch. **The fix is the curator's: exclude the whole repo folder from the sync, or move it out of the synced tree**; GitHub is where it is headed to be backed up. The old clash copies are still on disk, left for him to delete.
+> It reaches further than build output. **It renamed a source file** after an edit made with `sed -i`, which writes a new file and swaps it in: edit files in this repo in place, never by replace. **On 2 October 2026 it renamed two more**, `src/App.jsx` and `worker/war.test.ts`, each edited with an editor tool moments after a script had rewritten it in place; the copies were whole and moved back. Use one in place method per file, and if a file goes missing, look for its clash copy first. **It has renamed files inside `.git`**: a copy of the index and three of the branch logs, from 29 and 30 September. Checked on 1 October 2026 and the repository is intact, every branch and commit present, but a rename landing on a branch file could lose that branch. **The fix is the curator's: exclude the whole repo folder from the sync, or move it out of the synced tree**; GitHub is where it is headed to be backed up. The old clash copies are still on disk, left for him to delete.
 >
 > A side effect worth knowing: while `dist/assets` was missing, the browser asked for the script, got the page instead, and **cached that page under the script's name for a year**, because `_headers` marks `/assets/*` immutable. A rebuild with unchanged code has the same file name, so the page stayed blank until that one file was fetched with `cache: "reload"`. In production a missing asset meets the same single page fallback; it only bites a URL that is later reused, which hashed names almost never are.
 
@@ -905,7 +923,9 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 >
 > **Choosing a planet with fighting on it sets the front too.** That is the other half of "the whole scenario fills itself": the attacker in a defence, otherwise whoever holds it. A quiet planet leaves the front alone. In a party the host's choice carries the front to everybody, since it is part of the scenario.
 >
-> **The Major Order sits above the map**: its briefing in the game's words, the time left, and a bar per task in the colour of the front it is on. Nothing says what a task asks, because task types are not published and the briefing already says it. **A task's front is read from the value the upstream marks as type 1, in the game's numbering, 2 Terminids, 3 Automatons, 4 Illuminate. That is an inference from one real answer on 30 September 2026**, recorded as one. If the order alone fails to fetch, the war still lands with no order; an order that has ended, or was read over half an hour ago, is not shown.
+> **The Major Order sits over the war room's map, top right**: its briefing in the game's words, the time left, a bar per task in the colour of the front it is on, and what it pays. Nothing says what a task asks, because task types are not published and the briefing already says it. **A task's front is read from the value the upstream marks as type 1, in the game's numbering, 2 Terminids, 3 Automatons, 4 Illuminate. That is an inference from one real answer on 30 September 2026**, recorded as one. **So is the reward**: the server keeps it as the upstream sends it, a type and an amount, and the browser reads type 1 as medals because that one order paid type 1 amount 40. Any other type is shown as nothing rather than named wrongly. If the order alone fails to fetch, the war still lands with no order; an order that has ended, or was read over half an hour ago, is not shown.
+>
+> **The war so far**, under it: Helldivers in the war right now, and every Terminid, Automaton and Illuminate killed, Helldiver lost, bullet fired and mission won or lost, from `/api/v1/war`, a fourth fetch that may fail on its own like the order. **Field names read off a real answer on 2 October 2026** (`STAT_FIELDS` in `worker/war.ts`). Two fields in it were left out because they count nothing: `accuracy` read 100 with more bullets hit than fired, and `revives` read 2. Held to the same half hour as the map.
 >
 > **Fronts are emphasised, not enforced.** The roadmap said "only offering planets with an active campaign"; every planet stays choosable, because the scenario is also for pre building while nobody is online. Fronts come first in the search list. If the curator wants the rest hidden, it is one filter.
 
@@ -922,12 +942,12 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > **`SUPER_CONTACT` in `wrangler.jsonc` is a placeholder**: the tool's own public address, because the service will not answer without something. It should be a project address, never a personal one, and **which one is stigly's to pick**: the published repository, or an address on the domain. `SUPER_CLIENT` is the tool's address and **changes with the domain**. `npm run wiki` sends the same two; it used to give the API's own organisation as our contact.
 
 > [!info] The numbers behind the schedule
-> Every five minutes is 864 upstream requests a day, three paths each run (planets, campaigns, the Major Order), whatever the traffic. The service publishes a limit of 5 requests in 10 seconds; this is 3 in 300. **Five Cron Triggers per account on the free plan, 10 ms of CPU each**, verified 29 September 2026; Enodia uses none. Parsing and trimming the 300 KB planet answer measured 1.5 ms. The timeout is 20 seconds, because waiting is not CPU and the service took 10 seconds to answer once.
+> Every five minutes is 1,152 upstream requests a day, four paths each run (planets, campaigns, the Major Order, the war's totals), whatever the traffic. The service publishes a limit of 5 requests in 10 seconds; this is 4 in 300. **Five Cron Triggers per account on the free plan, 10 ms of CPU each**, verified 29 September 2026; Enodia uses none. Parsing and trimming the 300 KB planet answer measured 1.5 ms. The timeout is 20 seconds, because waiting is not CPU and the service took 10 seconds to answer once.
 >
 > Locally, `wrangler dev --test-scheduled` (the `workers` entry in `.claude/launch.json` passes it) and then `curl "http://localhost:8788/cdn-cgi/handler/scheduled?cron=*/5+*+*+*+*"` runs one fetch by hand. That is a real request to the real service.
 
 > [!success] The drop planner: "where would you like to play?" 1.25.0, 30 September 2026
-> The curator's idea: say what you are after and the tool says where to go, marked on the map. Three questions beside the map, then **Go here**, the top three fronts as buttons that choose the planet. On the map the picks carry a numbered ring in the brand colour, the other fronts that fit stay lit, and everything else steps back. `suggestFronts` in `galaxy.js`; the answers keep between visits in `hd2-planner`, out of the export.
+> The curator's idea: say what you are after and the tool says where to go, marked on the map. Three questions in the war room's left panel, then **Go here**, the top three fronts as buttons that choose the planet. On the map the picks carry a numbered ring in the brand colour, the other fronts that fit stay lit, and everything else steps back. `suggestFronts` in `galaxy.js`; the answers keep between visits in `hd2-planner`, out of the export.
 >
 > | Question | What it does |
 > |---|---|
@@ -948,7 +968,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!info] Names are placed, not just drawn
 > Every name that wants to show is placed in priority order and skipped if it would overlap one already placed: the chosen planet and search matches always, then fronts by how many Helldivers are on them, then any planet with room. `placeLabels` in `galaxy.js`. Thirty eight fronts named at once had run into each other in the dense clusters; now a name that does not fit waits for a closer zoom.
 
-**`npm run map`** checks the arithmetic against the shipped table: the right way up, every planet inside the disc, each supply line drawn once and none missing, search, that zooming holds the point under the cursor still, how the browser reads a war snapshot, which names fit, what the planner suggests, and that the table's rings close and its zones hold their planets. Seven of its rules were broken on purpose on 29 and 30 September 2026 and each broke exactly its own check. The server half is in `worker/war.test.ts`, sixteen tests with the upstream stood in for, the Major Order fixture being the real answer; eight of its rules were broken the same way.
+**`npm run map`** checks the arithmetic against the shipped table: the right way up, every planet inside the disc, each supply line drawn once and none missing, search, that zooming holds the point under the cursor still, how the browser reads a war snapshot, its order's reward and its totals, which names fit, what the planner suggests, that the table's rings close and its zones hold their planets, that the map fits beside a panel, and the war room's difficulty line against the wiki's table. Seven of its rules were broken on purpose on 29 and 30 September 2026 and each broke exactly its own check. The server half is in `worker/war.test.ts`, twenty tests with the upstream stood in for, the Major Order and the totals fixtures being real answers; nine of its rules were broken the same way, the last on 2 October 2026, when the totals were made to take the war down with them and exactly their test failed.
 
 ---
 
@@ -1381,6 +1401,12 @@ npm run wiki
 
 Re-fetches the weapon stats and the planet table, and **reports what would change without writing anything**. Add `-- --write` to apply it and `-- --refresh` to go back to the network instead of the cache in `.wiki-cache`. It is deliberately not part of the build: a build that needs the internet is a build that breaks on a train.
 
+```bash
+npm run difficulty
+```
+
+Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, the same way: a report by default, `-- --write` to apply, `-- --refresh` to go back to the network instead of `.wiki-cache`. **It refuses a table that does not read cleanly**: a moved column, a row short of cells, medals that do not add up, or operation modifiers and samples no longer starting where the effects list says they do. The enemy columns are not read; each enemy's article already says the level it starts at.
+
 > [!info] Node is on the PATH
 > Verified 18 August 2026: a fresh PowerShell resolves `node` to `C:\Program Files\nodejs\node.exe` and `npm` works with no setup. This used to need prepending, because a shell opened before the install could not see it. That is no longer true.
 
@@ -1538,7 +1564,7 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 npm run test:worker
 ```
 
-Fifty six tests, fifteen for accounts, twenty five for the live party and sixteen for the live war, run **inside workerd against a real local D1**, never in node, where none of what matters is true. Each protection was seen failing before it was trusted: rate limiting left to the library default (two fail, and it reproduces Enodia's finding that better-auth does not limit on Workers by default), the address read from `x-forwarded-for` (two fail), the schema missing `issuer` (five fail), and the response hardening removed (one fails).
+Sixty tests, fifteen for accounts, twenty five for the live party and twenty for the live war, run **inside workerd against a real local D1**, never in node, where none of what matters is true. Each protection was seen failing before it was trusted: rate limiting left to the library default (two fail, and it reproduces Enodia's finding that better-auth does not limit on Workers by default), the address read from `x-forwarded-for` (two fail), the schema missing `issuer` (five fail), and the response hardening removed (one fails).
 
 ```bash
 npm run typecheck

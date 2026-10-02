@@ -101,6 +101,13 @@ export const traitsOf = (name) => {
 
 const inRange = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
 
+/* Whether a mission is one this front offers. No mission, or no front,
+   asks nothing of the other. */
+const missionOn = (mission, faction) => {
+  const m = mission ? missionByName.get(mission) : null;
+  return !m || !faction || m.factions.includes(faction);
+};
+
 export function cleanScenario(raw) {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
   if (!isFaction(raw.faction)) return null;
@@ -111,7 +118,8 @@ export function cleanScenario(raw) {
     hazards: Array.isArray(raw.hazards)
       ? [...new Set(raw.hazards.filter((h) => typeof h === "string" && hazardInfo[h]))]
       : [],
-    mission: typeof raw.mission === "string" && missionByName.has(raw.mission) ? raw.mission : null,
+    mission: typeof raw.mission === "string" && missionByName.has(raw.mission) && missionOn(raw.mission, raw.faction)
+      ? raw.mission : null,
     difficulty: inRange(raw.difficulty, 0, 10) ? raw.difficulty : NO_DIFFICULTY,
     squad: inRange(raw.squad, 0, 4) ? raw.squad : NO_SQUAD,
   };
@@ -126,6 +134,9 @@ export const sameScenario = (a, b) => {
 
 export function useScenario() {
   const [scenario, setScenario] = useState(EMPTY_SCENARIO);
+  /* Whether storage has been read. Until then no front means "not loaded
+     yet" rather than "none chosen", and nothing should act on it. */
+  const [ready, setReady] = useState(false);
 
   /* Read after mount rather than in the initialiser, the same shape    */
   /* the rest of this app's persistence uses, so nothing touches        */
@@ -136,6 +147,7 @@ export function useScenario() {
   }, []);
 
   useEffect(() => {
+    setReady(true);
     const saved = readDoc(SETTINGS.scenarioEnv);
     if (!saved || typeof saved !== "object") return;
     setScenario((b) => ({
@@ -176,6 +188,16 @@ export function useScenario() {
     });
     return next;
   };
+
+  /* The same rule for a scenario read back from storage. The front and the
+     rest are stored apart and read in two steps, so a mission from another
+     front could come back with them: the curator found an Illuminate Blitz
+     on an Automaton drop on 2 October 2026. Checked once both have landed. */
+  useEffect(() => {
+    if (missionOn(scenario.mission, scenario.faction)) return;
+    setScenario((b) => (missionOn(b.mission, b.faction) ? b : saveEnv({ ...b, mission: null })));
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [scenario.mission, scenario.faction]);
 
   /* Choosing a planet fills the environment. Clearing it leaves the      */
   /* environment alone rather than wiping it, because you may have set    */
@@ -238,7 +260,7 @@ export function useScenario() {
     setScenario(() => saveEnv(next));
   }, []);
 
-  return { scenario, setFaction, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment, replaceScenario };
+  return { scenario, ready, setFaction, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment, replaceScenario };
 }
 
 /* ------------------------------------------------------------------ */

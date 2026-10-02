@@ -25,8 +25,11 @@ export function useRoute(fallback) {
     return () => window.removeEventListener("hashchange", onChange);
   }, [fallback]);
 
-  const navigate = useCallback((path) => {
-    window.location.hash = `/${path}`;
+  /* `replace` swaps the current entry rather than adding one, for a
+     redirect: Back should not land on a page that sends you on again. */
+  const navigate = useCallback((path, { replace = false } = {}) => {
+    if (replace) window.location.replace(`#/${path}`);
+    else window.location.hash = `/${path}`;
   }, []);
 
   const [destination, ...rest] = route.split("/");

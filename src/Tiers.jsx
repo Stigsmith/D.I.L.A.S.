@@ -3,7 +3,7 @@ import {
   Star, Bot, Bug, Eye, Flame, Info, Crosshair, Backpack, Plane, Satellite, Car,
   RadioTower, Users, Bomb, CircleDot, FilterX, Thermometer, Zap, Wind, Sword,
   Search, Lock, Unlock, HelpCircle, ChevronDown, AlertTriangle, Download, Upload,
-  Pencil, Trash2, Globe2, ArrowUp, ArrowDown, ChevronLeft, SlidersHorizontal,
+  Pencil, Trash2, Globe2, ArrowUp, ArrowDown, SlidersHorizontal,
 } from "lucide-react";
 
 /* ================================================================== */
@@ -25,16 +25,14 @@ import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 import { BRAND } from "./lib/brand.js";
 import { PATCH } from "./lib/patch.js";
 import {
-  planets, hazardInfo, biomeName, hazardName, hazardEffect, QUIET_HAZARDS, loudHazards,
-  missionsFor, missionTraits, missionByName, traitsOf, planetByName, usePlannerPrefs,
+  hazardInfo, biomeName, hazardName, hazardEffect, QUIET_HAZARDS, loudHazards,
+  missionsFor, missionTraits, traitsOf, planetByName,
 } from "./lib/scenario.js";
 import { scoreItem, scenarioIsSet } from "./lib/score.js";
 import { readBuild, explainScore } from "./lib/build.js";
-import { describeArmour, enemiesUpTo, arrivalsLine, EXPOSURE_GAP, enemySource } from "./lib/enemies.js";
+import { describeArmour, EXPOSURE_GAP, enemySource } from "./lib/enemies.js";
 import TierBadgePlate from "./TierBadgePlate.jsx";
-import GalaxyMap, { MajorOrder } from "./GalaxyMap.jsx";
-import { searchPlanets, unplaced, frontOf, suggestFronts } from "./lib/galaxy.js";
-import { useWar, agoText } from "./lib/war.js";
+import { agoText } from "./lib/war.js";
 import { useBadgeStyle } from "./lib/badge.js";
 import {
   CATEGORIES, vocabulary, acquisitionLabels,
@@ -429,7 +427,7 @@ function TierChips({ label, value, onChange }) {
    the planner covered both, and the search reaches the planets with no
    place on the map. A scenario saved with a biome set by hand still reads
    here and still clears. */
-function PlanetBar({ scenario, setMission, clearEnvironment, kind = null, onClearKind }) {
+function PlanetBar({ scenario, setMission, clearEnvironment, kind = null, onClearKind, stack = false }) {
   /* null or "mission". */
   const [open, setOpen] = useState(null);
   const [query, setQuery] = useState("");
@@ -467,7 +465,7 @@ function PlanetBar({ scenario, setMission, clearEnvironment, kind = null, onClea
 
   return (
     <div className="rounded-lg border border-base-800 bg-base-900/60 p-3">
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className={"grid grid-cols-1 gap-2 " + (stack ? "" : "sm:grid-cols-2")}>
         <Placed label="Dropping on" icon={Globe2} value={placeLabel} sub={placeSub}
           chosen={Boolean(scenario.planet || byHand)} />
         <Picker label="Mission" icon={Crosshair} open={open === "mission"}
@@ -523,77 +521,6 @@ function PlanetBar({ scenario, setMission, clearEnvironment, kind = null, onClea
               tags={m.traits.map((t) => ({ key: t, label: (missionTraits[t] || {}).name || t }))} />
           ))}
         </Pane>
-      ) : null}
-    </div>
-  );
-}
-
-/* The galaxy map with its search. One piece, so the scenario screen and
-   the drop screen cannot drift into two ways of choosing a planet. The
-   search lights its matches up on the map and lists the first few
-   underneath, which is also the way in for a keyboard and for the
-   planets with no place on the map. */
-/* The fronts as the map needs them: the locked hex, and the name. */
-const FRONTS = Object.fromEntries(FACTIONS.map((f) => [f.id, { hex: f.hex, label: f.label }]));
-
-/* `onChoose(name, front)`. The front is who you would be fighting on that
-   planet according to the live war, or null when the war is not here, too
-   old to trust, or quiet on that planet. The caller fills the scenario's
-   front from it, which is the "whole scenario fills itself" half. */
-export function PlanetChooser({ chosen, onChoose, none, autoFocus = true, war = null, plan = null }) {
-  const [query, setQuery] = useState("");
-  const live = war && war.fresh ? war.planets : null;
-
-  /* With the war live, a front you can drop on comes first in the list,
-     since those are the planets you can actually go to. */
-  const hits = useMemo(() => {
-    const found = searchPlanets(query, 40);
-    const ranked = live
-      ? [...found].sort((a, b) => Number(Boolean(live.get(b.name)?.campaign)) - Number(Boolean(live.get(a.name)?.campaign)))
-      : found;
-    return ranked.slice(0, 8);
-  }, [query, live]);
-
-  const choose = (name) => onChoose(name, frontOf(war, name));
-
-  return (
-    <div className="flex flex-col gap-2.5">
-      <SearchField placeholder={"Search " + planets.length + " planets or a sector"} query={query} setQuery={setQuery}
-        autoFocus={autoFocus} />
-      <MajorOrder order={war ? war.order : null} fronts={FRONTS} />
-      <GalaxyMap chosen={chosen} query={query} onChoose={choose} war={war} fronts={FRONTS}
-        picks={plan ? plan.picks.map((x) => x.name) : []} fits={plan && plan.count ? plan.fits : null} />
-      <p className="text-center text-[10px] leading-relaxed text-base-600">
-        {war && war.fresh ? (
-          <>
-            <span className="text-base-400">Live, read {agoText(war.age)}.</span>{" "}
-            {war.fronts === 1 ? "One front is" : `${war.fronts} fronts are`} open, ringed in the colour of who you
-            would fight. Choose one and your front fills itself in too.
-          </>
-        ) : war ? (
-          <>
-            The live war was last read {agoText(war.age)}, too long ago to trust, so the map is not coloured in.
-          </>
-        ) : (
-          "Click a sector to go in, then a planet to drop there. Zoom out, or press Escape, to go back to the galaxy."
-        )}
-      </p>
-      {query.trim() ? (
-        <div className="flex max-h-56 flex-col gap-1 overflow-y-auto text-left">
-          {hits.length === 0 ? (
-            <Empty>{none || "No planet by that name. Try a sector."}</Empty>
-          ) : hits.map((p) => {
-            const w = live ? live.get(p.name) : null;
-            const fighting = w && w.campaign && w.front ? " · a front, against the " + FRONTS[w.front].label : "";
-            return (
-              <PickRow key={p.name} on={p.name === chosen} onClick={() => choose(p.name)}
-                title={p.name}
-                sub={(p.sector ? p.sector + " sector · " : "") + biomeName(p.biome) + fighting +
-                  (unplaced.includes(p.name) ? " · not on the map" : "")}
-                tags={loudHazards(p.hazards).map((h) => ({ key: h, label: hazardName(h), warn: true }))} />
-            );
-          })}
-        </div>
       ) : null}
     </div>
   );
@@ -666,7 +593,9 @@ function PrefChip({ on, onClick, disabled, title, children }) {
   );
 }
 
-function Planner({ scenario, setFaction, prefs, setPrefs, war, plan, onChoose }) {
+/* `bare` drops the card and the title, for the war room's panel, which
+   carries both itself. */
+function Planner({ scenario, setFaction, prefs, setPrefs, war, plan, onChoose, bare = false }) {
   const front = scenario.faction;
   const f = FACTIONS.find((x) => x.id === front);
   const onFront = missionsFor(front);
@@ -679,10 +608,12 @@ function Planner({ scenario, setFaction, prefs, setPrefs, war, plan, onChoose })
   });
 
   return (
-    <div className="flex flex-col gap-3.5 rounded-lg border border-base-800 bg-base-900/60 p-3 text-left sm:p-4">
-      <p className="text-sm font-bold text-base-200" style={{ fontFamily: "'Oswald', sans-serif" }}>
-        Where would you like to play?
-      </p>
+    <div className={"flex flex-col gap-3.5 text-left " + (bare ? "" : "rounded-lg border border-base-800 bg-base-900/60 p-3 sm:p-4")}>
+      {bare ? null : (
+        <p className="text-sm font-bold text-base-200" style={{ fontFamily: "'Oswald', sans-serif" }}>
+          Where would you like to play?
+        </p>
+      )}
 
       <PlanStep n={1} label="Against">
         <div className="flex gap-2">
@@ -813,24 +744,6 @@ function GoHere({ war, plan, front, chosen, onChoose }) {
               : null}
           </>
         )}
-    </div>
-  );
-}
-
-/* The planner and the map, side by side on a wide screen and stacked on a
-   narrow one. The live war is read once here and handed to both, so they
-   cannot disagree about where the fronts are. */
-export function DropPlanner({ scenario, setFaction, onChoose, prefs, setPrefs, autoFocus = false }) {
-  const war = useWar(true);
-  const plan = useMemo(
-    () => suggestFronts(war, { front: scenario.faction, ...prefs }),
-    [war, scenario.faction, prefs]
-  );
-  return (
-    <div className="grid w-full grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,23rem)_minmax(0,1fr)]">
-      <Planner scenario={scenario} setFaction={setFaction} prefs={prefs} setPrefs={setPrefs}
-        war={war} plan={plan} onChoose={onChoose} />
-      <PlanetChooser chosen={scenario.planet} onChoose={onChoose} war={war} plan={plan} autoFocus={autoFocus} />
     </div>
   );
 }
@@ -1776,177 +1689,8 @@ function FactionPick({ faction: f, on, hero, dimmed, onChoose, compact = false }
 /* this tool, and everything downstream reads differently per front: the  */
 /* mission list, the biomes, and eventually the whole contextual rating.  */
 /* Guessing one for you would be inventing the most important input.      */
-/* ================================================================== */
-/* THE SCENARIO SCREEN                                                */
-/*                                                                    */
-/* A trial, 21 August 2026. The scenario used to be a panel repeated  */
-/* at the top of every tier list tab, which was two problems wearing  */
-/* one coat: it ate the height the table wanted, and repeating a      */
-/* control on every tab says that control is scoped to the tab. It    */
-/* never was. useScenario is called once in App and the value is      */
-/* shared, so the UI was lying about its own behaviour.               */
-/*                                                                    */
-/* So it becomes one screen you visit and a one line bar you read.    */
-/* Same component either way: full when nothing is chosen or when you */
-/* ask for it, collapsed to the bar the rest of the time.             */
-/* ================================================================== */
-
-/* Ten levels and an off switch. The game puts the icon first and so  */
-/* does this: nobody thinks "difficulty 7", they think of the mark    */
-/* and the name. The slider underneath is for dragging through them,  */
-/* which is faster than eleven clicks when you are hunting.           */
-function DifficultyPicker({ value, onChange, faction }) {
-  const level = Number(value) || 0;
-  const d = difficultyAt(level);
-
-  return (
-    <div className="flex flex-col items-center gap-2">
-      {/* The mark you are on, large, the way the game shows it. It is  */}
-      {/* the only one drawn: eleven in a row was prominence by         */}
-      {/* repetition, and it read as a filter rather than a dial.        */}
-      {/* Fixed heights on both halves so the block does not jump as you */}
-      {/* drag: Any has no mark, and Super Helldive is a longer word than */}
-      {/* Hard. A dial that shifts under the cursor is a dial you stop     */}
-      {/* trusting.                                                        */}
-      <div className="flex h-9 items-end justify-center">
-        {d ? <DifficultyIcon level={d.level} className="h-9 w-20" /> : null}
-      </div>
-      <div className="flex h-9 flex-col items-center justify-start">
-        <span className="text-base font-bold uppercase leading-none tracking-wide text-base-100"
-          style={{ fontFamily: "'Oswald', sans-serif" }}>
-          {d ? d.name : "Any difficulty"}
-        </span>
-        <span className="mt-1.5 text-[10px] leading-none text-base-500">
-          {d ? `Level ${d.level}` : "not set"}
-        </span>
-      </div>
-
-      <input type="range" min="0" max="10" step="1" value={level}
-        onChange={(e) => onChange(Number(e.target.value))}
-        aria-label="Difficulty"
-        aria-valuetext={d ? `${d.level}, ${d.name}` : "Any difficulty"}
-        className="dds-range w-full max-w-xl" style={{ "--fill": `${(level / 10) * 100}%` }} />
-      <div className="flex w-full max-w-xl justify-between text-[9px] uppercase tracking-wider text-base-600">
-        <span>Any</span>
-        <span>Super Helldive</span>
-      </div>
-
-      <p className="max-w-xl text-[10px] leading-relaxed text-base-600">
-        {d
-          ? `Judged against the ${enemiesUpTo(faction, level)} enemies this front fields at level ${level}.` +
-            arrivalsLine(faction, level)
-          : "Ratings count every enemy the front can field. Set a level and the tool stops warning you about things that do not spawn there."}
-      </p>
-    </div>
-  );
-}
-
-/* How many of you are dropping. It sits under the difficulty because it
-   is the same kind of question, how hard is this going to be, rather
-   than a question about the place. Four small buttons: there are only
-   five answers and a slider for five answers is a slider too many. */
-function SquadPicker({ value, onChange }) {
-  const n = Number(value) || 0;
-  return (
-    <div className="mt-2 flex flex-wrap items-center justify-center gap-2 border-t border-base-800 pt-2">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500"
-        style={{ fontFamily: "'Oswald', sans-serif" }}>
-        Dropping with
-      </span>
-      <div className="flex gap-1.5">
-        <button onClick={() => onChange(0)} aria-pressed={n === 0}
-          title="Not said. Nothing that depends on squad size will fire"
-          className={"rounded border px-2.5 py-1 text-[11px] transition-colors " +
-            (n === 0
-              ? "border-base-500 bg-base-800 text-base-100"
-              : "border-base-700 bg-base-900 text-base-500 hover:border-base-500 hover:text-base-200")}>
-          Any
-        </button>
-        {[1, 2, 3, 4].map((k) => (
-          <button key={k} onClick={() => onChange(k)} aria-pressed={n === k}
-            title={k === 1 ? "Solo. Nobody to hold the line while you reload" : `${k} of you`}
-            className={"w-9 rounded border py-1 text-[11px] tabular-nums transition-colors " +
-              (n === k
-                ? "border-brand bg-brand/10 text-base-100"
-                : "border-base-700 bg-base-900 text-base-500 hover:border-base-500 hover:text-base-200")}>
-            {k}
-          </button>
-        ))}
-      </div>
-      <span className="text-[10px] text-base-600">
-        {n === 1
-          ? "Solo. Nobody covers your reload and a loud gun wakes the whole map."
-          : n
-            ? `${n} of you. Someone else can carry what you did not.`
-            : "Not said, so nothing that depends on it will fire."}
-      </span>
-    </div>
-  );
-}
-
-/**
- * The full picker. `onDone` is null when this is standing in as the
- * gate, because there is nothing to go back to until a front is chosen.
- */
-export function ScenarioScreen({ scenario, setFaction, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment, onDone }) {
-  const chosen = Boolean(scenario.faction);
-  const [prefs, setPrefs] = usePlannerPrefs();
-
-  /* A planet with fighting on it brings its front along. */
-  const choose = (name, front) => {
-    setPlanet(name);
-    if (front && front !== scenario.faction) setFaction(front);
-  };
-
-  return (
-    /* The planner and the map lead, because the planet is the question and
-       the front follows from it. The three banners that used to open this
-       screen are the planner's first question now, smaller: choosing a
-       front first had become the long way round, the curator's point on
-       30 September 2026. */
-    <div className="mx-auto flex max-w-6xl flex-col gap-4">
-      <div className="relative flex w-full flex-col items-center text-center">
-        {onDone ? (
-          <button onClick={onDone} title="Back to the list"
-            className="absolute left-0 top-0 rounded border border-base-800 p-1.5 text-base-400 hover:border-base-600 hover:text-base-100">
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-        ) : null}
-        <p className="text-lg font-bold text-base-200" style={{ fontFamily: "'Oswald', sans-serif" }}>
-          Where are you dropping
-        </p>
-        <p className="mt-1 max-w-xl text-[13px] leading-relaxed text-base-500">
-          {chosen
-            ? "One scenario for the whole tool. Change it here and every list and every rating follows, on every tab."
-            : "Every rating here is per front. Say which below, or click a planet with fighting on it and the front comes with it."}
-        </p>
-      </div>
-
-      <DropPlanner scenario={scenario} setFaction={setFaction} onChoose={choose} prefs={prefs} setPrefs={setPrefs} />
-
-      {chosen ? (
-        <>
-          <div className="grid w-full grid-cols-1 items-start gap-4 lg:grid-cols-2">
-            <div className="rounded-lg border border-base-800 bg-base-900/60 px-4 py-3 text-center">
-              <DifficultyPicker value={scenario.difficulty} onChange={setDifficulty} faction={scenario.faction} />
-              <SquadPicker value={scenario.squad} onChange={setSquad} />
-            </div>
-            <PlanetBar scenario={scenario} setMission={setMission}
-              clearEnvironment={clearEnvironment} kind={prefs.kind} onClearKind={() => setPrefs({ kind: null })} />
-          </div>
-
-          {onDone ? (
-            <button onClick={onDone}
-              className="self-center rounded border border-base-700 bg-base-900 px-6 py-2 text-sm font-bold uppercase tracking-wide text-base-200 hover:border-base-500 hover:text-base-100"
-              style={{ fontFamily: "'Oswald', sans-serif" }}>
-              Done
-            </button>
-          ) : null}
-        </>
-      ) : null}
-    </div>
-  );
-}
+/* Since 2 October 2026 App.jsx sends you to the war room until one is    */
+/* chosen, and Done brings you back. See WarRoom.jsx.                      */
 
 /**
  * The one line reminder. Always on screen wherever the scenario is
@@ -2036,7 +1780,7 @@ function FactionBar({ faction, onChoose }) {
   );
 }
 
-export function TierBrowser({ catId, faction, setFaction, scenario, setPlanet, setBiome, toggleHazard, setMission, setDifficulty, setSquad, clearEnvironment, sortBy, setSortBy, filters, patchFilters, lockedSet, warbondLockedSet, toggleLock, clearItemLocks, itemLockCount, favoriteItems, toggleFavItem, clearFavItems }) {
+export function TierBrowser({ catId, faction, scenario, sortBy, setSortBy, filters, patchFilters, lockedSet, warbondLockedSet, toggleLock, clearItemLocks, itemLockCount, favoriteItems, toggleFavItem, clearFavItems }) {
   const [openRow, setOpenRow] = useState(null);
   /* Switching category is a route change now, so the open row is closed  */
   /* when the category under it changes rather than by the tab handler.   */
@@ -2156,16 +1900,9 @@ export function TierBrowser({ catId, faction, setFaction, scenario, setPlanet, s
   const unratedInCategory = category.items.filter((it) => judgedTier(it, null) === null).length;
   const backpackHere = catId === "strat" ? category.items.filter(eatsBackpack).length : 0;
 
-  /* No front, no table. Unchanged as a decision; what changed is that   */
-  /* the gate now asks the whole question rather than only the first     */
-  /* fifth of it, because it is the same screen you come back to later.  */
-  if (!faction) {
-    return (
-      <ScenarioScreen scenario={scenario} setFaction={setFaction} setPlanet={setPlanet} setBiome={setBiome}
-        toggleHazard={toggleHazard} setMission={setMission} setDifficulty={setDifficulty} setSquad={setSquad}
-        clearEnvironment={clearEnvironment} onDone={null} />
-    );
-  }
+  /* No front, no table. App.jsx sends you to the war room, so this is
+     only ever drawn for the moment before that. */
+  if (!faction) return null;
 
   return (
     <div className="flex flex-col gap-4">

@@ -16,7 +16,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import worker from './index.ts'
 import * as schema from './schema.ts'
-import { type Fetcher, UPSTREAM, refreshWar, trimOrder, trimWar } from './war.ts'
+import { type Fetcher, UPSTREAM, refreshWar, trimOrder, trimStats, trimWar } from './war.ts'
 
 const ORIGIN = 'https://dds.stigly-official.workers.dev'
 const db = drizzle(env.DB, { schema })
@@ -78,6 +78,18 @@ const ORDER = [{
   rewards: [{ type: 1, amount: 40 }],
 }]
 
+/** The war's totals exactly as the real service sent them on 2 October 2026, nonsense fields included. */
+const WAR = {
+  started: '2024-01-23T20:05:13Z', ended: '2028-02-08T20:04:55Z', now: '1972-08-18T12:30:30Z', clientVersion: '0.3.0',
+  factions: ['Humans', 'Terminids', 'Automaton', 'Illuminate'], impactMultiplier: 0.028533781,
+  statistics: {
+    missionsWon: 1056414361, missionsLost: 102693485, missionTime: 3482065814467,
+    terminidKills: 226645807204, automatonKills: 119725368690, illuminateKills: 76977223083,
+    bulletsFired: 2026282813838, bulletsHit: 2225226023679, timePlayed: 3482065814467,
+    deaths: 9057442173, revives: 2, friendlies: 1050259578, missionSuccessRate: 91, accuracy: 100, playerCount: 38398,
+  },
+}
+
 type Call = { url: string; headers: Record<string, string> }
 
 /** A stand in for the upstream that answers from the fixtures and records what it was asked. */
@@ -92,6 +104,7 @@ function fake(answers: Partial<Record<string, () => Response>> = {}) {
     if (path === '/api/v1/planets') return Response.json(PLANETS)
     if (path === '/api/v1/campaigns') return Response.json(CAMPAIGNS)
     if (path === '/api/v1/assignments') return Response.json(ORDER)
+    if (path === '/api/v1/war') return Response.json(WAR)
     return new Response('not found', { status: 404 })
   }
   return { fetcher, calls }
@@ -153,7 +166,16 @@ describe('trimming the Major Order', () => {
         { race: 2, goal: 25_000_000, progress: 12_759_594 },
         { race: 3, goal: 5_000_000, progress: 2_114_700 },
       ],
+      reward: { type: 1, amount: 40 },
     })
+  })
+
+  it('keeps the reward as a type and an amount, from either field, and nothing when there is none', () => {
+    const one = ORDER[0] as Record<string, unknown>
+    expect(trimOrder([{ ...one, reward: undefined }])?.reward).toEqual({ type: 1, amount: 40 })
+    expect(trimOrder([{ ...one, reward: null, rewards: [] }])?.reward).toBeNull()
+    expect(trimOrder([{ ...one, reward: { type: 'medals', amount: 40 }, rewards: [] }])?.reward).toBeNull()
+    expect(trimOrder([{ ...one, reward: { type: 1, amount: -5 }, rewards: [] }])?.reward).toBeNull()
   })
 
   it('is nothing when there is no order, or what arrived is not one', () => {
@@ -167,6 +189,23 @@ describe('trimming the Major Order', () => {
     expect(odd?.briefing.length).toBe(600)
     expect(odd?.tasks).toHaveLength(8)
     expect(odd?.tasks[0]).toEqual({ race: null, goal: 0, progress: 0 })
+    expect(odd?.reward).toBeNull()
+  })
+})
+
+describe('trimming the war totals', () => {
+  it('keeps the counts the war room shows, and leaves out the fields that count nothing', () => {
+    expect(trimStats(WAR)).toEqual({
+      playerCount: 38398, terminidKills: 226645807204, automatonKills: 119725368690, illuminateKills: 76977223083,
+      deaths: 9057442173, bulletsFired: 2026282813838, missionsWon: 1056414361, missionsLost: 102693485,
+    })
+    expect(JSON.stringify(trimStats(WAR))).not.toContain('accuracy')
+  })
+
+  it('is nothing without a statistics block, and reads a strange count as 0', () => {
+    expect(trimStats(null)).toBeNull()
+    expect(trimStats({ statistics: [] })).toBeNull()
+    expect(trimStats({ statistics: { playerCount: 'lots', deaths: -1 } })).toMatchObject({ playerCount: 0, deaths: 0, missionsWon: 0 })
   })
 })
 
@@ -185,20 +224,21 @@ describe('fetching and serving the snapshot', () => {
     expect(response.status).toBe(200)
     expect(response.headers.get('cache-control')).toBe('public, max-age=60')
     expect(response.headers.get('x-content-type-options')).toBe('nosniff')
-    const body = await response.json<{ fetchedAt: number; triedAt: number; ok: boolean; planets: { name: string }[]; order: { tasks: unknown[] } | null }>()
+    const body = await response.json<{ fetchedAt: number; triedAt: number; ok: boolean; planets: { name: string }[]; order: { tasks: unknown[] } | null; stats: { playerCount: number } | null }>()
     expect(body.fetchedAt).toBe(1_000_000)
     expect(body.triedAt).toBe(1_000_000)
     expect(body.ok).toBe(true)
     expect(body.planets.map((p) => p.name)).toEqual(['MALEVELON CREEK', 'BACKWATER', 'UNDER SIEGE'])
     expect(body.order?.tasks).toHaveLength(2)
+    expect(body.stats?.playerCount).toBe(38398)
   })
 
   /** The service answers 400 to a request missing either header. Found against the real one. */
-  it('names the tool and a contact to the upstream on both paths', async () => {
+  it('names the tool and a contact to the upstream on every path', async () => {
     const { fetcher, calls } = fake()
     await refreshWar(db, identity, fetcher)
     expect(calls.map((c) => c.url).sort()).toEqual([
-      `${UPSTREAM}/api/v1/assignments`, `${UPSTREAM}/api/v1/campaigns`, `${UPSTREAM}/api/v1/planets`,
+      `${UPSTREAM}/api/v1/assignments`, `${UPSTREAM}/api/v1/campaigns`, `${UPSTREAM}/api/v1/planets`, `${UPSTREAM}/api/v1/war`,
     ])
     expect(calls.every((c) => c.headers['x-super-client'] === 'dds.test')).toBe(true)
     expect(calls.every((c) => c.headers['x-super-contact'] === 'contact.test')).toBe(true)
@@ -245,6 +285,16 @@ describe('fetching and serving the snapshot', () => {
     expect(body.order).toBeNull()
   })
 
+  /** The totals are context too. Losing them must not cost the map its colour or the order. */
+  it('still lands the war and the order when only the totals fail, with no totals', async () => {
+    const totalsDown = fake({ '/api/v1/war': () => new Response('busy', { status: 503 }) })
+    expect(await refreshWar(db, identity, totalsDown.fetcher)).toEqual({ ok: true, planets: 3 })
+    const body = await (await war()).json<{ planets: unknown[]; order: unknown; stats: unknown }>()
+    expect(body.planets).toHaveLength(3)
+    expect(body.order).not.toBeNull()
+    expect(body.stats).toBeNull()
+  })
+
   it('never sends the failure reason to a browser', async () => {
     await refreshWar(db, identity, fake().fetcher)
     await refreshWar(db, identity, async () => { throw new Error('secret internal reason') })
@@ -269,7 +319,7 @@ describe('the Cron Trigger', () => {
     await worker.scheduled(createScheduledController({ cron: '*/5 * * * *' }), env)
 
     // The fake, and not the network, is what answered.
-    expect(spy).toHaveBeenCalledTimes(3)
+    expect(spy).toHaveBeenCalledTimes(4)
     const sent = new Headers(spy.mock.calls[0]?.[1]?.headers)
     expect(sent.get('x-super-client')).toBe(env.SUPER_CLIENT)
     expect(sent.get('x-super-contact')).toBe(env.SUPER_CONTACT)

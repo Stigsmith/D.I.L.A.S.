@@ -7,11 +7,11 @@
  *
  * A Cron Trigger calls `refreshWar` every five minutes (`wrangler.jsonc`), and
  * it keeps one trimmed row in D1. `GET /api/war` hands that row out with its
- * age. So the community API behind this is called 864 times a day, three
+ * age. So the community API behind this is called 1,152 times a day, four
  * paths every five minutes, whether one person has the map open or a thousand,
  * which is the polite way to use a service somebody runs for free. Its
- * published limit is 5 requests in 10 seconds; this is 3 in 300: the planets,
- * the campaigns, and the Major Order.
+ * published limit is 5 requests in 10 seconds; this is 4 in 300: the planets,
+ * the campaigns, the Major Order, and the war's running totals.
  *
  * ## The API decorates, it never carries
  *
@@ -75,13 +75,35 @@ export type WarPlanet = {
  * into sentences: `race` is the value the upstream marks with value type 1
  * and `goal` the one marked 3, which is how its own answer labels them. What
  * each task type means is not published, so nothing here guesses at it.
+ *
+ * `reward` is kept as the upstream sends it, a type and an amount. Type 1
+ * reads as medals: the one real order seen, on 30 September 2026, paid
+ * type 1 amount 40, and Major Orders pay medals. **That is an inference from
+ * one answer**, so the number stays a number here and the browser decides
+ * what to call it.
  */
 export type WarOrder = {
   title: string
   briefing: string
   expiresAt: string
   tasks: { race: number | null; goal: number; progress: number }[]
+  reward: { type: number; amount: number } | null
 }
+
+/**
+ * The war's running totals, from `/api/v1/war`. Field names as the upstream
+ * spelled them on 2 October 2026, read off a real answer. Every one is a
+ * count; anything missing or not a count is 0, and the browser shows only
+ * what is there. Two fields in that answer were left out because they were
+ * not counts of anything: `accuracy` read 100 with more bullets hit than
+ * fired, and `revives` read 2.
+ */
+export const STAT_FIELDS = [
+  'playerCount', 'terminidKills', 'automatonKills', 'illuminateKills',
+  'deaths', 'bulletsFired', 'missionsWon', 'missionsLost',
+] as const
+
+export type WarStats = Record<(typeof STAT_FIELDS)[number], number>
 
 export type Snapshot = {
   fetchedAt: number
@@ -91,6 +113,8 @@ export type Snapshot = {
   planets: WarPlanet[]
   /** The Major Order as of the same fetch, or null when there is none or it could not be read. */
   order: WarOrder | null
+  /** The war's running totals as of the same fetch, or null when they could not be read. */
+  stats: WarStats | null
 }
 
 type DB = DrizzleD1Database<typeof schema>
@@ -179,7 +203,24 @@ export function trimOrder(assignments: unknown): WarOrder | null {
     const race = of(1)
     return { race: typeof race === 'number' && Number.isInteger(race) ? race : null, goal: amount(of(3)), progress: amount(progress[i]) }
   })
-  return { title: text(a.title, 80), briefing, expiresAt, tasks }
+  const r = record(a.reward) ?? record(Array.isArray(a.rewards) ? a.rewards[0] : null)
+  const reward = r && typeof r.type === 'number' && Number.isInteger(r.type) && amount(r.amount) > 0
+    ? { type: r.type, amount: amount(r.amount) }
+    : null
+  return { title: text(a.title, 80), briefing, expiresAt, tasks, reward }
+}
+
+/**
+ * The war's running totals, down to the counts the war room shows. Pure.
+ * Null when what arrived has no statistics block, which the caller treats as
+ * the totals being absent rather than the war failing.
+ */
+export function trimStats(war: unknown): WarStats | null {
+  const s = record(record(war)?.statistics)
+  if (!s) return null
+  const out = {} as WarStats
+  for (const field of STAT_FIELDS) out[field] = amount(s[field])
+  return out
 }
 
 /**
@@ -220,17 +261,18 @@ export async function refreshWar(
   now: number = Date.now(),
 ): Promise<{ ok: true; planets: number } | { ok: false; error: string }> {
   try {
-    /* The Major Order is context. If it alone fails, the war still lands
-       and the order is simply absent, rather than the map losing its colour
-       over a paragraph of briefing. */
-    const [planets, campaigns, assignments] = await Promise.all([
+    /* The Major Order and the totals are context. If either alone fails,
+       the war still lands and that part is simply absent, rather than the
+       map losing its colour over a paragraph of briefing or a kill count. */
+    const [planets, campaigns, assignments, totals] = await Promise.all([
       ask(fetcher, '/api/v1/planets', identity.client, identity.contact),
       ask(fetcher, '/api/v1/campaigns', identity.client, identity.contact),
       ask(fetcher, '/api/v1/assignments', identity.client, identity.contact).catch(() => null),
+      ask(fetcher, '/api/v1/war', identity.client, identity.contact).catch(() => null),
     ])
     const trimmed = trimWar(planets, campaigns)
     if (!trimmed) throw new Error('the answer was not a list of planets and a list of campaigns')
-    const payload = JSON.stringify({ planets: trimmed, order: trimOrder(assignments) })
+    const payload = JSON.stringify({ planets: trimmed, order: trimOrder(assignments), stats: trimStats(totals) })
     await db.run(sql`
       insert into war_snapshot (id, payload, fetched_at, tried_at, ok, error)
       values ('war', ${payload}, ${now}, ${now}, 1, null)
@@ -256,12 +298,15 @@ export async function readWar(db: DB): Promise<Snapshot | null> {
     sql`select payload, fetched_at, tried_at, ok from war_snapshot where id = 'war'`,
   )
   if (!row || row.payload === null || row.fetched_at === null) return null
-  let doc: { planets?: WarPlanet[]; order?: WarOrder | null }
+  let doc: { planets?: WarPlanet[]; order?: WarOrder | null; stats?: WarStats | null }
   try {
     doc = JSON.parse(row.payload) as typeof doc
   } catch {
     return null
   }
   if (!Array.isArray(doc.planets)) return null
-  return { fetchedAt: row.fetched_at, triedAt: row.tried_at, ok: row.ok === 1, planets: doc.planets, order: doc.order ?? null }
+  return {
+    fetchedAt: row.fetched_at, triedAt: row.tried_at, ok: row.ok === 1,
+    planets: doc.planets, order: doc.order ?? null, stats: doc.stats ?? null,
+  }
 }

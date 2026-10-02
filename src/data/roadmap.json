@@ -87,7 +87,7 @@
       "title": "The galaxy map",
       "status": "shipped",
       "track": "solo",
-      "say": "Click the planet where you clicked it in the game and the scenario fills itself, front included, on a map coloured with the live war.",
+      "say": "Set where you are dropping in the war room: the galaxy map across the screen, coloured with the live war, with the Major Order, the war so far and what each difficulty brings laid over it.",
       "version": "1.25.0"
     },
     {
