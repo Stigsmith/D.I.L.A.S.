@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://dilas.me"><img alt="Open it at dilas.me" src="https://img.shields.io/badge/open-dilas.me-ffe900?style=flat-square&labelColor=1a1a1a"></a>
-  <img alt="Version 1.25.0" src="https://img.shields.io/badge/version-1.25.0-ffe900?style=flat-square&labelColor=1a1a1a">
+  <img alt="Version 1.26.0" src="https://img.shields.io/badge/version-1.26.0-ffe900?style=flat-square&labelColor=1a1a1a">
   <img alt="Game patch 7.1.1" src="https://img.shields.io/badge/game%20patch-7.1.1-ffe900?style=flat-square&labelColor=1a1a1a">
   <img alt="In your browser, no install, no account" src="https://img.shields.io/badge/runs%20in-your%20browser-ffe900?style=flat-square&labelColor=1a1a1a">
 </p>
