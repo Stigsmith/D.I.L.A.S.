@@ -1,4 +1,4 @@
-# **D.D.S.: Design Notes**
+# **D.I.L.A.S.: Design Notes**
 
 > Decisions, data conventions, and known gaps for `original-artifact.jsx`, the Helldivers 2 tier browser and loadout picker built in this project. Exists so a fresh chat can extend the tool without relitigating choices already settled with stigly.
 

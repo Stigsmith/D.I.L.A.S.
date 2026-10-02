@@ -2,7 +2,7 @@
  * Sending email, and the one place a provider is named.
  *
  * **Not live yet, and that is the point of this file existing now.** Stage 2
- * of `dds-cloudflare-handover.md` wires it up, and it cannot happen before
+ * of `dilas-cloudflare-handover.md` wires it up, and it cannot happen before
  * stigly buys a domain: Resend only sends from a domain you have verified you
  * own. Until then `configured()` is false, `auth.ts` offers no password reset,
  * and `/api/capabilities` says so, so the UI never shows a "check your email"

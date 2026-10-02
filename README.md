@@ -158,7 +158,7 @@ Art is optional. With `src/assets` empty, every item reads by its name instead o
 | `src/data/` | Items, ratings, rules, missions, planets, enemies and difficulty, as JSON |
 | `worker/` | The server: a Cloudflare Worker with D1, and a Durable Object per party |
 | `scripts/` | The data fetches and the checks |
-| [`CLAUDE.md`](CLAUDE.md), [`dds-roadmap.md`](dds-roadmap.md) | How the tool works and why, and what comes next |
+| [`CLAUDE.md`](CLAUDE.md), [`dilas-roadmap.md`](dilas-roadmap.md) | How the tool works and why, and what comes next |
 
 ## Where the numbers come from
 

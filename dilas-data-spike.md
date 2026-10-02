@@ -1,4 +1,4 @@
-# **D.D.S.: Data Spike**
+# **D.I.L.A.S.: Data Spike**
 
 > Run 20 August 2026, to answer four questions before the contextual scoring engine gets designed around guesses. Every finding below was measured against a live source, not recalled. The raw pulls are reproducible from the URLs in the last section.
 

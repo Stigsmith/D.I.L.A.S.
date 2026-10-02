@@ -1,5 +1,5 @@
 {
-  "name": "dds",
+  "name": "dilas",
   "private": true,
   "version": "1.25.0",
   "author": "Stigsmith",
@@ -25,7 +25,7 @@
     "deploy": "npm run build && node scripts/check-dist.mjs && wrangler deploy",
     "db:schema": "node scripts/db-schema.mjs",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "wrangler d1 migrations apply dds --local",
+    "db:migrate": "wrangler d1 migrations apply dilas --local",
     "types": "wrangler types",
     "typecheck": "tsc --noEmit -p tsconfig.worker.json",
     "test:worker": "vitest run --config vitest.worker.config.ts"

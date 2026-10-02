@@ -3,7 +3,7 @@
 /*                                                                    */
 /* A one shot, the same shape as add-vehicles.mjs. Brings the ratings */
 /* from patch 6.3.1 to what u.gg shows for 7.0.2 to 7.1.1, and adds   */
-/* the eleven items the game has that D.D.S. did not.                 */
+/* the eleven items the game has that D.I.L.A.S. did not.                 */
 /*                                                                    */
 /*   node scripts/apply-ugg-7-1.mjs            report                  */
 /*   node scripts/apply-ugg-7-1.mjs --write    apply                   */

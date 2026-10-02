@@ -256,7 +256,7 @@ export function Support() {
 /*                                                                    */
 /* The data is src/data/roadmap.json, which is the short public        */
 /* version. The working document with the reasoning and the           */
-/* dependency chain is dds-roadmap.md in the repo      */
+/* dependency chain is dilas-roadmap.md in the repo      */
 /* root, and it is the one that moves first.                          */
 /* ================================================================== */
 

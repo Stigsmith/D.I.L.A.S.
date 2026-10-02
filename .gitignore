@@ -29,9 +29,9 @@ public/favicon.svg
 .claude/settings.local.json
 .claude/worktrees/
 
-# Collection exports from Settings, named dds-YYYY-MM-DD.json. Personal
+# Collection exports from Settings, named dilas-YYYY-MM-DD.json (dds-, before the rename). Personal
 # state, never project data, and the move to Cloudflare means more of them.
-dds-20*.json
+*-20[0-9][0-9]-[0-9][0-9]-[0-9][0-9].json
 
 # Conflict copies a file sync app leaves beside a folder, named like
 # "items (# Name clash 2026-09-30 pmrvoiC #)". Found on 30 September 2026
