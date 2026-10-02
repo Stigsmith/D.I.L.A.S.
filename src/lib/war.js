@@ -14,7 +14,7 @@
 /* ================================================================== */
 
 import { useState, useEffect, useMemo } from "react";
-import { cleanWar } from "./galaxy.js";
+import { cleanWar, cleanPlanetHistory, cleanWarTrend } from "./galaxy.js";
 
 /* The snapshot moves every five minutes and the server lets a browser
    keep it for one, so asking more often than this buys nothing. */
@@ -82,6 +82,56 @@ export function useWar(active = true) {
   }, [active]);
 
   return useMemo(() => cleanWar(raw, now), [raw, now]);
+}
+
+/* ------------------------------------------------------------------ */
+/* The war over time, for the Star Map                                 */
+/*                                                                     */
+/* The server keeps one copy of the war an hour, for thirty days, from  */
+/* the day it first ran. Asked once per planet looked at, and once for  */
+/* the war's own line. The answer says which of three things is true:   */
+/* "ok" with the history, "empty" when the server has kept nothing yet, */
+/* and "no-server" where there is no server to ask, as under npm run    */
+/* dev or on Netlify.                                                   */
+/* ------------------------------------------------------------------ */
+
+async function askHistory(query, clean) {
+  try {
+    const res = await fetch("/api/war/history" + query, { headers: { accept: "application/json" } });
+    const type = res.headers.get("content-type") || "";
+    if (!type.includes("application/json")) return { status: "no-server", data: null };
+    if (!res.ok) return { status: res.status === 503 ? "empty" : "no-server", data: null };
+    const data = clean(await res.json());
+    return data && data.points.length ? { status: "ok", data } : { status: "empty", data };
+  } catch {
+    return { status: "no-server", data: null };
+  }
+}
+
+/** One planet's hours, by the table's name. */
+export function useWarHistory(planet) {
+  const [held, setHeld] = useState({ planet: null, status: "idle", data: null });
+  useEffect(() => {
+    if (!planet) return undefined;
+    let stop = false;
+    askHistory(`?planet=${encodeURIComponent(planet)}`, cleanPlanetHistory).then((got) => {
+      if (!stop) setHeld({ planet, ...got });
+    });
+    return () => { stop = true; };
+  }, [planet]);
+  return held.planet === planet ? held : { planet, status: planet ? "loading" : "idle", data: null };
+}
+
+/** The war's own hours: how many were fighting, and how many fronts were open. */
+export function useWarTrend(active = true) {
+  const [held, setHeld] = useState({ status: "loading", data: null });
+  useEffect(() => {
+    if (!active) return undefined;
+    let stop = false;
+    askHistory("", cleanWarTrend).then((got) => { if (!stop) setHeld(got); });
+    return () => { stop = true; };
+  }, [active]);
+  return held;
 }
 
 /* How long until, the way a person says it. */

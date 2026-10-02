@@ -140,11 +140,12 @@ function useStill() {
 /**
  * `room` is the war room: the map fills its parent, tilts if you let it,
  * and keeps clear of the panels laid over it by `insets`, pixels from each
- * side. Without it, the map is a square on the page.
+ * side. Without it, the map is a square on the page. The Star Map uses the
+ * same room.
  */
 export default function GalaxyMap({
   chosen, onChoose, query = "", disabled = false, label, war = null, fronts = {}, picks = [], fits = null,
-  room = false, insets = null,
+  room = false, insets = null, openOnChosen = false,
 }) {
   const svg = useRef(null);
   /* What takes the gestures: the map and, when tilted, the upright
@@ -537,8 +538,9 @@ export default function GalaxyMap({
      already looking at the place. Compared against the last value seen
      rather than a "has mounted" flag, so opening the map shows the whole
      galaxy even when React runs the effect twice, as it does in
-     development. */
-  const seen = useRef(chosen);
+     development. `openOnChosen` opens in the chosen planet's sector
+     instead, for a page whose address names the planet. */
+  const seen = useRef(openOnChosen ? null : chosen);
   useEffect(() => {
     if (seen.current === chosen) return;
     seen.current = chosen;

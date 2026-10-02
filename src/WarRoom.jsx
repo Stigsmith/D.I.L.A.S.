@@ -33,18 +33,18 @@ import { enemiesUpTo, arrivalsLine } from "./lib/enemies.js";
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 
 /* The fronts as the map needs them: the locked hex, and the name. */
-const FRONTS = Object.fromEntries(FACTIONS.map((f) => [f.id, { hex: f.hex, label: f.label }]));
+export const FRONTS = Object.fromEntries(FACTIONS.map((f) => [f.id, { hex: f.hex, label: f.label }]));
 
 /* The planner's width, and the gap it keeps from the edges. */
-const PANEL_PX = 368;
-const GAP_PX = 12;
+export const PANEL_PX = 368;
+export const GAP_PX = 12;
 /* Below this the room is too narrow for the planner beside the map, so
    it lays over it instead. */
-const WIDE_PX = 900;
+export const WIDE_PX = 900;
 
 /* Watches a box's size. The room's own width decides the layout rather
    than the window's, because the menu beside it comes and goes. */
-function useSize(ref) {
+export function useSize(ref) {
   const [size, setSize] = useState({ w: 0, h: 0 });
   useLayoutEffect(() => {
     const el = ref.current;
@@ -194,7 +194,7 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
 /* The search lights its matches on the map and lists the first few here,
    which is also the way in for a keyboard and for the planets with no
    place on the map. With the war live, a front comes first. */
-function PlanetSearch({ query, setQuery, war, chosen, onChoose }) {
+export function PlanetSearch({ query, setQuery, war, chosen, onChoose }) {
   const live = war && war.fresh ? war.planets : null;
   const hits = useMemo(() => {
     const found = searchPlanets(query, 40);
@@ -230,7 +230,7 @@ function PlanetSearch({ query, setQuery, war, chosen, onChoose }) {
 }
 
 /* How fresh the war is, and what to do with the map. */
-function WarLine({ war }) {
+export function WarLine({ war }) {
   return (
     <p className="mt-auto text-[10px] leading-relaxed text-base-600">
       {war && war.fresh ? (
@@ -253,7 +253,7 @@ function WarLine({ war }) {
 /* ------------------------------------------------------------------ */
 
 /* A count the way a person reads one: 227 billion, not 226,645,807,204. */
-function big(n) {
+export function big(n) {
   const at = (unit, word) => `${(n / unit).toLocaleString("en-GB", { maximumFractionDigits: n / unit >= 100 ? 0 : 1 })} ${word}`;
   if (n >= 1e12) return at(1e12, "trillion");
   if (n >= 1e9) return at(1e9, "billion");
@@ -262,8 +262,9 @@ function big(n) {
 }
 
 /* The war's running totals, as the community API keeps them. Shown only
-   for what arrived; a row with no figure is left out rather than zero. */
-function WarTotals({ stats, open, onToggle }) {
+   for what arrived; a row with no figure is left out rather than zero.
+   `trend` is the Star Map's line of how many were fighting, hour by hour. */
+export function WarTotals({ stats, open, onToggle, trend = null }) {
   if (!stats) return null;
   const rows = [
     ["Terminids killed", stats.bugs, FRONTS.bugs.hex],
@@ -286,6 +287,7 @@ function WarTotals({ stats, open, onToggle }) {
           <ChevronDown className={"h-3 w-3 self-center transition-transform " + (open ? "rotate-180" : "")} />
         </span>
       </button>
+      {open && trend ? <div className="border-t border-base-800 px-3 pt-2">{trend}</div> : null}
       {open && rows.length ? (
         <dl className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 border-t border-base-800 px-3 pb-2.5 pt-2 text-[11px]">
           {rows.map(([label, n, hex]) => (

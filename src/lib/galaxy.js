@@ -311,6 +311,54 @@ export function cleanWar(raw, now = Date.now()) {
   };
 }
 
+/* ------------------------------------------------------------------ */
+/* The war over time                                                   */
+/*                                                                     */
+/* The server keeps one copy an hour for thirty days, for the Star Map. */
+/* Cleaned the way the snapshot is: numbers bounded, owners nobody has  */
+/* heard of dropped, oldest first. An hour a planet is missing from     */
+/* means nothing was happening there.                                   */
+/* ------------------------------------------------------------------ */
+
+const whole = (v) => (Number.isFinite(v) && v > 0 ? Math.round(v) : 0);
+
+/** One planet's hours: who held it, how far it was taken or defended, who was there. */
+export function cleanPlanetHistory(raw) {
+  if (!raw || typeof raw !== "object" || !Array.isArray(raw.points) || !Number.isFinite(raw.from)) return null;
+  const points = [];
+  for (const p of raw.points) {
+    if (!p || typeof p !== "object" || !Number.isFinite(p.at)) continue;
+    const owner = FRONT_OF[p.owner] || null;
+    if (!owner && p.owner !== "Humans") continue;
+    const e = p.event && typeof p.event === "object" ? p.event : null;
+    const attacker = e ? FRONT_OF[e.faction] || null : null;
+    points.push({
+      at: p.at,
+      owner,
+      campaign: p.campaign === true,
+      liberation: owner && !attacker ? share(Number(p.maxHealth) - Number(p.health), Number(p.maxHealth)) : null,
+      defence: attacker ? { front: attacker, progress: share(Number(e.maxHealth) - Number(e.health), Number(e.maxHealth)) } : null,
+      players: whole(p.players),
+    });
+  }
+  points.sort((a, b) => a.at - b.at);
+  return { from: raw.from, points };
+}
+
+/** The war's own hours: how many were fighting, and how many fronts were open. */
+export function cleanWarTrend(raw) {
+  if (!raw || typeof raw !== "object" || !Array.isArray(raw.points) || !Number.isFinite(raw.from)) return null;
+  const points = raw.points
+    .filter((p) => p && typeof p === "object" && Number.isFinite(p.at))
+    .map((p) => ({ at: p.at, players: whole(p.players), fronts: whole(p.fronts) }))
+    .sort((a, b) => a.at - b.at);
+  return { from: raw.from, points };
+}
+
+/** How far along a planet was in one hour: taken back, or held in a defence. Null when neither. */
+export const progressAt = (point) =>
+  point.defence ? point.defence.progress : point.liberation;
+
 /* The front to fill in when a planet is chosen: who you would be
    fighting there, from a snapshot fresh enough to trust, or null to
    leave the scenario's front alone. */
