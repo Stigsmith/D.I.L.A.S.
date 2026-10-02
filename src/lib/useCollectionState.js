@@ -11,6 +11,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { KEYS, readList, writeList, readDoc, writeDoc } from "./storage.js";
+import { BRAND } from "./brand.js";
 import { idForLabel, warbondIdForLabel, gateableWarbondIds } from "./items.js";
 import {
   seedLockedItems, seedLockedWarbonds, lockedFromOwnership, isOwnershipDoc, buildLockedSet,
@@ -294,7 +295,7 @@ export function useCollectionState() {
     const url = URL.createObjectURL(new Blob([JSON.stringify(doc, null, 2)], { type: "application/json" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `dds-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `${BRAND.short.toLowerCase().replace(/[^a-z0-9]+/g, "")}-${new Date().toISOString().slice(0, 10)}.json`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -307,7 +308,7 @@ export function useCollectionState() {
   /* because they use different key names.                                */
   const importState = useCallback((doc) => {
     if (!doc || typeof doc !== "object") {
-      return { ok: false, text: "That file is not a D.D.S. export or an ownership list." };
+      return { ok: false, text: `That file is not a ${BRAND.short} export or an ownership list.` };
     }
 
     /* An ownership file describes one player, so it lands in the profile */
@@ -354,7 +355,7 @@ export function useCollectionState() {
     const drops = Array.isArray(doc.history) ? cleanHistory(doc.history) : null;
 
     if (!fav && !favItems && !builds && !hasProfiles && !items && !wbs && !drops) {
-      return { ok: false, text: "That file is not a D.D.S. export or an ownership list." };
+      return { ok: false, text: `That file is not a ${BRAND.short} export or an ownership list.` };
     }
     if (builds) { setLoadouts(builds); persist(KEYS.loadouts, builds); }
 

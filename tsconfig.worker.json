@@ -4,7 +4,7 @@
   // wrangler.jsonc by `npm run types`, and a typecheck is the cheapest guard on
   // code that handles passwords.
   //
-  // Standalone rather than extending a root tsconfig, because D.D.S. has none.
+  // Standalone rather than extending a root tsconfig, because this project has none.
   // Enodia's extends its app config; the options below are that config's,
   // minus the DOM, JSX and node types, which would redeclare Workers globals
   // with different shapes and produce dozens of errors that mean nothing.

@@ -77,10 +77,17 @@ export async function send(env: Mail, letter: Letter): Promise<boolean> {
  * an unexpected email is the shape of every phishing message; and a boring
  * subject line, because it is what gets typed into a search box.
  */
+/**
+ * The tool's name, the one copy outside `src/lib/brand.js`: the Worker's
+ * type check covers `worker/` only and cannot import the app's JavaScript.
+ * Change both together.
+ */
+const NAME = 'D.I.L.A.S.'
+
 export const resetLetter = (url: string): Omit<Letter, 'to'> => ({
-  subject: 'Reset your D.D.S. password',
+  subject: `Reset your ${NAME} password`,
   text: [
-    'Somebody asked to reset the password on this D.D.S. account.',
+    `Somebody asked to reset the password on this ${NAME} account.`,
     '',
     'If that was you, here is the link:',
     '',
@@ -91,6 +98,6 @@ export const resetLetter = (url: string): Omit<Letter, 'to'> => ({
     'If it was not you, ignore this. Nothing has changed.',
     '',
     '',
-    'D.D.S. is an unofficial fan project. Not affiliated with Arrowhead Game Studios.',
+    `${NAME} is an unofficial fan project. Not affiliated with Arrowhead Game Studios.`,
   ].join('\n'),
 })

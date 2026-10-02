@@ -1,4 +1,4 @@
-# How D.D.S. is served. Cache rules and security headers, with their reasons.
+# How D.I.L.A.S. is served. Cache rules and security headers, with their reasons.
 #
 # Vite copies this out of public/ into dist/, which is the assets directory
 # Cloudflare reads it from. It is parsed at deploy time and never served.
@@ -11,12 +11,12 @@
 # 1. A header set twice is JOINED WITH A COMMA, not overridden. So
 #    Cache-Control lives only on patterns that cannot both match one file.
 #    Put one on /* and every image gets two conflicting values.
-# 2. Netlify never applied any of this. D.D.S. shipped for its whole life
+# 2. Netlify never applied any of this. D.I.L.A.S. shipped for its whole life
 #    there with no security headers at all, so nothing below was tested by
 #    the old host. Every rule is verified by reading a real response under
 #    wrangler dev and again after deploying, never by trusting the file.
 
-# Vite fingerprints everything it emits, and D.D.S. item and theme art is
+# Vite fingerprints everything it emits, and D.I.L.A.S. item and theme art is
 # imported from src/assets rather than served from public/, so all of it
 # lands here with a content hash in the name and can never go stale.
 /assets/*
@@ -48,11 +48,11 @@
   # fetches only itself, so the policy can say exactly that.
   #
   # 'unsafe-inline' on style-src is for React's style attributes, which
-  # D.D.S. uses throughout for faction colours and the theme tokens. It does
+  # D.I.L.A.S. uses throughout for faction colours and the theme tokens. It does
   # not reach scripts.
   #
   # img-src is 'self' with no data:, tighter than Enodia's, because nothing in
-  # D.D.S. draws a data URI: Vite's assetsInlineLimit is 0 and the theme art
+  # D.I.L.A.S. draws a data URI: Vite's assetsInlineLimit is 0 and the theme art
   # is extracted to real files by npm run images. If a data URI ever becomes
   # necessary, add it here deliberately rather than discovering the breakage.
   #

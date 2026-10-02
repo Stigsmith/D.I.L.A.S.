@@ -2,8 +2,9 @@
   {
     "version": "1.25.0",
     "date": "2026-09-29",
-    "title": "Squad up, and the galaxy map",
+    "title": "D.I.L.A.S., the live party and the galaxy map",
     "changes": [
+      "D.D.S. is now D.I.L.A.S., the Democratic Intelligent Loadout & Armoury System, with an address of its own: dilas.me. Export your collection from the old address and Import it there; it is the last time you will need to.",
       "Drop Bay can now hold a live party. Open one and read out its six character code, and whoever types it in joins you, up to four. Nobody needs an account.",
       "Everybody's confirmed loadout lands in their slot on everybody's screen as they commit. Until somebody confirms, their slot says they are still deciding and nothing else, and the squad warnings wait for them.",
       "The host picks where you are dropping, the way the host picks the mission in game, and everybody else's scenario follows. If you change yours anyway, the party panel tells you it no longer matches and puts it back in one click.",

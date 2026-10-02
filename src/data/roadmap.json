@@ -165,7 +165,7 @@
       "title": "Accounts",
       "status": "later",
       "track": "social",
-      "say": "Log in somewhere else and your collection is there. Opens once the tool has its own domain, because a forgotten password needs an email to come back from.",
+      "say": "Log in somewhere else and your collection is there. Opens once password reset can send mail from dilas.me, because a forgotten password needs an email to come back from.",
       "release": "v2"
     },
     {
