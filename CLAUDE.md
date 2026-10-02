@@ -1441,6 +1441,15 @@ Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, t
 
 ---
 
+# **The README**
+
+> [!info] The public face, in W.A.R.P.'s house style. 2 October 2026
+> `README.md` follows the curator's other project, `C:\Dev\W.A.R.P\README.md`: a centred name and full name, a two line pitch, shields badges, quick links, an in character quote, a section per feature with a screenshot, **what it keeps and what it sends** as a table, building from source, where the numbers come from, and the licence and disclaimer. **Every claim in it is checked against the code**, and the privacy table says what Support's "Your data stays yours" says. Change both together.
+>
+> **The screenshots in `docs/images/` are 1600 by 900, taken with headless Edge from its own profile**, never from a browser anybody uses. The recipe, since the tool's security policy refuses inline scripts: build, put a throwaway `__seed.html` plus `__seed.js` in `dist/` that writes the scenario and the drop into `localStorage`, start `wrangler dev`, run one live war fetch, load the seed page once with `msedge --headless=new --user-data-dir=<a scratch folder> --dump-dom`, then `--screenshot` each route with `--window-size=1600,900 --virtual-time-budget=9000` (12000 for the maps, which glide). Convert with sharp to JPG at quality 84, and delete the seed files. Retake them when a screen they show changes.
+
+---
+
 # **Versioning And The Changelog**
 
 `src/data/changelog.json` is the record, newest first. **One version is one deploy**, not one day: a version can gather several days of small changes, and its `date` is when it shipped. That is the whole reason it is versioned rather than dated, since work here arrives in bursts and trickles that do not line up with a calendar.
