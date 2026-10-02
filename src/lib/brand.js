@@ -20,6 +20,10 @@
 
 export const BRAND = {
   name: "Democratic Intelligent Loadout & Armoury System",
+  /* The full name as the wordmark sets it: two deliberate lines rather
+     than wherever the box happens to wrap it, which was three ragged ones,
+     and four under a skin with a wide emblem. Must join back to `name`. */
+  nameLines: ["Democratic Intelligent", "Loadout & Armoury System"],
   short: "D.I.L.A.S.",
   tagline: "unofficial Helldivers 2 community tool",
 };
