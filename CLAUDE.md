@@ -1480,6 +1480,9 @@ Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, t
 >
 > Keep every `say` to one sentence. The moment an entry needs two, it belongs in the working document instead.
 
+> [!info] How an entry reads, since 3 October 2026. Enodia's shape, D.I.L.A.S.'s voice
+> Each version is `title`, a one line `say` and **three to six short `changes`**: what is different on screen, one sentence each, never the reasoning (that is what this file is for). The `say` carries some Super Earth flavour, Ministry of Truth dry rather than jokey. The curator asked for it concise and with Helldivers humour, and the whole history was rewritten that way, 55,000 characters down to 9,000. The Changelog page folds: one line per release, the newest open, opening one closes the other.
+
 > [!tip] Write the entry as the work lands, not at the end
 > Adding a line to the top entry costs nothing. Reconstructing a week of small changes from memory is how a changelog quietly becomes fiction.
 

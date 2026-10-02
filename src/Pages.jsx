@@ -10,7 +10,8 @@
 /* Support only, or the two pages start saying the same thing.         */
 /* ================================================================== */
 
-import { AlertTriangle, Bug } from "lucide-react";
+import { useState } from "react";
+import { AlertTriangle, Bug, ChevronDown } from "lucide-react";
 import { artCounts } from "./lib/assets.js";
 import { items, warbonds } from "./lib/items.js";
 import CHANGELOG from "./data/changelog.json";
@@ -370,48 +371,58 @@ function Spine({ items }) {
   );
 }
 
+/* Folded, Enodia's way, the curator's ask of 3 October 2026: one line per
+   release with its summary, and opening one closes whichever was open, so
+   the page fits on a screen. The newest starts open. */
 export function Changelog() {
+  const [open, setOpen] = useState(CHANGELOG[0] ? CHANGELOG[0].version : null);
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       <div className="rounded-lg border border-base-800 bg-base-900/60 p-4 text-xs leading-relaxed text-base-400">
-        Changes to the tool and its data, newest first. One version is one deploy, so a version can gather a few days of
-        work and the date is when it shipped. This is not the game patch notes: for what Arrowhead changed, read the
-        caveat on any flagged row.
+        What changed in the tool, newest first. One version is one deploy, dated the day it shipped. For what Arrowhead
+        changed in the game, read the caveat on any flagged row.
       </div>
 
-      {/* Keyed by version, not date. One version is one deploy and a deploy  */}
-      {/* can gather several days, so two entries sharing a date is normal    */}
-      {/* and two sharing a version is not. 0.3.0 and 0.4.0 both shipped on   */}
-      {/* 15 August, which is what React was warning about.                   */}
-      {CHANGELOG.map((entry) => (
-        <div key={entry.version} className="overflow-hidden rounded-lg border border-base-800 bg-base-900">
-          <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-base-800 px-4 py-2.5">
-            <h3 className="text-sm font-bold uppercase tracking-wide text-base-100" style={{ fontFamily: "'Oswald', sans-serif" }}>
-              {entry.title}
-            </h3>
-            <span className="flex items-center gap-2 text-[11px] tabular-nums" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-              <span className="rounded border border-base-700 px-1.5 py-px text-base-300">v{entry.version}</span>
-              <span className="text-base-500">{entry.date}</span>
-              {entry.estimated ? (
-                <span title="The date is an estimate. Nothing in the repo dates this one."
-                  className="rounded border border-base-800 px-1.5 py-px text-base-600">approx</span>
-              ) : null}
-              {entry.reconstructed ? (
-                <span title="Written after the fact from the design notes, not as the work happened. The date is inferred."
-                  className="rounded border border-base-800 px-1.5 py-px text-base-600">reconstructed</span>
-              ) : null}
-            </span>
+      {/* Keyed by version, not date: one deploy can share a day with another. */}
+      {CHANGELOG.map((entry) => {
+        const on = open === entry.version;
+        return (
+          <div key={entry.version} className={"overflow-hidden rounded-lg border bg-base-900 " + (on ? "border-base-600" : "border-base-800")}>
+            <button type="button" onClick={() => setOpen(on ? null : entry.version)} aria-expanded={on}
+              className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-base-800/40">
+              <span className="w-14 shrink-0 rounded border border-base-700 px-1.5 py-px text-center text-[11px] tabular-nums text-base-300"
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                v{entry.version}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-bold uppercase tracking-wide text-base-100" style={{ fontFamily: "'Oswald', sans-serif" }}>
+                  {entry.title}
+                </span>
+                {entry.say ? <span className="block truncate text-xs italic text-base-500">{entry.say}</span> : null}
+              </span>
+              <span className="hidden shrink-0 items-center gap-2 text-[11px] tabular-nums text-base-500 sm:flex"
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                {entry.date}
+                {entry.reconstructed ? (
+                  <span title="Written after the fact from the design notes. The date is inferred."
+                    className="rounded border border-base-800 px-1.5 py-px text-base-600">reconstructed</span>
+                ) : null}
+              </span>
+              <ChevronDown className={"h-4 w-4 shrink-0 text-base-500 transition-transform " + (on ? "rotate-180" : "")} />
+            </button>
+            {on ? (
+              <ul className="flex flex-col gap-1.5 border-t border-base-800 px-4 py-3">
+                {entry.changes.map((c, i) => (
+                  <li key={i} className="flex items-start gap-2 text-[13px] leading-relaxed text-base-300">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-brand" />
+                    {c}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
-          <ul className="flex flex-col gap-1.5 p-4">
-            {entry.changes.map((c, i) => (
-              <li key={i} className="flex items-start gap-2 text-[13px] leading-relaxed text-base-400">
-                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-base-600" />
-                {c}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
