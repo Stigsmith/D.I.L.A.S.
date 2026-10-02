@@ -27,7 +27,7 @@ A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai a
 | **Armoury** | `#/armoury/:tab` | Built. Your builds. Two tabs: **Builds**, the grid that browses every build at once, and **Coverage**, what your builds answer per front. See The Armoury |
 | **Collection** | `#/collection/:tab` | Built. Two tabs, Warbonds and Items, one per ownership axis |
 | **Rules** | `#/rules` | Built. Every rule behind our rating, what it moves here, and a switch to turn it off. Bottom of the menu. See The Rules Page |
-| **Tier Lists** | `#/tiers/:category` | Built, **off the menu since 1 October 2026**. Lives on as the picker inside every build, and whole at this address, linked from the Armoury |
+| **Tier Lists** | `#/tiers/:category` | Built. **Back in the menu since 3 October 2026**, the curator's call, after two days off it: the quickest way to see what a rule does is to watch the list move. A strip on the page sets the front, difficulty and how many of you without leaving it. Still the picker inside every build |
 | **The editor** | `#/builder/:id?` | Off the menu, lit as Armoury. Edits one build; `new` starts one, `new-bots` starts one for a front |
 | **Shared build** | `#/shared/:code` | Off the menu. A build carried in the link itself. See Drop History And Share Links |
 | **The war room** | `#/scenario` | Built, 2 October 2026. Off the menu: the scenario bar's Adjust, and every surface that needs a front first, send you here. Where the scenario is set, the galaxy map across the screen. See The Galaxy Map, "The war room" |
@@ -273,7 +273,7 @@ Rename freely. Put the old name in that item's `aliases` array and nothing break
 
 ### The shape of the tool
 
-- **Tier browsing was the primary tool until 1 October 2026, and he reversed it himself.** He still prefers judging items over accepting packaged builds, which is why the tier list survives as the picker in every build, ranked for the drop, and stays whole at `#/tiers`. What changed is the front door: Drop Bay, then the Armoury, the game's own two places. Do not put the tier list back in the menu without asking.
+- **Tier browsing was the primary tool until 1 October 2026, and he reversed it himself.** He still prefers judging items over accepting packaged builds, which is why the tier list survives as the picker in every build, ranked for the drop, and stays whole at `#/tiers`. What changed is the front door: Drop Bay, then the Armoury, the game's own two places. **He put it back in the menu himself on 3 October 2026**, with quick scenario controls on the page, for watching rules move the list. Drop Bay stays the front door.
 - **Curated loadouts are fixed and named, not generated.** Auto-calibration, pick a primary and have the rest adjust, was considered and declined. Do not rebuild it.
 - **Keep the loadout objects readable.** Tier rows are arrays, loadouts are objects, because he may edit loadouts by hand.
 

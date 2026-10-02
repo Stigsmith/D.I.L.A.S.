@@ -20,7 +20,7 @@
 /* ================================================================== */
 
 import { useState, useMemo, useRef, useLayoutEffect } from "react";
-import { ChevronLeft, ChevronRight, ChevronDown, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, Check, Map as MapIcon } from "lucide-react";
 
 import GalaxyMap, { MajorOrder } from "./GalaxyMap.jsx";
 import { FACTIONS, Planner, PlanetBar, SearchField, PickRow, Empty, DifficultyIcon, difficultyAt } from "./Tiers.jsx";
@@ -195,6 +195,43 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
 }
 
 /* ------------------------------------------------------------------ */
+/* The quick strip                                                     */
+/*                                                                     */
+/* The front, the difficulty and how many of you, on the tier list      */
+/* itself: the curator's ask of 3 October 2026, for watching a rule     */
+/* move the list without leaving it. The planet and the mission stay    */
+/* in the war room, one click away.                                      */
+/* ------------------------------------------------------------------ */
+
+export function ScenarioStrip({ scenario, setFaction, setDifficulty, setSquad, party, onWarRoom }) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-3 rounded-lg border border-base-800 bg-base-900/60 px-4 py-2.5">
+      <div className="flex gap-1.5" role="group" aria-label="Front">
+        {FACTIONS.map((f) => {
+          const on = scenario.faction === f.id;
+          return (
+            <button key={f.id} type="button" onClick={() => setFaction(f.id)} aria-pressed={on}
+              className={"flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors " +
+                (on ? "" : "border-base-700 text-base-500 hover:border-base-500 hover:text-base-200")}
+              style={on ? { ...OSWALD, color: f.hex, borderColor: f.hex, backgroundColor: f.hex + "1a" } : OSWALD}>
+              <f.Icon className="h-4 w-4" style={{ color: on ? f.hex : undefined }} />
+              {f.label}
+            </button>
+          );
+        })}
+      </div>
+      <DifficultyStepper value={scenario.difficulty} onChange={setDifficulty} />
+      <SquadCount value={scenario.squad} onChange={setSquad} party={party} />
+      <button type="button" onClick={onWarRoom}
+        className="ml-auto flex items-center gap-1.5 rounded border border-base-700 px-2.5 py-1.5 text-[11px] text-base-300 hover:border-base-500 hover:text-base-100">
+        <MapIcon className="h-3.5 w-3.5" />
+        Planet and mission
+      </button>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* The left panel's pieces                                             */
 /* ------------------------------------------------------------------ */
 
@@ -319,7 +356,7 @@ export function WarTotals({ stats, open, onToggle, trend = null }) {
 /* The game steps difficulty with two arrows either side of the mark and
    the name, so this does too. Level 0 is "not said", one step below
    Trivial, because a level you have not chosen is not the easiest one. */
-function DifficultyStepper({ value, onChange }) {
+export function DifficultyStepper({ value, onChange }) {
   const level = Number(value) || 0;
   const d = difficultyAt(level);
   const step = (by) => onChange(Math.max(0, Math.min(10, level + by)));
@@ -437,7 +474,7 @@ function LevelTiles({ facts: f, level, faction, fresh }) {
    because solo on Super Helldive and four of you on it rate gear
    differently, and a solo player is in no party for the tool to count.
    In a party the party's own count decides, and this only says it. */
-function SquadCount({ value, onChange, party }) {
+export function SquadCount({ value, onChange, party }) {
   const n = Number(value) || 0;
   const members = party && party.state ? party.state.members.length : 0;
   if (party && party.code) {
