@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.27.0",
+    "date": "2026-10-03",
+    "title": "Orientation is now mandatory",
+    "say": "Attendance is voluntary. Non-attendance has been noted.",
+    "changes": [
+      "A Democracy Officer gives new recruits a guided tour of the tool, one lit-up stop at a time. Settings has the refresher.",
+      "The Roadmap runs left to right, Shipped to Later, with one card per milestone that folds open.",
+      "The Changelog hangs off a timeline by month, and can be unfolded whole for the thorough citizen."
+    ]
+  },
+  {
     "version": "1.26.0",
     "date": "2026-10-03",
     "title": "The tier list reports back for duty",
@@ -10,9 +21,7 @@
       "The war room's difficulty floats in a card under the map, with how many of you beside it and what each level brings as tiles instead of a paragraph.",
       "Adjust scenario glows in your theme's colour, so the way into the war room is hard to miss.",
       "The full name under the wordmark sits in two tidy lines on every theme. The Aquila was asked to breathe in slightly.",
-      "The last traces of the old name are gone, apart from the folder it lives in.",
-      "The Roadmap runs left to right, Shipped to Later, one card per milestone that folds open. This Changelog hangs off a spine by month, and can be unfolded whole.",
-      "A Democracy Officer now gives new recruits a guided tour of the tool. Attendance is voluntary. Settings has the refresher."
+      "The last traces of the old name are gone, apart from the folder it lives in."
     ]
   },
   {
