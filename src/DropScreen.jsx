@@ -862,7 +862,8 @@ export default function DropScreen({ state, navigate, scenario, drop, update, pa
           onBuildAround={(id) => openEditor(null, null, id)} />
       )}
 
-      <div className={inParty ? "grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4" : "grid max-w-xl grid-cols-1 gap-3"}>
+      <div className={inParty ? "grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4" : "grid max-w-xl grid-cols-1 gap-3"}
+        data-tour="drop-slots">
         {mine ? (
           <FilledSlot label="You" build={mine} state={mineState} scenario={scenario} lockedSet={state.lockedSet}
             actions={confirmed ? (

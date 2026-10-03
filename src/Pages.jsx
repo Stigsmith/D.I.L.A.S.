@@ -253,8 +253,8 @@ export function Support() {
 /* which is the order work moves through, and every milestone is a     */
 /* card of one line that folds open. One open at a time across the     */
 /* page, so the whole plan fits on a screen. A progress axis, not a    */
-/* time axis: nothing unbuilt carries a date. Stacked below xl, where  */
-/* four columns beside the sidebar get too narrow to read.            */
+/* time axis: nothing unbuilt carries a date. Stacked below 1400 wide, */
+/* where four columns beside the sidebar get too narrow to read.      */
 /*                                                                    */
 /* The data is src/data/roadmap.json, which is the short public        */
 /* version. The working document with the reasoning and the           */
@@ -263,26 +263,30 @@ export function Support() {
 /* ================================================================== */
 
 /* One scale, from the light that is on to the light not lit yet.      */
+/* `node` is the hollow ring on the line, `dot` leads each card: filled */
+/* for shipped, half lit for next, hollow for everything further out.   */
 const STAGES = [
   { id: "shipped", name: "Shipped", say: "In the tool today, newest first.",
-    node: "bg-brand", ring: "border-brand bg-brand", head: "text-brand" },
+    node: "border-brand", dot: "border-brand bg-brand", head: "text-brand" },
   { id: "next", name: "Up next", say: "Being worked on, roughly in this order.",
-    node: "bg-brand/40", ring: "border-brand bg-brand/30", head: "text-base-100" },
-  { id: "planned", name: "Planned", say: "Intended, not started.",
-    node: "bg-base-500", ring: "border-base-500 bg-base-950", head: "text-base-300" },
+    node: "border-base-300", dot: "border-brand bg-brand/35", head: "text-base-100" },
+  { id: "planned", name: "Planned", say: "Intended, but not started.",
+    node: "border-base-400", dot: "border-base-500 bg-transparent", head: "text-base-300" },
   { id: "later", name: "Later", say: "Further out, and waiting on the server side.",
-    node: "bg-base-700", ring: "border-base-600 border-dashed bg-base-950", head: "text-base-500" },
+    node: "border-base-500", dot: "border-base-600 border-dashed bg-transparent", head: "text-base-400" },
 ];
 
 /* Shipped takes a double track and reads in two sub-columns, because   */
 /* it is the stage that only grows, Enodia's reasoning: four equal      */
 /* tracks put sixteen cards against two and three. Written out whole so */
-/* Tailwind finds them; the count is of the stages after Shipped.       */
+/* Tailwind finds them; the count is of the stages after Shipped. Below  */
+/* 1400 wide, beside the sidebar, the columns get too narrow for a      */
+/* title to sit on one line, and the stack reads better.                */
 const PLAN_COLUMNS = {
   0: "",
-  1: "xl:grid-cols-[2fr_minmax(0,1fr)]",
-  2: "xl:grid-cols-[2fr_minmax(0,1fr)_minmax(0,1fr)]",
-  3: "xl:grid-cols-[2fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]",
+  1: "min-[1400px]:grid-cols-[2fr_minmax(0,1fr)]",
+  2: "min-[1400px]:grid-cols-[2fr_minmax(0,1fr)_minmax(0,1fr)]",
+  3: "min-[1400px]:grid-cols-[2fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]",
 };
 
 export function Roadmap() {
@@ -300,46 +304,46 @@ export function Roadmap() {
   const share = total ? Math.round((built / total) * 100) : 0;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="rounded-lg border border-base-800 bg-base-900/60 p-4 text-xs leading-relaxed text-base-400">
-        Where this is going, in order rather than on a schedule. There are no dates on anything unbuilt: this is a two
-        person project built in bursts, and a date would be a guess wearing a promise. What has shipped carries a
-        version, because that part already happened.
-      </div>
+    <div className="mx-auto flex max-w-[1500px] flex-col gap-3 sm:px-4" data-tour="roadmap">
+      <p className="text-[15px] leading-relaxed text-base-200">
+        What has shipped, what is next, and what is further out. No dates: this is a two person project built in
+        bursts, and a date would be a guess wearing a promise.
+      </p>
 
       {/* The whole thing at a glance, before any of the detail. */}
       <div className="flex flex-col gap-1.5">
-        <div className="h-2 overflow-hidden rounded-full border border-base-800 bg-base-900"
+        <div className="h-4 overflow-hidden rounded-full border border-base-700 bg-base-950/80"
           role="img" aria-label={`${built} of ${total} shipped`}>
-          <span className="block h-full rounded-full bg-brand" style={{ width: `${share}%` }} />
+          <span className="block h-full rounded-full bg-brand/80 shadow-[inset_0_1px_0_rgb(255_255_255/0.25)]"
+            style={{ width: `${share}%` }} />
         </div>
-        <p className="text-[10px] uppercase tracking-[0.12em] text-base-500" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+        <p className="text-[10px] uppercase tracking-[0.14em] text-base-500" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
           <span className="text-brand">{built}</span> of {total} shipped
         </p>
       </div>
 
-      <div className={"relative grid items-start gap-8 xl:gap-5 " + PLAN_COLUMNS[stages.length - 1]}>
+      <div className={"relative mt-5 grid items-start gap-10 min-[1400px]:gap-7 " + PLAN_COLUMNS[stages.length - 1]}>
         {/* The line the stages sit on, so they read as one progression    */}
         {/* rather than as lists that happen to be side by side.           */}
         <span aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-[0.55rem] hidden h-px bg-gradient-to-r from-brand/70 via-brand/25 to-transparent xl:block" />
+          className="pointer-events-none absolute inset-x-0 top-[0.4rem] hidden h-px bg-gradient-to-r from-brand/60 via-brand/25 to-base-800 min-[1400px]:block" />
 
         {stages.map((s) => (
-          <section key={s.id} className="relative min-w-0 xl:pt-6">
+          <section key={s.id} className="relative min-w-0 min-[1400px]:pt-6">
             <span aria-hidden="true"
-              className={"absolute left-0 top-1 hidden h-2.5 w-2.5 rounded-full ring-4 ring-base-950 xl:block " + s.node} />
-            <header className="flex items-baseline gap-2">
-              <h3 className={"text-base font-bold uppercase tracking-wide " + s.head} style={{ fontFamily: "'Oswald', sans-serif" }}>
+              className={"absolute left-0 top-0 hidden h-3 w-3 rounded-full border-2 bg-base-950 min-[1400px]:block " + s.node} />
+            <header className="flex items-center gap-2.5">
+              <h3 className={"text-xl font-semibold uppercase tracking-[0.12em] " + s.head} style={{ fontFamily: "'Oswald', sans-serif" }}>
                 {s.name}
               </h3>
-              <span className="rounded-full bg-base-800 px-1.5 py-px text-[10px] tabular-nums text-base-400"
+              <span className="rounded-full bg-base-800 px-2 py-px text-[10px] tabular-nums text-base-400"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                 {s.items.length}
               </span>
             </header>
-            <p className="mb-3 mt-0.5 text-[11px] text-base-500">{s.say}</p>
+            <p className="mb-5 mt-1 text-[13px] text-base-500">{s.say}</p>
 
-            <div className={"grid items-start gap-1.5 " + (s.id === "shipped" ? "xl:grid-cols-2" : "")}>
+            <div className={"grid items-start gap-2 " + (s.id === "shipped" ? "md:grid-cols-2" : "")}>
               {s.items.map((m) => (
                 <PlanCard key={m.id} m={m} stage={s} on={open === m.id}
                   toggle={() => setOpen(open === m.id ? null : m.id)} />
@@ -354,18 +358,19 @@ export function Roadmap() {
 
 /* A milestone as one line until opened. The dot leads it in its stage's */
 /* colour, so skimming the left edge gives the shape without reading.   */
+/* Sentence case and the body face, like Enodia's: a title is something */
+/* to read, and sixteen of them in condensed capitals was a wall.        */
 function PlanCard({ m, stage, on, toggle }) {
   const track = ROADMAP.tracks[m.track] || null;
   const meta = m.version ? "v" + m.version : m.release || null;
   return (
     <div className={"rounded-lg border backdrop-blur-sm transition-colors " +
-      (on ? "border-brand/50 bg-base-900" : "border-base-800 bg-base-900/70 hover:border-base-600")}>
+      (on ? "border-brand/60 bg-base-900/90" : "border-base-700/70 bg-base-900/60 hover:border-base-500")}>
       <button type="button" onClick={toggle} aria-expanded={on}
-        className="group flex min-h-[2.4rem] w-full items-center gap-2.5 px-3 py-2 text-left">
-        <span aria-hidden="true" className={"h-2 w-2 shrink-0 rounded-full border " + stage.ring} />
-        <h4 className={"min-w-0 flex-1 text-[13px] font-bold uppercase leading-snug tracking-wide transition-colors " +
-            (on ? "text-brand" : "text-base-200 group-hover:text-brand")}
-          style={{ fontFamily: "'Oswald', sans-serif" }}>
+        className="group flex min-h-[3rem] w-full items-center gap-3 px-4 py-2.5 text-left">
+        <span aria-hidden="true" className={"h-2.5 w-2.5 shrink-0 rounded-full border " + stage.dot} />
+        <h4 className={"min-w-0 flex-1 text-[15px] font-semibold leading-snug transition-colors " +
+            (on ? "text-brand" : "text-base-100 group-hover:text-brand")}>
           {m.title}
         </h4>
         {meta ? (
@@ -373,13 +378,13 @@ function PlanCard({ m, stage, on, toggle }) {
             {meta}
           </span>
         ) : null}
-        <ChevronDown className={"h-3.5 w-3.5 shrink-0 transition-transform " + (on ? "rotate-180 text-brand" : "text-base-500")} />
+        <ChevronDown className={"h-4 w-4 shrink-0 transition-transform " + (on ? "rotate-180 text-brand" : "text-base-400")} />
       </button>
       {on ? (
-        <div className="px-3 pb-3 pl-[1.85rem]">
-          <p className="text-[12.5px] leading-relaxed text-base-300">{m.say}</p>
+        <div className="px-4 pb-4 pl-[2.4rem]">
+          <p className="text-[14px] leading-relaxed text-base-300">{m.say}</p>
           {track ? (
-            <p className="mt-2 text-[10px] uppercase tracking-wider text-base-500">
+            <p className="mt-3 text-[10px] uppercase tracking-wider text-base-500">
               {track.label}
               <span className="ml-1.5 normal-case tracking-normal text-base-600">{track.note}</span>
             </p>

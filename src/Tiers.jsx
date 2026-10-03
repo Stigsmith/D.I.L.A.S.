@@ -1320,7 +1320,7 @@ function RatingHeader({ faction, left, sortBy, setSortBy }) {
           {left}
         </span>
       </div>
-      <div className="flex items-stretch shrink-0">
+      <div className="flex items-stretch shrink-0" data-tour="rating-columns">
         {/* Both columns are the sort control. The lit one is the one   */}
         {/* the list is ordered by, which used to be hardcoded to the     */}
         {/* vote and is now whichever you picked.                          */}
@@ -1703,7 +1703,7 @@ export function ScenarioBar({ scenario, onAdjust, rulesOff = 0, onRules }) {
   const d = difficultyAt(scenario.difficulty);
 
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b px-4 py-2 sm:px-6"
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b px-4 py-2 sm:px-6" data-tour="scenario-bar"
       style={{ backgroundColor: f.hex + "0f", borderColor: f.hex + "33" }}>
       <span className="flex items-center gap-1.5">
         <f.Icon className="h-4 w-4 shrink-0" style={{ color: f.hex }} />

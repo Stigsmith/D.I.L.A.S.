@@ -123,7 +123,7 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
       {plannerOpen ? (
         <aside className="absolute z-20 flex flex-col overflow-hidden rounded-lg border border-base-700/80 bg-base-950/90 shadow-2xl backdrop-blur-md"
           style={{ left: GAP_PX, top: GAP_PX, bottom: wide ? GAP_PX : bottom, width: `min(${PANEL_PX}px, calc(100% - ${2 * GAP_PX}px))` }}
-          aria-label="Where would you like to play">
+          aria-label="Where would you like to play" data-tour="war-planner">
           <div className="flex items-center justify-between gap-2 border-b border-base-800 px-3 py-2.5">
             <p className="text-sm font-bold text-base-100" style={OSWALD}>Where would you like to play?</p>
             <button type="button" onClick={() => setPlanner(false)} title="Fold away" aria-label="Fold the planner away"
@@ -398,7 +398,8 @@ function DifficultyCard({ level, faction, onChange, squad }) {
   const f = levelFacts(level);
   const fresh = levelNew(level);
   return (
-    <div className="pointer-events-auto flex flex-col items-center gap-2 rounded-lg border border-base-700/80 bg-base-950/90 px-4 py-2.5 shadow-2xl backdrop-blur-md">
+    <div className="pointer-events-auto flex flex-col items-center gap-2 rounded-lg border border-base-700/80 bg-base-950/90 px-4 py-2.5 shadow-2xl backdrop-blur-md"
+      data-tour="war-difficulty">
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
         <DifficultyStepper value={level} onChange={onChange} />
         <span className="hidden h-8 w-px bg-base-800 sm:block" aria-hidden="true" />
