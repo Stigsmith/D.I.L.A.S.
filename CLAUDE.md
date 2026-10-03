@@ -1,6 +1,6 @@
 # **D.I.L.A.S.: Claude Instructions**
 
-> [!warning] The repo lives at `C:\Dev\dds` and nothing is called armory any more
+> [!warning] The repo lives at `C:\Dev\dilas` and nothing is called armory any more
 > Renamed 21 August 2026, folder included. `Armory.jsx` is `Tiers.jsx`, `useArmoryState.js` is `useCollectionState.js`, and the four `helldivers-2_armory-*.md` documents are `dilas-*.md` (they were `dds-*.md` until 3 October 2026). The original Claude.ai artifact is `original-artifact.jsx`.
 >
 > **The product name still lives in exactly one file.** `src/lib/brand.js`, unchanged. Renaming the repo did not change that, and it must not: the folder is a path, the brand is a value.
@@ -16,7 +16,7 @@
 >
 > It is in `src/lib/brand.js` and nowhere else: the sidebar, the mobile drawer, the browser tab (written into `index.html` by a small plugin in `vite.config.js`; it was a hardcoded title until the rename found it), the footer, About and the backup file's name all read from it. **The one other copy is the reset email in `worker/email.ts`**, because the Worker's type check cannot import the app's JavaScript. Renaming again is those two edits. Do not hardcode it anywhere else.
 >
-> **Nothing is called dds any more except the folder `C:\Dev\dds`**, which only the curator can rename. The curator's call, 3 October 2026: the documents became `dilas-*.md`, the package `dilas`, and on Cloudflare a new Worker `dilas` and a new database `dilas` replaced the `dds` ones, since neither can be renamed in place. The old `dds` Worker and its `dds.stigly-official.workers.dev` address went with it.
+> **Nothing is called dds any more, the folder included.** The curator's call, 3 October 2026: the repo moved from `C:\Dev\dds` to `C:\Dev\dilas`, the documents became `dilas-*.md`, the package `dilas`, and on Cloudflare a new Worker `dilas` and a new database `dilas` replaced the `dds` ones, since neither can be renamed in place. The old `dds` Worker and its `dds.stigly-official.workers.dev` address went with it.
 
 A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai artifact into a Vite and React project. Navigation is two levels: a persistent left sidebar for destinations, and a top tab bar scoped to whichever destination is open.
 
@@ -1439,7 +1439,7 @@ Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, t
 > Verified 18 August 2026: a fresh PowerShell resolves `node` to `C:\Program Files\nodejs\node.exe` and `npm` works with no setup. This used to need prepending, because a shell opened before the install could not see it. That is no longer true.
 
 > [!tip] How stigly actually deploys it
-> File Explorer into `C:\Dev\dds`, click the address bar, type `cmd`, Enter. That opens a terminal already in the folder. Then `npm run deploy`, which builds and puts it on Cloudflare in one go. He does not use a terminal habitually, so give the path and the clicks, not just the command.
+> File Explorer into `C:\Dev\dilas`, click the address bar, type `cmd`, Enter. That opens a terminal already in the folder. Then `npm run deploy`, which builds and puts it on Cloudflare in one go. He does not use a terminal habitually, so give the path and the clicks, not just the command.
 >
 > **Until dilas.me is deployed and announced, Netlify is still the address people use**, and `npm run build` then dragging `dist` onto Netlify still works exactly as before. See Hosting for why the two coexist.
 
@@ -1503,7 +1503,7 @@ Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, t
 npm run deploy
 ```
 
-Builds, then deploys. From `cmd` in the address bar of `C:\Dev\dds`, the same as the build always was. **It refuses to upload a build that is not whole**, see The Galaxy Map, "A file sync app watches this folder". **This machine is already logged in to Cloudflare**, machine wide, from Enodia, so there is no login step.
+Builds, then deploys. From `cmd` in the address bar of `C:\Dev\dilas`, the same as the build always was. **It refuses to upload a build that is not whole**, see The Galaxy Map, "A file sync app watches this folder". **This machine is already logged in to Cloudflare**, machine wide, from Enodia, so there is no login step.
 
 > [!danger] A deploy that reports success is not evidence that it landed
 > Enodia saw `wrangler deploy` print a new version id and "100%" three times in a row while old code kept running. **After every deploy, read something the new build changed off the live site.** The cheapest check: the `index-*.js` name in the live page must match the one in `dist/assets`, and the version in the footer must be the new one. If it did not land, `npx wrangler versions upload` then `npx wrangler versions deploy <id>@100% --yes`.
@@ -1513,7 +1513,7 @@ Builds, then deploys. From `cmd` in the address bar of `C:\Dev\dds`, the same as
 >
 > **Enodia's wrangler dev uses 8787 on this same machine.** On 25 September 2026 this tool started on 8787 while Enodia was already running there, printed "Ready on 8787", and Enodia went on answering every request. Every header read back was Enodia's policy over an app that did not have this tool's files. Nothing errored. The tell was a policy containing `data:`, which this tool deliberately does not allow.
 >
-> Stopping a background `wrangler dev` on Windows can orphan its `workerd` and `esbuild` children. Check nothing from `C:\Dev\dds` is still listening before starting another.
+> Stopping a background `wrangler dev` on Windows can orphan its `workerd` and `esbuild` children. Check nothing from `C:\Dev\dilas` is still listening before starting another.
 
 ### The security headers
 

@@ -1,6 +1,6 @@
 # **D.I.L.A.S.: Handover From Enodia, Hosting, Accounts And The Live API**
 
-> Written 25 September 2026 in the Enodia repo, for the next Claude session that opens `C:\Dev\dds`. Enodia is stigly's Hades II tool. It has already done everything in the v2 and v3 half of `dilas-roadmap.md`: it moved off Netlify onto Cloudflare Workers, opened accounts, synced between devices, published builds under short links, built an exchange with friends and leaderboards, and sent password resets from its own domain. This file says what to take from it, in what order, and what it cost Enodia to learn.
+> Written 25 September 2026 in the Enodia repo, for the next Claude session that opens `C:\Dev\dilas`. Enodia is stigly's Hades II tool. It has already done everything in the v2 and v3 half of `dilas-roadmap.md`: it moved off Netlify onto Cloudflare Workers, opened accounts, synced between devices, published builds under short links, built an exchange with friends and leaderboards, and sent password resets from its own domain. This file says what to take from it, in what order, and what it cost Enodia to learn.
 
 > [!danger] The source is the code, not this file
 > Every Enodia claim below names a file in **`C:\Dev\Enodia`**. Open that file before porting anything. The docblocks there are long on purpose and they carry reasoning this summary drops. If this file and the code disagree, the code wins, and this file should be corrected.
@@ -124,7 +124,7 @@ Small, independent, and worth doing first on its own: it puts security headers o
 > `localStorage` is per origin. The first visit to the new address starts empty, which is the warning already in D.I.L.A.S. `CLAUDE.md` under Hosting. D.I.L.A.S. has Export and Import in Settings, which is exactly the tool for this. Before the Netlify site is retired, ship one last Netlify build with a notice: the new address, and "Export here, Import there". Then leave the Netlify site up for a while rather than deleting it on the same day. Who uses the tool and how long to keep Netlify up are stigly's calls.
 
 > [!info] What stigly does himself in this stage
-> Buying the domain, and `wrangler login` once, which opens a browser to authorise. After that a deploy is `cmd` in the address bar of `C:\Dev\dds`, then `npm run deploy`. The same PowerShell note in `CLAUDE.md` applies.
+> Buying the domain, and `wrangler login` once, which opens a browser to authorise. After that a deploy is `cmd` in the address bar of `C:\Dev\dilas`, then `npm run deploy`. The same PowerShell note in `CLAUDE.md` applies.
 
 ---
 
