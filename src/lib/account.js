@@ -7,7 +7,7 @@
 /*                                                                    */
 /* Ported from Enodia's src/state/account.ts in C:\Dev\Enodia, minus */
 /* the sync and password reset halves, which arrive with Stages 3 and */
-/* 2 of dds-cloudflare-handover.md.                                   */
+/* 2 of dilas-cloudflare-handover.md.                                   */
 /*                                                                    */
 /* The gate is loose on purpose. **Viewing is free, creating is free, */
 /* saving locally is free.** Nothing in the tool proper asks who you  */

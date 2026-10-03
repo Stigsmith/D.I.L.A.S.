@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://dilas.me"><img alt="Open it at dilas.me" src="https://img.shields.io/badge/open-dilas.me-ffe900?style=flat-square&labelColor=1a1a1a"></a>
-  <img alt="Version 1.25.0" src="https://img.shields.io/badge/version-1.25.0-ffe900?style=flat-square&labelColor=1a1a1a">
+  <img alt="Version 1.26.0" src="https://img.shields.io/badge/version-1.26.0-ffe900?style=flat-square&labelColor=1a1a1a">
   <img alt="Game patch 7.1.1" src="https://img.shields.io/badge/game%20patch-7.1.1-ffe900?style=flat-square&labelColor=1a1a1a">
   <img alt="In your browser, no install, no account" src="https://img.shields.io/badge/runs%20in-your%20browser-ffe900?style=flat-square&labelColor=1a1a1a">
 </p>
@@ -158,7 +158,7 @@ Art is optional. With `src/assets` empty, every item reads by its name instead o
 | `src/data/` | Items, ratings, rules, missions, planets, enemies and difficulty, as JSON |
 | `worker/` | The server: a Cloudflare Worker with D1, and a Durable Object per party |
 | `scripts/` | The data fetches and the checks |
-| [`CLAUDE.md`](CLAUDE.md), [`dds-roadmap.md`](dds-roadmap.md) | How the tool works and why, and what comes next |
+| [`CLAUDE.md`](CLAUDE.md), [`dilas-roadmap.md`](dilas-roadmap.md) | How the tool works and why, and what comes next |
 
 ## Where the numbers come from
 

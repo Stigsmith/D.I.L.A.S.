@@ -110,7 +110,7 @@ function fake(answers: Partial<Record<string, () => Response>> = {}) {
   return { fetcher, calls }
 }
 
-const identity = { client: 'dds.test', contact: 'contact.test' }
+const identity = { client: 'dilas.test', contact: 'contact.test' }
 const war = (headers: Record<string, string> = {}) => SELF.fetch(`${ORIGIN}/api/war`, { headers })
 
 beforeEach(async () => {
@@ -241,7 +241,7 @@ describe('fetching and serving the snapshot', () => {
     expect(calls.map((c) => c.url).sort()).toEqual([
       `${UPSTREAM}/api/v1/assignments`, `${UPSTREAM}/api/v1/campaigns`, `${UPSTREAM}/api/v1/planets`, `${UPSTREAM}/api/v1/war`,
     ])
-    expect(calls.every((c) => c.headers['x-super-client'] === 'dds.test')).toBe(true)
+    expect(calls.every((c) => c.headers['x-super-client'] === 'dilas.test')).toBe(true)
     expect(calls.every((c) => c.headers['x-super-contact'] === 'contact.test')).toBe(true)
   })
 

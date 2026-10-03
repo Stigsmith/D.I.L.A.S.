@@ -1,7 +1,7 @@
 {
   // How D.I.L.A.S. is served, at dilas.me. Replaces dragging dist/ onto Netlify.
   //
-  // Stage 1 of dds-cloudflare-handover.md: the static site, plus a Worker
+  // Stage 1 of dilas-cloudflare-handover.md: the static site, plus a Worker
   // script answering /api/* and nothing else, plus a D1 database for
   // accounts. Same origin, which is what lets the Content-Security-Policy in
   // public/_headers keep saying connect-src 'self' unchanged.
@@ -12,7 +12,7 @@
   // Modelled on Enodia's wrangler.jsonc in C:\Dev\Enodia, which carries the
   // longer reasoning behind every key here. Read it before changing one.
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "dds",
+  "name": "dilas",
 
   // The API, and nothing else, on this origin under /api/*. See
   // run_worker_first below for why "nothing else" is enforced rather than
@@ -78,9 +78,9 @@
   // `wrangler dev` ignores `database_id` and runs on a local SQLite file under
   // .wrangler/, so all of this builds and tests with no network at all. Only
   // `--remote` commands and deploys use the id. Created 25 September 2026,
-  // region WEUR, beside Enodia's.
+  // region WEUR, beside Enodia's. Replaced on 3 October 2026 by a new database named dilas, since D1 cannot rename one; the old dds one was deleted.
   //
-  // **The binding is DB, not dds.** `wrangler d1 create` suggests naming the
+  // **The binding is DB, not dilas.** `wrangler d1 create` suggests naming the
   // binding after the database, and it did. The code says `env.DB`.
   //
   // **Changing the id orphans the local database.** wrangler dev keys its
@@ -90,8 +90,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "dds",
-      "database_id": "be6b81cb-3738-4d05-9950-375cf9ba6245",
+      "database_name": "dilas",
+      "database_id": "c59300f8-1776-4e4c-a5ba-bd39ab4f793b",
       "migrations_dir": "migrations"
     }
   ],
@@ -114,7 +114,7 @@
 
   // The live war. Every five minutes the Worker fetches who holds what from
   // api.helldivers2.dev and keeps a trimmed snapshot in D1; GET /api/war hands
-  // it out. See worker/war.ts, and Stage 6 of dds-cloudflare-handover.md.
+  // it out. See worker/war.ts, and Stage 6 of dilas-cloudflare-handover.md.
   //
   // **Five Cron Triggers per account on the free plan**, and this is one.
   // Enodia uses none. Verified on 29 September 2026 against

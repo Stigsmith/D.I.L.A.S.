@@ -44,17 +44,26 @@ export function levelFacts(level) {
 const range = (r) => String(r).replace("-", " to ");
 const most = (r) => Number(String(r).split("-").pop());
 
-/* The outposts, by count and the biggest kind you can meet. */
-function outpostText(o) {
-  if (!o.total) return "no outposts";
+/* The outposts as two halves: how many, and the biggest kind you can
+   meet. The war room's tiles show them apart; the line joins them. */
+export function outpostSummary(o) {
+  if (!o || !o.total) return { count: "none", note: "" };
   const sizes = ["giant", "heavy", "medium", "light"].filter((k) => o[k] && most(o[k]) > 0);
   const biggest = sizes[0];
-  const count = `${range(o.total)} outpost${o.total === "1" ? "" : "s"}`;
-  if (!biggest) return count;
-  if (sizes.length === 1) return `${count}, all ${biggest}`;
-  if (String(o[biggest]).startsWith("0-")) return `${count}, now and then a ${biggest} one`;
-  if (String(o[biggest]) === "1") return `${count}, one of them ${biggest}`;
-  return `${count}, up to ${most(o[biggest])} ${biggest}`;
+  const count = range(o.total);
+  if (!biggest) return { count, note: "" };
+  if (sizes.length === 1) return { count, note: `all ${biggest}` };
+  if (String(o[biggest]).startsWith("0-")) return { count, note: `now and then a ${biggest} one` };
+  if (String(o[biggest]) === "1") return { count, note: `one of them ${biggest}` };
+  return { count, note: `up to ${most(o[biggest])} ${biggest}` };
+}
+
+/* The outposts, by count and the biggest kind you can meet. */
+function outpostText(o) {
+  const { count, note } = outpostSummary(o);
+  if (count === "none") return "no outposts";
+  const label = `${count} outpost${o.total === "1" ? "" : "s"}`;
+  return note ? `${label}, ${note}` : label;
 }
 
 const SAMPLE_WORDS = { 1: "common samples", 2: "common and rare samples", 3: "common, rare and super samples" };

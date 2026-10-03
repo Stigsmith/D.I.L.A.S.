@@ -20,15 +20,15 @@
 /* ================================================================== */
 
 import { useState, useMemo, useRef, useLayoutEffect } from "react";
-import { ChevronLeft, ChevronRight, ChevronDown, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, Check, Map as MapIcon } from "lucide-react";
 
 import GalaxyMap, { MajorOrder } from "./GalaxyMap.jsx";
 import { FACTIONS, Planner, PlanetBar, SearchField, PickRow, Empty, DifficultyIcon, difficultyAt } from "./Tiers.jsx";
 import { searchPlanets, unplaced, frontOf, suggestFronts } from "./lib/galaxy.js";
 import { useWar, agoText } from "./lib/war.js";
 import { usePlannerPrefs, planets, biomeName, loudHazards, hazardName } from "./lib/scenario.js";
-import { levelParts, levelNew, DIFFICULTY_SOURCE } from "./lib/difficulty.js";
-import { enemiesUpTo, arrivalsLine } from "./lib/enemies.js";
+import { levelFacts, levelNew, outpostSummary, DIFFICULTY_SOURCE } from "./lib/difficulty.js";
+import { enemiesUpTo, arrivalsAt, arrivalsLine } from "./lib/enemies.js";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 
@@ -122,7 +122,7 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
       {/* Left: where would you like to play. */}
       {plannerOpen ? (
         <aside className="absolute z-20 flex flex-col overflow-hidden rounded-lg border border-base-700/80 bg-base-950/90 shadow-2xl backdrop-blur-md"
-          style={{ left: GAP_PX, top: GAP_PX, bottom, width: `min(${PANEL_PX}px, calc(100% - ${2 * GAP_PX}px))` }}
+          style={{ left: GAP_PX, top: GAP_PX, bottom: wide ? GAP_PX : bottom, width: `min(${PANEL_PX}px, calc(100% - ${2 * GAP_PX}px))` }}
           aria-label="Where would you like to play">
           <div className="flex items-center justify-between gap-2 border-b border-base-800 px-3 py-2.5">
             <p className="text-sm font-bold text-base-100" style={OSWALD}>Where would you like to play?</p>
@@ -168,21 +168,65 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
         </div>
       ) : null}
 
-      {/* Bottom: how hard, how many, and done. */}
+      {/* Bottom: how hard in a card of its own, centred under the open
+          map the way the game sets its difficulty picker; how many of you
+          and Done in a second card at the right. Floating rather than a
+          bar across the room, the curator's call of 3 October 2026: the
+          bar read as chrome and the difficulty got lost in it. */}
       <div ref={barRef}
-        className="absolute inset-x-0 bottom-0 z-20 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-base-800 bg-base-950/90 px-3 py-2.5 backdrop-blur-md sm:px-4">
-        <DifficultyStepper value={scenario.difficulty} onChange={setDifficulty} />
-        <LevelLine level={scenario.difficulty} faction={scenario.faction} />
-        <SquadCount value={scenario.squad} onChange={setSquad} party={party} />
+        className={"pointer-events-none absolute z-20 " +
+          (wide ? "grid grid-cols-[1fr_auto_1fr] items-end gap-3" : "flex flex-col items-stretch gap-2")}
+        style={{ bottom: GAP_PX, right: GAP_PX, left: (plannerOpen && wide ? PANEL_PX + GAP_PX : 0) + GAP_PX }}>
+        {wide ? <span /> : null}
+        <DifficultyCard level={scenario.difficulty} faction={scenario.faction} onChange={setDifficulty}
+          squad={<SquadCount value={scenario.squad} onChange={setSquad} party={party} />} />
         {onDone && scenario.faction ? (
           <button type="button" onClick={onDone}
-            className="ml-auto flex items-center gap-1.5 rounded border border-brand bg-brand px-4 py-1.5 text-sm font-bold uppercase tracking-wide text-brand-ink hover:brightness-110"
+            className={"pointer-events-auto flex items-center justify-center gap-1.5 rounded-lg border border-brand bg-brand px-5 py-2 text-sm font-bold uppercase tracking-wide text-brand-ink shadow-2xl hover:brightness-110 " +
+              (wide ? "justify-self-end" : "")}
             style={OSWALD}>
             <Check className="h-4 w-4" />
             Done
           </button>
-        ) : null}
+        ) : <span />}
       </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* The quick strip                                                     */
+/*                                                                     */
+/* The front, the difficulty and how many of you, on the tier list      */
+/* itself: the curator's ask of 3 October 2026, for watching a rule     */
+/* move the list without leaving it. The planet and the mission stay    */
+/* in the war room, one click away.                                      */
+/* ------------------------------------------------------------------ */
+
+export function ScenarioStrip({ scenario, setFaction, setDifficulty, setSquad, party, onWarRoom }) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-3 rounded-lg border border-base-800 bg-base-900/60 px-4 py-2.5">
+      <div className="flex gap-1.5" role="group" aria-label="Front">
+        {FACTIONS.map((f) => {
+          const on = scenario.faction === f.id;
+          return (
+            <button key={f.id} type="button" onClick={() => setFaction(f.id)} aria-pressed={on}
+              className={"flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors " +
+                (on ? "" : "border-base-700 text-base-500 hover:border-base-500 hover:text-base-200")}
+              style={on ? { ...OSWALD, color: f.hex, borderColor: f.hex, backgroundColor: f.hex + "1a" } : OSWALD}>
+              <f.Icon className="h-4 w-4" style={{ color: on ? f.hex : undefined }} />
+              {f.label}
+            </button>
+          );
+        })}
+      </div>
+      <DifficultyStepper value={scenario.difficulty} onChange={setDifficulty} />
+      <SquadCount value={scenario.squad} onChange={setSquad} party={party} />
+      <button type="button" onClick={onWarRoom}
+        className="ml-auto flex items-center gap-1.5 rounded border border-base-700 px-2.5 py-1.5 text-[11px] text-base-300 hover:border-base-500 hover:text-base-100">
+        <MapIcon className="h-3.5 w-3.5" />
+        Planet and mission
+      </button>
     </div>
   );
 }
@@ -312,7 +356,7 @@ export function WarTotals({ stats, open, onToggle, trend = null }) {
 /* The game steps difficulty with two arrows either side of the mark and
    the name, so this does too. Level 0 is "not said", one step below
    Trivial, because a level you have not chosen is not the easiest one. */
-function DifficultyStepper({ value, onChange }) {
+export function DifficultyStepper({ value, onChange }) {
   const level = Number(value) || 0;
   const d = difficultyAt(level);
   const step = (by) => onChange(Math.max(0, Math.min(10, level + by)));
@@ -344,34 +388,83 @@ function DifficultyStepper({ value, onChange }) {
   );
 }
 
-/* What the level brings, from the wiki's Difficulty table, and what it
-   means for the ratings: how many of the front's enemies are counted.
-   Wide screens only; the stepper says the name on a phone. */
-function LevelLine({ level, faction }) {
-  const parts = levelParts(level);
+/* The difficulty, in a card of its own: the stepper, and under it what
+   the level brings as small labelled tiles rather than a sentence, off
+   the wiki's Difficulty table, with what it means for the ratings last.
+   The sentences the tiles stand for are their tooltips. */
+/* How many of you sits beside the stepper: difficulty and squad size are
+   the two halves of how hard this is, and the ratings read them together. */
+function DifficultyCard({ level, faction, onChange, squad }) {
+  const f = levelFacts(level);
   const fresh = levelNew(level);
-  const enemies = faction && level ? `Ratings count the ${enemiesUpTo(faction, level)} enemies this front fields here.` + arrivalsLine(faction, level) : "";
   return (
-    <div className="hidden min-w-0 flex-1 flex-col gap-0.5 md:flex">
-      {parts ? (
-        <>
-          <p className="truncate text-[11px] text-base-300" title={fresh.length ? "New at this level: " + fresh.join("; ") : undefined}>
-            {parts.join(" · ")}
-          </p>
-          <p className="truncate text-[10px] text-base-500" title={enemies || undefined}>
-            {enemies || "Choose a front and the line says which of its enemies the ratings count here."}{" "}
-            <a href={DIFFICULTY_SOURCE.url} target="_blank" rel="noreferrer" className="text-base-600 underline hover:text-base-300"
-              title={`${DIFFICULTY_SOURCE.name}, ${DIFFICULTY_SOURCE.licence}`}>
-              wiki
-            </a>
-          </p>
-        </>
+    <div className="pointer-events-auto flex flex-col items-center gap-2 rounded-lg border border-base-700/80 bg-base-950/90 px-4 py-2.5 shadow-2xl backdrop-blur-md">
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+        <DifficultyStepper value={level} onChange={onChange} />
+        <span className="hidden h-8 w-px bg-base-800 sm:block" aria-hidden="true" />
+        {squad}
+      </div>
+      {f ? (
+        <LevelTiles facts={f} level={level} faction={faction} fresh={fresh} />
       ) : (
-        <p className="text-[11px] leading-relaxed text-base-500">
-          Ratings count every enemy the front can field. Set a level and the tool stops warning you about things that
-          do not spawn there, and says what the level brings.
+        <p className="max-w-sm text-center text-[11px] leading-relaxed text-base-500">
+          Set a level and the ratings count only the enemies that turn up there, and this says what the level brings.
         </p>
       )}
+    </div>
+  );
+}
+
+/* The sample kinds in the colours the game draws them. */
+const SAMPLE_DOTS = [["common", "#7ac943", "Common"], ["rare", "#f7931e", "Rare"], ["super", "#c78bf2", "Super"]];
+
+function Tile({ label, title, children }) {
+  return (
+    <div className="flex min-w-[4.5rem] flex-col items-center gap-0.5 px-1" title={title}>
+      <span className="text-[9px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>{label}</span>
+      <span className="text-center text-xs font-semibold leading-tight text-base-100">{children}</span>
+    </div>
+  );
+}
+
+function LevelTiles({ facts: f, level, faction, fresh }) {
+  const out = outpostSummary(f.outposts);
+  const arrival = faction ? arrivalsAt(faction, level) : null;
+  const enemyNote = faction
+    ? `Ratings count the ${enemiesUpTo(faction, level)} enemies this front fields here.` + arrivalsLine(faction, level)
+    : "Choose a front and this says how many of its enemies the ratings count here.";
+  return (
+    <div className="flex max-w-full flex-wrap items-start justify-center divide-x divide-base-800 border-t border-base-800 pt-2"
+      title={fresh.length ? "New at this level: " + fresh.join("; ") : undefined}>
+      <Tile label="Operation" title={`${f.missions} ${f.missions === 1 ? "mission" : "missions"} in an operation, ${f.medals.perMission.join(", ")} medals each`}>
+        {f.missions} {f.missions === 1 ? "mission" : "missions"}
+      </Tile>
+      <Tile label="Medals" title="Medals for a whole operation, all missions done">{f.medals.total}</Tile>
+      <Tile label="Outposts" title={out.note ? `${out.count} outposts, ${out.note}` : `${out.count} outposts`}>
+        {out.count}
+        {out.note ? <span className="block text-[10px] font-normal text-base-400">{out.note}</span> : null}
+      </Tile>
+      <Tile label="Samples" title={f.samples.map((x) => x[0].toUpperCase() + x.slice(1)).join(", ") + " samples"}>
+        <span className="flex items-center gap-1 pt-0.5">
+          {SAMPLE_DOTS.map(([id, hex, name]) => (
+            <span key={id} className="h-2.5 w-2.5 rounded-full" aria-label={name}
+              style={f.samples.includes(id) ? { backgroundColor: hex } : { boxShadow: `inset 0 0 0 1px ${hex}55` }} />
+          ))}
+        </span>
+      </Tile>
+      <Tile label="Modifiers" title="Operation modifiers: one from difficulty 5, a second from 8">{f.modifiers || "none"}</Tile>
+      <Tile label="Rewards" title="Extra requisition and experience at this level">{f.multiplier ? `+${f.multiplier}%` : "none"}</Tile>
+      <Tile label="Enemies" title={enemyNote}>
+        {faction ? enemiesUpTo(faction, level) : "?"}
+        {arrival && arrival.kind === "new" ? (
+          <span className="block text-[10px] font-normal text-accent-300">new: {arrival.names[0]}</span>
+        ) : null}
+      </Tile>
+      <a href={DIFFICULTY_SOURCE.url} target="_blank" rel="noreferrer"
+        className="self-center px-2 text-[9px] uppercase tracking-wider text-base-600 underline hover:text-base-300"
+        title={`${DIFFICULTY_SOURCE.name}, ${DIFFICULTY_SOURCE.licence}`}>
+        wiki
+      </a>
     </div>
   );
 }
@@ -381,7 +474,7 @@ function LevelLine({ level, faction }) {
    because solo on Super Helldive and four of you on it rate gear
    differently, and a solo player is in no party for the tool to count.
    In a party the party's own count decides, and this only says it. */
-function SquadCount({ value, onChange, party }) {
+export function SquadCount({ value, onChange, party }) {
   const n = Number(value) || 0;
   const members = party && party.state ? party.state.members.length : 0;
   if (party && party.code) {
