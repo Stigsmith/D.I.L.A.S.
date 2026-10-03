@@ -12,7 +12,10 @@ import {
   Library, Swords, Rocket, Store, User, Settings as SettingsIcon,
   LifeBuoy, Menu, X, Sun, Moon, Zap, Shield, Star, Lock, Download, Upload, AlertTriangle,
   Factory, Bug, PackageOpen, Trees, FileText, Crosshair, Radar, Shovel, Info, ScrollText, Milestone, Scale, Orbit, ListOrdered,
+  Megaphone,
 } from "lucide-react";
+import Tour from "./Tour.jsx";
+import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 
 import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser, ScenarioBar } from "./Tiers.jsx";
 import WarRoom, { ScenarioStrip } from "./WarRoom.jsx";
@@ -224,6 +227,7 @@ function SidebarLink({ item, active, onClick }) {
       onClick={locked ? undefined : onClick}
       disabled={locked}
       aria-current={active ? "page" : undefined}
+      data-tour={"nav-" + item.id}
       title={locked ? `Planned for ${item.release}` : undefined}
       className={
         "w-full flex items-center gap-2.5 rounded px-2.5 py-2 text-sm transition-colors text-left " +
@@ -252,7 +256,7 @@ const LANDING = { tiers: "tiers/primary", collection: "collection/warbonds", bay
 function Sidebar({ destination, navigate, onNavigated }) {
   const go = (id) => { navigate(LANDING[id] || id); onNavigated(); };
   return (
-    <nav className="flex h-full flex-col gap-5 overflow-y-auto p-3">
+    <nav className="flex h-full flex-col gap-5 overflow-y-auto p-3" data-tour="nav">
       {NAV.map((g) => (
         <div key={g.group}>
           <p className="mb-1.5 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-base-600"
@@ -361,7 +365,7 @@ function SurfaceToggle({ on, onClick, label, note }) {
   );
 }
 
-function Settings({ theme, setTheme, state }) {
+function Settings({ theme, setTheme, state, onTour }) {
   const [confirmingReset, setConfirmingReset] = useState(false);
   const { finish, setFinish, surface, toggleSurface } = useBadgeStyle();
   const themeNote = (THEMES.find((t) => t.id === theme) || {}).note || "";
@@ -369,6 +373,21 @@ function Settings({ theme, setTheme, state }) {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* The tour opens by itself once per browser. This is the way back. */}
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-base-800 bg-base-900 px-4 py-3">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-sm font-bold uppercase tracking-wide text-base-100" style={{ fontFamily: "'Oswald', sans-serif" }}>
+            The tour
+          </h3>
+          <p className="text-[11px] text-base-500">The Democracy Officer's walk round the tool, about a minute long.</p>
+        </div>
+        <button type="button" onClick={onTour} data-tour="tour-replay"
+          className="flex items-center gap-1.5 rounded border border-brand/70 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-brand hover:bg-brand hover:text-brand-ink"
+          style={{ fontFamily: "'Oswald', sans-serif" }}>
+          <Megaphone className="h-3.5 w-3.5" /> Replay the tour
+        </button>
+      </div>
+
       <div className="rounded-lg border border-base-800 bg-base-900 overflow-hidden">
         <div className="border-b border-base-800 px-4 py-2.5">
           <h3 className="text-sm font-bold uppercase tracking-wide text-base-100" style={{ fontFamily: "'Oswald', sans-serif" }}>
@@ -507,6 +526,23 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   /* The party menu, top right on every page. */
   const [partyOpen, setPartyOpen] = useState(false);
+
+  /* The tour, W.A.R.P.'s way: it opens by itself the first time this    */
+  /* browser visits, once, and Settings replays it. It walks from page   */
+  /* to page, so it remembers where you were and puts you back there.    */
+  const [touring, setTouring] = useState(() => readSetting(SETTINGS.tourDone, ["done"], null) === null);
+  const tourFrom = useRef(window.location.hash.replace(/^#\/?/, "") || "bay");
+  const startTour = useCallback(() => {
+    tourFrom.current = window.location.hash.replace(/^#\/?/, "") || "bay";
+    setPartyOpen(false);
+    setMenuOpen(false);
+    setTouring(true);
+  }, []);
+  const endTour = useCallback(() => {
+    writeSetting(SETTINGS.tourDone, "done");
+    setTouring(false);
+    navigate(tourFrom.current, { replace: true });
+  }, [navigate]);
 
   /* Reachable but not in the menu. The scenario is a sub screen of the   */
   /* surfaces that read it, not a destination of its own: putting it in   */
@@ -704,7 +740,7 @@ export default function App() {
         return <Shared code={param} state={state} scenario={scored} navigate={navigate}
           onUseForDrop={(id) => { updateDrop((d) => ({ ...d, mine: id, confirmed: null })); navigate("bay"); }} />;
       case "settings":
-        return <Settings theme={theme} setTheme={setTheme} state={state} />;
+        return <Settings theme={theme} setTheme={setTheme} state={state} onTour={startTour} />;
       case "support":
         return <Support />;
       case "about":
@@ -881,6 +917,8 @@ export default function App() {
           {OFF_MENU.has(dest) || inRoom ? null : <Footer />}
         </div>
       </div>
+
+      {touring ? <Tour navigate={navigate} onClose={endTour} /> : null}
     </div>
   );
 }

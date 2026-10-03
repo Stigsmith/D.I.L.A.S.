@@ -903,3 +903,31 @@ body {
   margin: 0;
   background-color: rgb(var(--base-950));
 }
+
+/* The tour's light. The shadow is the dim and the box is the hole in  */
+/* it, ringed in the brand colour, so moving the box between steps     */
+/* makes the light travel. See src/Tour.jsx.                           */
+.tour-spot {
+  box-shadow:
+    0 0 0 9999px rgb(0 0 0 / 0.72),
+    0 0 0 2px rgb(var(--brand)),
+    0 0 26px rgb(var(--brand) / 0.45);
+  transition: left 0.3s ease, top 0.3s ease, width 0.3s ease, height 0.3s ease;
+  animation: tour-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes tour-pulse {
+  50% {
+    box-shadow:
+      0 0 0 9999px rgb(0 0 0 / 0.72),
+      0 0 0 2px rgb(var(--brand)),
+      0 0 44px rgb(var(--brand) / 0.7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-spot {
+    transition: none;
+    animation: none;
+  }
+}

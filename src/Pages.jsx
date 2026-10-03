@@ -245,184 +245,287 @@ export function Support() {
 
 /* ------------------------------------------------------------------ */
 
-/* Reverse chronological, straight off the data file. A new entry is a  */
-/* new object in src/data/changelog.json and nothing else.              */
 /* ================================================================== */
 /* ROADMAP                                                            */
 /*                                                                    */
-/* One spine, one dot per milestone, newest shipped at the top so it   */
-/* reads the same direction as the changelog next to it. The pair is   */
-/* deliberate: Changelog is what landed, this is what is coming, and   */
-/* they sit together in the menu for that reason.                     */
+/* Enodia's shape, the curator's ask of 3 October 2026: the stages     */
+/* run left to right on one line, Shipped, Up next, Planned, Later,    */
+/* which is the order work moves through, and every milestone is a     */
+/* card of one line that folds open. One open at a time across the     */
+/* page, so the whole plan fits on a screen. A progress axis, not a    */
+/* time axis: nothing unbuilt carries a date. Stacked below 1400 wide, */
+/* where four columns beside the sidebar get too narrow to read.      */
 /*                                                                    */
 /* The data is src/data/roadmap.json, which is the short public        */
 /* version. The working document with the reasoning and the           */
-/* dependency chain is dilas-roadmap.md in the repo      */
-/* root, and it is the one that moves first.                          */
+/* dependency chain is dilas-roadmap.md in the repo root, and it is    */
+/* the one that moves first.                                          */
 /* ================================================================== */
 
-/* Shipped is settled, so it is quiet. Next is the only thing lit,     */
-/* because exactly one thing can be next and a timeline where          */
-/* everything glows tells you nothing.                                 */
-const STATUS = {
-  shipped: { label: "Shipped", dot: "bg-base-600 border-base-600", text: "text-base-500" },
-  next: { label: "Up next", dot: "bg-brand border-brand", text: "text-base-200" },
-  planned: { label: "Planned", dot: "bg-base-900 border-base-600", text: "text-base-400" },
-  later: { label: "Later", dot: "bg-base-900 border-base-800", text: "text-base-500" },
+/* One scale, from the light that is on to the light not lit yet.      */
+/* `node` is the hollow ring on the line, `dot` leads each card: filled */
+/* for shipped, half lit for next, hollow for everything further out.   */
+const STAGES = [
+  { id: "shipped", name: "Shipped", say: "In the tool today, newest first.",
+    node: "border-brand", dot: "border-brand bg-brand", head: "text-brand" },
+  { id: "next", name: "Up next", say: "Being worked on, roughly in this order.",
+    node: "border-base-300", dot: "border-brand bg-brand/35", head: "text-base-100" },
+  { id: "planned", name: "Planned", say: "Intended, but not started.",
+    node: "border-base-400", dot: "border-base-500 bg-transparent", head: "text-base-300" },
+  { id: "later", name: "Later", say: "Further out, and waiting on the server side.",
+    node: "border-base-500", dot: "border-base-600 border-dashed bg-transparent", head: "text-base-400" },
+];
+
+/* Shipped takes a double track and reads in two sub-columns, because   */
+/* it is the stage that only grows, Enodia's reasoning: four equal      */
+/* tracks put sixteen cards against two and three. Written out whole so */
+/* Tailwind finds them; the count is of the stages after Shipped. Below  */
+/* 1400 wide, beside the sidebar, the columns get too narrow for a      */
+/* title to sit on one line, and the stack reads better.                */
+const PLAN_COLUMNS = {
+  0: "",
+  1: "min-[1400px]:grid-cols-[2fr_minmax(0,1fr)]",
+  2: "min-[1400px]:grid-cols-[2fr_minmax(0,1fr)_minmax(0,1fr)]",
+  3: "min-[1400px]:grid-cols-[2fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]",
 };
 
 export function Roadmap() {
-  const shipped = ROADMAP.milestones.filter((m) => m.status === "shipped").reverse();
-  const coming = ROADMAP.milestones.filter((m) => m.status !== "shipped");
+  const [open, setOpen] = useState(null);
+  const inStage = (id) => {
+    const list = ROADMAP.milestones.filter((m) => m.status === id);
+    return id === "shipped" ? list.reverse() : list;
+  };
+  const stages = STAGES.map((s) => ({ ...s, items: inStage(s.id) })).filter((s) => s.items.length);
+
+  /* Counted, not asserted: sixteen of nineteen is a fact you can check */
+  /* against the cards underneath it.                                   */
+  const built = inStage("shipped").length;
+  const total = ROADMAP.milestones.length;
+  const share = total ? Math.round((built / total) * 100) : 0;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="rounded-lg border border-base-800 bg-base-900/60 p-4 text-xs leading-relaxed text-base-400">
-        Where this is going, in order rather than on a schedule. There are no dates on anything unbuilt: this is a two
-        person project built in bursts, and a date would be a guess wearing a promise. What has shipped carries a
-        version, because that part already happened.
+    <div className="mx-auto flex max-w-[1500px] flex-col gap-3 sm:px-4" data-tour="roadmap">
+      <p className="text-[15px] leading-relaxed text-base-200">
+        What has shipped, what is next, and what is further out. No dates: this is a two person project built in
+        bursts, and a date would be a guess wearing a promise.
+      </p>
+
+      {/* The whole thing at a glance, before any of the detail. */}
+      <div className="flex flex-col gap-1.5">
+        <div className="h-4 overflow-hidden rounded-full border border-base-700 bg-base-950/80"
+          role="img" aria-label={`${built} of ${total} shipped`}>
+          <span className="block h-full rounded-full bg-brand/80 shadow-[inset_0_1px_0_rgb(255_255_255/0.25)]"
+            style={{ width: `${share}%` }} />
+        </div>
+        <p className="text-[10px] uppercase tracking-[0.14em] text-base-500" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+          <span className="text-brand">{built}</span> of {total} shipped
+        </p>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-base-800 bg-base-900">
-        <div className="border-b border-base-800 px-4 py-2.5">
-          <h3 className="text-sm font-bold uppercase tracking-wide text-base-100" style={{ fontFamily: "'Oswald', sans-serif" }}>
-            Coming
-          </h3>
-        </div>
-        <Spine items={coming} />
+      <div className={"relative mt-5 grid items-start gap-10 min-[1400px]:gap-7 " + PLAN_COLUMNS[stages.length - 1]}>
+        {/* The line the stages sit on, so they read as one progression    */}
+        {/* rather than as lists that happen to be side by side.           */}
+        <span aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-[0.4rem] hidden h-px bg-gradient-to-r from-brand/60 via-brand/25 to-base-800 min-[1400px]:block" />
 
-        <div className="border-y border-base-800 bg-base-950/40 px-4 py-2.5">
-          <h3 className="text-sm font-bold uppercase tracking-wide text-base-300" style={{ fontFamily: "'Oswald', sans-serif" }}>
-            Shipped
-          </h3>
-          <p className="text-[11px] text-base-600">Newest first, same direction as the changelog.</p>
-        </div>
-        <Spine items={shipped} />
+        {stages.map((s) => (
+          <section key={s.id} className="relative min-w-0 min-[1400px]:pt-6">
+            <span aria-hidden="true"
+              className={"absolute left-0 top-0 hidden h-3 w-3 rounded-full border-2 bg-base-950 min-[1400px]:block " + s.node} />
+            <header className="flex items-center gap-2.5">
+              <h3 className={"text-xl font-semibold uppercase tracking-[0.12em] " + s.head} style={{ fontFamily: "'Oswald', sans-serif" }}>
+                {s.name}
+              </h3>
+              <span className="rounded-full bg-base-800 px-2 py-px text-[10px] tabular-nums text-base-400"
+                style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                {s.items.length}
+              </span>
+            </header>
+            <p className="mb-5 mt-1 text-[13px] text-base-500">{s.say}</p>
+
+            <div className={"grid items-start gap-2 " + (s.id === "shipped" ? "md:grid-cols-2" : "")}>
+              {s.items.map((m) => (
+                <PlanCard key={m.id} m={m} stage={s} on={open === m.id}
+                  toggle={() => setOpen(open === m.id ? null : m.id)} />
+              ))}
+            </div>
+          </section>
+        ))}
       </div>
     </div>
   );
 }
 
-function Spine({ items }) {
+/* A milestone as one line until opened. The dot leads it in its stage's */
+/* colour, so skimming the left edge gives the shape without reading.   */
+/* Sentence case and the body face, like Enodia's: a title is something */
+/* to read, and sixteen of them in condensed capitals was a wall.        */
+function PlanCard({ m, stage, on, toggle }) {
+  const track = ROADMAP.tracks[m.track] || null;
+  const meta = m.version ? "v" + m.version : m.release || null;
   return (
-    <ol className="relative flex flex-col">
-      {items.map((m, i) => {
-        const s = STATUS[m.status] || STATUS.later;
-        const last = i === items.length - 1;
-        return (
-          <li key={m.id} className="relative flex gap-3 px-4 py-3">
-            {/* The spine, drawn per row rather than as one absolute line, */}
-            {/* so it stops cleanly at the final dot instead of running    */}
-            {/* past it into the padding.                                   */}
-            {/* Measured, not eyeballed. The row pads 16px, the dot is 10px */}
-            {/* wide with a 4px top margin, so its centre is at x 21 and it  */}
-            {/* ends at y 26. A 1px line therefore starts at x 20.5, and     */}
-            {/* being two pixels out is the difference between a spine and   */}
-            {/* a row of unconnected dots.                                    */}
-            {!last ? (
-              <span aria-hidden="true" className="absolute left-[20.5px] top-[26px] bottom-0 w-px bg-base-700" />
-            ) : null}
-
-            <span aria-hidden="true"
-              className={"relative z-10 mt-1 h-2.5 w-2.5 shrink-0 rounded-full border-2 " + s.dot} />
-
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                <h4 className={"text-[13px] font-bold uppercase tracking-wide " +
-                    (m.status === "shipped" ? "text-base-300" : "text-base-100")}
-                  style={{ fontFamily: "'Oswald', sans-serif" }}>
-                  {m.title}
-                </h4>
-                {m.version ? (
-                  <span className="rounded border border-base-800 px-1.5 py-px text-[10px] tabular-nums text-base-500"
-                    style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                    v{m.version}
-                  </span>
-                ) : null}
-                {m.status === "next" ? (
-                  <span className="rounded bg-brand px-1.5 py-px text-[10px] font-bold uppercase tracking-wider text-base-950">
-                    {s.label}
-                  </span>
-                ) : null}
-                {m.release ? (
-                  <span className="rounded border border-base-700 px-1.5 py-px text-[10px] uppercase tracking-wider text-base-500">
-                    {m.release}
-                  </span>
-                ) : null}
-              </div>
-              <p className={"mt-1 text-[12px] leading-relaxed " + s.text}>{m.say}</p>
-              {/* Only where it changes. Four rows each saying "needs        */}
-              {/* nothing new" is four times the ink for none of the         */}
-              {/* information, and printing it once makes the hand-off       */}
-              {/* between the two tracks the thing you actually notice.      */}
-              {m.status !== "shipped" && m.track !== (items[i - 1] || {}).track ? (
-                <p className="mt-1.5 text-[10px] uppercase tracking-wider text-base-600">
-                  {(ROADMAP.tracks[m.track] || {}).label}
-                  <span className="ml-1.5 normal-case tracking-normal text-base-700">
-                    {(ROADMAP.tracks[m.track] || {}).note}
-                  </span>
-                </p>
-              ) : null}
-            </div>
-          </li>
-        );
-      })}
-    </ol>
+    <div className={"rounded-lg border backdrop-blur-sm transition-colors " +
+      (on ? "border-brand/60 bg-base-900/90" : "border-base-700/70 bg-base-900/60 hover:border-base-500")}>
+      <button type="button" onClick={toggle} aria-expanded={on}
+        className="group flex min-h-[3rem] w-full items-center gap-3 px-4 py-2.5 text-left">
+        <span aria-hidden="true" className={"h-2.5 w-2.5 shrink-0 rounded-full border " + stage.dot} />
+        <h4 className={"min-w-0 flex-1 text-[15px] font-semibold leading-snug transition-colors " +
+            (on ? "text-brand" : "text-base-100 group-hover:text-brand")}>
+          {m.title}
+        </h4>
+        {meta ? (
+          <span className="shrink-0 text-[10px] tabular-nums text-base-500" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+            {meta}
+          </span>
+        ) : null}
+        <ChevronDown className={"h-4 w-4 shrink-0 transition-transform " + (on ? "rotate-180 text-brand" : "text-base-400")} />
+      </button>
+      {on ? (
+        <div className="px-4 pb-4 pl-[2.4rem]">
+          <p className="text-[14px] leading-relaxed text-base-300">{m.say}</p>
+          {track ? (
+            <p className="mt-3 text-[10px] uppercase tracking-wider text-base-500">
+              {track.label}
+              <span className="ml-1.5 normal-case tracking-normal text-base-600">{track.note}</span>
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
 /* Folded, Enodia's way, the curator's ask of 3 October 2026: one line per
    release with its summary, and opening one closes whichever was open, so
-   the page fits on a screen. The newest starts open. */
+   the page fits on a screen. The newest starts open. Releases hang off one
+   spine, grouped by month, with the same cards and dots as the Roadmap so
+   the pair read as one place. "Unfold all" is for reading the lot in one go,
+   and opening any single release afterwards goes back to one at a time. */
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July",
+  "August", "September", "October", "November", "December"];
+
+function byMonth(entries) {
+  const groups = [];
+  for (const entry of entries) {
+    const [y, m] = (entry.date || "").split("-");
+    const label = MONTHS[Number(m) - 1] ? MONTHS[Number(m) - 1] + " " + y : "Undated";
+    const last = groups[groups.length - 1];
+    if (last && last.label === label) last.entries.push(entry);
+    else groups.push({ label, entries: [entry] });
+  }
+  return groups;
+}
+
+/* "3 Oct": the month is already the group's heading. */
+function shortDate(iso) {
+  const [, m, d] = (iso || "").split("-");
+  return MONTHS[Number(m) - 1] ? Number(d) + " " + MONTHS[Number(m) - 1].slice(0, 3) : iso;
+}
+
 export function Changelog() {
-  const [open, setOpen] = useState(CHANGELOG[0] ? CHANGELOG[0].version : null);
+  const newest = CHANGELOG[0] ? CHANGELOG[0].version : null;
+  const [open, setOpen] = useState(() => new Set(newest ? [newest] : []));
+  const all = open.size === CHANGELOG.length;
+  /* Closing takes only that one away; opening is exclusive again. */
+  const toggle = (v) => setOpen((now) => {
+    if (!now.has(v)) return new Set([v]);
+    const next = new Set(now);
+    next.delete(v);
+    return next;
+  });
+
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       <div className="rounded-lg border border-base-800 bg-base-900/60 p-4 text-xs leading-relaxed text-base-400">
         What changed in the tool, newest first. One version is one deploy, dated the day it shipped. For what Arrowhead
         changed in the game, read the caveat on any flagged row.
       </div>
 
-      {/* Keyed by version, not date: one deploy can share a day with another. */}
-      {CHANGELOG.map((entry) => {
-        const on = open === entry.version;
-        return (
-          <div key={entry.version} className={"overflow-hidden rounded-lg border bg-base-900 " + (on ? "border-base-600" : "border-base-800")}>
-            <button type="button" onClick={() => setOpen(on ? null : entry.version)} aria-expanded={on}
-              className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-base-800/40">
-              <span className="w-14 shrink-0 rounded border border-base-700 px-1.5 py-px text-center text-[11px] tabular-nums text-base-300"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                v{entry.version}
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-bold uppercase tracking-wide text-base-100" style={{ fontFamily: "'Oswald', sans-serif" }}>
-                  {entry.title}
-                </span>
-                {entry.say ? <span className="block truncate text-xs italic text-base-500">{entry.say}</span> : null}
-              </span>
-              <span className="hidden shrink-0 items-center gap-2 text-[11px] tabular-nums text-base-500 sm:flex"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                {entry.date}
-                {entry.reconstructed ? (
-                  <span title="Written after the fact from the design notes. The date is inferred."
-                    className="rounded border border-base-800 px-1.5 py-px text-base-600">reconstructed</span>
-                ) : null}
-              </span>
-              <ChevronDown className={"h-4 w-4 shrink-0 text-base-500 transition-transform " + (on ? "rotate-180" : "")} />
-            </button>
-            {on ? (
-              <ul className="flex flex-col gap-1.5 border-t border-base-800 px-4 py-3">
-                {entry.changes.map((c, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[13px] leading-relaxed text-base-300">
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-brand" />
-                    {c}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-        );
-      })}
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[10px] uppercase tracking-[0.12em] text-base-500" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+          <span className="text-brand">{CHANGELOG.length}</span> releases, now on v{newest}
+        </p>
+        <button type="button"
+          onClick={() => setOpen(all ? new Set() : new Set(CHANGELOG.map((e) => e.version)))}
+          className="flex items-center gap-1.5 rounded-md border border-base-700 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-base-300 hover:border-brand hover:text-brand"
+          style={{ fontFamily: "'Oswald', sans-serif" }}>
+          <ChevronDown className={"h-3.5 w-3.5 transition-transform " + (all ? "rotate-180" : "")} />
+          {all ? "Fold all" : "Unfold all"}
+        </button>
+      </div>
+
+      {byMonth(CHANGELOG).map((group) => (
+        <section key={group.label}>
+          <h3 className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-base-400" style={{ fontFamily: "'Oswald', sans-serif" }}>
+            {group.label}
+            <span className="ml-2 font-normal tracking-normal text-base-600" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+              {group.entries.length}
+            </span>
+          </h3>
+
+          {/* The spine, with one node per release on it. The newest node is */}
+          {/* lit; everything older is settled, so it is quiet.              */}
+          <ol className="ml-1 flex flex-col gap-1.5 border-l border-base-800 pl-4">
+            {/* Keyed by version, not date: one deploy can share a day with another. */}
+            {group.entries.map((entry) => {
+              const on = open.has(entry.version);
+              const latest = entry.version === newest;
+              return (
+                <li key={entry.version} className="relative">
+                  <span aria-hidden="true"
+                    className={"absolute -left-[21px] top-[15px] h-2 w-2 rounded-full ring-4 ring-base-950 " +
+                      (latest ? "bg-brand" : on ? "bg-base-400" : "bg-base-700")} />
+                  <div className={"rounded-lg border backdrop-blur-sm transition-colors " +
+                    (on ? "border-brand/50 bg-base-900" : "border-base-800 bg-base-900/70 hover:border-base-600")}>
+                    <button type="button" onClick={() => toggle(entry.version)} aria-expanded={on}
+                      className="group flex w-full items-center gap-3 px-3 py-2 text-left sm:px-4">
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-baseline gap-2">
+                          <span className={"text-sm font-bold uppercase tracking-wide transition-colors " +
+                              (on ? "text-brand" : "truncate text-base-100 group-hover:text-brand")}
+                            style={{ fontFamily: "'Oswald', sans-serif" }}>
+                            {entry.title}
+                          </span>
+                          {latest ? (
+                            <span className="shrink-0 rounded bg-brand px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-base-950">
+                              Latest
+                            </span>
+                          ) : null}
+                        </span>
+                        {entry.say && !on ? <span className="block truncate text-xs italic text-base-500">{entry.say}</span> : null}
+                      </span>
+                      <span className="flex shrink-0 flex-col items-end text-[10px] tabular-nums leading-tight text-base-500"
+                        style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                        <span className="text-base-300">v{entry.version}</span>
+                        <span>{shortDate(entry.date)}</span>
+                      </span>
+                      <ChevronDown className={"h-4 w-4 shrink-0 transition-transform " + (on ? "rotate-180 text-brand" : "text-base-500")} />
+                    </button>
+                    {on ? (
+                      <div className="border-t border-base-800 px-3 py-3 sm:px-4">
+                        {entry.say ? <p className="mb-2 text-[13px] italic leading-relaxed text-base-400">{entry.say}</p> : null}
+                        <ul className="flex flex-col gap-1.5">
+                          {entry.changes.map((c, i) => (
+                            <li key={i} className="flex items-start gap-2 text-[13px] leading-relaxed text-base-300">
+                              <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-brand" />
+                              {c}
+                            </li>
+                          ))}
+                        </ul>
+                        {entry.reconstructed ? (
+                          <p className="mt-2 text-[10px] text-base-600">
+                            Written after the fact from the design notes. The date is inferred.
+                          </p>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      ))}
     </div>
   );
 }
