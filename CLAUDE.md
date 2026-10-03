@@ -546,7 +546,7 @@ State lives in `localStorage`. **What you own and what you made is exported; wha
 | `hd2-loadouts` | Your builds | Yes |
 | `hd2-drop-history` | Every drop you confirmed, since 1 October 2026 | Yes, and an import adds to it rather than replacing it |
 | `hd2-scenario-*`, `hd2-drop`, `hd2-party`, `hd2-planner` | Where you are going tonight, with whom | No |
-| `hd2-theme`, `hd2-filter-view`, `hd2-map-skin`, `hd2-map-tilt`, `hd2-rules-off` | How this browser shows things | No |
+| `hd2-theme`, `hd2-filter-view`, `hd2-map-skin`, `hd2-map-tilt`, `hd2-rules-off`, `hd2-tour-done` | How this browser shows things | No |
 
 A key that has never been written reads as null, which is what lets the ownership seed apply exactly once without ever fighting your own toggles.
 
@@ -1448,12 +1448,25 @@ Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, t
 
 ---
 
+# **The Tour**
+
+> [!success] The Democracy Officer shows you round. 3 October 2026, the curator's ask
+> W.A.R.P.'s shape with Enodia's light: thirteen steps across eight pages, each lighting one thing and saying it twice, **in-universe in large type, then plainly in small type under it.** The register is Helldivers 2's own item tooltips; **none of the words are the game's**, every line is written for this tool. `src/lib/tour.js` holds the steps, `src/Tour.jsx` draws them, `.tour-spot` in `src/index.css` is the light.
+>
+> - **`plain` is the fact and must stand alone.** Somebody reading only the small print should still know what every lit thing does. The jokes are paid for by that.
+> - **It opens by itself once per browser**, then `hd2-tour-done` says "done", out of the export. Settings has **Replay the tour**. It walks from page to page and puts you back where you started.
+> - **Anchors are `data-tour` attributes**, never classes, so styling work cannot rename one by accident. The first *visible* match is lit, because the party button is in the DOM once per width.
+> - **An `optional` step whose anchor never turns up is skipped** the way you were going: Drop Bay has no slot before a front is chosen and sends you to the war room. Any other missing anchor (a menu entry on a phone, where the menu is a drawer) is said from the middle of the screen.
+> - **Screenshots of it in the Browser pane lie.** The pane paints stale frames after a scroll (see the bug block in Hard Rules), so check the card's place with `getBoundingClientRect` or a hit test, not the picture.
+
+---
+
 # **The README**
 
 > [!info] The public face, in W.A.R.P.'s house style. 2 October 2026
 > `README.md` follows the curator's other project, `C:\Dev\W.A.R.P\README.md`: a centred name and full name, a two line pitch, shields badges, quick links, an in character quote, a section per feature with a screenshot, **what it keeps and what it sends** as a table, building from source, where the numbers come from, and the licence and disclaimer. **Every claim in it is checked against the code**, and the privacy table says what Support's "Your data stays yours" says. Change both together.
 >
-> **The screenshots in `docs/images/` are 1600 by 900, taken with headless Edge from its own profile**, never from a browser anybody uses. The recipe, since the tool's security policy refuses inline scripts: build, put a throwaway `__seed.html` plus `__seed.js` in `dist/` that writes the scenario and the drop into `localStorage`, start `wrangler dev`, run one live war fetch, load the seed page once with `msedge --headless=new --user-data-dir=<a scratch folder> --dump-dom`, then `--screenshot` each route with `--window-size=1600,900 --virtual-time-budget=9000` (12000 for the maps, which glide). Convert with sharp to JPG at quality 84, and delete the seed files. Retake them when a screen they show changes.
+> **The screenshots in `docs/images/` are 1600 by 900, taken with headless Edge from its own profile**, never from a browser anybody uses. The recipe, since the tool's security policy refuses inline scripts: build, put a throwaway `__seed.html` plus `__seed.js` in `dist/` that writes the scenario, the drop and `hd2-tour-done` into `localStorage` (without the last, the tour opens over every shot), start `wrangler dev`, run one live war fetch, load the seed page once with `msedge --headless=new --user-data-dir=<a scratch folder> --dump-dom`, then `--screenshot` each route with `--window-size=1600,900 --virtual-time-budget=9000` (12000 for the maps, which glide). Convert with sharp to JPG at quality 84, and delete the seed files. Retake them when a screen they show changes.
 
 ---
 
