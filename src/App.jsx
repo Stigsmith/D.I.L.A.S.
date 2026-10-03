@@ -29,7 +29,7 @@ import Shared from "./Shared.jsx";
 import { PartyButton, PartyPanel } from "./Party.jsx";
 import { useRulesOff } from "./lib/rules.js";
 import { useParty, usePartySync } from "./lib/party.js";
-import Collection, { COLLECTION_TABS } from "./Collection.jsx";
+import Collection, { COLLECTION_TABS, CollectionNudge } from "./Collection.jsx";
 import Ambient, { Grain, Masthead } from "./Ambient.jsx";
 import { About, Support, Changelog, Roadmap, Footer } from "./Pages.jsx";
 import Account from "./Account.jsx";
@@ -96,6 +96,11 @@ const ALL_NAV = [...NAV.flatMap((g) => g.items), ...NAV_FOOT];
 /* The Armoury, the editor, the Rules page and a shared build joined on 1
    October 2026: each shows readings that the scenario moves. */
 const SCENARIO_SURFACES = new Set(["tiers", "bay", "armoury", "builder", "rules", "shared"]);
+
+/* The pages that recommend or offer gear, and so say something wrong   */
+/* while the collection is untouched. They carry the nudge toward       */
+/* Collection until the active profile is set up. See Collection.jsx.   */
+const NUDGE_SURFACES = new Set(["bay", "armoury", "tiers", "builder", "shared"]);
 
 /* Routable, deliberately absent from the sidebar. The tier list joined on
    1 October 2026: it is the picker inside the Armoury and Drop Bay now,
@@ -910,7 +915,14 @@ export default function App() {
             <PartyPanel party={party} sync={partySync} onClose={() => setPartyOpen(false)}
               onDropBay={() => { setPartyOpen(false); navigate("bay"); }} />
           ) : null}
-          <main className={inRoom ? "" : "p-4 sm:p-6"}>{surface}</main>
+          <main className={inRoom ? "" : "p-4 sm:p-6"}>
+            {state.needsSetup && NUDGE_SURFACES.has(dest) && !inRoom ? (
+              <div data-tour="collection-nudge">
+                <CollectionNudge onSetUp={() => navigate("collection/warbonds")} onAllOwned={state.markSetUp} />
+              </div>
+            ) : null}
+            {surface}
+          </main>
           {/* The war room fills the screen, and the other routes off the */}
           {/* menu are focused sub screens. Every other destination keeps */}
           {/* the footer.                                                 */}

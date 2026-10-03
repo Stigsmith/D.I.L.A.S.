@@ -42,7 +42,56 @@ export const TOUR = [
     speech:
       "This is the menu. Every destination on it has been cleared by the Ministry of Truth. The entries that are greyed out do not exist, and you did not see them.",
     plain:
-      "Drop Bay, the Star Map, the Armoury, the Tier Lists and your Collection, then the pages about the tool. Greyed out entries are planned and not built yet.",
+      "Drop Bay, the Star Map, the Armoury, the Tier Lists and your Collection, then the pages about the tool. Greyed out entries are planned and not built yet. First stop: Collection.",
+  },
+  /* Collection comes first, the curator's call of 3 October 2026: an   */
+  /* untouched collection reads as owning everything, so every step     */
+  /* after this one would be recommending gear the player may not have. */
+  /* One step per kind of button, because they act on different things. */
+  {
+    route: "collection/warbonds",
+    at: "collection-guide",
+    title: "Requisitions first",
+    speech:
+      "Before you are issued anything, Super Earth must know what you already possess. Undeclared equipment is not a crime. It is merely suspicious.",
+    plain:
+      "Start here. Until your collection is filled in, the tool assumes you own every warbond and every item, and recommends accordingly. The quick start at the top gets you most of the way in one click.",
+  },
+  {
+    route: "collection/warbonds",
+    at: "warbond-tile",
+    title: "Warbonds you bought",
+    speech:
+      "Each Warbond is a solemn pact between you and Super Earth, sealed with Super Credits. Mark the ones you have signed. The Ministry already knows, but it likes to hear you say it.",
+    plain:
+      "Click a warbond's name to switch it between owned and not owned. Not owned locks everything in it at once, everywhere in the tool.",
+  },
+  {
+    route: "collection/warbonds",
+    at: "warbond-contents",
+    title: "Medals, spent wisely",
+    speech:
+      "Owning a Warbond is not the same as earning its contents. Every item inside must be bought with Medals, earned in blood, sweat and paperwork.",
+    plain:
+      "The tick marks every item in that warbond unlocked, the cross marks them all not yet, and the number says how many you have. Both stay greyed out until you own the warbond. For a few items here and there, use the Items tab.",
+  },
+  {
+    route: "collection/warbonds",
+    at: "warbond-tier",
+    title: "Bulk requisition",
+    speech:
+      "For the citizen in a hurry: declare an entire tier of Warbonds in one stroke. Efficiency is patriotism.",
+    plain:
+      "Own all and Own none switch a whole tier of warbonds at once. They do not touch the items inside, which keep whatever you set with the tick and the cross.",
+  },
+  {
+    route: "collection/items",
+    at: "item-row",
+    title: "Item by item",
+    speech:
+      "Every rifle, grenade, stratagem and pair of boots, itemised for your convenience and the Ministry's records. Clicking a padlock is a legally binding act.",
+    plain:
+      "Every item has its own padlock: click the row to switch it. Filter by source or slot, then lock or unlock everything shown at once. Armour lives only here. A dim padlock means a warbond you do not own is holding it.",
   },
   {
     route: "scenario",
@@ -101,15 +150,6 @@ export const TOUR = [
       "The u.gg community tier beside ours for your scenario. Click a row to see what moved it. Either column sorts the list.",
   },
   {
-    route: "collection/warbonds",
-    at: "nav-collection",
-    title: "Requisitions",
-    speech:
-      "Log the Warbonds you own and the gear you have unlocked. The tool will never recommend equipment you have not earned. Earning it is your civic duty.",
-    plain:
-      "What you own, per profile. Gear you have not unlocked is left out of suggestions and pickers unless you ask to see it.",
-  },
-  {
     route: "rules",
     at: "nav-rules",
     title: "Full transparency",
@@ -139,6 +179,7 @@ export const TOUR = [
     title: "Dismissed",
     speech:
       "Orientation complete. You are now fully informed, which is the second most dangerous thing a citizen can be. Get out there and spread Managed Democracy.",
-    plain: "That is the tour. Drop Bay is where an evening starts.",
+    plain:
+      "That is the tour. If your collection is not filled in yet, do that first, in Collection; after that, Drop Bay is where an evening starts.",
   },
 ];

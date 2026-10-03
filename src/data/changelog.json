@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.28.0",
+    "date": "2026-10-03",
+    "title": "Declare your equipment, citizen",
+    "say": "The Ministry cannot recommend what you do not own. It has tried.",
+    "changes": [
+      "Until your collection is filled in, Drop Bay, the Armoury and the Tier Lists say so, with one click to set it up or to declare that you own everything.",
+      "Collection opens with a quick start, new player or veteran, and a short guide to what each of its buttons does.",
+      "The tour now starts in Collection and stops at every kind of button there."
+    ]
+  },
+  {
     "version": "1.27.0",
     "date": "2026-10-03",
     "title": "Orientation is now mandatory",

@@ -15,7 +15,7 @@ import { BRAND } from "./brand.js";
 import { idForLabel, warbondIdForLabel, gateableWarbondIds } from "./items.js";
 import {
   seedLockedItems, seedLockedWarbonds, lockedFromOwnership, isOwnershipDoc, buildLockedSet,
-  cleanProfileDoc, blankProfile, profileId, DEFAULT_PROFILE_ID,
+  cleanProfileDoc, blankProfile, profileId, DEFAULT_PROFILE_ID, needsSetup,
 } from "./ownership.js";
 import { cleanLoadout, duplicateLoadout } from "./loadouts.js";
 import { cleanHistory, mergeHistory } from "./history.js";
@@ -160,6 +160,18 @@ export function useCollectionState() {
         ? p.lockedWarbonds.filter((n) => n !== id)
         : [...p.lockedWarbonds, id],
     }));
+  }, [updateActive]);
+
+  /* "Yes, this is my collection", from the Collection guide or the nudge. */
+  const markSetUp = useCallback(() => {
+    updateActive((p) => ({ ...p, setUp: true }));
+  }, [updateActive]);
+
+  /* The guide's quick start: the active profile from scratch, as nothing  */
+  /* owned or everything owned, keeping its id and name. Either is a       */
+  /* deliberate answer, so the profile counts as set up afterwards.        */
+  const resetActiveTo = useCallback((mode) => {
+    updateActive((p) => ({ ...blankProfile(p.id, p.name, mode, p), setUp: true }));
   }, [updateActive]);
 
   const setWarbondGroup = useCallback((ids, locked) => {
@@ -416,6 +428,7 @@ export function useCollectionState() {
     setActiveProfile, createProfile, renameProfile, deleteProfile,
     toggleFavorite, toggleFavItem, clearFavItems,
     toggleLock, clearItemLocks, setItemGroup, toggleWarbond, setWarbondGroup,
+    markSetUp, resetActiveTo, needsSetup: needsSetup(active),
     saveLoadout, deleteLoadout, duplicate, logDrop, unlogDrop,
     exportState, importState, resetLocal,
   };

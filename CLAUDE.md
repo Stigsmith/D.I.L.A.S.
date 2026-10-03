@@ -191,6 +191,15 @@ Data authority lives outside this repo, in the Helldivers 2 project files: `hell
 > [!info] The bulk buttons on a warbond tile are a tick and a cross, not two padlocks
 > Three padlocks in a row read as the same control repeated. The tick and cross also say the right thing: they set the medal axis for the whole warbond, they do not toggle the warbond.
 
+> [!danger] Setting it up comes first. The curator's call, 3 October 2026
+> **An untouched collection locks nothing, so it reads as owning every warbond and every item**, and every suggestion and picker offers gear the player may not have. Three things push toward fixing that:
+>
+> - **The nudge**, `CollectionNudge`, over Drop Bay, the Armoury, the Tier Lists, the editor and a shared build (`NUDGE_SURFACES` in `App.jsx`) while the active profile needs it: **Set up my collection**, or **I own everything**
+> - **The guide**, `CollectionGuide`, at the top of Collection: a quick start (**I am fairly new** resets the profile to nothing owned, **I have played a lot** to everything owned), and one card per kind of button, because the page's buttons act on different things
+> - **The tour starts there**, one stop per kind of button
+>
+> `needsSetup` in `src/lib/ownership.js` is the one test: no `setUp` mark and no lock of either kind. **Any lock counts as a collection somebody has touched**, so nobody who already set theirs up is nagged. `setUp` lives on the profile, so it is exported with it, and `cleanProfile` keeps it.
+
 Armor passives stay out of the warbond axis. The source maps passives to armor set names, not to warbonds, so armor remains on per item unlock only, which is what the Items tab gives it. If a passive to warbond mapping ever appears, wire it into the item's `acquisition` and Collection picks it up with no other change.
 
 ### Resuming
@@ -1451,7 +1460,7 @@ Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, t
 # **The Tour**
 
 > [!success] The Democracy Officer shows you round. 3 October 2026, the curator's ask
-> W.A.R.P.'s shape with Enodia's light: thirteen steps across eight pages, each lighting one thing and saying it twice, **in-universe in large type, then plainly in small type under it.** The register is Helldivers 2's own item tooltips; **none of the words are the game's**, every line is written for this tool. `src/lib/tour.js` holds the steps, `src/Tour.jsx` draws them, `.tour-spot` in `src/index.css` is the light.
+> W.A.R.P.'s shape with Enodia's light: seventeen steps across eight pages, **starting in Collection** (see Collection, "Setting it up"), each lighting one thing and saying it twice, **in-universe in large type, then plainly in small type under it.** The register is Helldivers 2's own item tooltips; **none of the words are the game's**, every line is written for this tool. `src/lib/tour.js` holds the steps, `src/Tour.jsx` draws them, `.tour-spot` in `src/index.css` is the light.
 >
 > - **`plain` is the fact and must stand alone.** Somebody reading only the small print should still know what every lit thing does. The jokes are paid for by that.
 > - **It opens by itself once per browser**, then `hd2-tour-done` says "done", out of the export. Settings has **Replay the tour**. It walks from page to page and puts you back where you started.
