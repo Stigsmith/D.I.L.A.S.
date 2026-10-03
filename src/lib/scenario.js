@@ -286,7 +286,7 @@ export function useScenario() {
    ours: the community vote is the reference, but the whole point of the
    second column is that it knows where you are dropping, so that is the
    one worth ranking by until you say otherwise. */
-export const SORT_COLUMNS = ["dds", "ugg"];
+export const SORT_COLUMNS = ["ours", "ugg"];
 
 /* ------------------------------------------------------------------ */
 /* The drop planner's answers                                          */
@@ -334,7 +334,7 @@ export function usePlannerPrefs() {
 }
 
 export function useTierSort() {
-  const [sortBy, setSortBy] = useState("dds");
+  const [sortBy, setSortBy] = useState("ours");
 
   useEffect(() => {
     const saved = readSetting(SETTINGS.tierSort, SORT_COLUMNS, null);

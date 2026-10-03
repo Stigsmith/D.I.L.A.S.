@@ -1,6 +1,6 @@
-# **D.D.S.: Handover From Enodia, Hosting, Accounts And The Live API**
+# **D.I.L.A.S.: Handover From Enodia, Hosting, Accounts And The Live API**
 
-> Written 25 September 2026 in the Enodia repo, for the next Claude session that opens `C:\Dev\dds`. Enodia is stigly's Hades II tool. It has already done everything in the v2 and v3 half of `dds-roadmap.md`: it moved off Netlify onto Cloudflare Workers, opened accounts, synced between devices, published builds under short links, built an exchange with friends and leaderboards, and sent password resets from its own domain. This file says what to take from it, in what order, and what it cost Enodia to learn.
+> Written 25 September 2026 in the Enodia repo, for the next Claude session that opens `C:\Dev\dilas`. Enodia is stigly's Hades II tool. It has already done everything in the v2 and v3 half of `dilas-roadmap.md`: it moved off Netlify onto Cloudflare Workers, opened accounts, synced between devices, published builds under short links, built an exchange with friends and leaderboards, and sent password resets from its own domain. This file says what to take from it, in what order, and what it cost Enodia to learn.
 
 > [!danger] The source is the code, not this file
 > Every Enodia claim below names a file in **`C:\Dev\Enodia`**. Open that file before porting anything. The docblocks there are long on purpose and they carry reasoning this summary drops. If this file and the code disagree, the code wins, and this file should be corrected.
@@ -8,7 +8,7 @@
 > One example, found while writing this: the comment in `worker/limit.ts` says publishing is capped at fifty builds per account, and `MAX_PER_USER` in `worker/publish.ts` is **100**. The comment went stale and the number did not.
 
 > [!warning] Assistant knowledge of Cloudflare's limits and prices is not a source
-> Anything here that Enodia **measured** is stated as fact, with its file. Anything about Cloudflare, Resend or the Helldivers APIs that Enodia never tested is marked **verify**. Check it against the current docs or a real response before building on it. That is the same rule the DDS `CLAUDE.md` already applies to wikis.
+> Anything here that Enodia **measured** is stated as fact, with its file. Anything about Cloudflare, Resend or the Helldivers APIs that Enodia never tested is marked **verify**. Check it against the current docs or a real response before building on it. That is the same rule the D.I.L.A.S. `CLAUDE.md` already applies to wikis.
 
 ---
 
@@ -26,7 +26,7 @@ Settled with stigly on 25 September 2026. Do not reopen them.
 
 ---
 
-# **Where DDS Stands Today**
+# **Where D.I.L.A.S. Stands Today**
 
 Measured on 25 September 2026, not recalled.
 
@@ -39,7 +39,7 @@ Measured on 25 September 2026, not recalled.
 | Network at runtime | None. Planets, weapons and missions are fetched at build time by `npm run wiki` and shipped |
 | Uncommitted work | As of this writing, 14 modified files and 7 untracked paths, among them `App.jsx`, `Builder.jsx`, `DropBay.jsx`, `Tiers.jsx`, `score.js`, both docs and the Phase 5 files `build.js` and `build-rules.json`. Only two commits exist. **Look at `git status` first and ask before branching over them** |
 
-The dependency chain in `dds-roadmap.md` ("The dependency chain") still holds, and Enodia confirms it: **auth and shared storage first, then Exchange, then live squad.** The live war state layer needs no account (`dds-roadmap.md`, "Order, revised") and can go in right after hosting moves.
+The dependency chain in `dilas-roadmap.md` ("The dependency chain") still holds, and Enodia confirms it: **auth and shared storage first, then Exchange, then live squad.** The live war state layer needs no account (`dilas-roadmap.md`, "Order, revised") and can go in right after hosting moves.
 
 ---
 
@@ -60,12 +60,12 @@ browser ──► yourdomain/            static assets  (free, unlimited)
 
 ### The config, adapted
 
-Read Enodia's `wrangler.jsonc` in full first, because every key in it carries a comment explaining why. The DDS version should look like this once Stage 1 lands. Stage 0 is the same file without `main`, `d1_databases` and `vars`.
+Read Enodia's `wrangler.jsonc` in full first, because every key in it carries a comment explaining why. The D.I.L.A.S. version should look like this once Stage 1 lands. Stage 0 is the same file without `main`, `d1_databases` and `vars`.
 
 ```jsonc
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "dds",
+  "name": "dilas",
   "main": "worker/index.ts",
   // Enodia uses 2026-09-02. Anything past 2025-04-01 is what not_found_handling relies on
   "compatibility_date": "<today>",
@@ -85,13 +85,13 @@ Read Enodia's `wrangler.jsonc` in full first, because every key in it carries a 
   },
 
   "d1_databases": [
-    { "binding": "DB", "database_name": "dds", "database_id": "<from wrangler d1 create>", "migrations_dir": "migrations" }
+    { "binding": "DB", "database_name": "dilas", "database_id": "<from wrangler d1 create>", "migrations_dir": "migrations" }
   ],
 
   // Not secrets. Printed on every letter and every upstream request
   "vars": {
     "MAIL_FROM": "<Name> <someone@the domain>",
-    "SUPER_CLIENT": "dds",
+    "SUPER_CLIENT": "dilas.me",
     "SUPER_CONTACT": "<a project address on the domain, ask stigly>"
   }
 }
@@ -108,8 +108,8 @@ Small, independent, and worth doing first on its own: it puts security headers o
 
 1. **`wrangler` as a dev dependency** and a `deploy` script: `"deploy": "npm run build && wrangler deploy"`. Enodia's `package.json` has the same.
 2. **`wrangler.jsonc`** as above, assets only.
-3. **`public/_headers`.** DDS's Vite `publicDir` is the default `public/`, so that is the only route into `dist/`. Port Enodia's `assets/_headers`, **with its comments**, and adjust:
-   - `/assets/*` immutable for a year. That is easier here than in Enodia: DDS item art lives under `src/assets` and is imported, so Vite fingerprints it. Check that no art is referenced by a stable path from `public/` before assuming every image is hashed
+3. **`public/_headers`.** D.I.L.A.S.' Vite `publicDir` is the default `public/`, so that is the only route into `dist/`. Port Enodia's `assets/_headers`, **with its comments**, and adjust:
+   - `/assets/*` immutable for a year. That is easier here than in Enodia: D.I.L.A.S. item art lives under `src/assets` and is imported, so Vite fingerprints it. Check that no art is referenced by a stable path from `public/` before assuming every image is hashed
    - `/index.html` `max-age=0, must-revalidate`
    - `/*` gets `X-Content-Type-Options`, `Referrer-Policy`, `Strict-Transport-Security` **without `preload`**, and the CSP
 4. **The fonts. Fix this first or the CSP breaks the site.** `src/App.jsx:35` and `src/Tiers.jsx:43` `@import` Oswald and JetBrains Mono from `fonts.googleapis.com`. A CSP of `style-src 'self'` blocks the import and `font-src` defaulting to `'self'` blocks `fonts.gstatic.com`. **This is exactly the bug Enodia shipped**, and nobody saw it because Netlify never applied the policy. Recommended fix: vendor the faces, as Enodia's `scripts/fonts.ts` does, so the page loads nothing from anybody else. The alternative, adding both Google hosts to the policy, works and leaks every visitor's IP to Google.
@@ -121,10 +121,10 @@ Small, independent, and worth doing first on its own: it puts security headers o
 6. **Deploy, then prove it landed.** See pitfall 9 below. A version id and "100%" are not evidence.
 
 > [!danger] Moving origin empties everybody's collection
-> `localStorage` is per origin. The first visit to the new address starts empty, which is the warning already in DDS `CLAUDE.md` under Hosting. DDS has Export and Import in Settings, which is exactly the tool for this. Before the Netlify site is retired, ship one last Netlify build with a notice: the new address, and "Export here, Import there". Then leave the Netlify site up for a while rather than deleting it on the same day. Who uses the tool and how long to keep Netlify up are stigly's calls.
+> `localStorage` is per origin. The first visit to the new address starts empty, which is the warning already in D.I.L.A.S. `CLAUDE.md` under Hosting. D.I.L.A.S. has Export and Import in Settings, which is exactly the tool for this. Before the Netlify site is retired, ship one last Netlify build with a notice: the new address, and "Export here, Import there". Then leave the Netlify site up for a while rather than deleting it on the same day. Who uses the tool and how long to keep Netlify up are stigly's calls.
 
 > [!info] What stigly does himself in this stage
-> Buying the domain, and `wrangler login` once, which opens a browser to authorise. After that a deploy is `cmd` in the address bar of `C:\Dev\dds`, then `npm run deploy`. The same PowerShell note in `CLAUDE.md` applies.
+> Buying the domain, and `wrangler login` once, which opens a browser to authorise. After that a deploy is `cmd` in the address bar of `C:\Dev\dilas`, then `npm run deploy`. The same PowerShell note in `CLAUDE.md` applies.
 
 ---
 
@@ -145,14 +145,14 @@ All paths are in `C:\Dev\Enodia`. **Keep the Worker in TypeScript** even though 
 | `worker/schema-app.ts` | Pattern only | Your own tables, hand written, in a separate file |
 | `drizzle.config.ts` | Verbatim | Reads both schema files |
 | `vitest.worker.config.ts`, `worker/test-setup.ts`, `worker/env.d.ts` | Verbatim | Tests run inside workerd against a real local D1 |
-| `tsconfig.worker.json` | Adapt | DDS has no root `tsconfig.json` to extend, so this one has to stand alone |
+| `tsconfig.worker.json` | Adapt | D.I.L.A.S. has no root `tsconfig.json` to extend, so this one has to stand alone |
 
 ### Setup, in order
 
 ```bash
 npm install better-auth drizzle-orm
 npm install -D wrangler drizzle-kit @cloudflare/vitest-pool-workers vitest typescript
-npx wrangler d1 create dds
+npx wrangler d1 create dilas
 ```
 
 Put the id it prints into `wrangler.jsonc`, then:
@@ -170,19 +170,19 @@ Scripts, from Enodia's `package.json`:
 "deploy": "npm run build && wrangler deploy",
 "db:schema": "npx auth@latest generate --config worker/auth.config.ts --output worker/schema.ts --y",
 "db:generate": "drizzle-kit generate",
-"db:migrate": "wrangler d1 migrations apply dds --local",
+"db:migrate": "wrangler d1 migrations apply dilas --local",
 "types": "wrangler types",
 "test:worker": "vitest run --config vitest.worker.config.ts"
 ```
 
-Secrets: `.dev.vars` locally, and add `.dev.vars`, `.dev.vars.*` and `.wrangler/` to DDS's `.gitignore` first, because it names none of them today. In production, `npx wrangler secret put BETTER_AUTH_SECRET` in production. Remote migrations are `npx wrangler d1 migrations apply dds --remote`, run before deploying the code that needs them.
+Secrets: `.dev.vars` locally, and add `.dev.vars`, `.dev.vars.*` and `.wrangler/` to the tool's `.gitignore` first, because it names none of them today. In production, `npx wrangler secret put BETTER_AUTH_SECRET` in production. Remote migrations are `npx wrangler d1 migrations apply dilas --remote`, run before deploying the code that needs them.
 
 > [!warning] Without `.dev.vars`, every `/api/*` answers 500
 > That is the secret guard doing its job, not a regression. Enodia lost time to it in fresh worktrees.
 
 ### The gate
 
-**Viewing is free, creating is free, saving locally is free. An account is only needed to share or compete.** That is Enodia's rule (`src/state/account.ts`), and it suits DDS: nothing that works today should start asking who you are. Enodia keeps an `ACCOUNTS_LIVE` flag in the UI so accounts can be switched off with one line and a deploy. **It is only a UI gate.** The API works for anyone who calls it, so every server route has to be safe on its own.
+**Viewing is free, creating is free, saving locally is free. An account is only needed to share or compete.** That is Enodia's rule (`src/state/account.ts`), and it suits D.I.L.A.S.: nothing that works today should start asking who you are. Enodia keeps an `ACCOUNTS_LIVE` flag in the UI so accounts can be switched off with one line and a deploy. **It is only a UI gate.** The API works for anyone who calls it, so every server route has to be safe on its own.
 
 ---
 
@@ -191,7 +191,7 @@ Secrets: `.dev.vars` locally, and add `.dev.vars`, `.dev.vars.*` and `.wrangler/
 > [!danger] Do not open accounts until a forgotten password has a way back
 > An account you can be locked out of permanently is a trap with a nice form on it. Enodia kept accounts shut until reset worked end to end: the letter sends, the link lands on a real screen, and the new password takes. `ROADMAP.md` records that the reset form once worked, the letter once sent, and the link then landed on a page where nothing happened.
 
-- **Resend, on a subdomain.** Enodia's records sit on `send.enodia.me`, so the apex SPF, where Proton receives mail, never had to be edited (`ROADMAP.md`, "Blocked, and on whom"). Do the same on the DDS domain. Adding and verifying the domain in Resend is stigly's job, in the dashboard
+- **Resend, on a subdomain.** Enodia's records sit on `send.enodia.me`, so the apex SPF, where Proton receives mail, never had to be edited (`ROADMAP.md`, "Blocked, and on whom"). Do the same on the D.I.L.A.S. domain. Adding and verifying the domain in Resend is stigly's job, in the dashboard
 - `RESEND_API_KEY` is a secret. `MAIL_FROM` is a `var`, because it is printed on every letter and therefore is not secret
 - **`/api/capabilities`** tells the UI whether reset exists. `worker/auth.ts` only adds `sendResetPassword` when mail is configured, so nobody ever sees "check your email" for a letter that was never sent
 - `revokeSessionsOnPasswordReset: true`. People reset a password because they think somebody else has it
@@ -203,7 +203,7 @@ Secrets: `.dev.vars` locally, and add `.dev.vars`, `.dev.vars.*` and `.wrangler/
 
 # **Stage 3: Sync Between Devices**
 
-This is the thing DDS's roadmap actually asks for: "log in elsewhere and your collection is there" (`dds-roadmap.md`, "Accounts before profiles").
+This is the thing D.I.L.A.S.' roadmap actually asks for: "log in elsewhere and your collection is there" (`dilas-roadmap.md`, "Accounts before profiles").
 
 Read `worker/sync.ts`, `src/state/sync.ts`, `src/state/stamps.ts` and `src/state/useSync.ts`, and the `syncItem` docblock in `worker/schema-app.ts`. The design:
 
@@ -217,17 +217,17 @@ Read `worker/sync.ts`, `src/state/sync.ts`, `src/state/stamps.ts` and `src/state
 | **Listed keys, never a wildcard** | The `setting` kind syncs whole `localStorage` keys from an explicit list. The device's own bookkeeping keys never sync |
 | **Bounded** | 16 KB per item, 2000 items per account, 500 per call, unknown kinds refused |
 
-**Mapping DDS onto it** is the DDS session's first design job, and it has to be done from the code, not from memory:
+**Mapping D.I.L.A.S. onto it** is the D.I.L.A.S. session's first design job, and it has to be done from the code, not from memory:
 
 - **Loadouts** (`hd2-loadouts`) as one item per loadout. Each needs a stable id and a `modified` time. Check whether they carry one, and add it if not
 - **Locks, favorites, warbonds, profiles, theme, scenario** as whole keys. Newest wins per key: an edit to the same key on two devices inside one sync window loses one of them. Enodia judged that rare enough to accept
-- The migration keys DDS reads once and keeps, such as `hd2-brief-*`, **do not sync**
+- The migration keys D.I.L.A.S. reads once and keeps, such as `hd2-brief-*`, **do not sync**
 
 > [!question] Do profiles survive accounts
-> `dds-roadmap.md` recommends keeping them separate. It is still stigly's call, and sync is the moment it has to be made, because it decides whether `hd2-profiles` is one item or several.
+> `dilas-roadmap.md` recommends keeping them separate. It is still stigly's call, and sync is the moment it has to be made, because it decides whether `hd2-profiles` is one item or several.
 
 > [!bug] Sync must not remount the screen
-> Enodia rendered `<Builds key={libraryAt}>`, so every sync rebuilt the whole screen, and sync runs on every focus. Alt-tabbing back from the game threw away an open build and an unsaved draft (`ROADMAP.md`, "Fixed on 11 September"). Treat the sync signal as "re-read storage", never as a React `key`. DDS's `App.jsx` holds builder state that the same mistake would destroy.
+> Enodia rendered `<Builds key={libraryAt}>`, so every sync rebuilt the whole screen, and sync runs on every focus. Alt-tabbing back from the game threw away an open build and an unsaved draft (`ROADMAP.md`, "Fixed on 11 September"). Treat the sync signal as "re-read storage", never as a React `key`. D.I.L.A.S.' `App.jsx` holds builder state that the same mistake would destroy.
 
 ---
 
@@ -240,7 +240,7 @@ Read `worker/sync.ts`, `src/state/sync.ts`, `src/state/stamps.ts` and `src/state
 - `POST /api/builds` publishes, `PUT /api/builds/<id>` replaces in place, `DELETE` **takes down**, and `POST /api/builds/<id>/restore` puts back. `GET /api/b/<id>` is public, because a link that needs an account is useless
 - **Taking down is `taken_down_at`, not a delete.** Enodia's first version deleted the row, and `on delete cascade` destroyed every run and rating logged against it and the build in every follower's library (`ROADMAP.md`, "Following got its guarantees")
 - **The `shape` token.** The browser fingerprints the picks and sends the hash. The server stores and compares it and never reads it. It is how stats know which version of a build a run was played on
-- **Facet tokens.** The browser sends short strings describing its own build, such as `primary:<id>` or `faction:bots`. The server stores and groups them for leaderboards and never interprets one. `src/state/facets.ts` owns the vocabulary. DDS's stable item ids (`CLAUDE.md`, "Ids are the primary key") are exactly what these want
+- **Facet tokens.** The browser sends short strings describing its own build, such as `primary:<id>` or `faction:bots`. The server stores and groups them for leaderboards and never interprets one. `src/state/facets.ts` owns the vocabulary. D.I.L.A.S.' stable item ids (`CLAUDE.md`, "Ids are the primary key") are exactly what these want
 - Caps: 16 KB payload, 120-character name, a per-account total, and a publish rate limit, because republishing over one id replaces rather than adds
 
 > [!bug] Assert the request body in the client tests
@@ -257,7 +257,7 @@ Short links need a path route, `/b/<id>`, which is where `not_found_handling: "s
 ### Rules that carry over as they are
 
 > [!danger] Counts, never a score
-> Every stat is a tally: takes, players, runs, clears, best difficulty, a mean rating **with how many it is a mean of**. A board orders by **one** counted column and never combines two. That is why Enodia has no clear-rate board: five clears from five runs would outrank ninety from a hundred, and the board would be claiming quality when all it has is less evidence (`worker/boards.ts`). DDS already keeps its community rating and its own rating separate, so it should hold to the same rule.
+> Every stat is a tally: takes, players, runs, clears, best difficulty, a mean rating **with how many it is a mean of**. A board orders by **one** counted column and never combines two. That is why Enodia has no clear-rate board: five clears from five runs would outrank ninety from a hundred, and the board would be claiming quality when all it has is less evidence (`worker/boards.ts`). D.I.L.A.S. already keeps its community rating and its own rating separate, so it should hold to the same rule.
 
 - **Stats are keyed per version**, `(build_id, user_id, shape)`. Otherwise an author replaces the build and keeps its numbers
 - **User ids never go over the wire.** `mine` is a boolean computed server side. The person who played a build stays private, and who published it never was
@@ -267,13 +267,13 @@ Short links need a path route, `/b/<id>`, which is where `not_found_handling: "s
 - **All the boards come from one query.** `scan` reads live listings once and each board sorts that array. D1 bills rows read. The `SCAN` ceiling is named, so a truncated board is never silently wrong
 - **Following, not copying.** A followed build updates, prose changes apply quietly, and a changed loadout waits as an offer (`src/state/offers.ts`). An offer never outranks a real edit in sync
 
-### What DDS has to decide, not inherit
+### What D.I.L.A.S. has to decide, not inherit
 
 > [!question] For stigly
-> - **What is a run, and what is a clear?** Enodia's is a Hades run and a boss kill, at a Fear level. DDS's could be a mission, an operation, extraction, a difficulty, a squad size. Leaderboards cannot exist until this is answered
+> - **What is a run, and what is a clear?** Enodia's is a Hades run and a boss kill, at a Fear level. D.I.L.A.S.' could be a mission, an operation, extraction, a difficulty, a squad size. Leaderboards cannot exist until this is answered
 > - **Which boards.** Candidates from the facets: most followed builds, most runs per faction, most published primary or stratagem, highest difficulty cleared. Counts only
-> - **Moderation.** Enodia opened a public shelf knowing it had no report and no hide. The defence is narrow: a listing carries a build name and a display name and no other free text (`worker/exchange.ts`, `worker/index.ts` docblock). DDS builds carry notes, and LFG would carry more. Decide this before anything discoverable ships
-> - **The 39 curated builds are binned** (`dds-roadmap.md`). Enodia also dropped its curated shelf. Nothing needs porting there
+> - **Moderation.** Enodia opened a public shelf knowing it had no report and no hide. The defence is narrow: a listing carries a build name and a display name and no other free text (`worker/exchange.ts`, `worker/index.ts` docblock). D.I.L.A.S. builds carry notes, and LFG would carry more. Decide this before anything discoverable ships
+> - **The 39 curated builds are binned** (`dilas-roadmap.md`). Enodia also dropped its curated shelf. Nothing needs porting there
 
 ---
 
@@ -281,7 +281,7 @@ Short links need a path route, `/b/<id>`, which is where `not_found_handling: "s
 
 Independent of accounts, and it pairs with the starmap in Phase 6a. It can ship any time after Stage 0.
 
-> [!success] Built in D.D.S. 1.25.0, 30 September 2026, as designed below. Not yet deployed
+> [!success] Built in D.I.L.A.S. 1.25.0, 30 September 2026, as designed below. Not yet deployed
 > A Cron Trigger every five minutes, one trimmed row in D1 (`war_snapshot`), `GET /api/war` with `Cache-Control: public, max-age=60`, and the browser refusing anything over thirty minutes old. `worker/war.ts`. What the "verify" list below found:
 >
 > - **Rate limit:** 5 requests per 10 seconds, from the upstream's README. This design makes 3 per 5 minutes.
@@ -291,13 +291,13 @@ Independent of accounts, and it pairs with the starmap in Phase 6a. It can ship 
 > - **The Cache API on workers.dev** was not needed: the cron snapshot made it moot.
 
 > [!danger] The API decorates, it never carries
-> DDS's own rule, from `dds-roadmap.md`, and the backend is built around it. The shipped planet table is identity and layout. Live state only colours it in. If the upstream is down, you lose the colouring and nothing else: no spinner on the critical path, and never a stale ownership map presented as current.
+> D.I.L.A.S.' own rule, from `dilas-roadmap.md`, and the backend is built around it. The shipped planet table is identity and layout. Live state only colours it in. If the upstream is down, you lose the colouring and nothing else: no spinner on the critical path, and never a stale ownership map presented as current.
 
 ### Design
 
 1. **A Cron Trigger fetches the upstream on a schedule** (every 5 to 10 minutes; **verify** the free-plan cron allowance) and upserts a snapshot into D1: one row per endpoint, holding `payload`, `fetched_at` and `ok`. The upstream is then called a fixed number of times a day whatever the traffic, which is the polite way to use a community-run proxy.
 2. **`GET /api/war`** reads the snapshot and returns it with `fetched_at`, plus `Cache-Control: public, max-age=60`. **The browser decides whether it is too old to show**: past a threshold, say 30 minutes, it draws the uncoloured map and says why. The server never hides staleness.
-3. **Headers.** `api.helldivers2.dev` refuses requests without `X-Super-Client` and `X-Super-Contact` (`dds-roadmap.md`, "Map positions are patch data"). Both go in `vars`. The contact should be a project address on the new domain, never a personal one, and that is stigly's to pick.
+3. **Headers.** `api.helldivers2.dev` refuses requests without `X-Super-Client` and `X-Super-Contact` (`dilas-roadmap.md`, "Map positions are patch data"). Both go in `vars`. The contact should be a project address on the new domain, never a personal one, and that is stigly's to pick.
 4. **Trim before storing.** Keep only the fields the app draws: owner, liberation, campaigns, active effects, the Major Order. It keeps the D1 row small and the response small.
 5. **Join by name**, as the build-time fetch already does. Two sources agreeing on an order is not something to bet a map on.
 
@@ -305,15 +305,15 @@ Why a cron snapshot rather than a pass-through with the Cache API: upstream load
 
 ### What it unlocks
 
-From `dds-roadmap.md`, "What live state adds once it is there":
+From `dilas-roadmap.md`, "What live state adds once it is there":
 
 - Offering only planets with an active campaign
 - Faction filled exactly from who holds the planet
-- **Active planet effects feeding `score.js`**: 156 are published (`dds-data-spike.md`), and the variant enemies already flagged in `enemies.json` switch on from the same list
+- **Active planet effects feeding `score.js`**: 156 are published (`dilas-data-spike.md`), and the variant enemies already flagged in `enemies.json` switch on from the same list
 - The Major Order as context
 
 > [!warning] Verify before building
-> - The upstream's rate limits and terms, for `api.helldivers2.dev` and DiveHarder alike. The DDS spike could not even resolve DiveHarder's host
+> - The upstream's rate limits and terms, for `api.helldivers2.dev` and DiveHarder alike. The D.I.L.A.S. spike could not even resolve DiveHarder's host
 > - Which endpoint carries planet effects and campaigns today. Read a real response, and keep a fixture of it for the tests
 > - The request budget: cron runs count as Worker invocations. At 5 minutes that is 288 a day, which is nothing against 100k
 
@@ -324,7 +324,7 @@ From `dds-roadmap.md`, "What live state adds once it is there":
 > [!warning] Enodia has not built this. No lessons carry over
 > Everything here is a lead to verify, not a finding.
 
-Live squad needs subscribe and push, which nothing above does. `dds-roadmap.md` says to budget it separately, and that is right. The Cloudflare-native shape is **one Durable Object per party**, holding WebSockets with the hibernation API, plus a join code (the friend-code pattern fits). Each member's confirmed loadout goes in, and `src/lib/squad.js` runs over the list unchanged, since it is already a pure function over two to four builds. **Verify**: Durable Objects availability and limits on the free plan, and WebSocket billing.
+Live squad needs subscribe and push, which nothing above does. `dilas-roadmap.md` says to budget it separately, and that is right. The Cloudflare-native shape is **one Durable Object per party**, holding WebSockets with the hibernation API, plus a join code (the friend-code pattern fits). Each member's confirmed loadout goes in, and `src/lib/squad.js` runs over the list unchanged, since it is already a pure function over two to four builds. **Verify**: Durable Objects availability and limits on the free plan, and WebSocket billing.
 
 Open questions the roadmap already asks: what an unconfirmed slot shows ("Party auto-fill on the compare slots"), and whether a party needs accounts at all or only a code.
 
@@ -346,11 +346,11 @@ Every one of these passed a type check and a green build. Most were found by mea
 10. **`run_worker_first: true` makes every request billable.** Name the paths, `["/api/*"]`
 11. **`_headers` joins a header set twice with a comma** rather than overriding it. Put `Cache-Control` only on patterns that cannot both match one file (`assets/_headers`, note 1)
 12. **A fresh cached file does not revalidate.** `must-revalidate` only applies once a response is stale. A re-cut image under the same name stayed invisible to returning visitors for a day. Use short max-ages on unhashed art, or rename it (`assets/_headers`, note 3)
-13. **Keep `<meta charset="utf-8">` in the built page.** Artifact wrappers inject one and hide the bug, and a plain host then renders `·` as a Chinese character. DDS's `index.html` has it. Keep it
+13. **Keep `<meta charset="utf-8">` in the built page.** Artifact wrappers inject one and hide the bug, and a plain host then renders `·` as a Chinese character. D.I.L.A.S.' `index.html` has it. Keep it
 14. **Rehearse every migration against real rows.** drizzle-kit generated a table rebuild that selected a column not on the source table, SQLite read the double-quoted name as a string literal, and every row got the text `'shape'`. It reported success (`migrations/0009_low_shadowcat.sql`, header)
 15. **Never `DELETE` a parent row with cascading children** that belong to other people. Soft-delete with a timestamp
 16. **The workerd test pool pins its own compatibility date.** Its workerd refused dates past what it shipped with, so the test config pins an older date than production. Only behaviour gated between the two dates can differ. `vitest.worker.config.ts` says so
-17. **A copy guard that reads single lines cannot see wrapped JSX.** Enodia's retired-claims check passed banned phrases for weeks, because the formatter wraps paragraphs. If DDS gets a "never say this again" check, test it against a wrapped sentence
+17. **A copy guard that reads single lines cannot see wrapped JSX.** Enodia's retired-claims check passed banned phrases for weeks, because the formatter wraps paragraphs. If D.I.L.A.S. gets a "never say this again" check, test it against a wrapped sentence
 18. **Retire sentences that stop being true.** "Nothing is tracked about you" became false the day stats existed. Enodia now says what is counted, and has a switch to turn it off (`src/ui/Account.tsx`, Settings)
 
 ---
@@ -375,7 +375,7 @@ Every one of these passed a type check and a green build. Most were found by mea
 | The edge rate-limit rule | A Cloudflare dashboard rule in front of `/api/*`. It rejects before a Worker runs, which the app limiter cannot do. Free, and still not done on Enodia |
 | Contact address | For `X-Super-Contact` and `MAIL_FROM` |
 | Product calls | What a run and a clear are, which boards exist, moderation, profiles versus accounts, when to retire Netlify, and what an unconfirmed squad slot shows |
-| Version number | Accounts landing is a major bump by DDS's own rule (`CLAUDE.md`, "Versioning And The Changelog"), so 2.0.0 |
+| Version number | Accounts landing is a major bump by D.I.L.A.S.' own rule (`CLAUDE.md`, "Versioning And The Changelog"), so 2.0.0 |
 
 ---
 
@@ -385,5 +385,5 @@ Every one of these passed a type check and a green build. Most were found by mea
 2. Read this file, then in `C:\Dev\Enodia`: `wrangler.jsonc`, `assets/_headers`, `worker/index.ts`, `worker/auth.ts`, `worker/limit.ts`
 3. **Stage 0 on a branch**: vendor the two fonts, `public/_headers`, `wrangler.jsonc` with assets only, the `workers` launch config. Verify under `wrangler dev` by curling headers and loading the page
 4. Deploy to `*.workers.dev` once stigly has run `wrangler login`, then curl the live headers
-5. Update DDS `CLAUDE.md` "Hosting" and `dds-roadmap.md`, and add a changelog entry. The markdown roadmap moves first and `roadmap.json` follows
+5. Update D.I.L.A.S. `CLAUDE.md` "Hosting" and `dilas-roadmap.md`, and add a changelog entry. The markdown roadmap moves first and `roadmap.json` follows
 6. Stage 6 (war state) or Stage 1 (accounts) next. That order is stigly's call: the first needs no account and pairs with the starmap, and the second unblocks everything social

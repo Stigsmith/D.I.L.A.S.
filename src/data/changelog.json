@@ -1,512 +1,357 @@
 [
   {
+    "version": "1.26.0",
+    "date": "2026-10-03",
+    "title": "The tier list reports back for duty",
+    "say": "Fewer clicks between you and your loadout. Efficiency is patriotism.",
+    "changes": [
+      "The tier list is back in the menu, with the front, difficulty and how many of you on the page itself. Flip a rule off and watch the list move.",
+      "Drop Bay has a proper DROP button. Your slot no longer asks you to merely confirm your commitment to Democracy.",
+      "The war room's difficulty floats in a card under the map, with how many of you beside it and what each level brings as tiles instead of a paragraph.",
+      "Adjust scenario glows in your theme's colour, so the way into the war room is hard to miss.",
+      "The full name under the wordmark sits in two tidy lines on every theme. The Aquila was asked to breathe in slightly.",
+      "The last traces of the old name are gone, apart from the folder it lives in."
+    ]
+  },
+  {
     "version": "1.25.0",
     "date": "2026-10-02",
-    "title": "D.I.L.A.S., the live party and the galaxy map",
+    "title": "D.I.L.A.S., the war room and the Star Map",
+    "say": "New name, new address, same unwavering commitment to Managed Democracy.",
     "changes": [
-      "D.D.S. is now D.I.L.A.S., the Democratic Intelligent Loadout & Armoury System, with an address of its own: dilas.me. Export your collection from the old address and Import it there; it is the last time you will need to.",
-      "Drop Bay can now hold a live party. Open one and read out its six character code, and whoever types it in joins you, up to four. Nobody needs an account.",
-      "Everybody's confirmed loadout lands in their slot on everybody's screen as they commit. Until somebody confirms, their slot says they are still deciding and nothing else, and the squad warnings wait for them.",
-      "The host picks where you are dropping, the way the host picks the mission in game, and everybody else's scenario follows. If you change yours anyway, the party panel tells you it no longer matches and puts it back in one click.",
-      "Reload the page or lose your connection and you come back to the same seat. A host who leaves hands the party to whoever has been in longest, the host can remove somebody, and a party nobody has touched for twelve hours is deleted.",
-      "Support now says exactly what a party sends: your name, your confirmed loadout and the host's scenario, to the others in it and nobody else. Everything else still stays in your browser.",
-      "Pick where you are dropping on the galaxy map, laid out the way the game draws it. Click the planet where you clicked it in the game and its biome and hazards fill themselves in. Hover one first to see what it does to you.",
-      "Drag to move, scroll or pinch to zoom, and names appear as you zoom in. Searching by planet or sector lights the matches up.",
-      "An ordinary planet no longer counts normal temperature as one of its hazards.",
-      "The map shows the war as it stands: every planet in the colour of whoever holds it, and the fronts you can drop on ringed and named. Hover one to see how far it is liberated or defended and how many Helldivers are there.",
-      "Choose a planet with fighting on it and your front switches to whoever you would be fighting there, so one click fills in the whole scenario.",
-      "The Major Order sits over the map: what it asks, how long is left, how far along each part of it is in the colour of the front it is on, and how many medals it pays.",
-      "Where would you like to play? Say which front, what kind of mission and what kind of planet you are after, no caves or fewer megacities or no fog, and the planner names the three busiest fronts that fit and marks them on the map. One click drops you there.",
-      "The three big faction banners are gone. Choosing a front is the planner's first question now, and choosing a planet with fighting on it answers it for you.",
-      "Changing front clears a mission that front does not have, so a Terminid mission no longer hangs on after you pick an Automaton planet.",
-      "The war is read every five minutes by the tool's own server; your browser never talks to anybody else. If it cannot be read, or the last reading is more than half an hour old, the map simply stays uncoloured and says why.",
-      "The map works the way the game's does: click a sector and it glides in to planet level, zoom out far enough and it glides back to the whole galaxy. The wheel zooms smoothly instead of a notch at a time.",
-      "A new Tactical look for the map, now the default: sectors as blocks glowing in the colour of whoever holds them, the fronts pulsing, a radar sweep that lights each territory as it passes, and the game's own planet renders once you are inside a sector. The plain chart is still one click away.",
-      "The planner's planet question works both ways: caves and megacities can each be avoided, ignored or asked for.",
-      "The biome and hazards you could set by hand are gone; the map and the planner do that job now.",
-      "Building the tool now checks the result is whole, and a deploy refuses to upload one that is not, after a file sync app was caught renaming the freshly built scripts away.",
-      "Where you are dropping is set in the war room, laid out like the game's Galactic War screen: the galaxy map fills everything right of the menu, tilted back like a table with a switch to lay it flat, with where you would like to play in a panel on the left that folds away, the Major Order over the top right, and difficulty along the bottom.",
-      "Planets on the map are sharper: each render is now cut from the wiki's full size original, twice the resolution of before at under half the download.",
-      "Drop Bay is the front door now: the tool opens on it, and it suggests three of your own builds for where you are going, each saying why it fits.",
-      "Adjust a build without leaving Drop Bay. The editor opens over the drop screen and saving puts the build in your slot. With no builds yet, your slot starts one from the primary list, already ranked for the drop.",
-      "Say how many of you are dropping once, beside the difficulty in the war room. In a party the party's own count decides.",
-      "Every drop you confirm is recorded, and the suggestions say how often and how lately you dropped with each build. It goes in your backup file too.",
-      "The Loadout Builder is the Armoury now: your builds, and a new Coverage tab showing what you have for each occasion on each front, and where the gaps are.",
-      "The tier list has left the menu. It is the list you pick from in every build, ranked by what each item is worth where you are dropping, and still whole from a link in the Armoury.",
-      "A new Rules page shows every rule behind our rating, what it moves where you are dropping, and lets you switch any rule off to see what changes.",
-      "Share a build with a link. Whoever opens it can keep a copy, or keep it and drop with it.",
-      "Commando missions are Automaton only, as in the game, and read the way they play: reinforcement boosters cannot be brought, every call-in comes twice at most, and weapons that need no ammo, like the Quasar, rise.",
-      "The scenario bar shows how many of you are dropping, and how many rules you have switched off.",
-      "Once you have a few drops logged on a front, Drop Bay adds a build you have not taken in a while, for a change, and names gear that is good here that you have never brought against them, one click from a build around it.",
-      "The Armoury has a History tab: how many drops and where, the builds you keep coming back to, the ones gathering dust with one click to drop with them, and every drop you confirmed. Build cards say how often and how lately you took them.",
-      "The party has its own menu at the top right of every page: squad up, see who is in and what they confirmed, and leave, without going to Drop Bay. Friends and finding a group will live there once accounts exist.",
-      "The tilted map leans back as far as the game's own, and planets and their names stand upright on it instead of squashing into ovals and leaning like italics.",
-      "Half the planets no longer sit in a dark square: their pictures were crops of the game's map, and they are now cut round and sized to match their neighbours.",
-      "Step through the difficulties the way the game does, with what each one brings beside it from the wiki: missions in an operation and their medals, outposts, samples, operation modifiers and the reward bonus.",
-      "The war so far, beside the Major Order: how many Helldivers are in the war right now, and every Terminid, Automaton and Illuminate killed, Helldiver lost, bullet fired and mission won.",
-      "Super Earth can be chosen too, with a click on it in the middle of the galaxy.",
-      "Drop Bay says everything once: one Squad up, in the corner of every page, and the planet and mission named in the bar above, with the brief under it saying only what they do to you. There are no squadmate slots to fill in by hand; the squad is a party's, and outside one Drop Bay is you.",
-      "With no front chosen, Drop Bay and the tier list take you to the war room, and Done brings you back once you have picked one.",
-      "A mission from another front no longer comes back with a saved scenario, which had left an Illuminate Blitz sitting on an Automaton drop.",
-      "A Star Map in the menu, for reading the war rather than setting up a drop: every front grouped by who you would fight there, busiest first. Click a planet for what it is, who holds it, how many are there and what its hazards do, with one click to drop there.",
-      "The tool now keeps the war's history itself, one reading an hour for thirty days, so the Star Map can show how a front has moved and how many were fighting. It starts the day this version goes live."
+      "D.D.S. is now D.I.L.A.S., the Democratic Intelligent Loadout & Armoury System, at dilas.me. Export your collection at the old address and Import it here, once.",
+      "Drop Bay is the front door. It suggests three of your own builds for this drop, says why each fits, and lets you adjust one without leaving.",
+      "Squad up with a six character code. Everybody's confirmed loadout lands in their slot, and the host's scenario becomes everybody's. No account needed.",
+      "The war room: the galaxy map across the whole screen, coloured with the live war, the Major Order and its medals over the top, and a planner that says where to go.",
+      "The Star Map, for reading the war: every front, each planet's intel, its history hour by hour, and one click to drop there.",
+      "The Armoury keeps your builds, shows what you have for each occasion on each front, and remembers every drop you confirmed.",
+      "The Rules page lists every rule behind our rating, what it moves where you are going, and a switch to turn it off.",
+      "Commando missions are Automaton only and play like it: no reinforcement boosters, and weapons that need no ammo rise.",
+      "Share a build as a link. Whoever opens it can keep a copy, or keep it and drop with it."
     ]
   },
   {
     "version": "1.24.0",
     "date": "2026-09-28",
     "title": "Drop Bay becomes the drop screen",
+    "say": "The thirty seconds before the hellpod, given the respect they deserve.",
     "changes": [
-      "Drop Bay now opens on a screen for the moment before you dive: a slot for you and three for your squad, what the mission and the planet are going to ask of you above them, and what the four of you are going to struggle with below.",
-      "Choose your loadout, then confirm it. Until you do, your slot says you are still deciding and the squad warnings leave it out, so a half picked kit never sets off a false alarm. Edit the build after confirming and it goes back to still deciding.",
-      "Your squadmates' slots are filled in by hand for now. Next is a party code: open a party, share the code, and their confirmed loadouts land in their slots on their own, with no account needed.",
-      "The loadout picker keeps the rules the grid always had. On a hot planet, builds that vent heat are not offered, and builds made for another difficulty are left out, and it tells you how many each rule took out. A build already in a slot that the planet now rules out stays there and says why.",
-      "The grid of every build moved to a Builds tab beside it and lost its squad comparison, because the drop screen does that job now. Deleting a build in the builder takes you back to that tab.",
-      "The structure demolition warning now fires from the mission you actually picked, like Destroy Command Bunkers, rather than only from the grid's old mission filter.",
-      "Adjusting the scenario from Drop Bay and pressing Done brings you back to Drop Bay instead of the tier list."
+      "Drop Bay opens on the moment before you dive: your slot, three for your squad, and what the mission and planet will ask of you.",
+      "Choose a loadout, then confirm it. Until you do, the squad warnings leave you out, so a half picked kit never raises a false alarm.",
+      "The picker keeps the hard rules: no heat venting builds on a hot planet, nothing built for another difficulty.",
+      "The grid of every build moved to its own tab."
     ]
   },
   {
     "version": "1.23.0",
     "date": "2026-09-26",
-    "title": "Ironclad Democracy arrives, and the ratings catch up with the game",
+    "title": "Ironclad Democracy arrives",
+    "say": "Eleven new tools of liberation, and the ratings caught up with the game.",
     "changes": [
-      "Eleven new items. Eight come from the Ironclad Democracy warbond: the AR-11 Arbitrator, GL-15 Evictor, P-34 Breacher, G-8 Immolation and G-60 Anti-Tank Seeker, the Surplus EAT Allocation and Integrated Extinguishers boosters, and the Blunt-Force Mitigation armor passive on the Tanker and Ironclad sets. The LAS-12 Sai comes from the Superstore, and the Eagle Gas Airstrike and TD-110 Maelstrom from the campaign. Every one of them is rated. None has art yet, so they show their initials for now.",
-      "The ratings were read off u.gg again on 26 September. The game is on 7.1.1, which fixed crashes and changed no weapon. u.gg dates its lists separately, so primaries are now stamped 7.1.1, support weapons, backpacks, eagles and sentries 7.0.2, and the rest 7.1.0. Every expanded row still says which one it has.",
-      "Five ratings moved. The Orbital Precision Strike goes from S to S+ on every front. The P-4 Senator drops from S+ to S on bots, the FLAM-66 Torcher from S+ to S on squids, and the VG-70 Variable from S to A on squids. Rock Solid climbs from B to A on squids.",
-      "Three Castellan's Creed items finally have a rating: the 40-K Meltagun and the Melta Mine sit at S+ or S everywhere, and the Hot-Shot Marksman Rifle lands at B on bots, D on bugs and C on squids. The P/40-K Bolt Pistol is now the only item in the tool nobody has rated.",
-      "All nineteen patch caveats are gone. Each one warned that an item had changed after the vote was cast, and every vote now comes after the change. Worth knowing: the Anti-Tank Mines, flagged as the rating most likely to move once voters caught up with the demolition buff, did not move.",
-      "The Meltamine is now the Melta Mine, as the game spells it. Anything you saved under the old name still finds it.",
-      "Fresh figures from the wiki. All nine melee weapons now show their handling, the Trident's recoil drops from 12 to 2, and the Orbital Precision Strike's cooldown from 90 to 80 seconds. Two of our own ratings move because of it: the Cremator climbs from S to S+ on bugs now that its damage against big targets is known, and the GL-52 De-Escalator drops from A to B on bugs. Everything else that moved in our column moved because the vote did.",
-      "A loadout card could keep warning about a patch caveat after that caveat had been retired. It only warns about a live one now, and right now there are none."
+      "Eleven new items, eight of them from the Ironclad Democracy warbond.",
+      "Ratings re-read from u.gg for patch 7.1.1, each list stamped with the patch it was voted on.",
+      "Five ratings moved. The Orbital Precision Strike is S+ everywhere now.",
+      "All nineteen patch caveats retired: every vote now postdates the change it was warning about.",
+      "The Meltamine is the Melta Mine, as the game spells it. Saved builds still find it."
     ]
   },
   {
     "version": "1.22.0",
     "date": "2026-09-25",
-    "title": "The groundwork for accounts, switched off",
+    "title": "Accounts, built and switched off",
+    "say": "Classified groundwork. Citizens need not concern themselves.",
     "changes": [
-      "Nothing you can see has changed. Behind the tool there is now a small server that can hold accounts, and it is switched off from where you sit: Account in the menu is still locked, and the tool never asks who you are.",
-      "It stays off until a forgotten password can be recovered, because an account you can be locked out of for good is worse than no account. That needs a domain the tool can send email from, which is the next step.",
-      "Once it opens, an account will be how your locks, favorites, profiles and builds follow you to another device. None of it will ever be needed to use the tool, and everything will keep living in your browser either way.",
-      "Support no longer says there is no server behind the tool, because as of this version there is one. What it says now is still exactly true: nothing you do here is sent anywhere, and there are no accounts yet."
+      "There is now a small server that can hold accounts. It is switched off, and the tool never asks who you are.",
+      "It stays off until a forgotten password can be recovered. An account you can be locked out of forever helps nobody.",
+      "Support no longer claims there is no server, because now there is one."
     ]
   },
   {
     "version": "1.21.0",
     "date": "2026-09-25",
-    "title": "A new home on Cloudflare, and the page stops talking to anybody else",
+    "title": "A new home on Cloudflare",
+    "say": "Relocated to a more defensible position. No casualties.",
     "changes": [
-      "The tool can now be served from Cloudflare, the same place Enodia runs. It is the same tool with the same screens. This is the first step toward accounts, which need a server to exist somewhere, and nothing about how you use it changes today.",
-      "The two typefaces now come from the tool itself rather than from Google. Nothing looks different, but opening the page no longer tells Google that you visited, and the first screen no longer waits on somebody else's server to draw its headings.",
-      "The page now tells your browser to refuse anything it did not arrive with: no scripts, styles, fonts or images from any other address. It has never loaded any, but until now nothing said so, and the old host sent no security instructions at all. Accounts will need this in place before they open.",
-      "Art and fonts are now cached for a year, because every file has its own fingerprint in its name and a changed file always gets a new one. The page itself is checked on every visit, so an update reaches you the next time you open the tool rather than whenever your browser gets round to it."
+      "The tool is served from Cloudflare. Same screens, same everything.",
+      "Fonts come from the tool itself, so opening it no longer tells Google you visited.",
+      "The page refuses anything from any other address: no outside scripts, styles, fonts or images.",
+      "Art and fonts are cached for a year; the page checks for updates every visit."
     ]
   },
   {
     "version": "1.20.0",
     "date": "2026-08-22",
-    "title": "A build is now scored as a build, and armour is back where it belongs",
+    "title": "A build is scored as a build",
+    "say": "Nine items, one verdict. The Ministry approves of teamwork.",
     "changes": [
-      "Every loadout now carries two readings instead of none: what the gear is worth where you are dropping, and what the nine pieces are worth together. The difference between them is the point. A kit whose parts average an A and which fits together like a B is the interesting case, and showing only the B would make it a verdict you cannot argue with.",
-      "Armour penetration moves a rating again, for the first time since it was pulled out in August. It judges the whole build rather than one weapon, which is the whole reason it works this time. Judged per weapon, 48 of 51 primaries on the bot front share one of two identical readings, so the old rules were charging an assault rifle for being an assault rifle. Judged per build, the same reading splits the curated set 36, 41 and 23 percent three ways.",
-      "It only counts what you aim. A sentry cannot pick a weak point and an orbital does not care where the plate is thin, so a build whose only heavy penetration is a Railcannon has not answered the question of what to do about the thing walking at you. What the Railcannon does answer is counted separately.",
-      "The Eruptor and Stalwart trade is now something the tool can see. Bringing a weapon built for armour means bringing something else for the crowd, and a build where everything you hold is built for armour is told so. That trade is invisible one weapon at a time and obvious across a build.",
-      "A build that leaves a hole is told which hole. Nothing for opening armour, nothing that holds off a crowd, nothing that closes a fabricator on a mission that is entirely fabricators. Each one carries the sentence explaining it, and each is conditioned on where you are dropping, so none of them fire on a quiet drop where the gap does not matter.",
-      "A build with no holes says nothing and keeps exactly what its gear is worth. Silence is the normal state here, the same call the squad panel already made: not being congratulated for having no gaps is different from being told you are fine.",
-      "The builder shows the same reading, live. Change a slot or change the front the build is for and it recomputes, so you can watch a gap close instead of saving and going to look.",
-      "Drop Bay now shows the scenario bar. The cards read where you are dropping, so the control that changes what they say belongs on the same screen.",
-      "Every loadout rule is measured against 300 random legal builds before it ships, not just against the 39 curated ones. Two rules were written, measured and cut for describing the pool rather than the build: one asked for a demolition 40 hole closer that 86 percent of builds do not carry, and one fired on 45 percent of builds and only ever on the bot front. Both facts are true and neither told you anything.",
-      "The rules are checked before every build the same way the weapon rules are. A loadout rule that reads a field the engine cannot produce, or names a role that does not exist, used to fail silently by never firing. Seven ways of getting that wrong now stop the build.",
-      "A stale formula came out of the rule health report. It had been calculating peril the old way for two versions after the real one changed, so every rule that depends on difficulty and squad size was being measured in a situation the tool no longer produces.",
-      "A slot in the builder shows one rating instead of three. It used to show all three fronts side by side with nothing saying which was which, and a build is for one front, so two of them were answering a question nobody asked. The one it shows is ours for where you are dropping, matching the reading above it, with the community vote in the tooltip and a marker whenever the two disagree.",
-      "Three pieces of advice stopped telling a full squad it was outnumbered. They scale off how much trouble you are in, which rises with difficulty as well as with being alone, so four players on Super Helldive were being told there were not enough of them. No rating moved; only the wording was wrong."
+      "Every loadout carries two readings: what its gear is worth where you are dropping, and what the nine pieces are worth together.",
+      "Armour penetration counts again, for the whole build, and only for what you aim. An orbital does not find weak points.",
+      "A build that leaves a hole is told which one: nothing for armour, nothing for the crowd, nothing to close a fabricator.",
+      "The builder recomputes as you edit, so you can watch a gap close.",
+      "Every loadout rule is tested against 300 random builds before it ships. Two were cut for describing the pool instead of the build."
     ]
   },
   {
     "version": "1.19.0",
     "date": "2026-08-21",
-    "title": "The second rating column stopped hiding, and six rules stopped spelling out the same lists of weapons",
+    "title": "Peril, and a column that stopped hiding",
+    "say": "Being outnumbered and going deep are the same problem. Both now count.",
     "changes": [
-      "Difficulty and squad size now feed one number the tool calls peril, and the stealth advice scales smoothly along it instead of switching on at a cutoff. Being outnumbered and being deep are the same problem by different routes: solo on Impossible and a pair on Helldive now read the same.",
-      "How much a squad changes things is taken from the game rather than guessed. The wiki publishes how patrol timing shifts with player count, and most of the relief comes from the second player, with a fourth adding little the third did not.",
-      "Ratings are no longer forced to a tier by any rule. Everything is points now, so five silenced weapons in the same situation land on five different tiers in the order they already stood, rather than being flattened together at the top.",
-      "The advice runs both ways. Four of you on Challenging will see silenced weapons marked down and loud ones marked up, because quiet is effort spent on a problem you do not have there.",
-      "Difficulty and squad size are now one number the tool calls peril, and the stealth advice follows it instead of a hard cutoff. It used to appear only if you were solo at difficulty 7 or above, which meant a pair on Impossible got nothing and a full squad on Super Helldive got nothing.",
-      "The advice also stopped claiming you are alone when you are not. Those explanations were written when the rule only fired for solo players.",
-      "Our rating column now appears as soon as you pick a front. It used to stay blank until you also chose a planet, a biome, a hazard or a mission, and most sessions never do. On the Terminid front that was hiding 37 weapons already sitting at a different tier than the community vote puts them.",
-      "It was hiding more than that. Everything the tool learned to say about difficulty and squad size was unreachable unless you happened to also set where you were dropping. Drop solo at 8 on bots and 93 ratings move, and none of them used to show.",
-      "A column that agrees with the community is not an empty column. Where nothing about your drop changes a weapon's rating, the tool now says exactly that instead of showing you a blank box.",
-      "Two ideas the scoring rules kept repeating are now properties of the weapons themselves. Six rules used to name the same handful of weapons over and over: three said which support weapons you aim at something far away, three said which weapons are quiet. Change your mind about one of them and you had to remember every rule that mentioned it.",
-      "Those weapons now carry a tag, and the rules ask for the tag. Nothing about any rating changed, which was the point: all thirty four rules fire on exactly the same weapons in exactly the same scenarios as before.",
-      "Each tag records where it came from. Long range is our judgement and says so. Suppressed is a published fact, twelve metres of audible range against a hundred, and says that instead. The tool has always kept our opinions and the game's facts visibly apart, and the tags follow the same rule.",
-      "The rules the tool scores with are now checked before every build. A rule that named a weapon that no longer existed, or asked for a tag spelled wrong, used to fail silently: it simply never fired, and the rating column went on looking like it had worked. Five ways of getting that wrong are now caught and stop the build.",
-      "Advice that can run both ways now has wording for both ways. A weapon marked down for being quiet in a situation that does not need quiet used to be explained with the sentence written for the opposite case.",
-      "The squad panel's coverage checks now know how many of you there are. They used to switch on at difficulty 7 no matter the squad size, so a pair on Extreme got nothing while four players on Suicide got everything. Both now read the same peril figure the tier list uses."
+      "Difficulty and squad size combine into one number, peril, and the stealth advice scales along it instead of switching on at a cutoff.",
+      "How much a second player helps is taken from the game's own patrol figures, not guessed.",
+      "Our rating appears as soon as you pick a front. It used to wait for a planet that most sessions never set.",
+      "Rules no longer force a tier. Everything is points, so weapons keep the order they already stood in.",
+      "Two ideas the rules kept repeating, long range and suppressed, are now tags on the weapons, each saying where it came from."
     ]
   },
   {
     "version": "1.18.0",
     "date": "2026-08-21",
-    "title": "A sandstorm is weather, not a climate, and one rule was quietly beating another",
+    "title": "Sandstorms are weather, not a climate",
+    "say": "A three minute sandstorm is not a lifestyle.",
     "changes": [
-      "Fixed a rule that could silently overrule another one. A rule saying a weapon is at least S and a rule saying it is at most B cannot both be true, and the tool was letting whichever ran second win. That is how the Censor scored twenty two points higher than a silenced SMG and landed three tiers below it.",
-      "When two rules make opposite absolute claims neither applies now, and the points decide. Both rules already had their say in the points; neither has earned the right to overrule the other.",
-      "Sandstorms and blizzards no longer cap a weapon tier outright, and they cost less. They are weather rather than climate: a sandstorm runs for about three minutes, a quarter of a Blitz and under a tenth of a full operation. Pricing it as a permanent state said never bring a marksman here about something that is not happening most of the time.",
-      "And the other half of that, which the old rule missed entirely: alone, a storm is partly a gift. It cuts their sight as much as yours, and solo you are not trying to win the firefight. A suppressed weapon in a storm now goes up rather than down.",
-      "On Automatons at Impossible, solo, in a sandstorm, the R-72 Censor is now the top primary in the list. It used to sit at B.",
-      "The rule health check gained a sweep for the same class of bug, so a floor and a ceiling that can fire together get named rather than quietly resolved.",
-      "The minimum tier filter now wears the badge itself rather than a flat copy of its colour, finish and all. One shape for a tier everywhere, so the thing you are filtering to looks like the thing you will see in the list. Which floor is picked is a ring around the plate, because the badge already spends its rim, its glow and its fill on saying which tier it is."
+      "Two rules making opposite absolute claims no longer quietly overrule each other. The points decide.",
+      "Sandstorms and blizzards cost less and cap nothing. They come and go; heat and cold do not.",
+      "Alone, a storm is partly a gift: it blinds them as much as you. Solo on bots in a sandstorm, the Censor now tops the list."
     ]
   },
   {
     "version": "1.17.0",
     "date": "2026-08-21",
-    "title": "The tier badge is a stamped plate now, and the ladder finally reads as a ladder",
+    "title": "The tier badge is a stamped plate",
+    "say": "Freshly pressed at the Super Earth Mint.",
     "changes": [
-      "Every tier rating is drawn rather than filled: a stamped plate with two clipped corners, a stencil letter, and the tier colour running the rim, the glow and the fill. Seven interior finishes and three surface toggles, all of them cosmetic and none of them meaning anything.",
-      "A new palette, and the order is the point. S+ red, S yellow, A purple, B blue, C green, D grey. Heat at the top cooling downward, so D reads as already falling off toward unrated rather than as one more colour in a rainbow.",
-      "The grey at D is a hair cool rather than neutral, and it sits at the same weight as the colour it replaced, so the bottom of the ladder does not suddenly go light or heavy.",
-      "Three competing palettes had been in the code and the notes for weeks. Two are now gone.",
-      "Pick your finish in Settings, with four real rows beside the dropdown so you are choosing against items rather than against a word. It is separate from the theme on purpose: changing to a warbond skin will never move it.",
-      "The theme picker became a dropdown too, with a line saying what each skin is based on. It used to be a row of thirteen chips, plus a cycle button in the top bar that did the same job less clearly. The button is gone and each setting now lives in exactly one place.",
-      "The up and down markers moved to the top left of the badge. That corner is square and the top right is the chamfer, so a round marker there was sitting on a cut edge.",
-      "Nothing here ever costs a badge its legibility. A D reads exactly as clearly as an S+, which is why nothing shrinks, fades or damages a letter to say a rating is low."
+      "Every tier is a stamped plate with a stencil letter, in a new ladder: S+ red, S yellow, A purple, B blue, C green, D grey.",
+      "Pick the badge's finish in Settings. Changing theme never moves it.",
+      "Nothing ever fades or shrinks a badge to say a rating is low. A D reads as clearly as an S+."
     ]
   },
   {
     "version": "1.16.0",
     "date": "2026-08-21",
-    "title": "How many of you are dropping, and the first rule that cares",
+    "title": "How many of you are dropping",
+    "say": "Solo on Impossible and four on Impossible are different wars.",
     "changes": [
-      "Squad size joins the scenario, under the difficulty. Solo on Impossible and a four stack on Impossible are not the same game, and until now the tool could not tell them apart.",
-      "Rules can finally read the difficulty and the squad size. Difficulty has been in the scenario since 1.11.0 and no rule could see it, so it changed which enemies got counted and nothing else.",
-      "Alone on a bot planet at 7 and up, suppressed weapons take over. A suppressed weapon is audible at 12 metres against 100 for everything else, so a perimeter sentry dies without waking the base behind it. Solo, that is the difference between walking through an outpost and running from it.",
-      "The effect is what a tier list cannot say on its own. The community vote gives you six S+ primaries on bots and not one is suppressed. Drop solo at 8 and the R-72 Censor is the only S+ left, while the AR-59 Suppressor and the M7S SMG climb out of B and C to sit near the top.",
-      "Bring three friends and the same list goes straight back to agreeing with the crowd, because at a full squad we have nothing to add that they did not already know. Saying nothing is the right answer more often than it looks.",
-      "A rule can now also say what it does not want: everything except a named handful, which is what lets the loud half of the list fall at the same time as the quiet half rises."
+      "Squad size joins the scenario, and rules can read it along with difficulty.",
+      "Solo on bots at 7 and up, suppressed weapons take over: a sentry dies without waking the base behind it.",
+      "The crowd's vote has six S+ primaries on bots and not one is suppressed. That is the gap this tool exists to fill."
     ]
   },
   {
     "version": "1.15.0",
     "date": "2026-08-21",
-    "title": "The scenario is a screen, not a panel on top of every tab",
+    "title": "The scenario is a screen, not a panel on every tab",
+    "say": "One choice, shown once. Six copies of it was excessive even for propaganda.",
     "changes": [
-      "Where you are dropping is its own screen now, reached from a one line bar above the table. It used to be a panel repeated at the top of every tier list tab, which ate the height the table wanted and made one shared choice look like six separate ones.",
-      "It was always one choice. The tool just kept showing it six times.",
-      "The screen is the three front banners at full size, difficulty, then planet and mission, and it fits a desktop window without scrolling. Picking a front dims the other two and lights the one you chose; clicking it again unpicks it and all three come back.",
-      "Difficulty shows the game's own mark for the level you are on, in the game's own colours. They were being repainted in the theme colour, which flattened ten distinct marks into one.",
-      "Planet and mission sit side by side and share one search pane, so opening one closes the other. The mission list finally says what each mission asks of you rather than only its name, and searching carry finds all five carry missions, none of which have the word in their title.",
-      "Both rating columns are now sort buttons. Click either to order the list by it. Ours is the default, and the column you are sorting by is the solid one while the other steps back.",
-      "Tier badges caught some light. Same six colours, with a lighter top edge and a darker bottom, so a badge reads as a thing rather than a rectangle."
+      "Where you are dropping is its own screen, behind a one line bar above the list.",
+      "Difficulty shows the game's own marks in the game's own colours.",
+      "Both rating columns are sort buttons; the one you are sorting by is the solid one."
     ]
   },
   {
     "version": "1.14.0",
     "date": "2026-08-21",
-    "title": "The row shows the numbers instead of apologising for not having them",
+    "title": "The row shows the numbers",
+    "say": "Less apologising, more ballistics.",
     "changes": [
-      "Every weapon row carried a line saying magazine size, fire rate, recoil and stagger were in no source this project had. That stopped being true a week ago and the line kept saying it, which is worse than never claiming a gap: it tells you the tool does not know something it is holding.",
-      "Weapons now show what was fetched. Magazine and spares, how much a resupply gives you back, rate of fire, ergonomics, recoil climb, sway, stagger and pushback, and how much of the damage survives against durable parts.",
-      "Ergonomics and durable damage get a plain English line each, because 65 and 24% mean nothing on their own. One is how fast the barrel follows the camera, the other is how much of the listed damage still lands on the big fleshy parts.",
-      "The admission survives, narrowed to what is genuinely still missing: reload time and projectile count.",
-      "The six melee weapons say something different, because the wiki has no data page for them at all. Those figures are unknown rather than merely unlisted, and the row says which."
+      "Weapon rows show what the wiki publishes: magazine and spares, fire rate, ergonomics, recoil, sway, stagger and durable damage.",
+      "What is genuinely still missing, reload time and projectile count, is still admitted."
     ]
   },
   {
     "version": "1.13.0",
     "date": "2026-08-21",
-    "title": "Armour stops downgrading half the tier list for no reason",
+    "title": "Armour stops downgrading half the list",
+    "say": "Charging 48 rifles for being rifles was not justice.",
     "changes": [
-      "Enemy armour no longer moves any rating. It was taking a tier off 42 of the 51 primaries on the Automaton front, which is not a finding, it is a rule describing the pool it is looking at.",
-      "The reason is simple once you see it: 48 of those 51 primaries have an identical armour reading. Only the Eruptor, the Double-Edge Sickle and the Torcher differ. Charging the other 48 was charging them for being primaries.",
-      "And it was charging twice. The community tier already knows an assault rifle does not open a Hulk. You bring one knowing your support weapon handles that, which is a fact about your whole loadout and not about the rifle.",
-      "Everything armour told you is still on the row, in full, as a fact rather than a verdict. Your Liberator bouncing off six of twenty two Automatons is worth knowing. It is just not news about the Liberator.",
-      "Armour comes back when the tool can score a whole loadout, which is where the real question lives: does anything in your four slots open heavy armour, and what did you give up to carry it.",
-      "Added a rule health check that would have caught this before it shipped. It measures every scoring rule against the pool it can fire on and flags any that fire on most of it. All 31 remaining rules pass."
+      "Enemy armour no longer moves single item ratings. It was marking down 42 of 51 Automaton primaries for having identical armour readings.",
+      "The facts stay on every row. They come back as a rating once whole loadouts are scored.",
+      "A rule health check now flags any rule that fires on most of what it looks at."
     ]
   },
   {
     "version": "1.12.0",
     "date": "2026-08-21",
     "title": "A roadmap in the menu",
+    "say": "What is coming, minus the promises. Dates are for Major Orders.",
     "changes": [
-      "Added Roadmap, next to Changelog. One says what landed, the other says what is coming, and they are only really useful as a pair.",
-      "A single timeline, one line per milestone, with the one thing that is actually next lit and everything else quiet. A roadmap where everything glows tells you nothing.",
-      "Every unbuilt item says what it waits on. Most of it waits on nothing and runs in your browser; everything social waits on there being somewhere to keep data that is not one browser on one machine, which is why that is one item and not four.",
-      "No dates on anything unbuilt. This is a two person project built in bursts and a date would be a guess wearing a promise. Shipped items carry their version instead, because that part already happened."
+      "One timeline, one line per milestone, with the one thing actually next lit up.",
+      "Every unbuilt item says what it waits on, and none carries a date."
     ]
   },
   {
     "version": "1.11.0",
     "date": "2026-08-21",
-    "title": "Say what difficulty you play at, and stop being warned about things that do not spawn there",
+    "title": "Say what difficulty you play at",
+    "say": "No more warnings about Factory Striders on Trivial.",
     "changes": [
-      "Difficulty is part of the scenario now, sat next to planet and mission, on the same slider Drop Bay already used. It is remembered, and changing planet does not reset it: swapping where you are going does not mean you stopped playing at the level you play at.",
-      "Every enemy knows which difficulty it starts appearing at, so ratings are judged against the roster you can actually meet. Thirty three of the fifty four on a Challenging drop, all fifty four on Super Helldive.",
-      "A Factory Strider is difficulty 4 and up. Until now the tool counted one no matter where you said you were dropping, which made every reading a Super Helldive statement in disguise.",
-      "The reading says which level it counted, in its own heading, so you can check it. Leave the slider at Any and it judges the whole front and says that instead of implying the top.",
-      "Fixed an Illuminate roster that never exists. Crushers and Wretches are Vote Snatchers, and on a planet where those show up they replace the Overseers, Harvesters, Watchers and Stingrays rather than joining them. Counting both sets together described a front nobody drops onto.",
-      "The Stingray had no difficulty on its own wiki page while the wiki's difficulty table listed it at 4. Taken from the table, and written down as a deliberate exception rather than a silent guess."
+      "Difficulty is part of the scenario, and ratings count only the enemies you can meet at that level.",
+      "Fixed an Illuminate roster that never exists: Vote Snatchers replace the regulars rather than join them."
     ]
   },
   {
     "version": "1.10.1",
     "date": "2026-08-21",
     "title": "It is a scenario, not a brief",
+    "say": "A brief is handed to you. A scenario is what you are walking into.",
     "changes": [
-      "The five answers about where you are dropping, front, planet, biome, hazards and mission, are now called the scenario. The tool had been calling it a brief in a couple of places without ever saying what one was, which is a good way to make someone read a word twice and learn nothing.",
-      "A brief is a document somebody hands you. This is the situation you are walking into. Earlier entries below still say brief, because they were true when they were written and a changelog that edits its own past is not much of a record.",
-      "Where the second rating comes from now says so in full: your scenario, meaning the front, planet, biome, hazards and mission you picked above. It no longer assumes you know what it is talking about.",
-      "Nothing you had set is lost. A browser that was already here keeps the front and planet it was on."
+      "Front, planet, biome, hazards and mission are now called the scenario everywhere. Nothing you had set was lost."
     ]
   },
   {
     "version": "1.10.0",
     "date": "2026-08-21",
-    "title": "Armor penetration finally has something to be measured against",
+    "title": "Armour penetration has something to measure against",
+    "say": "80 enemies, 594 body parts, all of them catalogued for freedom.",
     "changes": [
-      "The tool has always shown an armor penetration number and never had anything to compare it to, so every judgement about it was a threshold somebody picked. It now holds the other half: the armor value of every body part of all 80 enemies, straight off the wiki.",
-      "Expand any weapon and it says what that penetration actually opens on the front you picked, and what it does not. An AR-23 Liberator against Automatons gets through seven of the twenty two wherever you hit them, needs a weak point on nine, and bounces off six completely, Dropships and tanks among them.",
-      "The rule is the game's own and it is three states rather than a scale. Above the armor value is full damage. Exactly equal is 65%, which is a hit and a slow one. Below it the round bounces and does nothing at all.",
-      "That 65% case turns out to matter more than expected. A Devastator is armored to 3, so an AP 3 weapon only ties it, and AP 4 is the first clean answer to one. The squad warning about bot penetration now says that rather than claiming an Autocannon makes Devastators a non-issue.",
-      "Five scoring rules replace the two that guessed from the game's penetrating tag. They cover all three fronts, where the old pair only ever fired on Automatons, and every one of them reads the armor values rather than a label.",
-      "Weapons that cannot aim are judged differently from weapons that can. A sentry, an eagle or an orbital picks its own line and cannot pick a weak point, so a front full of armor costs it more than it costs something in your hands.",
-      "The special strains and brigades are fetched and kept out of the reckoning. A Predator Strain Hunter should not change what your gun says about a normal bug drop, since it only exists while a galactic effect is running. They are flagged in the data, ready for when the tool can tell which effect is up.",
-      "The gap in this data is stated rather than hidden. A Charger's inner flesh is soft and you only reach it once the leg armor is off, and nothing published marks which parts are exposed from the start. So a weak point means one exists, not that you can hit it on approach."
+      "Every weapon says what its penetration opens on your front, and what it bounces off.",
+      "The rule is the game's own: above the armour value is full damage, equal is 65%, below is a ricochet.",
+      "Special strains and brigades are kept out of the reckoning for a normal drop."
     ]
   },
   {
     "version": "1.9.1",
     "date": "2026-08-20",
-    "title": "A better planet source, and the map coordinates to go with it",
+    "title": "A better planet source",
+    "say": "Twelve planets rejoined the galaxy. Welcome back.",
     "changes": [
-      "Dropped the training manual API, which was the last thing still leaning on a source this project had already caught being twelve planets behind. Planets now come from the helldivers-2 community dataset and its API, which is the same organisation and returns exactly our 281.",
-      "Every planet now carries where it sits on the galaxy map, and 339 supply lines between them are recorded. Fetched once and shipped, so the map that will eventually replace the planet dropdown needs no network call to draw.",
-      "Hazards were losing half their answer. Two sources carry two different fields and neither is a superset: one holds the temperature, the other the headline weather. Widow's Harbor read as extreme cold in one and meteor storms in the other. They are unioned now, which took hazard assignments from 440 to 544.",
-      "Stopped counting normal temperature as a hazard. It is the absence of one.",
-      "Cross-checked our biomes against a second source for the first time. They agree on 274 of 276, and the two that differ hold each other's biome, which looks like a swap rather than a pattern."
+      "Planets come from the community dataset, which knows all 281, with map positions and 339 supply lines.",
+      "Hazards stopped losing half their answer, and normal temperature stopped counting as one."
     ]
   },
   {
     "version": "1.9.0",
     "date": "2026-08-20",
-    "title": "The second column has a number in it, and a mission to read it against",
+    "title": "The second rating column goes live",
+    "say": "The crowd's opinion, and ours, side by side. Dissent is logged, not punished.",
     "changes": [
-      "The D.D.S. column is live. Say where you are dropping and every row gets a second rating: what this tool makes of that item on that planet, against that front, next to what the crowd made of it in the abstract.",
-      "It is a delta on the community tier, never a replacement. Both stay on the row so every disagreement is visible rather than laundered, and a brief can move a rating by two tiers at most.",
-      "Every point of movement carries a sentence. Tap a row and it lists exactly which rules fired and what each was worth. A score that cannot explain itself is a score nobody should trust.",
-      "Twenty three rules to start with, and all but three fire on sourced data: the game own heat multipliers, its armour penetration tags, durable damage ratios, ergonomics, magazine depth, and the hazard descriptions the community dataset publishes.",
-      "On a sandstorm planet against Automatons, nineteen of fifty two primaries move. Every marksman rifle drops and every shotgun and SMG rises, which is the opposite of what a static tier list tells you and the entire reason this exists.",
-      "Three rules name six support weapons by hand, because nothing published separates a long range support weapon from a close one. Those rules say so in the data file rather than pretending to be derived.",
-      "Unrated items still collect reasons even though they have no tier to move. That is how something nobody has voted on gets tried on the front it happens to suit.",
-      "Added the mission picker, by the name the game uses. Seventy missions from the wiki, listed per front, because the mission list genuinely differs: Purge Hatcheries is not a thing on the Automaton war.",
-      "Under the name sits the line the name does not tell you. Retrieve Valuable Data reads as: you pick something up and walk it across the map, it occupies a hand, so a one handed weapon lets you shoot while carrying and everything else means putting the objective down first.",
-      "Rules key on what a mission asks of you rather than on its name. Seventy missions, eight traits, so a rule about carrying something does not have to list every mission that involves carrying something.",
-      "Ten more scoring rules, for carrying, escorting, holding ground, eradicating, hunting named heavies and blitzing."
+      "Say where you are dropping and every row gets a second rating, beside the community's, never replacing it.",
+      "Every point of movement carries a sentence. Tap a row to see which rules fired and what each was worth.",
+      "Seventy missions by their game names, each with the line its name does not tell you."
     ]
   },
   {
     "version": "1.7.0",
     "date": "2026-08-20",
-    "title": "Difficulty has a slider and a name, not four numbered chips",
+    "title": "Difficulty gets names, planets get a picker",
+    "say": "Nobody says difficulty 7. They say Suicide Mission.",
     "changes": [
-      "The difficulty filter in Drop Bay is a slider over all ten levels, and it says the name. Nobody thinks in difficulty 7, they think Suicide Mission.",
-      "Added the ten difficulty icons from the game, painted through the theme so they take the brand colour on any skin.",
-      "The four bands a build declares are unchanged, so nothing saved had to move. The slider works out which band a level falls in.",
-      "Hovering a difficulty band in the builder now names the levels it covers, so 7-9 reads as Suicide Mission to Helldive.",
-      "Added the three sample icons and the XP mark to the art library. Nothing uses them yet.",
-      "Replaced the planet table. It came from the training manual API, which turns out to be missing twelve planets including the one the current Major Order is about. It now comes from the helldivers-2/json community dataset: 281 planets against 269, 32 named biomes against 24 slugs, and 440 hazard assignments against 385. MIT licensed rather than unstated.",
-      "Those hazards now carry what they actually do. Extreme Cold delays heat buildup and cuts rate of fire, Ion Storms intermittently disable stratagems, and the three visibility hazards are graded lightly, moderately and greatly. That is the difference between a scoring rule and a label.",
-      "Credited the helldivers-2 community organisation and DiveHarder on About, alongside the wiki.",
-      "Made item names readable on a phone. The name had 64px of a 343px row and needed 193px, so most of them showed as three characters and an ellipsis. The padlock and star stack instead of sitting side by side, the rating columns are exactly badge width, and the chevron stopped reserving 36px for a 16px arrow. The name column went from 64px to 144px and rows grew by 7px.",
-      "Added the planet picker. Search 281 planets or a sector, choose one, and the biome and its hazards fill themselves in. The holo select in game shows you one image of a surface, and even a veteran cannot always tell a canyon from a mesa from it, let alone whether the place has ion storms.",
-      "Each hazard says what it does to you, not just its name. Klen Dahth II reads as intense heat, extreme cold and sandstorms, and spells out that heat speeds weapon heat buildup while cold delays it and costs you rate of fire.",
-      "Biome and hazards can still be set by hand if you would rather not name a planet. Doing so drops the planet, since the brief would otherwise claim to be somewhere it is not."
+      "Difficulty is a slider over all ten levels with the game's own names and marks.",
+      "Search 281 planets and the biome and hazards fill themselves in, each hazard saying what it does to you.",
+      "Item names are readable on a phone."
     ]
   },
   {
     "version": "1.6.0",
     "date": "2026-08-20",
-    "title": "Pick a front first, and the tier list has two rating columns instead of three fronts",
+    "title": "Pick a front first",
+    "say": "You chose your war before you opened the tool. Now the tool knows it too.",
     "changes": [
-      "The faction is a choice you make above the table now, not a filter inside it. Three buttons, named Automatons, Terminids and Illuminate. Nothing ranks until you pick one, because everything downstream reads differently per front and guessing one would be inventing the most important input.",
-      "Your choice is remembered, so the tool opens on the war you were last fighting.",
-      "The three faction columns are two rating columns: what u.gg voted, and what this tool works out for where you are dropping. The second is empty for now and says so. It fills when the scoring engine lands.",
-      "The other two fronts moved into the expanded row rather than out of the tool. Tap any row to see them.",
-      "A new loadout starts on the front you already picked, instead of always starting on Terminids.",
-      "Removed the Rank by chip row, which the buttons above the table replace.",
-      "Centred the faction buttons above the table and gave them some weight: the in-game faction mark, an accent bar in the front's own colour, and a soft bloom on the one you are on. The chooser and the bar are one control at two sizes now, so they cannot drift apart.",
-      "Gave the faction buttons their key art, muted hard and darkened toward the label so the text keeps its ground. Tall crops on the chooser, wide bands on the bar.",
-      "The bar is full width and shorter now, three equal buttons that stretch with the window rather than three fixed pills.",
-      "A skin can now ship a separate phone masthead as masthead-sm. The header box runs up to 27:1 and the phone row is nearer 10:1, so one cut was losing half of whatever was drawn. Skins without one fall back to the wide cut exactly as before.",
-      "The faction picker is on Drop Bay and the Loadout Builder now, not just the tier list.",
-      "Drop Bay shares the front with the tier list instead of keeping one of its own. Choosing Automatons in one place and finding Terminids in the other was never the intent.",
-      "In the builder the same control sets what the build is for, which is a property of the build rather than the brief. Changing it there marks the build unsaved and leaves the rest of the tool where it was.",
-      "Tier list filters survive leaving the page. A tier floor and a couple of hidden categories used to be thrown away the moment you glanced at Drop Bay. They now persist across navigation and a reload."
+      "The front is chosen above the list, not filtered inside it, and remembered.",
+      "Three faction columns became two rating columns: the community vote, and ours.",
+      "Tier list filters survive a trip to another page."
     ]
   },
   {
     "version": "1.5.0",
     "date": "2026-08-20",
-    "title": "Vehicles, their ratings, and every stratagem's call-in code",
+    "title": "Vehicles and call-in codes",
+    "say": "Exosuits, FRVs and a tank destroyer. Spare no expense.",
     "changes": [
-      "Added the eight vehicles and exosuits: the three FRVs, the Patriot, Emancipator, Lumberer and Breakthrough exosuits, and the Bastion tank destroyer. Their art has been sitting in the library since 18 August with nothing to attach it to, because no source this project had listed a single vehicle. The wiki fetch changed that.",
-      "They are unrated, and that is the honest state rather than a gap. No community tier list covers them, so they show a dashed badge, sort last, and survive every tier floor. Their armor penetration, demolition force, cooldown and hull values are real and come from the game data.",
-      "Added Vehicle as a stratagem type, in the blue call-in group next to support weapons and backpacks, where the game puts it.",
-      "Every stratagem now carries its cooldown and its call-in input code. 88 of them, against the 12 that had a cooldown before.",
-      "67 items now carry the game's own tags, including which support weapons are expendable, which reload standing still, and which can be team reloaded.",
-      "The eight vehicle images used to be bundled as unrecognised UI files. They are named properly now, so they attach to their items instead of riding along as dead weight.",
-      "Rated all eight vehicles from u.gg, stamped patch 7.0.0. They are the only weapon ratings in this tool that are actually current with the game; every other u.gg list here is still 6.3.1.",
-      "Corrected two acquisition paths that were assumed. The Lumberer and Breakthrough exosuits come from the Exo Experts warbond, not requisition, so they are warbond gateable now. The Supply and Incinerator FRVs are campaign rewards.",
-      "Fixed a row reading \"3 uses, null upgraded\". Only Eagles carried a use count before, and they always have an upgraded figure, so nothing had ever shown the gap."
+      "All eight vehicles and exosuits, rated.",
+      "Every stratagem carries its cooldown and its call-in code."
     ]
   },
   {
     "version": "1.4.0",
     "date": "2026-08-20",
-    "title": "The stats this tool never had, and a hot planet bug it has had all along",
+    "title": "The stats this tool never had",
+    "say": "And a hot planet bug that had been sabotaging plasma users all along.",
     "changes": [
-      "Added every weapon stat the reference tables never carried: magazine size, spare magazines, fire rate, recoil, ergonomics, sway, projectile drag and velocity, durable damage, stagger and pushback. 174 of 180 weapons, throwables and stratagems now carry them.",
-      "Fixed the hot planet filter. It removed any build carrying a weapon whose damage type reads heat or arc, which is 26 items. Only ten of them can actually overheat. Three Purifier builds and one Blitzer build were being ruled out of every hot planet over a mechanic those weapons do not have.",
-      "The heat-venting damage filter on the tier list now returns the four laser primaries that vent heat, instead of every plasma weapon as well.",
-      "Cold and hot are real numbers now. A Sickle vents 1.5 times faster on an ice planet and 0.75 times as fast on a hot one, and those figures come from the game rather than from a judgement.",
-      "Curated builds derive their heat flag the same way your own builds do. Drop Bay always claimed it normalised both and only ever did it for yours.",
-      "Added a planet table: 269 planets with their biome and their environmental hazards, 24 biomes and 14 hazards. Nothing reads it yet. It is what the planet picker will run on.",
-      "Added npm run wiki, which re-fetches all of the above and reports what changed before writing anything.",
-      "Credited the Helldivers Wiki on About, with its licence. The data is CC BY-NC-SA, so attribution is a condition rather than a courtesy.",
-      "The validator now checks the fetched data resolves to real items, and fails if the heat set ever comes back empty, since the hot planet filter reads it."
+      "Magazine, fire rate, recoil and the rest, fetched from the wiki.",
+      "Hot planets only rule out builds that can actually overheat: ten items, not twenty six.",
+      "Heat and cold effects are the game's real multipliers."
     ]
   },
   {
     "version": "1.3.0",
     "date": "2026-08-20",
-    "title": "Chrome heights, a phone that gives its screen back, and the Terminid mark",
+    "title": "A phone gets its screen back",
+    "say": "Less chrome, more democracy per pixel.",
     "changes": [
-      "Halved the chrome on a phone. The header and the tab bar are one 44px row now, holding the menu, the tabs and the theme control, and the masthead art paints behind it at 60% strength so the tabs stay readable. That is 56px of an 812px screen handed back to the list, 12% of the screen down to 5%.",
-      "Where a destination has no tabs, that row shows its name instead, so it is never just a menu button on its own.",
-      "Lined the page header up with the sidebar brand box on a wide screen. They were 61px and 86px, set independently, and the step was visible across the whole top of the app. Both read one number now.",
-      "Fixed the sidebar nav overflowing its own column by 2px, which came from the same two heights disagreeing.",
-      "Fixed the sticky faction column header docking in the wrong place after a window resize. The chrome height was only recalculated on the next navigation, so it could sit 85px too high and slide under the chrome.",
-      "Gave the Bile Titan skin its Terminid mark. It replaces the skull in the sidebar and takes the acid green like every other themed mark.",
-      "Cut that mark from 399KB to 21KB. It arrived at 2304px wide and is painted at 40px.",
-      "Split the locked and favourite filters out of the tier list filter grid into a group of their own, with the padlock and star on them. They are facts about your collection, and everything above them is a fact about the gear.",
-      "Re-specified the masthead cut for the new header: 2560 x 170 with the subject inside the centre 1400 x 90, worked out from the real box on every screen from a 375px phone to a 2560px desktop."
+      "On a phone the header and tabs are one 44 pixel row.",
+      "The page header lines up with the sidebar. The Bile Titan skin has its Terminid mark."
     ]
   },
   {
     "version": "1.2.0",
     "date": "2026-08-18",
-    "title": "Attribution, About, Support and this changelog",
+    "title": "About, Support and this changelog",
+    "say": "Paperwork. Super Earth runs on it.",
     "changes": [
-      "Added an unofficial community tool subtitle under the tool wordmark.",
-      "Added a sitewide footer naming Arrowhead and Sony as unaffiliated.",
-      "Moved the patch stamp into the footer and shortened it. The full detail now lives on About.",
-      "Added the About page: what this is, where the numbers come from, and what a stale rating means.",
-      "Rebuilt Support around known issues and how to report one.",
-      "Added this changelog.",
-      "Restored the gear filter in Drop Bay, which was lost when Drop Bay replaced the old picker.",
-      "Put the Castellan's Creed aquila back as the mark. The Astra Militarum crest is colour art and turns to mush at 36 pixels.",
-      "Renamed the tool from Super Earth Armory to Democracy Deployment System. It is a working title, so the name now lives in one file and a future rename is one edit.",
-      "Removed the picker component Drop Bay replaced, about 80 lines that nothing had called since the port.",
-      "Surfaced the per biome notes in Drop Bay. They were written for that old picker and had been unused ever since."
+      "The tool became the Democracy Deployment System, with its name kept in one place for the next rename.",
+      "About, Support, a footer naming Arrowhead and Sony as unaffiliated, and this changelog."
     ]
   },
   {
     "version": "1.1.0",
     "date": "2026-08-17",
-    "title": "Warbond skins, ambient effects and the image library",
+    "title": "Warbond skins",
+    "say": "Ten new uniforms. Regulation colours only.",
     "changes": [
-      "Added ten warbond skins on top of Dark, Light and Neon, each built from its own palette study.",
-      "Added the ambient layer: tracers on the Creek, gas and grain on Entrenched Division, rain on ODST, drips on Bile Titan, stars on Super Destroyer.",
-      "Gave every skin a masthead banner and its own mark.",
-      "Corrected Malevelon Creek from an invented green black to the poster's actual blue night.",
-      "Retoned Viper Commandos to woodland camo, with teal only as a lighting accent.",
-      "Sorted the image library into category folders and cut 22.7MB of art the app never rendered."
+      "Ten skins on top of Dark, Light and Neon, each with its own atmosphere: tracers on the Creek, rain for the ODSTs, gas over Entrenched Division."
     ]
   },
   {
     "version": "1.0.0",
     "date": "2026-08-16",
-    "title": "Squad checks, role tags and ownership profiles",
+    "title": "Squads, roles and profiles",
+    "say": "The first squad readout. Morale is mandatory.",
     "changes": [
-      "Added role tags for anti-armor, chaff and objective, hand assigned on top of a corrected AP derivation.",
-      "Added the squad panel in Drop Bay: put two to four builds side by side and get told what is going to hurt.",
-      "Added named ownership profiles, so a second player's collection can be modelled separately.",
-      "Finished Collection with both ownership axes, warbonds and per item unlocks."
+      "Role tags for anti-armour, crowd control and objectives, and a squad panel that says what is going to hurt.",
+      "Named ownership profiles, so a second player's collection lives apart from yours."
     ]
   },
   {
     "version": "0.4.0",
     "date": "2026-08-15",
-    "reconstructed": true,
     "title": "Stable ids, the Builder and Drop Bay",
+    "say": "Every item got a serial number. Renames no longer lose your gear.",
     "changes": [
-      "Moved every item onto a stable id, a slug of its name that never changes when the name does. Done deliberately before the Builder existed, so that user authored loadouts could never be keyed by display name in the first place.",
-      "Rewrote the validator around ids: uniqueness, real slugs, alias collisions, and every stored reference resolving to something that exists.",
-      "Added aliases so state saved under an older name still resolves. Two live there from the 7.0.0 rebuild, SG-225 Trident and AR-23C Liberator Carbine, both verified to migrate.",
-      "Built the Loadout Builder: nine slots, a picker that reuses the tier row so ratings and provenance are in front of you at the moment you choose.",
-      "Built Drop Bay as a plain grid, replacing the artifact's three scored picks.",
-      "Made every row expand, not just armor and flagged ones, carrying art, numbers, what the source does not record, and where the rating came from.",
-      "Wired in the art: 227 of 228 items, 24 warbond covers and 28 generic UI files. Only Electrical Conduit has none, and nothing depends on art existing.",
-      "Set the Vite asset inline limit to 0. The 4KB default was pulling a few hundred KB of stratagem icons into the JS bundle and defeating lazy loading."
-    ]
+      "Items keyed by stable ids, so a rename never orphans what you saved.",
+      "The Loadout Builder, with the tier list as its picker, and Drop Bay as a grid of builds."
+    ],
+    "reconstructed": true
   },
   {
     "version": "0.3.0",
     "date": "2026-08-15",
-    "reconstructed": true,
-    "title": "Ported out of the artifact into a real project",
+    "title": "Out of the artifact, into a real project",
+    "say": "Field promoted from prototype to tool.",
     "changes": [
-      "Moved from a single Claude artifact into a Vite and React project. Scoped to these changes and no others: behaviour stayed identical to the artifact, and everything wanted beyond that was recorded as deferred rather than slipped in.",
-      "Kept display names as the lookup key, as the artifact had them. Stable ids were deliberately deferred to the next pass.",
-      "Shipped a validator checking name matching and the tier scale, so a rename could not silently orphan lock state.",
-      "Replaced window.storage with localStorage. That was a sandbox constraint of the artifact runtime, not a preference.",
-      "Added ownership.json as the seed for lock state, with the rule that an empty file locks nothing, plus a fillable template listing all 24 warbonds.",
-      "Added export and import mid port, at your request. Persistence became a v1 guarantee rather than a nicety.",
-      "Added the sidebar navigation, with destinations belonging to later releases shown but not reachable.",
-      "Four themes: Dark, Light, Neon, and Castellan's Creed. Castellan's is a theme, dark only, which the token architecture allows on purpose.",
-      "Pinned Tailwind 3 rather than 4, which removed placeholder utilities and changes the default border colour to currentColor.",
-      "Rewrote CLAUDE.md to carry the locked decisions from both source documents, and surfaced the conflicts between them rather than silently picking a side.",
-      "Fixed the id slug that turned Castellan's Creed into castellan-s-creed."
-    ]
+      "Ported to a proper project with identical behaviour, export and import, a sidebar, and four themes."
+    ],
+    "reconstructed": true
   },
   {
     "version": "0.2.0",
     "date": "2026-08-14",
-    "reconstructed": true,
     "title": "The 7.0.0 data rebuild",
+    "say": "17 wrong ratings, 38 wrong sources and 2 wrong names, corrected for the record.",
     "changes": [
-      "Rebuilt the data layer from the per item tables instead of the summary tier list, which had produced three classes of error.",
-      "Corrected 17 wrong per-faction ratings, almost all from prose clumping. The Liberator family, Adjudicator, Halt and Machete had been written off as B or C across the board.",
-      "Corrected 38 wrong sources. Nine of the eighteen booster sources were wrong.",
-      "Corrected 2 wrong names. SG-225 Trident is LAS-13 Trident, and it is an energy weapon rather than ballistic, so it became hot gated and cold advantaged. That was a behaviour change, not a relabelling. AR-23C Liberator Carbine is AR-23A; the old file used one designation for two weapons.",
-      "Added 29 items that were missing entirely, including True Grit, the only armor passive besides Med-Kit rated S+ on all three fronts.",
-      "Brought coverage to complete: 228 rows matching the source tables row for row.",
-      "Established that two patch stamps coexist. Only the armor passive table is restamped to 7.0.0; everything else is 6.3.1 community consensus applied to a post patch game. This is the defining property of the data layer and the reason stale flags exist at all.",
-      "Flagged 19 items as stale, where a confirmed 7.0.0 change touched that exact item after the vote was cast.",
-      "Dropped all 27 approx flags. The full tables give real per-faction ratings, so the summary fallback was no longer needed.",
-      "Recorded the judgment calls separately from the corrections, as the ones to revisit if better data appears: Breaker Incendiary and Cookout as fire rather than ballistic, the Hot-Shot Lasgun as heat, Meltagun and Meltamine as fire, and Kinetic Displacement Mitigation as fire.",
-      "Corrected the warbond count to 24 as of 12 August 2026, and grouped Righteous Revenants as the third Legendary."
-    ]
+      "Rebuilt from the per item tables: complete coverage, 29 missing items added."
+    ],
+    "reconstructed": true
   },
   {
     "version": "0.1.0",
     "date": "2026-07",
-    "estimated": true,
-    "reconstructed": true,
     "title": "The original artifact",
+    "say": "Where it all began: one file and a lot of opinions.",
     "changes": [
-      "A single file Helldivers 2 tier browser with four tabs: tier lists, curated loadouts, warbonds and favorites.",
-      "Per faction ratings across six browsable categories, merging the five stratagem call-in menus into one, because you pick a stratagem by faction and tier rather than by which menu it sits under.",
-      "Two independent lock sets, per item and per warbond, unioned at read time so clearing one never destroys the other.",
-      "A second favourites axis: starred tier rows, independent of both locks and loadout favourites.",
-      "Biome and difficulty as hard gates rather than soft scoring, after feedback that warning is not enough when the answer is do not bring this.",
-      "The cold biome advantage, added as a correction: heat vents slower on ice, so laser and plasma are genuinely better there. Cryo Beam, Frostline and Frost Lance exist because of it.",
-      "Faction theming through the whole interface rather than just labels, and stratagem colour groups following the in-game call-in menu.",
-      "The name matching invariant, with a legacy name map migrating saved lock state through renames.",
-      "39 curated loadouts, fixed and named rather than generated.",
-      "Patch caveats as a hover explanation rather than a filter chip."
-    ]
+      "A single file tier browser with lock sets, favourites, hard biome gates, and 39 curated loadouts."
+    ],
+    "estimated": true,
+    "reconstructed": true
   }
 ]

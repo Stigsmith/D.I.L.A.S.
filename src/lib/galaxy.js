@@ -10,7 +10,7 @@
 /* planets.json, fetched once by scripts/fetch-wiki.mjs, so the map   */
 /* draws, pans and fills the scenario with no network call at all.    */
 /* Who holds what is live and arrives separately, if it arrives: it  */
-/* decorates the map and never carries it. dds-roadmap.md, "The live */
+/* decorates the map and never carries it. dilas-roadmap.md, "The live */
 /* starmap".                                                          */
 /*                                                                    */
 /* The layout is the game's, because finding a planet again where you */

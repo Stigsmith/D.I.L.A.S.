@@ -49,7 +49,7 @@ const COLUMNS = [
 async function page() {
   mkdirSync(CACHE, { recursive: true });
   if (!REFRESH && existsSync(CACHED)) return JSON.parse(readFileSync(CACHED, "utf8")).text;
-  const res = await fetch(PAGE, { headers: { "user-agent": "dds (community loadout tool)" } });
+  const res = await fetch(PAGE, { headers: { "user-agent": "dilas (community loadout tool)" } });
   if (!res.ok) throw new Error(`Difficulty: ${res.status} ${res.statusText}`);
   const text = await res.text();
   writeFileSync(CACHED, JSON.stringify({ fetchedAt: new Date().toISOString(), text }));

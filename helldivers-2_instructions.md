@@ -42,7 +42,7 @@ Read only what the task needs.
 |---|---|
 | "What is this weapon rated" | `helldivers-2_tables.md`. Do not use the tier list, it summarises and clumps. |
 | "What should I bring against X" | `helldivers-2_tier-list.md`. Drop into the tables only when a specific number is needed. |
-| Anything touching the tool | `dds-design.md` **first**, then the tables, then the .jsx. |
+| Anything touching the tool | `dilas-design.md` **first**, then the tables, then the .jsx. |
 | Current patch, meta, or anything that may have moved | Search the web. These files go stale. |
 
 > [!danger] Never edit the tool blind
@@ -80,7 +80,7 @@ Read only what the task needs.
 - `helldivers-2_stigly_profile.md`: who he is as a Helldivers player. Career stats, faction exposure, co-op setup, spending. Apply from message one.
 - `helldivers-2_tier-list.md`: the decision layer. What to bring per faction, plus co-op doctrine for both even-skill and mixed-skill sessions.
 - `helldivers-2_tables.md`: the data source. Every item, per-faction ratings, AP class, DPS, demo force, capacity, unlock source, armor passive lookup. Nothing clumped.
-- `dds-design.md`: why the tool is built the way it is. Locked decisions, data conventions, known gaps. Not optional before touching the tool.
+- `dilas-design.md`: why the tool is built the way it is. Locked decisions, data conventions, known gaps. Not optional before touching the tool.
 - `original-artifact.jsx`: the React tool. Vault only, not project knowledge. Request an upload when needed.
 
 File creation and restyling in this project uses the **obsidian-markdown-style** skill.

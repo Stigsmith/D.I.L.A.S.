@@ -897,7 +897,7 @@ function DifficultySlider({ value, onChange, label = "Difficulty", hint }) {
             onChange={(e) => onChange(Number(e.target.value))}
             aria-label={label}
             aria-valuetext={d ? `${d.level}, ${d.name}` : "Any difficulty"}
-            className="dds-range w-full"
+            className="dilas-range w-full"
             style={{ "--fill": `${pct}%` }} />
           {/* Ends only. Ten numbers under a ten step slider is the wall   */}
           {/* the slider was replacing.                                     */}
@@ -1307,7 +1307,7 @@ function RowDetail({ item, faction, scored, difficulty }) {
 /* --shell-chrome carries.                                              */
 const RATING_COLUMNS = [
   { id: "ugg", label: "u.gg", title: "u.gg community vote" },
-  { id: "dds", label: BRAND.short, title: "Our rating for the scenario you set" },
+  { id: "ours", label: BRAND.short, title: "Our rating for the scenario you set" },
 ];
 
 function RatingHeader({ faction, left, sortBy, setSortBy }) {
@@ -1399,7 +1399,7 @@ export function statSummary(item) {
 /* onSelect turns the row into a picker entry. The lock, favorite and    */
 /* expand controls inside it stop propagation so tapping them does not   */
 /* also choose the item.                                                 */
-function TierRow({ item, factionFilter, scenario, sortBy = "dds", isLocked, lockedByWarbond, toggleLock, isFav, toggleFav, open, onToggleOpen, onSelect }) {
+function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, lockedByWarbond, toggleLock, isFav, toggleFav, open, onToggleOpen, onSelect }) {
   const stop = (fn) => (e) => { e.stopPropagation(); fn(); };
   const { id, name, flag } = item;
   /* factionFilter is a real front now, never "all": the table does not   */
@@ -1520,7 +1520,7 @@ function TierRow({ item, factionFilter, scenario, sortBy = "dds", isLocked, lock
           </div>
           <div className="w-12 sm:w-16 flex items-center justify-center border-l px-1 py-1.5"
             style={{
-              backgroundColor: sortBy === "dds" ? factionMeta.hex + "14" : "transparent",
+              backgroundColor: sortBy === "ours" ? factionMeta.hex + "14" : "transparent",
               borderColor: factionMeta.hex + "33",
             }}
             title={scored && scored.reasons.length
@@ -1530,7 +1530,7 @@ function TierRow({ item, factionFilter, scenario, sortBy = "dds", isLocked, lock
               <PendingBadge />
             ) : (
               <span className="relative flex items-center">
-                <TierBadge tier={scored.tier} quiet={sortBy !== "dds"} className={ROW_BADGE} />
+                <TierBadge tier={scored.tier} quiet={sortBy !== "ours"} className={ROW_BADGE} />
                 {/* Top left, because that corner of the plate is square  */}
                 {/* and the top right is the chamfer. A round marker over  */}
                 {/* a cut corner reads as damage rather than as a badge.   */}
@@ -1729,7 +1729,9 @@ export function ScenarioBar({ scenario, onAdjust, rulesOff = 0, onRules }) {
       ) : null}
 
       <button onClick={onAdjust}
-        className={(rulesOff ? "" : "ml-auto ") + "flex shrink-0 items-center gap-1.5 rounded border border-base-700 bg-base-900 px-2 py-1 text-[11px] text-base-300 hover:border-base-500 hover:text-base-100"}>
+        /* Lit in the theme's own brand colour so it reads as the way in to
+           the war room, the curator's ask of 3 October 2026. */
+        className={(rulesOff ? "" : "ml-auto ") + "flex shrink-0 items-center gap-1.5 rounded border border-brand/70 bg-base-900 px-2.5 py-1 text-[11px] font-semibold text-brand shadow-[0_0_10px_rgb(var(--brand)/0.35)] transition-shadow hover:border-brand hover:shadow-[0_0_16px_rgb(var(--brand)/0.6)]"}>
         <SlidersHorizontal className="h-3.5 w-3.5" />
         Adjust scenario
       </button>
@@ -1900,9 +1902,15 @@ export function TierBrowser({ catId, faction, scenario, sortBy, setSortBy, filte
   const unratedInCategory = category.items.filter((it) => judgedTier(it, null) === null).length;
   const backpackHere = catId === "strat" ? category.items.filter(eatsBackpack).length : 0;
 
-  /* No front, no table. App.jsx sends you to the war room, so this is
-     only ever drawn for the moment before that. */
-  if (!faction) return null;
+  /* No front, no table: the strip above the list asks for one. */
+  if (!faction) {
+    return (
+      <p className="rounded-lg border border-dashed border-base-700 px-4 py-10 text-center text-sm text-base-500">
+        Pick a front above and the list ranks for that war. Everything after it, the planet, the difficulty and how many
+        of you, moves the ratings too.
+      </p>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">

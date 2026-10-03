@@ -1,7 +1,7 @@
 # **D.I.L.A.S.: Claude Instructions**
 
-> [!warning] The repo lives at `C:\Dev\dds` and nothing is called armory any more
-> Renamed 21 August 2026, folder included. `Armory.jsx` is `Tiers.jsx`, `useArmoryState.js` is `useCollectionState.js`, and the four `helldivers-2_armory-*.md` documents are `dds-*.md`. The original Claude.ai artifact is `original-artifact.jsx`.
+> [!warning] The repo lives at `C:\Dev\dilas` and nothing is called armory any more
+> Renamed 21 August 2026, folder included. `Armory.jsx` is `Tiers.jsx`, `useArmoryState.js` is `useCollectionState.js`, and the four `helldivers-2_armory-*.md` documents are `dilas-*.md` (they were `dds-*.md` until 3 October 2026). The original Claude.ai artifact is `original-artifact.jsx`.
 >
 > **The product name still lives in exactly one file.** `src/lib/brand.js`, unchanged. Renaming the repo did not change that, and it must not: the folder is a path, the brand is a value.
 
@@ -16,7 +16,7 @@
 >
 > It is in `src/lib/brand.js` and nowhere else: the sidebar, the mobile drawer, the browser tab (written into `index.html` by a small plugin in `vite.config.js`; it was a hardcoded title until the rename found it), the footer, About and the backup file's name all read from it. **The one other copy is the reset email in `worker/email.ts`**, because the Worker's type check cannot import the app's JavaScript. Renaming again is those two edits. Do not hardcode it anywhere else.
 >
-> **The repo folder, the Worker, the D1 database and the `dds-*.md` documents keep `dds`.** They are infrastructure, not the brand: renaming the Worker moves its workers.dev address, and renaming the database orphans it.
+> **Nothing is called dds any more, the folder included.** The curator's call, 3 October 2026: the repo moved from `C:\Dev\dds` to `C:\Dev\dilas`, the documents became `dilas-*.md`, the package `dilas`, and on Cloudflare a new Worker `dilas` and a new database `dilas` replaced the `dds` ones, since neither can be renamed in place. The old `dds` Worker and its `dds.stigly-official.workers.dev` address went with it.
 
 A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai artifact into a Vite and React project. Navigation is two levels: a persistent left sidebar for destinations, and a top tab bar scoped to whichever destination is open.
 
@@ -27,7 +27,7 @@ A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai a
 | **Armoury** | `#/armoury/:tab` | Built. Your builds. Two tabs: **Builds**, the grid that browses every build at once, and **Coverage**, what your builds answer per front. See The Armoury |
 | **Collection** | `#/collection/:tab` | Built. Two tabs, Warbonds and Items, one per ownership axis |
 | **Rules** | `#/rules` | Built. Every rule behind our rating, what it moves here, and a switch to turn it off. Bottom of the menu. See The Rules Page |
-| **Tier Lists** | `#/tiers/:category` | Built, **off the menu since 1 October 2026**. Lives on as the picker inside every build, and whole at this address, linked from the Armoury |
+| **Tier Lists** | `#/tiers/:category` | Built. **Back in the menu since 3 October 2026**, the curator's call, after two days off it: the quickest way to see what a rule does is to watch the list move. A strip on the page sets the front, difficulty and how many of you without leaving it. Still the picker inside every build |
 | **The editor** | `#/builder/:id?` | Off the menu, lit as Armoury. Edits one build; `new` starts one, `new-bots` starts one for a front |
 | **Shared build** | `#/shared/:code` | Off the menu. A build carried in the link itself. See Drop History And Share Links |
 | **The war room** | `#/scenario` | Built, 2 October 2026. Off the menu: the scenario bar's Adjust, and every surface that needs a front first, send you here. Where the scenario is set, the galaxy map across the screen. See The Galaxy Map, "The war room" |
@@ -59,9 +59,9 @@ A Helldivers 2 tier browser and loadout tool, ported out of a single Claude.ai a
 > | **Share links** | A build in the link itself, no server |
 > | **Commando missions** | Automaton only, with their own trait and eight rules: the reinforcement and call-in limits, from the wiki |
 
-What is agreed but not built lives in `dds-roadmap.md`: the accounts, Exchange and live squad dependency chain, the wider warning set, and the offline build authoring plan. Read it before starting anything that sounds like new scope.
+What is agreed but not built lives in `dilas-roadmap.md`: the accounts, Exchange and live squad dependency chain, the wider warning set, and the offline build authoring plan. Read it before starting anything that sounds like new scope.
 
-Data authority lives outside this repo, in the Helldivers 2 project files: `helldivers-2_tables.md` for every rating and number, `helldivers-2_tier-list.md` for the decision layer, `dds-design.md` and `dds-web-requirements.md` for why the tool works the way it does. The original artifact is kept at `original-artifact.jsx` in the repo root as a reference implementation. It is not built and not imported.
+Data authority lives outside this repo, in the Helldivers 2 project files: `helldivers-2_tables.md` for every rating and number, `helldivers-2_tier-list.md` for the decision layer, `dilas-design.md` and `dilas-web-requirements.md` for why the tool works the way it does. The original artifact is kept at `original-artifact.jsx` in the repo root as a reference implementation. It is not built and not imported.
 
 ---
 
@@ -81,7 +81,7 @@ Data authority lives outside this repo, in the Helldivers 2 project files: `hell
 > | **Enemy armour** | 80 enemies, 594 body parts. Shown on every row as a fact, moves no rating, waits for loadout scoring |
 > | **Vehicles** | All eight, rated |
 >
-> **What is left**, in order: three judgement tags, then Drop Bay becoming the drop screen. Loadout scoring landed in 1.20.0. **The tool moved to Cloudflare in 1.21.0**, Stage 0 of `dds-cloudflare-handover.md`, which is the plan for accounts, sync, Exchange and the live war map. The plan lives in `dds-roadmap.md`, which also explains how the phases relate to the v2 and v3 labels in the sidebar.
+> **What is left**, in order: three judgement tags, then Drop Bay becoming the drop screen. Loadout scoring landed in 1.20.0. **The tool moved to Cloudflare in 1.21.0**, Stage 0 of `dilas-cloudflare-handover.md`, which is the plan for accounts, sync, Exchange and the live war map. The plan lives in `dilas-roadmap.md`, which also explains how the phases relate to the v2 and v3 labels in the sidebar.
 
 > [!success] Armour moves a rating again, at the loadout level. 1.20.0. Do not put it back on the item
 > Five armour rules shipped in 1.10.0 and came out in 1.13.0. They were the wrong altitude and the measurement is blunt: **48 of 51 primaries on the Automaton front share one of two identical armour readings**, and the rules took a tier off 42 of them. Only the Eruptor, the Double-Edge Sickle and the Torcher differ.
@@ -122,7 +122,7 @@ Data authority lives outside this repo, in the Helldivers 2 project files: `hell
 >
 > **And agreement with u.gg is not a meaningful baseline to return to.** A u.gg rating is an unweighted blur over Super Helldive veterans and new players soloing at difficulty 3, over every planet and every condition, with faction as its only axis. It is not the four player rating. Comparing a four stack at 9 in a sandstorm against it and calling the match "nothing to add" compares a situation against an average of situations that never happen in isolation.
 >
-> The curator made this argument on 21 August 2026 and it is the right one. **Do not quote the old line as a principle.** What is actually true is that the rule set has no non solo squad rules and no difficulty gradient yet. See `dds-roadmap.md`, "Warning logic, a wider set", which already asks whether difficulty should scale thresholds rather than gate them, and is now a measured question rather than an open one.
+> The curator made this argument on 21 August 2026 and it is the right one. **Do not quote the old line as a principle.** What is actually true is that the rule set has no non solo squad rules and no difficulty gradient yet. See `dilas-roadmap.md`, "Warning logic, a wider set", which already asks whether difficulty should scale thresholds rather than gate them, and is now a measured question rather than an open one.
 >
 > `notIdIn` was added alongside, symmetric with `notTags`, so a rule can say "everything except these". It is what lets the loud half of a list fall at the same moment the quiet half rises.
 
@@ -273,7 +273,7 @@ Rename freely. Put the old name in that item's `aliases` array and nothing break
 
 ### The shape of the tool
 
-- **Tier browsing was the primary tool until 1 October 2026, and he reversed it himself.** He still prefers judging items over accepting packaged builds, which is why the tier list survives as the picker in every build, ranked for the drop, and stays whole at `#/tiers`. What changed is the front door: Drop Bay, then the Armoury, the game's own two places. Do not put the tier list back in the menu without asking.
+- **Tier browsing was the primary tool until 1 October 2026, and he reversed it himself.** He still prefers judging items over accepting packaged builds, which is why the tier list survives as the picker in every build, ranked for the drop, and stays whole at `#/tiers`. What changed is the front door: Drop Bay, then the Armoury, the game's own two places. **He put it back in the menu himself on 3 October 2026**, with quick scenario controls on the page, for watching rules move the list. Drop Bay stays the front door.
 - **Curated loadouts are fixed and named, not generated.** Auto-calibration, pick a primary and have the rest adjust, was considered and declined. Do not rebuild it.
 - **Keep the loadout objects readable.** Tier rows are arrays, loadouts are objects, because he may edit loadouts by hand.
 
@@ -419,7 +419,7 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 - **`tags`** is the other curated layer and it is not the same thing as `roles`. A role says what job an item does for a squad. A tag says something a scoring rule needs to ask about that no fetched field answers. Two exist, `long-range` and `suppressed`, and **each declares its own provenance in `vocabulary.json`**: `long-range` is `curator`, `suppressed` is `wiki`. See The Tag Layer.
 - **`flag`** is `"stale"` when the rating predates a confirmed change to that exact item, which requires a `patchNote`, or `"new"` when the item is in the game with no rating yet. **None is stale as of 1.23.0**: the nineteen that were all cleared when u.gg's votes came to postdate the changes, flag and note both set to null. Only the P/40-K Bolt Pistol is `new`. The machinery stays for the next patch.
 - **`effect` versus `note`.** Armor passives and boosters carry an `effect`, which is what the thing actually does. Everything else carries a `note`, which is opinion. They never both appear.
-- **`stats` are sparse, and that is now a gap rather than a principle.** AP, DPS, capacity, demo force, cooldown, uses and medal cost came out of the source tables. Magazine size, spare magazines, fire rate, recoil, reload time, projectile count and stagger were recorded here as **not in any source this project has**. The data spike on 20 August 2026 found all of them published, plus ergonomics, sway, durable damage, stagger, pushback and projectile drag. See `dds-data-spike.md`. Still leave them absent rather than guessing, but the answer now is to fetch them rather than to shrug.
+- **`stats` are sparse, and that is now a gap rather than a principle.** AP, DPS, capacity, demo force, cooldown, uses and medal cost came out of the source tables. Magazine size, spare magazines, fire rate, recoil, reload time, projectile count and stagger were recorded here as **not in any source this project has**. The data spike on 20 August 2026 found all of them published, plus ergonomics, sway, durable damage, stagger, pushback and projectile drag. See `dilas-data-spike.md`. Still leave them absent rather than guessing, but the answer now is to fetch them rather than to shrug.
 
 > [!success] The hot biome gate was firing on weapons with no heat mechanic. Fixed in 1.4.0
 > `damageType` of `heat` or `arc` marked 26 items as thermally affected, and a hot biome removed any build carrying one. Only ten of them can overheat: the LAS laser family, the Quasar and the Rover's drone. Every plasma weapon feeds from magazines. Three Purifier builds and one Blitzer build were ruled out of every hot planet over a mechanic they do not have.
@@ -709,7 +709,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > `isHeldWeapon` in `loadouts.js` is the one definition. It lived in three places until 1.20.0: inside `heldGear`, inside `squad.js`, and inside `score.js` as the `held` match key, whose comment read "mirrors heldGear in loadouts.js". **`heldGear` is wider by exactly one thing, a backpack**, because a pack vents with you but is not something you aim.
 
 > [!danger] The 39 curated builds are not a fair denominator, and `npm run builds` says so in two columns
-> The curator's call, 22 August 2026: **they are legacy AI generations**, made before this project had stats or scoring behind it, and using the tool's own tiering and warnings would net better ones. `dds-roadmap.md` already had the measurement: 35 of 39 use an S or S+ primary, 13 distinct primaries appear across all of them, and three A tier marksman rifles for bots appear zero times.
+> The curator's call, 22 August 2026: **they are legacy AI generations**, made before this project had stats or scoring behind it, and using the tool's own tiering and warnings would net better ones. `dilas-roadmap.md` already had the measurement: 35 of 39 use an S or S+ primary, 13 distinct primaries appear across all of them, and three A tier marksman rifles for bots appear zero times.
 >
 > So the health check reports every rule against **300 random legal builds**, 100 per front, seeded so two runs stay comparable. That is the honest denominator for whether a rule discriminates. The curated column stays beside it because those 39 are what is on screen today, **and the gap between the two columns is itself a reading**: a rule firing far more often on the curated set than on a random one is describing his 39.
 
@@ -756,7 +756,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 # **The Drop Screen**
 
 > [!success] Drop Bay's first tab, 1.24.0, 27 September 2026. Local, no server
-> `src/DropScreen.jsx` for the screen, `src/lib/drop.js` for everything that is not a picture. The moment before you dive: **a brief**, **four slots**, and **the squad read**. Picking a loadout happens in a picker over the screen, the builder's pattern, so the main screen says nothing about choosing. `dds-roadmap.md`, "What Drop Bay turns into", is the plan it was built from.
+> `src/DropScreen.jsx` for the screen, `src/lib/drop.js` for everything that is not a picture. The moment before you dive: **a brief**, **four slots**, and **the squad read**. Picking a loadout happens in a picker over the screen, the builder's pattern, so the main screen says nothing about choosing. `dilas-roadmap.md`, "What Drop Bay turns into", is the plan it was built from.
 
 | Part | What it is |
 |---|---|
@@ -803,7 +803,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 # **The Live Party**
 
 > [!success] Built, 1.25.0, 29 September 2026. **Not deployed yet**: that waits for the curator
-> Squad up with a code on the drop screen. One person opens a party and reads out six characters; whoever types them in is in, up to four. Each person's **confirmed** loadout lands in their slot on everybody's screen, the host's scenario becomes everybody's, and the squad read is the same on every screen because it counts the same builds. Stage 7 of `dds-cloudflare-handover.md`, which Enodia never built, so nothing was ported.
+> Squad up with a code on the drop screen. One person opens a party and reads out six characters; whoever types them in is in, up to four. Each person's **confirmed** loadout lands in their slot on everybody's screen, the host's scenario becomes everybody's, and the squad read is the same on every screen because it counts the same builds. Stage 7 of `dilas-cloudflare-handover.md`, which Enodia never built, so nothing was ported.
 
 | Part | Where |
 |---|---|
@@ -846,7 +846,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!info] Every party rule was broken on purpose to see its test fail
 > The squad cap, host only scenario, host only removal, the returning seat, the host handover and the loadout size cap, on 29 September 2026. Each broke exactly the test aimed at it. Do the same for any new rule.
 
-**Shipping it** is two steps, in this order, and both wait for the curator: `npx wrangler d1 migrations apply dds --remote` for the `api_rate_limit`, `war_snapshot` and `war_history` tables, then `npm run deploy`, which also creates the Durable Object class from the `v1` migration in `wrangler.jsonc` and registers the five minute Cron Trigger. Then open a party on the live address from two browsers, and after five minutes check `/api/war` answers 200, before calling it done.
+**Shipping it** is two steps, in this order, and both wait for the curator: `npx wrangler d1 migrations apply dilas --remote` for the `api_rate_limit`, `war_snapshot` and `war_history` tables, then `npm run deploy`, which also creates the Durable Object class from the `v1` migration in `wrangler.jsonc` and registers the five minute Cron Trigger. Then open a party on the live address from two browsers, and after five minutes check `/api/war` answers 200, before calling it done.
 
 ---
 
@@ -862,7 +862,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 | **Drop Bay** | **No map of its own since 2 October 2026.** With no front it sends you to the war room; with no planet its brief offers **Choose in the war room**. In a party only the host is offered it, because the host sets the scenario. The by hand biome and hazards were retired on 30 September 2026, once the map and planner covered them |
 
 > [!danger] The layout is patch data and the map needs no network
-> Positions and supply lines ship in `planets.json`, fetched once by `npm run wiki` from `api.helldivers2.dev`. A planet does not move. **The map draws, pans and fills the scenario with nothing fetched at run time.** Who holds what is live and arrives separately, if it arrives: it decorates the map and never carries it. **Never ship ownership**; a stale territory map is worse than an uncoloured one. `dds-roadmap.md`, "The live starmap".
+> Positions and supply lines ship in `planets.json`, fetched once by `npm run wiki` from `api.helldivers2.dev`. A planet does not move. **The map draws, pans and fills the scenario with nothing fetched at run time.** Who holds what is live and arrives separately, if it arrives: it decorates the map and never carries it. **Never ship ownership**; a stale territory map is worse than an uncoloured one. `dilas-roadmap.md`, "The live starmap".
 
 > [!danger] The data's y points up, and the flip lives in exactly one place
 > `project()` in `galaxy.js`. Cyberstan, the Automaton home world, sits up and to the left in game and does here; `npm run map` checks it, and a map drawn without the flip fails that check and nothing else.
@@ -890,7 +890,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > |---|---|
 > | **Left** | "Where would you like to play?": the planet search with its results, the planner and Go here, then what you are dropping on and the mission. **On a wide room it takes its width off the map**, passed as `insets` to `stageFit`, so the galaxy is never drawn under it. On a room under 900 pixels it lays over the map, starts folded, and folds again once you choose a planet. Folded, it is a tab on the left edge |
 > | **Top right** | The Major Order and **the war so far**, each folding to its title. Laid over the map rather than taking room from it, the way the game lays its own |
-> | **Bottom** | Difficulty as a stepper, with what the level brings off the wiki and how many of the front's enemies the ratings count; **How many of you**, or the party's count in a party; and **Done** once a front is chosen. Its measured height is the map's bottom inset |
+> | **Bottom** | **A floating card, centred under the open map** like the game's difficulty picker (the curator's call of 3 October 2026, after a full width bar read as chrome): the difficulty stepper and **How many of you** side by side, since the ratings read the two together, and under them what the level brings as **labelled tiles** (operation, medals, outposts, samples as three dots in the game's colours, modifiers, rewards, enemies counted and what is new), each tile's full sentence in its tooltip. **Done** floats on its own at the right once a front is chosen. On a phone the card fills the width and Done sits under it. The cards' measured height is the map's bottom inset |
 > | **The map's own controls** | Where you are at the top left of the open space, the look and the tilt at its bottom left, the zoom at its bottom right, so the top right is free for the Major Order |
 >
 > **The room clips with `overflow: clip`, not hidden.** The drawing reaches past the room's edges so a tilted sector fills it, and a box that merely hides its overflow can still be scrolled by focus or by a script bringing something into view: found in the browser, where a click scrolled the whole room 325 pixels sideways. Every mark, name and render is drawn 1.3 times bigger there (`FULL_MARKS`), and the hover card's render grows to match.
@@ -932,7 +932,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > Fixed alongside the map. The hazard table calls it `normal_temp`, and the scenario screen's filter looked for `normal_temperature`, so it never matched: every ordinary planet read "2 hazards", and Normal Temperature was offered as a hazard toggle. `QUIET_HAZARDS` and `loudHazards` in `scenario.js` are the one definition now; the drop screen's brief had its own copy, which was right, and uses the shared one.
 
 > [!success] The live war colours it in, same version
-> **Stage 6 of `dds-cloudflare-handover.md`, built the way that plan designed it.** A Cron Trigger fetches `api.helldivers2.dev` every five minutes and keeps one trimmed row in D1; `GET /api/war` hands it out with its age; the browser decides whether it is young enough to draw. `worker/war.ts` for the server, `cleanWar` in `galaxy.js` and `useWar` in `src/lib/war.js` for the browser.
+> **Stage 6 of `dilas-cloudflare-handover.md`, built the way that plan designed it.** A Cron Trigger fetches `api.helldivers2.dev` every five minutes and keeps one trimmed row in D1; `GET /api/war` hands it out with its age; the browser decides whether it is young enough to draw. `worker/war.ts` for the server, `cleanWar` in `galaxy.js` and `useWar` in `src/lib/war.js` for the browser.
 >
 > | On the map | |
 > |---|---|
@@ -1439,7 +1439,7 @@ Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, t
 > Verified 18 August 2026: a fresh PowerShell resolves `node` to `C:\Program Files\nodejs\node.exe` and `npm` works with no setup. This used to need prepending, because a shell opened before the install could not see it. That is no longer true.
 
 > [!tip] How stigly actually deploys it
-> File Explorer into `C:\Dev\dds`, click the address bar, type `cmd`, Enter. That opens a terminal already in the folder. Then `npm run deploy`, which builds and puts it on Cloudflare in one go. He does not use a terminal habitually, so give the path and the clicks, not just the command.
+> File Explorer into `C:\Dev\dilas`, click the address bar, type `cmd`, Enter. That opens a terminal already in the folder. Then `npm run deploy`, which builds and puts it on Cloudflare in one go. He does not use a terminal habitually, so give the path and the clicks, not just the command.
 >
 > **Until dilas.me is deployed and announced, Netlify is still the address people use**, and `npm run build` then dragging `dist` onto Netlify still works exactly as before. See Hosting for why the two coexist.
 
@@ -1474,11 +1474,14 @@ Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, t
 > Add the entry to `changelog.json` with a new `version`, then set the same string in `package.json`. The footer and the Changelog page both read `CHANGELOG[0].version`, so they cannot drift. **Nothing else hardcodes a version.**
 
 > [!danger] Two roadmap files, and the markdown one moves first
-> `dds-roadmap.md` in the repo root is the **working document**: the reasoning, the dependency chain, the open questions, everything a session needs. `src/data/roadmap.json` is the **public summary** shown on the Roadmap page, one sentence per milestone.
+> `dilas-roadmap.md` in the repo root is the **working document**: the reasoning, the dependency chain, the open questions, everything a session needs. `src/data/roadmap.json` is the **public summary** shown on the Roadmap page, one sentence per milestone.
 >
 > They will drift, and the drift is one directional. **Change the markdown first, then check whether the summary still reads true.** A milestone that moved status, or a new one worth a person knowing about, belongs in both. Anything that is reasoning rather than intent belongs only in the markdown, or the page stops being concise, which is the whole reason it exists.
 >
 > Keep every `say` to one sentence. The moment an entry needs two, it belongs in the working document instead.
+
+> [!info] How an entry reads, since 3 October 2026. Enodia's shape, D.I.L.A.S.'s voice
+> Each version is `title`, a one line `say` and **three to six short `changes`**: what is different on screen, one sentence each, never the reasoning (that is what this file is for). The `say` carries some Super Earth flavour, Ministry of Truth dry rather than jokey. The curator asked for it concise and with Helldivers humour, and the whole history was rewritten that way, 55,000 characters down to 9,000. The Changelog page folds: one line per release, the newest open, opening one closes the other.
 
 > [!tip] Write the entry as the work lands, not at the end
 > Adding a line to the top entry costs nothing. Reconstructing a week of small changes from memory is how a changelog quietly becomes fiction.
@@ -1488,7 +1491,7 @@ Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, t
 # **Hosting**
 
 > [!success] Served from Cloudflare since 1.21.0, 25 September 2026
-> **https://dilas.me** from the next deploy: bought on Cloudflare on 2 October 2026 and attached to the Worker as a custom domain in `wrangler.jsonc`, so the deploy creates its DNS record and certificate. Until then **https://dds.stigly-official.workers.dev**, which stays on through the move. Both on the same Cloudflare account as Enodia. Stage 0 of `dds-cloudflare-handover.md` moved `dist/` here as static assets, and **Stage 1 added a Worker on `/api/*` and a D1 database for accounts**, switched off in the UI. See Accounts. Everything the tool does for somebody using it still happens in the browser. Read that handover before Stage 1; it carries eighteen pitfalls Enodia paid for.
+> **https://dilas.me** from the next deploy: bought on Cloudflare on 2 October 2026 and attached to the Worker as a custom domain in `wrangler.jsonc`, so the deploy creates its DNS record and certificate. The Worker's own address is **https://dilas.stigly-official.workers.dev**; the old `dds` one was deleted with the old Worker on 3 October 2026. Both on the same Cloudflare account as Enodia. Stage 0 of `dilas-cloudflare-handover.md` moved `dist/` here as static assets, and **Stage 1 added a Worker on `/api/*` and a D1 database for accounts**, switched off in the UI. See Accounts. Everything the tool does for somebody using it still happens in the browser. Read that handover before Stage 1; it carries eighteen pitfalls Enodia paid for.
 
 | File | What it does |
 |---|---|
@@ -1500,7 +1503,7 @@ Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, t
 npm run deploy
 ```
 
-Builds, then deploys. From `cmd` in the address bar of `C:\Dev\dds`, the same as the build always was. **It refuses to upload a build that is not whole**, see The Galaxy Map, "A file sync app watches this folder". **This machine is already logged in to Cloudflare**, machine wide, from Enodia, so there is no login step.
+Builds, then deploys. From `cmd` in the address bar of `C:\Dev\dilas`, the same as the build always was. **It refuses to upload a build that is not whole**, see The Galaxy Map, "A file sync app watches this folder". **This machine is already logged in to Cloudflare**, machine wide, from Enodia, so there is no login step.
 
 > [!danger] A deploy that reports success is not evidence that it landed
 > Enodia saw `wrangler deploy` print a new version id and "100%" three times in a row while old code kept running. **After every deploy, read something the new build changed off the live site.** The cheapest check: the `index-*.js` name in the live page must match the one in `dist/assets`, and the version in the footer must be the new one. If it did not land, `npx wrangler versions upload` then `npx wrangler versions deploy <id>@100% --yes`.
@@ -1510,7 +1513,7 @@ Builds, then deploys. From `cmd` in the address bar of `C:\Dev\dds`, the same as
 >
 > **Enodia's wrangler dev uses 8787 on this same machine.** On 25 September 2026 this tool started on 8787 while Enodia was already running there, printed "Ready on 8787", and Enodia went on answering every request. Every header read back was Enodia's policy over an app that did not have this tool's files. Nothing errored. The tell was a policy containing `data:`, which this tool deliberately does not allow.
 >
-> Stopping a background `wrangler dev` on Windows can orphan its `workerd` and `esbuild` children. Check nothing from `C:\Dev\dds` is still listening before starting another.
+> Stopping a background `wrangler dev` on Windows can orphan its `workerd` and `esbuild` children. Check nothing from `C:\Dev\dilas` is still listening before starting another.
 
 ### The security headers
 
@@ -1564,7 +1567,7 @@ Netlify never sent any, for the whole life of the tool. Now every response carri
 # **Accounts**
 
 > [!success] Stage 1 built, 1.22.0, 25 September 2026. **Switched off**
-> A Cloudflare Worker answers `/api/*` and nothing else, a D1 database named `dds` holds the accounts, and better-auth runs email and password sign in. Ported from Enodia's backend in `C:\Dev\Enodia`, which built all of this first; `dds-cloudflare-handover.md` is the plan and its eighteen pitfalls.
+> A Cloudflare Worker answers `/api/*` and nothing else, a D1 database named `dilas` holds the accounts, and better-auth runs email and password sign in. Ported from Enodia's backend in `C:\Dev\Enodia`, which built all of this first; `dilas-cloudflare-handover.md` is the plan and its eighteen pitfalls.
 >
 > **Nobody using the tool can see any of it.** `ACCOUNTS_LIVE` in `src/lib/account.js` is `false`, so the sidebar keeps "Account v2" locked and `#/account` falls back to the tier list, exactly as before.
 
@@ -1616,7 +1619,7 @@ The Worker only. `tsconfig.worker.json` stands alone, because this project has n
 | `db:migrate` | apply them to the **local** database |
 | `types` | `worker-configuration.d.ts` from `wrangler.jsonc`. Re-run after editing the config |
 
-**Production migrations run before the code that needs them:** `npx wrangler d1 migrations apply dds --remote`, then `npm run deploy`.
+**Production migrations run before the code that needs them:** `npx wrangler d1 migrations apply dilas --remote`, then `npm run deploy`.
 
 ### Secrets
 
@@ -1651,7 +1654,7 @@ The Worker only. `tsconfig.worker.json` stands alone, because this project has n
 - **Weapon stats beyond the tables.** Magazine size, spare magazines, fire rate, recoil, reload time, projectile count and stagger are not in the source data. They would come from helldivers.wiki.gg.
 - **Vehicles and mechs.** No EXO-45, EXO-49, FRV or GATER anywhere in the source tables. The stratagem list is incomplete without them.
 - **A smart roll-the-dice generator in the builder.** Roll a build that is deliberately not just the top rated item in every slot, plus playstyle options to steer it. Wanted, and explicitly parked: it needs the coverage logic to be much better first. **This is not the auto-calibration that was declined.** That was a live picker that re-adjusted your other slots as you chose. This is a deliberate roll you ask for.
-- **The 39 curated builds get binned and a new set built from scratch.** The curator's call, 22 August 2026, and it supersedes both earlier plans: not authored by hand one at a time, and not merely moved out of the default view into Exchange. They are legacy AI generations from before this project had stats or scoring, and the numbers say so: 35 of 39 use an S or S+ primary, 13 distinct primaries appear across all of them, the Grenade Pistol is in 16, and three A tier marksman rifles for bots appear zero times. The replacement is a separate tool that reads this project's data plus a logic document and writes `loadouts.json`, with variety as a hard constraint. **Phase 5 built most of what it needs**: `readBuild` is the validator and `check-builds.mjs` already generates and scores 300 legal builds. See `dds-roadmap.md`.
+- **The 39 curated builds get binned and a new set built from scratch.** The curator's call, 22 August 2026, and it supersedes both earlier plans: not authored by hand one at a time, and not merely moved out of the default view into Exchange. They are legacy AI generations from before this project had stats or scoring, and the numbers say so: 35 of 39 use an S or S+ primary, 13 distinct primaries appear across all of them, the Grenade Pistol is in 16, and three A tier marksman rifles for bots appear zero times. The replacement is a separate tool that reads this project's data plus a logic document and writes `loadouts.json`, with variety as a hard constraint. **Phase 5 built most of what it needs**: `readBuild` is the validator and `check-builds.mjs` already generates and scores 300 legal builds. See `dilas-roadmap.md`.
 - **A bug and feature request form on Support.** Needs somewhere for a submission to go, so it waits on the same shared storage that accounts need. The footer no longer claims no data leaves your browser, so this is unblocked on the copy side.
 
 ---

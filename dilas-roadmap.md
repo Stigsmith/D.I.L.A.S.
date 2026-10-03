@@ -11,12 +11,12 @@
 
 Everything below rests on one primitive: **data living somewhere that is not one browser, plus identity to say whose it is.** Today every lock, favorite, profile and build sits in `localStorage`, which is scoped to one browser on one machine. That is why a second player has to set the tool up again from scratch on their own device.
 
-> [!success] Settled 25 September 2026: Cloudflare, and the plan is `dds-cloudflare-handover.md`
+> [!success] Settled 25 September 2026: Cloudflare, and the plan is `dilas-cloudflare-handover.md`
 > Enodia, stigly's Hades II tool, built every stage of this chain first on the same Cloudflare account. The handover in the repo root is the port plan, stage by stage, with the pitfalls it cost. **Its decisions table is settled and is not reopened here**: Cloudflare Workers, its own D1, Resend for mail, its own domain.
 >
 > | Stage | | Status |
 > |---|---|---|
-> | 0 | Hosting on Cloudflare, security headers, fonts vendored | **Done, 1.21.0.** Live at `dds.stigly-official.workers.dev`; **dilas.me** attaches on the next deploy |
+> | 0 | Hosting on Cloudflare, security headers, fonts vendored | **Done, 1.21.0.** Was `dds.stigly-official.workers.dev`, now `dilas.stigly-official.workers.dev`; **dilas.me** attaches on the next deploy |
 > | 1 | Worker, D1 and accounts | **Built, 1.22.0, and switched off in the UI.** The backend is live; nobody can see it until `ACCOUNTS_LIVE` flips |
 > | 2 | Mail and password reset | **Unblocked: dilas.me was bought on 2 October 2026.** Resend only sends from a domain you own, and now there is one. Needs the Resend account, the domain verified with it, and `MAIL_FROM`. Accounts stay shut until this works |
 > | 3 | Sync between devices | Needs the profiles question answered |
@@ -154,7 +154,7 @@ Everything shipped in 1.3.0 through 1.9.0 sits in the first track. **None of it 
 **Armour came back and it works this time.** The 1.13.0 post mortem said it would return as a loadout property and it has. The measurement that settles it: held penetration splits the 39 curated builds **36 / 41 / 23** three ways, where the per item version had 48 of 51 primaries sharing one of two identical readings. Same data, different altitude, opposite result.
 
 > [!danger] The 39 curated builds are no longer the denominator, and that was the curator's call
-> Asked whether the layer should be softened because it mostly marks the curated set down, his answer on 22 August 2026 was that **the curated sets are legacy AI generations, and using DDS tiering and warnings would likely net better builds**. So they are not ground truth and nothing is calibrated against them.
+> Asked whether the layer should be softened because it mostly marks the curated set down, his answer on 22 August 2026 was that **the curated sets are legacy AI generations, and using the tool's own tiering and warnings would likely net better builds**. So they are not ground truth and nothing is calibrated against them.
 >
 > `npm run builds` now measures every rule against **300 random legal builds** as well, 100 per front, seeded. That change immediately paid for itself: two rules that looked healthy against the curated 39 were describing the pool against a random sample, and both were cut before they shipped rather than after somebody noticed in the app.
 

@@ -157,7 +157,7 @@ function Status({ state }) {
   if (state === "confirmed") {
     return (
       <span className="flex shrink-0 items-center gap-1 rounded border border-emerald-700/60 bg-emerald-950/40 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-400" style={OSWALD}>
-        <Check className="h-3 w-3" strokeWidth={3} /> Confirmed
+        <Check className="h-3 w-3" strokeWidth={3} /> Dropping
       </span>
     );
   }
@@ -869,7 +869,14 @@ export default function DropScreen({ state, navigate, scenario, drop, update, pa
               <SlotButton onClick={unconfirm} Icon={RotateCcw}>Change my mind</SlotButton>
             ) : (
               <>
-                <SlotButton primary onClick={confirm} Icon={Check}>Confirm</SlotButton>
+                {/* The moment the screen exists for, so it looks like it: the
+                    curator found no DROP button on 3 October 2026. Dropping is
+                    confirming: it counts for the squad and goes in the history. */}
+                <button type="button" onClick={confirm}
+                  className="flex w-full items-center justify-center gap-2 rounded border border-brand bg-brand py-2.5 text-base font-bold uppercase tracking-[0.2em] text-brand-ink shadow-[0_0_18px_rgb(var(--brand)/0.35)] transition-shadow hover:shadow-[0_0_26px_rgb(var(--brand)/0.6)]"
+                  style={OSWALD}>
+                  <Rocket className="h-4 w-4" /> Drop
+                </button>
                 <SlotButton onClick={() => setPicking(true)}>Choose another</SlotButton>
                 <SlotButton onClick={() => openEditor(mine.id)} Icon={Pencil}>{mine.preset ? "Adjust a copy" : "Adjust"}</SlotButton>
               </>

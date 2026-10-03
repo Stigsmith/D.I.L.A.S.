@@ -1,6 +1,6 @@
-# **D.D.S.: Squad Requirements**
+# **D.I.L.A.S.: Squad Requirements**
 
-> Feature requirements for planning a drop with a second player: named unlock profiles, a side by side build comparison, overlap checks that need no new data, a two tag role layer, and the coverage warnings that layer feeds. Replaces an earlier draft that specced hosted squad rooms and a six tag synergy dashboard. Depends on decisions in `dds-design.md`, the web requirements document and `CLAUDE.md`; conflicts between this file and those must be surfaced, not silently resolved.
+> Feature requirements for planning a drop with a second player: named unlock profiles, a side by side build comparison, overlap checks that need no new data, a two tag role layer, and the coverage warnings that layer feeds. Replaces an earlier draft that specced hosted squad rooms and a six tag synergy dashboard. Depends on decisions in `dilas-design.md`, the web requirements document and `CLAUDE.md`; conflicts between this file and those must be surfaced, not silently resolved.
 
 ---
 
