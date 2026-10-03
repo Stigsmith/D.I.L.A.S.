@@ -37,7 +37,7 @@ export function PartyButton({ party, open, onToggle, compact = false }) {
   const members = party.state ? party.state.members : [];
   const live = party.status === "live";
   return (
-    <button onClick={onToggle} aria-expanded={open} aria-haspopup="dialog"
+    <button onClick={onToggle} aria-expanded={open} aria-haspopup="dialog" data-tour="party"
       title={inParty ? `Party ${party.code}` : "Squad up with friends who use the tool"}
       className={"flex shrink-0 items-center gap-1.5 rounded border px-2 py-1 text-[11px] transition-colors " +
         (open ? "border-base-500 bg-base-800 text-base-100" : "border-base-700 bg-base-900 text-base-300 hover:border-base-500 hover:text-base-100")}>

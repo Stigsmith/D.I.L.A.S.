@@ -116,6 +116,9 @@ export const SETTINGS = {
      This browser's view of the rules, not a fact about a drop: out of the
      export, never sent to a party. */
   rulesOff: "hd2-rules-off",
+  /* "done" once the tour has run or been skipped in this browser, so it
+     opens by itself only once. Settings replays it. Out of the export. */
+  tourDone: "hd2-tour-done",
 };
 
 /* Both scenario keys were spelled hd2-brief-* until 21 August 2026. A    */

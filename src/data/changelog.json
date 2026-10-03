@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.27.0",
+    "date": "2026-10-03",
+    "title": "Orientation is now mandatory",
+    "say": "Attendance is voluntary. Non-attendance has been noted.",
+    "changes": [
+      "A Democracy Officer gives new recruits a guided tour of the tool, one lit-up stop at a time. Settings has the refresher.",
+      "The Roadmap runs left to right, Shipped to Later, with one card per milestone that folds open.",
+      "The Changelog hangs off a timeline by month, and can be unfolded whole for the thorough citizen."
+    ]
+  },
+  {
     "version": "1.26.0",
     "date": "2026-10-03",
     "title": "The tier list reports back for duty",
