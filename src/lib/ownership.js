@@ -106,7 +106,18 @@ export function cleanProfile(p, taken = []) {
     name,
     lockedItems: list(p.lockedItems, (x) => itemById.has(x)),
     lockedWarbonds: list(p.lockedWarbonds, (x) => gateableWarbondIds.has(x)),
+    ...(p.setUp === true ? { setUp: true } : {}),
   };
+}
+
+/* Whether this profile still says what a fresh browser says: nothing      */
+/* locked, which reads as owning every warbond and every item, so every    */
+/* suggestion and picker offers gear the player may not have. The curator's */
+/* point of 3 October 2026, and the reason the tool now nudges toward       */
+/* Collection first. `setUp` is the player saying "yes, really, all of it", */
+/* and any lock at all is taken as a collection somebody has touched.       */
+export function needsSetup(p) {
+  return Boolean(p) && !p.setUp && p.lockedItems.length === 0 && p.lockedWarbonds.length === 0;
 }
 
 /* A stored document, or anything close enough to one, normalised into a  */

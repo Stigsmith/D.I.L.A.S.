@@ -21,7 +21,8 @@
 /* ================================================================== */
 
 import { useState, useMemo } from "react";
-import { Search, Lock, Unlock, FilterX, CheckCheck, X, User, Plus, Pencil, Trash2, AlertTriangle } from "lucide-react";
+import { Search, Lock, Unlock, FilterX, CheckCheck, X, User, Plus, Pencil, Trash2, AlertTriangle, ChevronDown, ListChecks } from "lucide-react";
+import { BRAND } from "./lib/brand.js";
 
 import { warbondArt } from "./lib/assets.js";
 import { Chips, ItemArt, sourceLabelFor } from "./Tiers.jsx";
@@ -73,6 +74,145 @@ const START_MODES = [
   { id: "copy", label: "Copy of this one", note: "Starts as whatever the active profile owns right now." },
   { id: "full", label: "Everything owned", note: "Nothing locked, the way a fresh browser starts." },
 ];
+
+/* ================================================================== */
+/* SETTING IT UP                                                       */
+/*                                                                    */
+/* The curator's call, 3 October 2026: Collection is where everybody   */
+/* has to start, because an untouched one locks nothing and so reads   */
+/* as owning every warbond and every item. Every suggestion and picker */
+/* then offers gear the player may not have. Two pieces:               */
+/*  - CollectionNudge, over the pages that recommend, until the active */
+/*    profile is set up (needsSetup in src/lib/ownership.js)           */
+/*  - CollectionGuide, at the top of this page: a quick start, and     */
+/*    what each of the page's buttons does, because there are several  */
+/*    and they act on different things                                 */
+/* ================================================================== */
+
+const OSWALD = { fontFamily: "'Oswald', sans-serif" };
+
+export function CollectionNudge({ onSetUp, onAllOwned }) {
+  return (
+    <div className="mb-4 flex flex-wrap items-center gap-3 rounded-lg border border-accent-600/60 bg-accent-950/40 px-4 py-3">
+      <AlertTriangle className="h-5 w-5 shrink-0 text-accent-400" />
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-bold uppercase tracking-wide text-accent-300" style={OSWALD}>
+          Tell {BRAND.short} what you own first
+        </p>
+        <p className="text-xs leading-relaxed text-base-300">
+          Nothing in your collection is marked yet, so the tool assumes you own every warbond and every item, and it will
+          suggest gear you do not have. It takes a few minutes, once.
+        </p>
+      </div>
+      <div className="flex shrink-0 flex-wrap gap-2">
+        <button type="button" onClick={onSetUp}
+          className="rounded border border-accent-500 bg-accent-500 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-accent-950 hover:bg-accent-400"
+          style={OSWALD}>
+          Set up my collection
+        </button>
+        <button type="button" onClick={onAllOwned}
+          className="rounded border border-base-700 px-3 py-1.5 text-xs uppercase tracking-wider text-base-400 hover:border-base-500 hover:text-base-100"
+          style={OSWALD}>
+          I own everything
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* One explanation per kind of button, drawn with the button's own icon
+   so the guide and the page cannot be read as talking about different
+   things. */
+const HOW = [
+  {
+    icons: [Unlock, Lock], title: "Warbonds you bought",
+    say: "Click a warbond's name to switch it between owned and not owned. That is the Super Credit purchase. Own all and Own none do a whole tier at once.",
+  },
+  {
+    icons: [CheckCheck, X], title: "What you unlocked inside",
+    say: "Inside a warbond, items cost Medals. The tick marks every item in it unlocked, the cross marks them all not yet. The number says how many you have. Both are greyed out until you own the warbond.",
+  },
+  {
+    icons: [Lock, ListChecks], title: "One item at a time",
+    say: "The Items tab lists every item, armour included, each with its own padlock. Filter by source or slot, then lock or unlock everything shown in one click.",
+  },
+  {
+    icons: [User], title: "One profile per player",
+    say: "Each profile is its own collection, so two players on one browser do not fight over padlocks. New can start from nothing owned, everything owned, or a copy.",
+  },
+];
+
+function CollectionGuide({ state }) {
+  const fresh = state.needsSetup;
+  const [open, setOpen] = useState(fresh);
+  const shown = open || fresh;
+
+  return (
+    <div data-tour="collection-guide"
+      className={"overflow-hidden rounded-lg border bg-base-900 " + (fresh ? "border-accent-600/60" : "border-base-800")}>
+      <button type="button" onClick={() => setOpen(!shown)} aria-expanded={shown} disabled={fresh}
+        className="flex w-full items-center gap-3 px-4 py-2.5 text-left enabled:hover:bg-base-800/40">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-sm font-bold uppercase tracking-wide text-base-100" style={OSWALD}>
+            {fresh ? "Start here: what do you own?" : "How your collection works"}
+          </h3>
+          <p className="text-[11px] text-base-500">
+            Everything else in the tool reads this page. A locked item never turns up in a suggestion or a picker unless
+            you ask to see it.
+          </p>
+        </div>
+        {fresh ? null : <ChevronDown className={"h-4 w-4 shrink-0 text-base-500 transition-transform " + (shown ? "rotate-180" : "")} />}
+      </button>
+
+      {shown ? (
+        <div className="flex flex-col gap-4 border-t border-base-800 p-4">
+          {fresh ? (
+            <div className="flex flex-col gap-2" data-tour="collection-quickstart">
+              <p className="text-xs leading-relaxed text-base-300">
+                Nothing is marked yet, so right now the tool thinks you own everything. Pick the starting point closer to
+                the truth, then fix the difference below.
+              </p>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <button type="button" onClick={() => state.resetActiveTo("empty")}
+                  className="rounded-lg border border-base-700 bg-base-950/60 p-3 text-left hover:border-accent-500">
+                  <span className="block text-sm font-bold uppercase tracking-wide text-base-100" style={OSWALD}>I am fairly new</span>
+                  <span className="block text-[11px] leading-relaxed text-base-400">
+                    Start from nothing owned, then switch on the warbonds you bought and tick what you unlocked, starter gear included.
+                  </span>
+                </button>
+                <button type="button" onClick={() => state.resetActiveTo("full")}
+                  className="rounded-lg border border-base-700 bg-base-950/60 p-3 text-left hover:border-accent-500">
+                  <span className="block text-sm font-bold uppercase tracking-wide text-base-100" style={OSWALD}>I have played a lot</span>
+                  <span className="block text-[11px] leading-relaxed text-base-400">
+                    Start from everything owned, then switch off the warbonds you never bought and cross out what you have not unlocked.
+                  </span>
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            {HOW.map((h, i) => (
+              <div key={h.title} className="rounded-lg border border-base-800 bg-base-950/40 p-3">
+                <div className="mb-1.5 flex items-center gap-2">
+                  <span className="grid h-5 w-5 place-items-center rounded-full bg-base-800 text-[10px] font-bold text-base-300">{i + 1}</span>
+                  {h.icons.map((Icon, k) => <Icon key={k} className="h-3.5 w-3.5 text-base-400" />)}
+                  <span className="text-xs font-bold uppercase tracking-wide text-base-100" style={OSWALD}>{h.title}</span>
+                </div>
+                <p className="text-[11px] leading-relaxed text-base-400">{h.say}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-base-500">
+            <span className="flex items-center gap-1"><Lock className="h-3 w-3 text-accent-700" /> dim padlock: held by a warbond you do not own</span>
+            <span className="flex items-center gap-1"><Lock className="h-3 w-3 text-accent-400" /> bright padlock: an item you have not unlocked</span>
+          </p>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 function ProfileBar({ state }) {
   const [open, setOpen] = useState(null);
@@ -186,12 +326,13 @@ function ProfileBar({ state }) {
 /* WARBONDS TAB                                                       */
 /* ================================================================== */
 
-function WarbondTile({ warbond, locked, unlockedHere, total, onToggle, onSetItems }) {
+function WarbondTile({ warbond, locked, unlockedHere, total, onToggle, onSetItems, tour }) {
   const cover = warbondArt(warbond.id);
   const partial = unlockedHere !== total;
 
   return (
-    <div className={"flex items-stretch overflow-hidden rounded border text-xs transition-colors " +
+    <div data-tour={tour ? "warbond-tile" : undefined}
+      className={"flex items-stretch overflow-hidden rounded border text-xs transition-colors " +
       (locked ? "border-accent-700/60 bg-accent-950/40" : "border-base-800 bg-base-900")}>
       <button onClick={onToggle} aria-pressed={locked}
         title={locked ? `Mark ${warbond.name} as owned` : `Mark ${warbond.name} as not owned`}
@@ -213,7 +354,8 @@ function WarbondTile({ warbond, locked, unlockedHere, total, onToggle, onSetItem
       {/* rather than on the warbond. Disabled while the warbond is not     */}
       {/* owned, because every item in it is already held by the warbond    */}
       {/* and the only way back is the toggle on the left.                  */}
-      <div className="flex shrink-0 items-center gap-0.5 border-l border-base-800 pl-1.5 pr-1">
+      <div className="flex shrink-0 items-center gap-0.5 border-l border-base-800 pl-1.5 pr-1"
+        data-tour={tour ? "warbond-contents" : undefined}>
         <span className={"mr-0.5 text-[10px] tabular-nums " + (partial && !locked ? "text-accent-500" : "text-base-600")}
           title={`${unlockedHere} of ${total} tracked items unlocked`}>
           {partial ? `${unlockedHere}/${total}` : total}
@@ -244,15 +386,15 @@ function WarbondsTab({ lockedItems, lockedWarbonds, toggleWarbond, setWarbondGro
       <div className="rounded-lg border border-base-800 bg-base-900/60 p-4 text-xs leading-relaxed text-base-400">
         Mark a warbond you do not own and every item in it is held across the tier lists and the loadout picker at once.
         That is separate from per item unlocking, so turning a warbond back on will not wipe the individual items you
-        locked by hand, and marking one as owned does not hand you its contents. Use the padlocks on the right of a
-        warbond for that.
+        locked by hand, and marking one as owned does not hand you its contents. Use the tick and the cross on the right
+        of a warbond for that.
         <span className="mt-2 block text-base-500">
           Armor passives are not listed here. The source data maps passives to armor sets, not to warbonds, so armor
           stays on per item unlocking in the Items tab.
         </span>
       </div>
 
-      {WARBOND_TIERS.map((g) => {
+      {WARBOND_TIERS.map((g, gi) => {
         const inTier = warbonds.filter((w) => w.tier === g.id);
         const ids = inTier.map((w) => w.id);
         const lockedInGroup = ids.filter((id) => wbSet.has(id)).length;
@@ -265,7 +407,9 @@ function WarbondsTab({ lockedItems, lockedWarbonds, toggleWarbond, setWarbondGro
                 </h3>
                 <p className="text-[11px] text-base-500">{g.note}</p>
               </div>
-              <div className="flex shrink-0 gap-1.5">
+              {/* The tour points at the Premium tier's pair: the Standard   */}
+              {/* warbond is free, so that is where owning a tier matters.   */}
+              <div className="flex shrink-0 gap-1.5" data-tour={g.id === "premium" ? "warbond-tier" : undefined}>
                 <button onClick={() => setWarbondGroup(ids, true)}
                   className="rounded border border-base-700 bg-base-900 px-2 py-1 text-[11px] text-base-400 hover:border-accent-600 hover:text-accent-400">
                   Own none
@@ -277,10 +421,10 @@ function WarbondsTab({ lockedItems, lockedWarbonds, toggleWarbond, setWarbondGro
               </div>
             </div>
             <div className="grid grid-cols-1 gap-1.5 p-3 sm:grid-cols-2 lg:grid-cols-3">
-              {inTier.map((w) => {
+              {inTier.map((w, wi) => {
                 const contents = itemIdsByWarbond.get(w.id) || [];
                 return (
-                  <WarbondTile key={w.id} warbond={w} locked={wbSet.has(w.id)}
+                  <WarbondTile key={w.id} warbond={w} locked={wbSet.has(w.id)} tour={gi === 1 && wi === 0}
                     total={itemCountByWarbond[w.id] || 0}
                     unlockedHere={contents.filter((id) => !itemLocks.has(id)).length}
                     onToggle={() => toggleWarbond(w.id)}
@@ -352,13 +496,13 @@ const SORTED = [...items].sort(
   (a, b) => SLOT_ORDER.indexOf(a.slot) - SLOT_ORDER.indexOf(b.slot) || a.name.localeCompare(b.name)
 );
 
-function ItemRow({ item, availability, source, onToggle }) {
+function ItemRow({ item, availability, source, onToggle, tour }) {
   const held = availability !== "available";
   const byWarbond = availability === "warbond";
   const meta = AVAILABILITY[availability];
 
   return (
-    <div
+    <div data-tour={tour ? "item-row" : undefined}
       onClick={byWarbond ? undefined : onToggle}
       role={byWarbond ? undefined : "button"}
       tabIndex={byWarbond ? undefined : 0}
@@ -490,7 +634,8 @@ function ItemsTab({ lockedItems, warbondLockedSet, toggleLock, setItemGroup }) {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-base-800 pt-3 text-[11px] text-base-500">
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-base-800 pt-3 text-[11px] text-base-500"
+          data-tour="items-bulk">
           <span>{rows.length} of {items.length} shown</span>
           {counts.available > 0 ? <span>{counts.available} available</span> : null}
           {counts.warbond > 0 ? <span className="text-accent-700">{counts.warbond} held by a warbond</span> : null}
@@ -519,8 +664,8 @@ function ItemsTab({ lockedItems, warbondLockedSet, toggleLock, setItemGroup }) {
             Nothing matches those filters. Clear the search, widen the source, or set availability back to All.
           </div>
         ) : (
-          rows.map((it) => (
-            <ItemRow key={it.id} item={it} source={sourceLabelFor(it)}
+          rows.map((it, i) => (
+            <ItemRow key={it.id} item={it} source={sourceLabelFor(it)} tour={i === 0}
               availability={availabilityOf(it.id, itemLocks, warbondLockedSet)}
               onToggle={() => toggleLock(it.id)} />
           ))
@@ -546,6 +691,10 @@ export const COLLECTION_TABS = [
 export default function Collection({ tab, state }) {
   return (
     <div className="flex flex-col gap-4">
+      {/* Keyed so switching to a profile that still needs setting up    */}
+      {/* opens the guide again. Prefixed: the Items tab below is keyed  */}
+      {/* on the same id, and siblings must not share a key.             */}
+      <CollectionGuide key={"guide-" + state.activeProfileId} state={state} />
       <ProfileBar state={state} />
       {/* Keyed on the profile so switching resets the tab's own filter    */}
       {/* state rather than carrying one player's search onto another.     */}
