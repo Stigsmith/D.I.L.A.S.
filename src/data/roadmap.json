@@ -154,13 +154,6 @@
       "say": "The strains, surges and other live effects on a planet changing what the tool tells you to bring."
     },
     {
-      "id": "map-screen",
-      "title": "The map as its own screen",
-      "status": "planned",
-      "track": "solo",
-      "say": "The galaxy map reachable on its own, with what each planet has been through behind it."
-    },
-    {
       "id": "accounts",
       "title": "Accounts",
       "status": "later",
