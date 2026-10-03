@@ -78,7 +78,7 @@
   // `wrangler dev` ignores `database_id` and runs on a local SQLite file under
   // .wrangler/, so all of this builds and tests with no network at all. Only
   // `--remote` commands and deploys use the id. Created 25 September 2026,
-  // region WEUR, beside Enodia's.
+  // region WEUR, beside Enodia's. Replaced on 3 October 2026 by a new database named dilas, since D1 cannot rename one; the old dds one was deleted.
   //
   // **The binding is DB, not dilas.** `wrangler d1 create` suggests naming the
   // binding after the database, and it did. The code says `env.DB`.
@@ -91,7 +91,7 @@
     {
       "binding": "DB",
       "database_name": "dilas",
-      "database_id": "be6b81cb-3738-4d05-9950-375cf9ba6245",
+      "database_id": "c59300f8-1776-4e4c-a5ba-bd39ab4f793b",
       "migrations_dir": "migrations"
     }
   ],
