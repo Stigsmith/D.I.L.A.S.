@@ -229,7 +229,14 @@ export function readBuild(loadout, scenario = {}) {
   /* The parts. Every slot gets the full contextual reading it would get
      on a tier row, so a build's number and the rows behind it can never
      tell you different things about the same weapon. */
-  const parts = facts.items.map((item) => ({ item, ...scoreItem(item, scenario) }));
+  /* Each part is read beside the other eight, which is what lets a pairing
+     rule fire: the Cremator next to fire resistant armour, True Grit next
+     to a Recoilless. The builder's picker and slots pass the same thing,
+     so a slot and the part behind it never disagree. */
+  const parts = facts.items.map((item, i) => ({
+    item,
+    ...scoreItem(item, { ...scenario, alongside: facts.items.filter((_, j) => j !== i) }),
+  }));
   const rated = parts.filter((p) => typeof p.score === "number");
 
   /* Unrated slots are excluded rather than counted as zero, the same

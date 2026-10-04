@@ -476,6 +476,24 @@
       "say": "One arena and no ground to give up. Anything you can plant and leave finally gets to sit still long enough to pay for itself."
     },
     {
+      "id": "holding-ground-wants-the-cremator",
+      "name": "Holding ground rewards the Cremator",
+      "when": {
+        "mission": [
+          "wave",
+          "defend"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "b-flam-80-cremator"
+        ]
+      },
+      "delta": 8,
+      "say": "You are not going anywhere and they keep coming. Five hundred rounds of fire fed from your back, poured across the one approach they have to use, is what a held position is for.",
+      "judgement": "Ours, the curator's call of 4 October 2026: the Cremator shines in Eradicate and defence missions, huddled on a position against large groups. Deliberately not a front rule: the vote already prices how well fire does against bugs and bots, and a second bump for the same fact would count it twice. Named by id because no published field separates a backpack fed stream from a flamethrower that reloads."
+    },
+    {
       "id": "hvt-wants-antitank",
       "name": "High value targets reward anti-tank",
       "when": {
@@ -544,35 +562,46 @@
     },
     {
       "id": "peril-bots-wants-quiet",
-      "name": "Hard bot drops reward suppressed weapons",
+      "name": "Alone or in pairs on a hard bot drop, quiet wins",
       "when": {
         "faction": [
           "bots"
-        ]
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 22
+        }
       },
       "match": {
         "tags": [
           "suppressed"
         ]
       },
-      "say": "Under this much pressure on a bot planet, the fight you win is the one you do not start. A suppressed weapon is audible at 12 metres rather than 100, so a sentry on a perimeter dies without waking the base behind it. This is the difference between walking through an outpost and running from it.",
-      "source": "The five suppressed weapons, and this is sourced rather than judged: the wiki carries Suppressed as a trait in each weapon's infobox and states that a suppressed weapon has an audible range of 12 metres against 100 for everything else. Listed by id here because the fetch does not read weapon article infoboxes yet. Move it into the fetch when it does.",
+      "say": "One or two of you, at a level where every fight you start is one you have to finish alone. A suppressed weapon is audible at 13 metres rather than 100, so a sentry on a perimeter dies without waking the base behind it.",
+      "source": "The five suppressed weapons. Sourced rather than judged: the wiki carries Suppressed as a trait in each weapon's infobox and its Stealth page gives the audible range as 13 metres. A tag rather than a fetched field because the fetch reads only reload times from weapon infoboxes so far",
       "scaleBy": {
         "path": "scenario.peril",
-        "from": 0,
-        "times": 0.64,
-        "clamp": 30
+        "from": 16,
+        "times": 0.6,
+        "clamp": 16
       },
-      "judgement": "Ours. The size is set by one choice: being unheard is worth about a tier at peril 22, which is solo on Impossible or a duo on Helldive. Everything else follows from the scale. Below zero it inverts on purpose: with four of you on Challenging a silenced weapon is effort spent on a problem you do not have.",
-      "sayInverted": "There is enough slack in this drop that nothing needs to be a secret. Staying unheard costs you rate of fire and stopping power, and at this level you are not being punished for making noise. Bring the louder gun."
+      "judgement": "Ours, retuned on 4 October 2026 at the curator's word: a four stack that has reached Super Helldive knows what it is doing, and loud is how most of them play it. So this fires only for one or two of you, from solo on Suicide Mission or two of you on Impossible, and grows to about a tier alone on Super Helldive. It used to fire for every squad, reach a tier at peril 22, where four of you at difficulty 10 sat, and mark silenced weapons down below zero. Both are gone."
     },
     {
       "id": "peril-bots-punishes-loud",
-      "name": "Hard bot drops punish loud weapons",
+      "name": "Alone or in pairs on a very hard bot drop, noise costs",
       "when": {
         "faction": [
           "bots"
-        ]
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 28
+        }
       },
       "match": {
         "held": true,
@@ -580,19 +609,18 @@
           "suppressed"
         ]
       },
-      "say": "Every shot from this brings the patrol, and at this level there is not enough slack to absorb one more fight. On paper it may be the better gun. Here the noise is the stat that decides the run.",
+      "say": "With one or two of you this deep, every shot from this brings the patrol and there is nobody holding the line while you deal with it. Still a good gun. The noise is a cost here, not a verdict.",
       "scaleBy": {
         "path": "scenario.peril",
-        "from": 0,
-        "times": -0.48,
-        "clamp": 20
+        "from": 16,
+        "times": -0.25,
+        "clamp": 8
       },
-      "judgement": "Ours, and deliberately gentler than the reward it mirrors. This matches almost half of everything you can hold, so it is set at roughly three quarters of a tier at peril 22 rather than a full one. A rule that touches half a list has to argue quietly.",
-      "sayInverted": "Loud is free here. Whatever the noise brings, this drop has the slack to hold it, and at this level it does not bring much. This is the situation the community rating already assumes, so nothing about it counts against this."
+      "judgement": "Ours, cut to a nudge on 4 October 2026: the curator's Autocannon and Leveller clear Super Helldive in a four stack, and this was marking them down there. It now fires only for one or two of you, from solo on Impossible or two of you on Helldive, and never reaches half a tier. It matches nearly half of everything you can hold, so it has to argue quietly."
     },
     {
       "id": "peril-storm-favours-stealth",
-      "name": "Storms on a hard bot drop favour stealth",
+      "name": "Storms favour stealth for one or two of you on bots",
       "when": {
         "faction": [
           "bots"
@@ -601,22 +629,186 @@
           "sandstorms",
           "blizzards",
           "thick_fog"
-        ]
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 22
+        }
       },
       "match": {
         "tags": [
           "suppressed"
         ]
       },
-      "say": "A storm cuts their sight as much as yours, and under this much pressure you are not trying to win the firefight. Reduced visibility plus a weapon nobody hears is the difference between crossing an outpost and being chased out of one.",
+      "say": "A storm cuts their sight as much as yours, and with this few of you this deep you are not trying to win the firefight. Reduced visibility plus a weapon nobody hears is the difference between crossing an outpost and being chased out of one.",
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": 0.3,
+        "clamp": 8
+      },
+      "judgement": "Ours. Stacks with the plain quiet rule, so a storm is worth a little extra on top. Same window as that rule since 4 October 2026."
+    },
+    {
+      "id": "peril-wants-quiet-bugs-squids",
+      "name": "Alone or in pairs on a hard bug or squid drop, quiet helps",
+      "when": {
+        "faction": [
+          "bugs",
+          "squids"
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 22
+        }
+      },
+      "match": {
+        "tags": [
+          "suppressed"
+        ]
+      },
+      "say": "Stealth works here too: bugs and squids hear and see you the way bots do, and a breach or a Watcher's call you never trigger is a fight you never have. It matters less than on bots, where one flare brings a dropship.",
+      "source": "helldivers.wiki.gg, Stealth: every faction detects by sound and then sight. Terminids open a breach and the Illuminate need a Watcher to call for help, each with a long cue that can be interrupted",
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": 0.35,
+        "clamp": 10
+      },
+      "judgement": "Ours. About six tenths of the bot rule, because stealth is most viable against the Automatons. Added 4 October 2026."
+    },
+    {
+      "id": "peril-wants-stealth-armour",
+      "name": "Alone or in pairs on a hard bot drop, stealth armour pays",
+      "when": {
+        "faction": [
+          "bots"
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 22
+        }
+      },
+      "match": {
+        "slot": "armor",
+        "anyOf": [
+          {
+            "number": [
+              {
+                "path": "passive.detectionRange",
+                "gte": 1
+              }
+            ]
+          },
+          {
+            "number": [
+              {
+                "path": "passive.movementNoise",
+                "gte": 1
+              }
+            ]
+          }
+        ]
+      },
+      "say": "One or two of you this deep, and the patrol that never sees you is the one you never fight. Less noise, a shorter detection range, or both, is a margin of error you will use.",
+      "source": "The passive's own effect: Reduced Signature cuts movement noise by half and detection range by 40%, Scout the range alone, Feet First the noise alone",
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": 0.5,
+        "clamp": 12
+      },
+      "judgement": "Ours, the curator's window from 4 October 2026: solo from Suicide Mission, two of you from Impossible, growing to nearly a tier alone on Super Helldive. Three or four of you get nothing, because a full squad at any level can hold the fight it starts. All three passives get the same points, and the vote already orders them."
+    },
+    {
+      "id": "peril-wants-stealth-armour-bugs-squids",
+      "name": "Alone or in pairs on a hard bug or squid drop, stealth armour helps",
+      "when": {
+        "faction": [
+          "bugs",
+          "squids"
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 22
+        }
+      },
+      "match": {
+        "slot": "armor",
+        "anyOf": [
+          {
+            "number": [
+              {
+                "path": "passive.detectionRange",
+                "gte": 1
+              }
+            ]
+          },
+          {
+            "number": [
+              {
+                "path": "passive.movementNoise",
+                "gte": 1
+              }
+            ]
+          }
+        ]
+      },
+      "say": "Bugs and squids find you by sound and sight too, so not being found still saves you the breach or the Watcher's call. Worth less than against bots, worth something.",
+      "source": "helldivers.wiki.gg, Stealth",
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": 0.3,
+        "clamp": 8
+      },
+      "judgement": "Ours. Six tenths of the bot rule, the ratio the quiet weapon rules keep."
+    },
+    {
+      "id": "easy-drop-wastes-stealth-armour",
+      "name": "Stealth armour is wasted on an easy drop",
+      "when": {
+        "peril": {
+          "lte": 0
+        }
+      },
+      "match": {
+        "slot": "armor",
+        "anyOf": [
+          {
+            "number": [
+              {
+                "path": "passive.detectionRange",
+                "gte": 1
+              }
+            ]
+          },
+          {
+            "number": [
+              {
+                "path": "passive.movementNoise",
+                "gte": 1
+              }
+            ]
+          }
+        ]
+      },
+      "say": "At this level being heard costs you nothing, so a passive spent on not being heard is a passive not spent on staying alive or carrying more.",
       "scaleBy": {
         "path": "scenario.peril",
         "from": 0,
-        "times": 0.4,
-        "clamp": 15
+        "times": 0.3,
+        "clamp": 8
       },
-      "judgement": "Ours. Stacks with the plain quiet rule rather than replacing it, so a storm is worth extra on top rather than instead. Sized at about six tenths of a tier at peril 22.",
-      "sayInverted": "A storm cuts your sight as much as theirs, and this drop is comfortable enough that the fight is one you can simply win. Trading reach for silence is the wrong trade here."
+      "judgement": "Ours. Only below zero peril, four of you through Challenging or alone on Easy, and never more than half a tier: four of you on Trivial lose about that. The curator: on a low difficulty it can come down."
     },
     {
       "id": "commando-no-reinforcement-boosters",
@@ -787,24 +979,667 @@
         ]
       },
       "match": {
-        "traits": [
-          "stealth"
+        "slot": "armor",
+        "anyOf": [
+          {
+            "number": [
+              {
+                "path": "passive.detectionRange",
+                "gte": 1
+              }
+            ]
+          },
+          {
+            "number": [
+              {
+                "path": "passive.movementNoise",
+                "gte": 1
+              }
+            ]
+          }
         ]
       },
       "delta": 8,
       "say": "Every time a bot calls for help the threat level climbs, and the whole map gets worse. Not being seen is the best answer to that this mission has.",
       "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026"
+    },
+    {
+      "id": "quiet-weapon-loud-armour",
+      "name": "A silenced weapon without stealth armour is half a commitment",
+      "when": {
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 22
+        }
+      },
+      "match": {
+        "tags": [
+          "suppressed"
+        ],
+        "held": true,
+        "notAlongside": {
+          "slot": "armor",
+          "anyOf": [
+            {
+              "number": [
+                {
+                  "path": "passive.detectionRange",
+                  "gte": 1
+                }
+              ]
+            },
+            {
+              "number": [
+                {
+                  "path": "passive.movementNoise",
+                  "gte": 1
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "delta": -5,
+      "say": "Nobody hears the shot, and every patrol still sees you coming. Silence pays when you are not spotted first, so without armour that keeps you unseen this is the slower gun for most of its upside.",
+      "judgement": "Ours, the curator's call of 4 October 2026: go full or go not at all. Only where stealth is worth playing, solo from Suicide Mission or two of you from Impossible. Fires only inside a build."
+    },
+    {
+      "id": "stealth-armour-quiet-weapon",
+      "name": "Stealth armour with a silenced weapon is the whole commitment",
+      "when": {
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 22
+        }
+      },
+      "match": {
+        "slot": "armor",
+        "anyOf": [
+          {
+            "number": [
+              {
+                "path": "passive.detectionRange",
+                "gte": 1
+              }
+            ]
+          },
+          {
+            "number": [
+              {
+                "path": "passive.movementNoise",
+                "gte": 1
+              }
+            ]
+          }
+        ],
+        "alongside": {
+          "tags": [
+            "suppressed"
+          ],
+          "held": true
+        }
+      },
+      "delta": 5,
+      "say": "Unseen and unheard. The armour keeps patrols from finding you, and the weapon removes the ones you choose without waking the rest.",
+      "judgement": "Ours, the other half of the same call, in the same window. Fires only inside a build."
+    },
+    {
+      "id": "true-grit-long-reload",
+      "name": "True Grit on a support weapon with a long reload",
+      "when": {},
+      "match": {
+        "stratType": "support",
+        "notGameTags": [
+          "HEAT"
+        ],
+        "number": [
+          {
+            "path": "wiki.reload.seconds",
+            "gte": 3.5
+          },
+          {
+            "path": "wiki.ammo.magazine",
+            "lte": 120
+          }
+        ],
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.supportReload",
+              "gte": 1
+            }
+          ]
+        }
+      },
+      "delta": 6,
+      "say": "This takes three and a half seconds or more to reload, and True Grit takes 30% off it every time. The longer the reload, the more of every fight that is.",
+      "source": "Reload times from each weapon's own wiki infobox, fetched by npm run wiki. True Grit: +30% support weapon reload speed",
+      "judgement": "Ours. A magazine over 120 is left out, the Stalwart, Machine Gun and Flamethrower among them: they reload so rarely that a faster reload barely shows. Heat weapons are left out too: the Laser Cannon swaps a heat sink it rarely needs. Fires only inside a build."
+    },
+    {
+      "id": "true-grit-stationary-reload",
+      "name": "True Grit on a reload that roots you",
+      "when": {},
+      "match": {
+        "stratType": "support",
+        "notGameTags": [
+          "HEAT"
+        ],
+        "wiki.reload.stationary": true,
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.supportReload",
+              "gte": 1
+            }
+          ]
+        }
+      },
+      "delta": 4,
+      "say": "You cannot move while this reloads, which is the price of how hard it hits. Every second True Grit takes off is a second you are not standing still in the open.",
+      "source": "Stationary Reload from the weapon's wiki infobox or the game's own tag, whichever says so",
+      "judgement": "Ours. Stacks with the long reload rule, because a long reload you cannot walk out of is worse than either alone. Fires only inside a build."
+    },
+    {
+      "id": "true-grit-every-shot",
+      "name": "True Grit on a weapon that reloads after every shot",
+      "when": {},
+      "match": {
+        "stratType": "support",
+        "number": [
+          {
+            "path": "wiki.ammo.magazine",
+            "eq": 1
+          },
+          {
+            "path": "wiki.reload.seconds",
+            "gte": 0.5
+          }
+        ],
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.supportReload",
+              "gte": 1
+            }
+          ]
+        }
+      },
+      "delta": 4,
+      "say": "One round in the magazine means a reload after every shot, so 30% off the reload is close to 30% more shots in a fight.",
+      "source": "Magazine size and reload time from the wiki",
+      "judgement": "Ours. This is what puts the Railgun and the Speargun on the list: their reloads are short, and they do one after every shot. Fires only inside a build."
+    },
+    {
+      "id": "true-grit-earns-its-keep",
+      "name": "True Grit with a support weapon worth reloading faster",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.supportReload",
+            "gte": 1
+          }
+        ],
+        "alongside": {
+          "anyOf": [
+            {
+              "stratType": "support",
+              "notGameTags": [
+                "HEAT"
+              ],
+              "number": [
+                {
+                  "path": "wiki.reload.seconds",
+                  "gte": 3.5
+                },
+                {
+                  "path": "wiki.ammo.magazine",
+                  "lte": 120
+                }
+              ]
+            },
+            {
+              "stratType": "support",
+              "notGameTags": [
+                "HEAT"
+              ],
+              "wiki.reload.stationary": true
+            },
+            {
+              "stratType": "support",
+              "number": [
+                {
+                  "path": "wiki.ammo.magazine",
+                  "eq": 1
+                },
+                {
+                  "path": "wiki.reload.seconds",
+                  "gte": 0.5
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "delta": 8,
+      "say": "Your support weapon reloads long, often or rooted to the spot, and this passive takes 30% off every one of those. This is what True Grit is for.",
+      "judgement": "Ours. Fires only inside a build."
+    },
+    {
+      "id": "true-grit-nothing-to-reload",
+      "name": "True Grit with nothing that reloads",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.supportReload",
+            "gte": 1
+          }
+        ],
+        "notAlongside": {
+          "stratType": "support",
+          "number": [
+            {
+              "path": "wiki.reload.seconds",
+              "gte": 0.5
+            }
+          ]
+        }
+      },
+      "delta": -6,
+      "say": "No support weapon here has a reload for True Grit to shorten: an Arc Thrower or a Quasar never reloads, an expendable is thrown away, and no support weapon is no support weapon. You keep the handling and lose the half that makes it S+.",
+      "judgement": "Ours. Fires only inside a build."
+    },
+    {
+      "id": "gunslinger-pistol",
+      "name": "A pistol beside Gunslinger",
+      "when": {},
+      "match": {
+        "slot": "secondary",
+        "category": [
+          "Pistol"
+        ],
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.sidearmReload",
+              "gte": 1
+            }
+          ]
+        }
+      },
+      "delta": 6,
+      "say": "Gunslinger reloads this 40% faster, draws it half again as quick and takes most of its recoil away. A pistol you fight with becomes a pistol you can lean on.",
+      "judgement": "Ours. The Pistol category only: the Ultimatum, the Grenade Pistol and the Stim Pistol are tools you fire once, not sidearms you fight with. Fires only inside a build."
+    },
+    {
+      "id": "gunslinger-with-a-pistol",
+      "name": "Gunslinger with a pistol worth fighting with",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.sidearmReload",
+            "gte": 1
+          }
+        ],
+        "alongside": {
+          "slot": "secondary",
+          "category": [
+            "Pistol"
+          ]
+        }
+      },
+      "delta": 8,
+      "say": "You brought a real pistol, and every part of this passive is about it: the reload, the draw and the recoil.",
+      "judgement": "Ours. Fires only inside a build."
+    },
+    {
+      "id": "gunslinger-without-a-pistol",
+      "name": "Gunslinger with no pistol to sling",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.sidearmReload",
+            "gte": 1
+          }
+        ],
+        "notAlongside": {
+          "slot": "secondary",
+          "category": [
+            "Pistol"
+          ]
+        }
+      },
+      "delta": -6,
+      "say": "Every part of Gunslinger is about your sidearm, and this build's sidearm is not a pistol you fight with. A one shot launcher, a stim pistol or a blade gets almost nothing from it.",
+      "judgement": "Ours. Fires only inside a build."
+    },
+    {
+      "id": "melee-weapon-with-melee-armour",
+      "name": "A melee weapon beside armour that hits harder",
+      "when": {},
+      "match": {
+        "damageType": [
+          "melee"
+        ],
+        "slot": [
+          "secondary",
+          "stratagem"
+        ],
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.meleeDamage",
+              "gte": 1
+            }
+          ]
+        }
+      },
+      "say": "Your armour adds to every swing of this. If you are going to fight up close, this is how.",
+      "scaleBy": {
+        "path": "alongside.passive.meleeDamage",
+        "from": 0,
+        "times": 0.2,
+        "clamp": 8
+      },
+      "judgement": "Ours. Scales with the armour's melee bonus: Peak Physique and Rock Solid add 40%, Reinforced Epaulettes 20%. Fires only inside a build."
+    },
+    {
+      "id": "melee-armour-with-melee-weapon",
+      "name": "Melee armour with a melee weapon to use it on",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.meleeDamage",
+            "gte": 1
+          }
+        ],
+        "alongside": {
+          "damageType": [
+            "melee"
+          ],
+          "slot": [
+            "secondary",
+            "stratagem"
+          ]
+        }
+      },
+      "say": "You brought something to swing, and this passive is for exactly that.",
+      "scaleBy": {
+        "path": "passive.meleeDamage",
+        "from": 0,
+        "times": 0.25,
+        "clamp": 10
+      },
+      "judgement": "Ours. Scales with the bonus. No penalty without a melee weapon: everyone can melee, and Peak Physique's ergonomics are worth something to any gun. Fires only inside a build."
+    },
+    {
+      "id": "resists-own-fire",
+      "name": "Armour that resists the fire you brought",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.fireResist",
+            "gte": 1
+          }
+        ],
+        "alongside": {
+          "damageType": [
+            "fire"
+          ],
+          "slot": [
+            "primary",
+            "secondary",
+            "throwable",
+            "stratagem"
+          ]
+        }
+      },
+      "say": "You are bringing fire, and fire spreads to your own feet. This armour takes most of the sting out of standing in your own flames.",
+      "source": "The passive's own effect, read as a number. Inflammable resists 75%, Kinetic Displacement Mitigation and Acclimated 50%, Desert Stormer 40%",
+      "scaleBy": {
+        "path": "passive.fireResist",
+        "from": 0,
+        "times": 0.18,
+        "clamp": 16
+      },
+      "judgement": "Ours, the curator's pairing from 4 October 2026. Scales with how much it resists, so a single element passive beats one covering everything at a lower figure. Fires only inside a build."
+    },
+    {
+      "id": "fire-gear-with-resistant-armour",
+      "name": "Fire gear is safer with armour that resists it",
+      "when": {},
+      "match": {
+        "damageType": [
+          "fire"
+        ],
+        "slot": [
+          "primary",
+          "secondary",
+          "throwable",
+          "stratagem"
+        ],
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.fireResist",
+              "gte": 25
+            }
+          ]
+        }
+      },
+      "say": "Burning ground and a flame that licks back are this weapon's worst habit, and your armour shrugs most of that off.",
+      "scaleBy": {
+        "path": "alongside.passive.fireResist",
+        "from": 0,
+        "times": 0.08,
+        "clamp": 6
+      },
+      "judgement": "Ours, and deliberately small: the armour does not make the weapon better, it makes its worst habit cheaper. Scales with the armour's figure. Fires only inside a build."
+    },
+    {
+      "id": "resists-own-arc",
+      "name": "Armour that resists the arc you brought",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.arcResist",
+            "gte": 1
+          }
+        ],
+        "alongside": {
+          "damageType": [
+            "arc"
+          ],
+          "slot": [
+            "primary",
+            "secondary",
+            "throwable",
+            "stratagem"
+          ]
+        }
+      },
+      "say": "You are bringing arc, and arc jumps to whoever is nearest, a Tesla Tower above all. This armour takes most of that off you.",
+      "source": "The passive's own effect, read as a number. Electrical Conduit resists 95%, Adreno-Defibrillator and Acclimated 50%, Desert Stormer 40%",
+      "scaleBy": {
+        "path": "passive.arcResist",
+        "from": 0,
+        "times": 0.18,
+        "clamp": 16
+      },
+      "judgement": "Ours, the curator's pairing from 4 October 2026. Scales with how much it resists, so a single element passive beats one covering everything at a lower figure. Fires only inside a build."
+    },
+    {
+      "id": "arc-gear-with-resistant-armour",
+      "name": "Arc gear is safer with armour that resists it",
+      "when": {},
+      "match": {
+        "damageType": [
+          "arc"
+        ],
+        "slot": [
+          "primary",
+          "secondary",
+          "throwable",
+          "stratagem"
+        ],
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.arcResist",
+              "gte": 25
+            }
+          ]
+        }
+      },
+      "say": "Arc chains to whoever is closest, you included, and your armour takes most of that off you.",
+      "scaleBy": {
+        "path": "alongside.passive.arcResist",
+        "from": 0,
+        "times": 0.08,
+        "clamp": 6
+      },
+      "judgement": "Ours, and deliberately small: the armour does not make the weapon better, it makes its worst habit cheaper. Scales with the armour's figure. Fires only inside a build."
+    },
+    {
+      "id": "resists-own-gas",
+      "name": "Armour that resists the gas you brought",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.gasResist",
+            "gte": 1
+          }
+        ],
+        "alongside": {
+          "damageType": [
+            "gas"
+          ],
+          "slot": [
+            "primary",
+            "secondary",
+            "throwable",
+            "stratagem"
+          ]
+        }
+      },
+      "say": "You are bringing gas, and you will walk through your own cloud sooner or later. This armour lets you.",
+      "source": "The passive's own effect, read as a number. Advanced Filtration resists 80%, Acclimated 50%, Desert Stormer 40%, Hazmat 25%",
+      "scaleBy": {
+        "path": "passive.gasResist",
+        "from": 0,
+        "times": 0.18,
+        "clamp": 16
+      },
+      "judgement": "Ours, the curator's pairing from 4 October 2026. Scales with how much it resists, so a single element passive beats one covering everything at a lower figure. Fires only inside a build."
+    },
+    {
+      "id": "gas-gear-with-resistant-armour",
+      "name": "Gas gear is safer with armour that resists it",
+      "when": {},
+      "match": {
+        "damageType": [
+          "gas"
+        ],
+        "slot": [
+          "primary",
+          "secondary",
+          "throwable",
+          "stratagem"
+        ],
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.gasResist",
+              "gte": 25
+            }
+          ]
+        }
+      },
+      "say": "A gas cloud does not care whose it is, and your armour lets you stand in yours.",
+      "scaleBy": {
+        "path": "alongside.passive.gasResist",
+        "from": 0,
+        "times": 0.08,
+        "clamp": 6
+      },
+      "judgement": "Ours, and deliberately small: the armour does not make the weapon better, it makes its worst habit cheaper. Scales with the armour's figure. Fires only inside a build."
+    },
+    {
+      "id": "c4-with-throw-range",
+      "name": "C4 Pack beside armour that throws further",
+      "when": {},
+      "match": {
+        "idIn": [
+          "b-md-c4-pack"
+        ],
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.throwRange",
+              "gte": 1
+            }
+          ]
+        }
+      },
+      "say": "C4 is thrown before it is set off, and this armour throws it further: further from you when it goes, and further onto the thing you wanted it on.",
+      "scaleBy": {
+        "path": "alongside.passive.throwRange",
+        "from": 0,
+        "times": 0.25,
+        "clamp": 8
+      },
+      "judgement": "Ours, the curator's ask of 4 October 2026, read as throw range. Named by id because nothing else is a backpack of thrown charges. Fires only inside a build."
+    },
+    {
+      "id": "throw-range-with-c4",
+      "name": "Throw range with a C4 Pack to throw",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.throwRange",
+            "gte": 1
+          }
+        ],
+        "alongside": {
+          "idIn": [
+            "b-md-c4-pack"
+          ]
+        }
+      },
+      "say": "You are carrying a backpack full of things to throw, and this passive throws them further.",
+      "scaleBy": {
+        "path": "passive.throwRange",
+        "from": 0,
+        "times": 0.2,
+        "clamp": 6
+      },
+      "judgement": "Ours. Servo-Assisted throws 30% further, Desert Stormer 20%. Fires only inside a build."
     }
   ],
   "knownGaps": [
     "Three visibility rules lean on a long-range tag that is our judgement rather than a published field. It lives in vocabulary.json with its reasoning, and the rules that read it carry a `judgement` saying so. It used to be the same six ids written out inside each of those three rules.",
     "The visibility rules key on the Marksman category only. Special was tried and dropped: it holds a flamethrower, a stim pistol and a shotgun pistol alongside the Dominator, so it says nothing about range.",
     "Armour penetration moves no rating at the item level and it must not. It moves one at the loadout level as of 1.20.0: build-rules.json reads the best thing a build holds against the front, which splits the 39 curated builds 36 / 41 / 23 where the per item reading split 51 primaries 48 to 3. Enemy armour is still shown on every expanded row as a fact. See whyThereAreNoArmourRules, which is about this file and stays true.",
-    "Suppressed is sourced from a wiki article infobox rather than from a module, so it is curated on the items instead of fetched. It is a real published fact, 12 metres of audible range against 100, and it carries no `judgement` field for that reason. Move it into fetch-wiki.mjs when that script learns to read weapon infoboxes.",
+    "Suppressed is sourced from a wiki article infobox rather than from a module, so it is curated on the items instead of fetched. It is a real published fact, 13 metres of audible range on the wiki's Stealth page, and it carries no `judgement` field for that reason. fetch-wiki.mjs reads weapon infoboxes since 4 October 2026, for reload times, so moving Suppressed into the fetch is now a small change rather than a new one.",
     "The weather rules price a hazard as if it were always happening. A planet listing sandstorms has sandstorms sometimes, roughly three minutes at a time, and nothing in the data says how often. The visibility penalties are set as a risk you carry across a run rather than a state you are in, which is a judgement and not a measurement.",
-    "Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad], where the squad curve is [10, 4, 1, 0] taken from the wiki patrol interval multipliers. The two zero points are the curator's calibration from play: a four stack is comfortable through 5 and solo through 3. Only three rules read it, all on the bot front, so difficulty and squad still move nothing on bugs or squids.",
-    "Three rules scale off peril rather than gating on it as of 1.19.0, so solo at 7 and solo at 10 no longer move the same items by the same amount. All three are on the bot front. Nothing on bugs or squids scales off it, and that is where the gradient is still missing.",
-    "The negative half is defined and barely used. peril-bots-punishes-loud hands out a bonus below zero peril and explains it with its sayInverted, and it is the only rule doing anything down there. Nothing yet says that anti tank at difficulty 3 is firepower for an enemy that does not spawn.",
-    "A rule scaling off peril must not name a squad size in its say. Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] and depth reaches it as readily as being alone does, so four players on Super Helldive sit at 30. All three bot peril rules shipped in 1.19.0 asserting the reader was outnumbered, and their inverted halves asserted the reader was not, both on a figure that says neither. Fixed on 22 August 2026 by describing the pressure instead. Nothing about how a squad size might get its own wording is solved here; the rule simply may not claim one it did not check."
+    "Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad], where the squad curve is [10, 4, 1, 0] taken from the wiki patrol interval multipliers. The formula is unchanged on 4 October 2026; what changed is that the stealth rules also gate on squad. The curator: a four stack on Super Helldive knows what it is doing, so stealth is a question for one or two of you, from solo on Suicide Mission or two of you on Impossible. Peril alone puts four of you at difficulty 10 above two of you at 9, which is the wrong way round for stealth, so the squad gate does what the formula cannot.",
+    "The stealth rules scale off peril from 16, gated at 22, for one or two of you. Bugs and squids have their own, at about six tenths of the bot figure, since 4 October 2026. Nothing on bugs or squids reads difficulty for anything but stealth, so the gradient there is still thin.",
+    "The negative half is used once. easy-drop-wastes-stealth-armour takes up to half a tier off stealth passives below zero peril. The old inverted halves, silenced weapons marked down and loud ones lifted on an easy drop, were removed on 4 October 2026: not needing stealth is not a reason to mark it down. Nothing yet says that anti tank at difficulty 3 is firepower for an enemy that does not spawn.",
+    "A rule scaling off peril must not name a squad size in its say. Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] and depth reaches it as readily as being alone does, so four players on Super Helldive sit at 30. All three bot peril rules shipped in 1.19.0 asserting the reader was outnumbered, and their inverted halves asserted the reader was not, both on a figure that says neither. Fixed on 22 August 2026 by describing the pressure instead. Nothing about how a squad size might get its own wording is solved here; the rule simply may not claim one it did not check.",
+    "Pairing rules, those with an alongside or notAlongside clause, read the rest of the build and so never fire on a tier row. They show in the builder's picker and slots and on every build's parts. Twenty since 4 October 2026: stealth, True Grit, Gunslinger, melee, fire, arc and gas resistance, and C4 with throw range. npm run builds measures them by placing each subject in 60 random builds.",
+    "Armour weight is not modelled. A build records the passive and not the set, so light, medium and heavy armour, and what they want beside them (stamina boosters, jump packs and warp packs for heavy, a shield pack for light), cannot be read. The curator asked for it on 4 October 2026. It needs a weight on the build, which touches the builder, share links and the party."
   ]
 }

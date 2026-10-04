@@ -16,7 +16,7 @@
 /* same check before anyone trusts them.                              */
 /* ================================================================== */
 
-import { build, loadouts, items, readJson, FACTIONS } from "./lib/app.mjs";
+import { build, loadouts, items, score, readJson, FACTIONS } from "./lib/app.mjs";
 
 const RULES = readJson("src/data/build-rules.json").rules;
 const PRESETS = loadouts.presets;
@@ -249,6 +249,76 @@ for (const label of ["nothing set", "four at 7", "solo at 10"]) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Pairings                                                            */
+/*                                                                     */
+/* Item rules in context-rules.json that read the rest of the build:   */
+/* True Grit beside a Recoilless, a Cremator beside fire resistance.   */
+/* A random build carries any one passive about once in thirty, so a   */
+/* plain sweep would see almost none of them. Instead each item the    */
+/* rule is about is placed into 60 random builds, 20 per front, and    */
+/* the question is how often the pairing fires once you carry it.      */
+/* Near 0% is a pairing nobody will meet; near 100% is a rule that     */
+/* fires whatever else you bring, which is not a pairing at all.       */
+/* ------------------------------------------------------------------ */
+
+const PAIRING_KEYS = ["alongside", "notAlongside"];
+const PAIRINGS = readJson("src/data/context-rules.json").rules.filter((r) =>
+  PAIRING_KEYS.some((k) => JSON.stringify(r.match || {}).includes(`"${k}"`))
+);
+const SLOT_KEY = { primary: "primary", secondary: "secondary", throwable: "grenade", armor: "armor", booster: "booster" };
+
+/* The gentlest scenario the rule's own gate allows. */
+function pairingScenario(rule, faction) {
+  const when = rule.when || {};
+  const s = { faction, hazards: when.hazard || [], biome: null, mission: when.mission ? missionWith(when.mission) : null, difficulty: 0, squad: 0 };
+  if (when.peril || when.squad || when.difficulty) {
+    for (let sq = 4; sq >= 1; sq -= 1) {
+      if (when.squad && !score.numberTest(sq, when.squad)) continue;
+      const d = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].find((d) => {
+        if (when.difficulty && !score.numberTest(d, when.difficulty)) return false;
+        return !when.peril || score.numberTest(score.peril({ difficulty: d, squad: sq }), when.peril);
+      });
+      if (d) { s.difficulty = d; s.squad = sq; break; }
+    }
+  }
+  return s;
+}
+
+function place(loadout, item) {
+  if (item.slot !== "stratagem") return { ...loadout, [SLOT_KEY[item.slot]]: item.id };
+  const strats = loadout.strats.filter((id) => id !== item.id).slice(0, 3);
+  return { ...loadout, strats: [item.id, ...strats] };
+}
+
+console.log("\n  Pairings. Each item a pairing is about, placed in 60 random builds, 20 per front.\n");
+console.log("  fires  items  rule");
+const pairRows = [];
+{
+  const r = rng(20261004);
+  const hosts = FACTIONS.flatMap((faction) => Array.from({ length: 20 }, (_, n) => randomBuild(faction, r, n)));
+  for (const rule of PAIRINGS) {
+    const subject = Object.fromEntries(Object.entries(rule.match).filter(([k]) => !PAIRING_KEYS.includes(k)));
+    const subjects = ALL.filter((it) =>
+      score.matches({ item: it, wiki: items.statsFor(it.id), armour: null, scenario: {} }, subject)
+    );
+    let tries = 0;
+    let fired = 0;
+    for (const it of subjects) {
+      for (const host of hosts) {
+        if (!it.ratings[host.faction].tier) continue;
+        tries += 1;
+        const reading = build.readBuild(place(host, it), pairingScenario(rule, host.faction));
+        const part = reading.parts.find((p) => p.item.id === it.id);
+        if (part && part.reasons.some((x) => x.id === rule.id)) fired += 1;
+      }
+    }
+    const pct = tries ? Math.round((fired / tries) * 100) : 0;
+    pairRows.push({ id: rule.id, pct, subjects: subjects.length });
+    const note = !fired ? "   NEVER FIRES, check its match clause" : pct >= 95 ? "   fires whatever else you bring, is it a pairing" : "";
+    console.log(`   ${String(pct).padStart(3)}%  ${String(subjects.length).padStart(5)}  ${rule.id}${note}`);
+  }
+}
+console.log("");
 
 const loud = rows.filter((r) => r.wild >= 60);
 const dead = rows.filter((r) => r.fired === 0 && r.wild === 0);

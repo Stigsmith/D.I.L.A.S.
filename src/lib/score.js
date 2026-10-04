@@ -133,7 +133,10 @@ const asArray = (v) => (v === undefined || v === null ? [] : Array.isArray(v) ? 
 /* penetration does to the front you picked, so a rule can read stats.ap, */
 /* wiki.handling.ergonomics and armour.bounceShare in the same syntax.    */
 /* Anything not named here is a field on the item itself.                 */
-const ROOTS = ["wiki", "armour", "scenario"];
+/* `alongside` is the other item a pairing rule matched in the same build, */
+/* so a rule can scale off its partner: how much fire the armour resists,  */
+/* read from the Cremator's side.                                          */
+const ROOTS = ["wiki", "armour", "scenario", "alongside"];
 
 export function reach(ctx, path) {
   const parts = String(path).split(".");
@@ -233,12 +236,42 @@ export function matches(ctx, match) {
       }
       continue;
     }
+    /* Any one of several clauses. Clauses are otherwise ANDed, and some
+       questions are genuinely either-or: a support weapon earns True Grit
+       by a long reload, by a reload that pins you in place, or by a
+       reload after every shot. */
+    if (key === "anyOf") {
+      if (!asArray(want).some((clause) => matches(ctx, clause))) return false;
+      continue;
+    }
+    /* Pairings. What else is in the build, matched with this same item
+       matcher. They only fire inside a build: a tier row has no build, and
+       a rule asking what you brought with it cannot answer there, the same
+       way a rule asking about difficulty does not fire before you say one.
+       The partner is kept on the context so the rule can scale off it. */
+    if (key === "alongside" || key === "notAlongside") {
+      const others = ctx.scenario && ctx.scenario.alongside;
+      if (!Array.isArray(others)) return false;
+      const partner = others.find((other) => matches(partnerCtx(ctx, other), want));
+      if (key === "alongside") {
+        if (!partner) return false;
+        ctx.alongside = partner;
+      } else if (partner) return false;
+      continue;
+    }
 
     /* Everything else is a plain field on the item, compared as a set. */
     const value = reach(ctx, key);
     if (!asArray(want).includes(value)) return false;
   }
   return true;
+}
+
+/* The other item, read the way this one is. It carries no build of its own,
+   so a partner clause cannot ask about pairings in turn. */
+function partnerCtx(ctx, other) {
+  const { alongside, ...scenario } = ctx.scenario || {};
+  return { item: other, wiki: statsFor(other.id), armour: null, scenario };
 }
 
 /* A rule's `when` is about the scenario rather than the item.
@@ -316,6 +349,10 @@ const NO_RULES_OFF = new Set();
 export const rulesOffIn = (scenario) =>
   scenario && scenario.rulesOff instanceof Set ? scenario.rulesOff : NO_RULES_OFF;
 
+/* scenario.alongside, when present, is the rest of the build this item sits
+   in: an array of items, never this one. readBuild and the builder set it;
+   the tier list does not, so pairing rules stay silent there. Like rulesOff
+   it is never saved with the scenario or sent to a party. */
 export function scoreItem(item, scenario = {}) {
   const faction = scenario.faction;
   const base = faction ? item.ratings[faction].tier : null;
@@ -346,6 +383,8 @@ export function scoreItem(item, scenario = {}) {
   for (const rule of RULES.rules) {
     if (off.has(rule.id)) continue;
     if (!applies(scenario, rule.when)) continue;
+    /* A partner found by one rule must not leak into the next. */
+    ctx.alongside = null;
     if (!matches(ctx, rule.match)) continue;
 
     /* A rule may state its delta outright, or compute one from a number */

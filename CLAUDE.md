@@ -385,10 +385,10 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 | `vocabulary.json` | The shared enums. The app and the validator both read this one so they cannot disagree |
 | `ownership.json` | What you own. Ships empty |
 | `ownership.template.json` | Every warbond listed as not owned, ready to fill in |
-| `wiki-stats.json` | **Generated.** The stats the tables never had, for 195 items. Never edit by hand |
+| `wiki-stats.json` | **Generated.** The stats the tables never had, for 195 items, and since 4 October 2026 a reload time for 90 held weapons, read from each weapon's own wiki infobox. Never edit by hand |
 | `planets.json` | **Generated.** 281 planets: biome, hazards, sector, their cities by size, and for 274 of them a place on the galaxy map and the supply lines to their neighbours. Read by the scenario, the map and the drop planner |
 | `enemies.json` | **Generated.** 80 enemies, 594 body parts, each with an armor value, plus the difficulty each enemy starts appearing at. What every penetration figure is measured against. Never edit by hand |
-| `context-rules.json` | The 43 rules that move one item rating, each with a `name` for the Rules page. Read by `score.js`, checked by `npm run rules` |
+| `context-rules.json` | The 68 rules that move one item rating, each with a `name` for the Rules page. 20 of them are pairings, which read the rest of the build. Read by `score.js`, checked by `npm run rules`, and the pairings by `npm run builds` |
 | `missions.json` | The 70 missions by the game's names, the fronts each appears on, and the nine traits a rule keys on. Hand kept from the wiki; the names and fronts are the wiki's, the traits are ours |
 | `build-rules.json` | The 9 rules that move a whole build. Read by `build.js`, checked by `npm run builds` |
 | `difficulty.json` | **Generated** by `npm run difficulty` from the table on the wiki's Difficulty page: per level, missions in an operation, medals, objectives, outposts by size, what the level introduces, and the reward multiplier. Read by the war room's difficulty bar through `src/lib/difficulty.js`. Never edit by hand |
@@ -428,6 +428,7 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 - **`tags`** is the other curated layer and it is not the same thing as `roles`. A role says what job an item does for a squad. A tag says something a scoring rule needs to ask about that no fetched field answers. Two exist, `long-range` and `suppressed`, and **each declares its own provenance in `vocabulary.json`**: `long-range` is `curator`, `suppressed` is `wiki`. See The Tag Layer.
 - **`flag`** is `"stale"` when the rating predates a confirmed change to that exact item, which requires a `patchNote`, or `"new"` when the item is in the game with no rating yet. **None is stale as of 1.23.0**: the nineteen that were all cleared when u.gg's votes came to postdate the changes, flag and note both set to null. Only the P/40-K Bolt Pistol is `new`. The machinery stays for the next patch.
 - **`effect` versus `note`.** Armor passives and boosters carry an `effect`, which is what the thing actually does. Everything else carries a `note`, which is opinion. They never both appear.
+- **`passive`**, on armor only since 4 October 2026: the effect's percentages as numbers a rule can scale off, `{ "fireResist": 75 }`. Read off the `effect` text, never judged. Every armor carries the object, empty when nothing in it is a number a rule asks about. The keys are a closed list in `validate.mjs` (`PASSIVE_KEYS`), because a misspelt key is a rule that never fires. **Change `effect` and `passive` together.**
 - **`stats` are sparse, and that is now a gap rather than a principle.** AP, DPS, capacity, demo force, cooldown, uses and medal cost came out of the source tables. Magazine size, spare magazines, fire rate, recoil, reload time, projectile count and stagger were recorded here as **not in any source this project has**. The data spike on 20 August 2026 found all of them published, plus ergonomics, sway, durable damage, stagger, pushback and projectile drag. See `dilas-data-spike.md`. Still leave them absent rather than guessing, but the answer now is to fetch them rather than to shrug.
 
 > [!success] The hot biome gate was firing on weapons with no heat mechanic. Fixed in 1.4.0
@@ -583,7 +584,7 @@ An expanded row carries the item's art at full size, its numbers, what the sourc
 >
 > Weapons now carry a **Handling and ammo** section reading straight off the fetched block: magazine and spares, resupply count, rate of fire, ergonomics, recoil climb, sway, durable damage share, stagger and pushback, and pellet count where it is above one.
 >
-> **The admission survives, narrowed to what is actually still absent:** reload time and projectile count. Do not delete it. Restate it if a later fetch fills either.
+> **The admission survives, narrowed to what is actually still absent:** projectile count. **Reload time arrived on 4 October 2026**, from each weapon's infobox, and the row shows it, a round at a time and rooted to the spot where those apply. A weapon with no reload on its page says it never reloads or the page does not say, since the tool cannot tell those apart. Do not delete the admission. Restate it if a later fetch fills projectile count.
 >
 > **A weapon the wiki has no data page for** gets a different line saying those figures are genuinely unknown rather than merely unlisted. That is the only case where the section does not render. It was six melee weapons until 26 September 2026, when the wiki published them; since 1.23.0 all nine melee weapons show handling and nothing held is in that state. The line stays for the next item that arrives before its page does. The TD-110 Maelstrom is the one call-in with no wiki data yet.
 
@@ -638,15 +639,29 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > Everything is points, and points preserve order. If a rule needs to reach further, that is a bigger
 > coefficient, not a new instrument.
 
+> [!danger] Stealth is for one or two of you. The curator's call, 4 October 2026
+> **"Let's just assume people diving at Super Helldive know what they're doing."** He clears Super Helldive in a four stack without stealth armour, and the old rules marked his Autocannon and Leveller down there and lifted the Censor to S+. A four stack at difficulty 10 sat at peril 30, above a duo on Helldive at 28, which is the wrong way round for stealth.
+>
+> **The peril formula did not change.** The squad panel and the coverage rules read it and nobody objected to them. What changed is that every stealth rule now also gates on `squad: { lte: 2 }`, which is the only way to put two of you on Helldive above four of you on Super Helldive:
+>
+> | | Fires from | At solo Super Helldive |
+> |---|---|---|
+> | Quiet weapons, stealth armour, storms | **peril 22**: solo on Suicide Mission, two of you on Impossible | about a tier |
+> | Loud weapons marked down | **peril 28**: solo on Impossible, two of you on Helldive | -6, under half a tier |
+> | Silenced weapon **without** stealth armour, and the reverse | peril 22, pairings | -5 and +5 |
+> | Stealth armour on an easy drop | **peril 0 or less** | down to -8 at four on Trivial |
+>
+> Each counts **from peril 16**, so it starts small and grows. Three or four of you get nothing at any level. Bugs and squids have their own quiet and stealth armour rules at about six tenths of the bot figure: the wiki's Stealth page says every faction detects by sound then sight, and stealth is most viable against bots.
+>
+> **The inverted halves are gone.** Not needing stealth is not a reason to mark it down, so a silenced weapon on an easy drop is no longer penalised and a loud one no longer lifted. The one negative left is stealth armour below zero peril, his "on low difficulties it can be reduced". A rule gated to one side of its own zero needs no `sayInverted`, and the validator now knows that.
+>
+> Measured against 1.28.0 across eight scenarios and three fronts: **711 of 5,896 tier rows moved**, nearly all back toward the vote at four players on hard levels.
+
 > [!info] How a coefficient is chosen
 > One question: **at what peril should this be worth one tier?** A tier is about 14 points, so
-> `times = 14 / thatPeril`. Being unheard is worth a tier at peril 22, so 0.64. The loud rule mirrors
-> it at 0.48 rather than 0.64 because it matches nearly half of everything you can hold, and **a rule
-> touching half a list has to argue quietly.**
->
-> Scaling off `scenario.peril` also gets the negative half for free: the same rule that rewards a
-> silenced weapon at peril 22 penalises it at -24, where four of you on Trivial are carrying an
-> answer to a problem you do not have.
+> `times = 14 / (thatPeril - from)`. Being unheard, counted from 16, is worth about a tier at solo
+> Super Helldive, peril 40, so 0.6. The loud rule is 0.25 because it matches nearly half of
+> everything you can hold, and **a rule touching half a list has to argue quietly.**
 
 > [!info] The clamp grows past peril 22
 > `swingFor` runs `28 + max(0, peril - 22) * 0.5`, reaching 37 at solo Super Helldive. Two tiers is
@@ -691,9 +706,10 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > **Both fall back to the band when no level is set**, so nothing regressed for a squad that has not
 > said where it is dropping.
 
-> [!info] It only reaches three tier rules, all on the bot front
-> Difficulty and squad still move nothing on bugs or squids in the tier list. The squad panel is
-> front agnostic and reads peril on every front.
+> [!info] Eight tier rules read it, five of them on the bot front
+> Since 4 October 2026 bugs and squids have a quiet weapon and a stealth armour rule each, and the
+> easy drop rule reads every front. Outside stealth, difficulty and squad still move nothing on bugs
+> or squids in the tier list. The squad panel is front agnostic and reads peril on every front.
 
 ---
 
@@ -759,6 +775,38 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > `scripts/lib/app.mjs` inlines the JSON imports and hands back the real `src/lib` modules, so a script measures the code that ships rather than a copy of it. `check-rules.mjs` and `check-builds.mjs` both use it.
 >
 > It exists because the first copy of those twenty lines **carried a stale peril formula, 4 times difficulty minus squad minus 1, for two versions after `SQUAD_PRESSURE` replaced it.** Every rule gating on peril was being sampled in a situation the engine no longer produces. It calls `score.peril` now and cannot drift again.
+
+---
+
+# **Pairings**
+
+> [!success] What a piece is worth beside the rest of its build. 1.29.0, 4 October 2026, the curator's ask
+> True Grit is worth more beside a Recoilless than beside an Arc Thrower, Inflammable more beside a Cremator, Gunslinger more beside a Senator than an Ultimatum. **A pairing is an ordinary item rule in `context-rules.json` with an `alongside` or `notAlongside` clause**, an item clause matched against the other items in the build, with the same matcher.
+>
+> **The rest of the build rides on the scenario as `scenario.alongside`**, an array of the other items, the way `rulesOff` does. `readBuild` sets it for every part, and the builder sets it for every slot and for the picker, so a slot, its part and the gear badge never disagree. **The tier list never sets it, so a pairing never fires on a bare row.** It is never saved or sent to a party: `usePartySync` gets the bare scenario.
+>
+> A pairing may scale off its partner: `alongside.passive.fireResist` is the armour's figure read from the Cremator's side. The partner found by one rule is cleared before the next, and a partner clause cannot ask about pairings in turn; the validator refuses both mistakes.
+
+| Pairing | Fires when | Points |
+|---|---|---|
+| **True Grit** | beside a support weapon with a reload of 3.5s or more and a magazine of 120 or less; a reload that roots you; or a reload after every shot. Heat weapons excluded | weapon +6, +4, +4, stacking; True Grit +8. **-6 with nothing that reloads** |
+| **Gunslinger** | beside a secondary in the Pistol category | pistol +6, Gunslinger +8. **-6 without one** |
+| **Melee** | a melee weapon beside Peak Physique, Rock Solid or Reinforced Epaulettes | scaled by the bonus: up to +8 weapon, +10 armour |
+| **Fire, arc, gas resistance** | armour resisting what the build brings | armour by its figure, 75% fire is +14; the gear up to +6 |
+| **C4 and throw range** | the C4 Pack beside Servo-Assisted or Desert Stormer | C4 up to +8, armour up to +6 |
+| **Stealth** | one or two of you from peril 22: a silenced weapon with or without stealth armour | -5 without, +5 to the armour with |
+
+> [!warning] Points preserve order, so the vote still decides a lot
+> With a Cremator on bots, Acclimated goes A to S and Inflammable B to A: Inflammable gains more, +14 to +9, but the vote puts it two tiers lower to start. On bugs, where the vote has Inflammable at S+, it tops the picker. **This is deliberate and the curator should know it.** A pairing is a strong argument, not a floor, and making it one would be the floor mistake again.
+
+> [!info] Reload times are fetched, and the stationary flag reads two sources
+> `npm run wiki` pulls each primary, secondary and support weapon's own article, ten at a time because the API cuts long batches short, and reads `reload_time`, or `rounds_reload_full_time` for a weapon loaded a round at a time. A value marked (Base) wins, otherwise the first unmarked one. **90 weapons carry one**; the rest never reload (melee, expendables, Quasar, Arc Thrower, Cremator) or their page does not say. `reload.stationary` is true when either the infobox or the game's own tag says Stationary Reload: the module tags the Anti-Materiel Rifle and Laser Cannon and misses the Autocannon, Recoilless, Spear and W.A.S.P., the infobox the other way round. Cached as `.wiki-cache/weapon-pages-*.json`.
+
+> [!info] `npm run builds` measures them, not `npm run rules`
+> A pairing never fires on a tier row, so the item check skips them and says so. The build check places every item a pairing is about into 60 seeded random builds, 20 per front, in the gentlest scenario the rule's gate allows, and reports how often it fires: near 0% is a pairing nobody meets, 95% or more is a rule that fires whatever else you bring. All twenty fire; the highest is "a silenced weapon without stealth armour" at 92%, because a random build rarely carries stealth armour, which is the point of it.
+
+> [!todo] Armour weight is the next pairing, and it needs the build to record one
+> The curator wants heavy armour to want the stamina booster, a jump pack or a warp pack, and light armour to want a shield pack. A build records the passive and not the set, so there is no weight to read. Adding one touches the builder, `cleanLoadout`, share links and the party's packed build. Asked about on 4 October 2026, not built.
 
 ---
 
@@ -933,7 +981,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!danger] A file sync app watches this folder and renames what the build rewrites
 > On 30 September and 1 October 2026 it renamed every generated art folder, and once `dist/assets`, to copies named `... (# Name clash <date> <id> #)`, leaving the app with no art or no scripts. `.gitignore` carries `*Name clash*`. **Both the image importer and the build now empty their folders in place** rather than deleting and remaking them (`scripts/lib/empty-in-place.mjs`; the build's half is a small plugin in `vite.config.js` with Vite's own `emptyOutDir` off). Since then no build has been renamed. **`scripts/check-dist.mjs` runs after every build and again inside `npm run deploy` just before the upload**, and refuses if a file the page asks for is missing or a clash copy sits in `dist`.
 >
-> It reaches further than build output. **It renamed a source file** after an edit made with `sed -i`, which writes a new file and swaps it in: edit files in this repo in place, never by replace. **On 2 October 2026 it renamed two more**, `src/App.jsx` and `worker/war.test.ts`, each edited with an editor tool moments after a script had rewritten it in place; the copies were whole and moved back. Use one in place method per file, and if a file goes missing, look for its clash copy first. **It has renamed files inside `.git`**: a copy of the index and three of the branch logs, from 29 and 30 September. Checked on 1 October 2026 and the repository is intact, every branch and commit present, but a rename landing on a branch file could lose that branch. **The fix is the curator's: exclude the whole repo folder from the sync, or move it out of the synced tree**; GitHub is where it is headed to be backed up. The old clash copies are still on disk, left for him to delete.
+> It reaches further than build output. **It renamed a source file** after an edit made with `sed -i`, which writes a new file and swaps it in: edit files in this repo in place, never by replace. **On 2 October 2026 it renamed two more**, `src/App.jsx` and `worker/war.test.ts`, each edited with an editor tool moments after a script had rewritten it in place; the copies were whole and moved back. Use one in place method per file, and if a file goes missing, look for its clash copy first. **It has renamed files inside `.git`**: a copy of the index and three of the branch logs, from 29 and 30 September. Checked on 1 October 2026 and the repository is intact, every branch and commit present, but a rename landing on a branch file could lose that branch. **On 4 October 2026 it took `.git/index` itself**, along with `src/lib/score.js`, `scripts/fetch-wiki.mjs` and `scripts/validate.mjs`, all within five minutes of editor tool edits. With no index, `git status` showed every tracked file as deleted and staged while the working tree was untouched; moving the clash copy back to `.git/index` restored it exactly. **If `git status` ever shows everything deleted, look for `.git/index (# Name clash ...)` before anything else, and never run a reset to "fix" it.** **It is Proton Drive**, identified on 4 October 2026: its `Mappings.json` lists `C:\Dev` as a synced folder, so every project under it is backed up, this one included, and the "Name clash" and "Delete conflict" names are its conflict format. **The fix is the curator's: exclude the whole repo folder from the sync, or move it out of the synced tree**; GitHub is where it is headed to be backed up. The old clash copies are still on disk, left for him to delete.
 >
 > A side effect worth knowing: while `dist/assets` was missing, the browser asked for the script, got the page instead, and **cached that page under the script's name for a year**, because `_headers` marks `/assets/*` immutable. A rebuild with unchanged code has the same file name, so the page stayed blank until that one file was fetched with `cache: "reload"`. In production a missing asset meets the same single page fallback; it only bites a URL that is later reused, which hashed names almost never are.
 
@@ -1513,7 +1561,7 @@ Reads the table on the wiki's Difficulty page into `src/data/difficulty.json`, t
 # **Hosting**
 
 > [!success] Served from Cloudflare since 1.21.0, 25 September 2026
-> **https://dilas.me** from the next deploy: bought on Cloudflare on 2 October 2026 and attached to the Worker as a custom domain in `wrangler.jsonc`, so the deploy creates its DNS record and certificate. The Worker's own address is **https://dilas.stigly-official.workers.dev**; the old `dds` one was deleted with the old Worker on 3 October 2026. Both on the same Cloudflare account as Enodia. Stage 0 of `dilas-cloudflare-handover.md` moved `dist/` here as static assets, and **Stage 1 added a Worker on `/api/*` and a D1 database for accounts**, switched off in the UI. See Accounts. Everything the tool does for somebody using it still happens in the browser. Read that handover before Stage 1; it carries eighteen pitfalls Enodia paid for.
+> **https://dilas.me** from the next deploy: bought on Cloudflare on 2 October 2026 and attached to the Worker as a custom domain in `wrangler.jsonc`, so the deploy creates its DNS record and certificate. The Worker's own address is **https://dilas.stigsmith.workers.dev**: the curator renamed the account's `workers.dev` subdomain from `stigly-official` to `stigsmith` on 4 October 2026, in the dashboard, and the old address stopped answering at once with no redirect. Enodia was unaffected, since it runs on enodia.me with `workers_dev` off. The old `dds` one was deleted with the old Worker on 3 October 2026. Both on the same Cloudflare account as Enodia. Stage 0 of `dilas-cloudflare-handover.md` moved `dist/` here as static assets, and **Stage 1 added a Worker on `/api/*` and a D1 database for accounts**, switched off in the UI. See Accounts. Everything the tool does for somebody using it still happens in the browser. Read that handover before Stage 1; it carries eighteen pitfalls Enodia paid for.
 
 | File | What it does |
 |---|---|

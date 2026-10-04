@@ -1018,10 +1018,14 @@ function Section({ title, children }) {
 /* their absence anyway, which is worse than never claiming the gap: it   */
 /* tells you the tool does not know something it is holding.              */
 /*                                                                        */
-/* What is genuinely still absent is two fields, and saying so keeps the  */
-/* admission honest rather than deleting it wholesale.                    */
+/* Reload time arrived on 4 October 2026, read from each weapon's own wiki */
+/* infobox, so the admission narrowed again. A weapon with no reload on    */
+/* its page either never reloads, a Quasar or an Arc Thrower, or the page  */
+/* does not say, and the line admits it cannot tell those apart.           */
 const STILL_MISSING =
-  "Reload time and projectile count are still not in any source this project has. Everything above is fetched from helldivers.wiki.gg.";
+  "Projectile count is still not in any source this project has. Everything above is fetched from helldivers.wiki.gg.";
+const NO_RELOAD =
+  "Its wiki page gives no reload time: it never reloads, or the page does not say. Projectile count is not in any source this project has either. Everything above is fetched from helldivers.wiki.gg.";
 
 /* A weapon the wiki has no data page for gets the admission rather than  */
 /* an empty section. This was six of the nine melee weapons until 26     */
@@ -1131,6 +1135,11 @@ function RowDetail({ item, faction, scored, difficulty }) {
                   ? `${wiki.ammo.magazine}${wiki.ammo.spareMagazines !== undefined ? `, ${wiki.ammo.spareMagazines} spare` : ""}`
                   : null}
               </Fact>
+              <Fact label="Reload">
+                {wiki.reload
+                  ? <>{wiki.reload.seconds}s{wiki.reload.perRound ? <span className="text-base-500"> · a round at a time, for a full load</span> : null}{wiki.reload.stationary ? <span className="text-base-500"> · you cannot move while it reloads</span> : null}</>
+                  : null}
+              </Fact>
               <Fact label="From a resupply">
                 {wiki.ammo && wiki.ammo.fromSupply !== undefined ? `${wiki.ammo.fromSupply} magazines` : null}
               </Fact>
@@ -1162,7 +1171,7 @@ function RowDetail({ item, faction, scored, difficulty }) {
                 {wiki.projectile && wiki.projectile.pellets !== undefined && wiki.projectile.pellets > 1
                   ? `${wiki.projectile.pellets}` : null}
               </Fact>
-              <p className="text-[10px] leading-relaxed text-base-600">{STILL_MISSING}</p>
+              <p className="text-[10px] leading-relaxed text-base-600">{wiki.reload ? STILL_MISSING : NO_RELOAD}</p>
             </Section>
           ) : isWeapon ? (
             <p className="text-[10px] leading-relaxed text-base-600">{NO_FETCHED_STATS}</p>

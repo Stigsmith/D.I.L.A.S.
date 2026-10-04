@@ -1,5 +1,20 @@
 [
   {
+    "version": "1.29.0",
+    "date": "2026-10-04",
+    "title": "Your armour has opinions now",
+    "say": "Equipment works better together. The Ministry regrets that this took a memo.",
+    "changes": [
+      "Armour passives now pair with the rest of your build: True Grit with a long or rooted reload, Gunslinger with a real pistol, melee armour with a blade, and fire, arc or gas resistance with gear of the same kind.",
+      "The builder's picker sees the build you are making, so a Cremator lifts fire resistant armour and True Grit lifts a Recoilless as you choose.",
+      "The Cremator earns its keep in Eradicate and defence missions, where you hold one spot and they keep coming.",
+      "Stealth is for one or two of you now, from solo on Suicide Mission or two of you on Impossible. A full squad on Super Helldive is trusted to know what it is doing.",
+      "Silenced weapons and stealth armour count against bugs and squids too, a little less than against bots, and a silenced gun without stealth armour counts for less.",
+      "Support weapons and sidearms carry their reload times, read from the wiki.",
+      "The Rules page has a new group, What it is paired with, for the twenty rules that read a whole build."
+    ]
+  },
+  {
     "version": "1.28.0",
     "date": "2026-10-03",
     "title": "Declare your equipment, citizen",

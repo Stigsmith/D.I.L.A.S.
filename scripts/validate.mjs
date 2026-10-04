@@ -46,6 +46,12 @@ const FLAGS = set(vocab.flags);
 const SOURCES = set(vocab.ratingSources);
 const ACQUISITION = set(vocab.acquisitionTypes);
 const TRAITS = set(vocab.armorTraits.map((t) => t.id));
+/* Percentages an armor passive carries, read off its effect. */
+const PASSIVE_KEYS = set([
+  "fireResist", "gasResist", "acidResist", "arcResist", "explosiveResist",
+  "meleeDamage", "supportReload", "sidearmReload", "primaryReload",
+  "throwRange", "detectionRange", "movementNoise",
+]);
 const ROLES = set(vocab.roles);
 /* Ours, plus the sourced facts the fetch does not reach yet. Each one     */
 /* declares its own provenance in vocabulary.json, so a judgement and a    */
@@ -135,6 +141,18 @@ for (const it of items) {
   }
   if (it.traits.length && it.slot !== "armor") at("traits on a non armor item", it.traits);
   if (!it.traits.length && it.slot === "armor") at("traits", it.traits);
+
+  /* What an armor passive does, as numbers a rule can scale off. Read off
+     its own effect text, so every armor carries the object, empty when
+     nothing in it is a number a rule asks about. A misspelt key is a rule
+     that never fires, which is why the names are a closed list. */
+  if (it.slot === "armor") {
+    if (!it.passive || typeof it.passive !== "object") at("passive", it.passive);
+    else for (const [k, v] of Object.entries(it.passive)) {
+      if (!PASSIVE_KEYS.has(k)) at("passive key", k);
+      if (typeof v !== "number" || v <= 0 || v > 100) at(`passive ${k}`, v);
+    }
+  } else if (it.passive !== undefined) at("passive on a non armor item", it.passive);
 
   /* Roles are our editorial layer, written by scripts/tag-roles.mjs.    */
   /* The values are checked and duplicates are rejected, but an empty    */
@@ -328,8 +346,32 @@ for (const rule of rules) {
   /* A rule scaling off the scenario crosses zero and runs both ways. Its
      say was written for one direction, so without a sayInverted the tool
      explains a penalty using the sentence meant for a bonus. */
-  if (rule.scaleBy && String(rule.scaleBy.path).startsWith("scenario.") && !rule.sayInverted) {
+  /* Unless a peril gate keeps it on one side of its own zero: a rule that
+     only fires from peril 16 and counts from 16 never comes out negative,
+     and a second sentence for it would be dead copy. */
+  const gate = (rule.when && rule.when.peril) || {};
+  const from = rule.scaleBy ? rule.scaleBy.from ?? 0 : 0;
+  const oneSided =
+    rule.scaleBy && String(rule.scaleBy.path) === "scenario.peril" &&
+    ((gate.gte !== undefined && gate.gte >= from) || (gate.lte !== undefined && gate.lte <= from));
+  if (rule.scaleBy && String(rule.scaleBy.path).startsWith("scenario.") && !rule.sayInverted && !oneSided) {
     ruleProblems.push(`${rule.id} scales off the scenario so it can invert, but carries no sayInverted`);
+  }
+  /* A pairing names its partner in a clause of its own, and the partner has
+     no build to look into, so a pairing inside a pairing never fires. A
+     rule scaling off its partner needs a partner to have been found. */
+  const partners = []; collect(rule.match || {}, partners, ["alongside", "notAlongside"]);
+  for (const p of partners) {
+    const nested = []; collect(p, nested, ["alongside", "notAlongside"]);
+    if (nested.length) ruleProblems.push(`${rule.id} asks about a pairing inside a pairing, which can never fire`);
+  }
+  const passivePaths = []; collect(rule, passivePaths, ["path"]);
+  for (const p of passivePaths) {
+    const m = String(p).match(/^(?:alongside\.)?passive\.(.+)$/);
+    if (m && !PASSIVE_KEYS.has(m[1])) ruleProblems.push(`${rule.id} reads passive "${m[1]}", which no armor carries`);
+  }
+  if (rule.scaleBy && String(rule.scaleBy.path).startsWith("alongside.") && !(rule.match && rule.match.alongside)) {
+    ruleProblems.push(`${rule.id} scales off its partner but has no alongside clause to find one`);
   }
 
   const refIds = []; collect(rule, refIds, ["idIn", "notIdIn"]);
@@ -421,11 +463,8 @@ for (const rule of buildRules.rules) {
     const known = root === "facts" ? FACTS_FIELDS : root === "reach" ? REACH_FIELDS : SCENARIO_FIELDS;
     if (!known.has(field)) buildProblems.push(`${rule.id} reads "${path}", which build.js cannot produce, so it never fires`);
   }
-  /* Same contract the context rules have. A rule that scales off the
-     scenario crosses zero and needs a sentence for each direction. */
-  if (rule.scaleBy && String(rule.scaleBy.path).startsWith("scenario.") && !rule.sayInverted) {
-    buildProblems.push(`${rule.id} scales off the scenario so it can invert, but carries no sayInverted`);
-  }
+  /* Whether a rule scaling off the scenario carries a sentence for each
+     direction is checked once, in checkRules, for both files. */
 }
 if (buildProblems.length) fail(`${buildProblems.length} problem(s) in build-rules.json:`, buildProblems);
 

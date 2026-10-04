@@ -16,7 +16,7 @@ Everything below rests on one primitive: **data living somewhere that is not one
 >
 > | Stage | | Status |
 > |---|---|---|
-> | 0 | Hosting on Cloudflare, security headers, fonts vendored | **Done, 1.21.0.** Was `dds.stigly-official.workers.dev`, now `dilas.stigly-official.workers.dev`; **dilas.me** attaches on the next deploy |
+> | 0 | Hosting on Cloudflare, security headers, fonts vendored | **Done, 1.21.0.** Live at **dilas.me**, with `dilas.stigsmith.workers.dev` as the Worker's own address since 4 October 2026 |
 > | 1 | Worker, D1 and accounts | **Built, 1.22.0, and switched off in the UI.** The backend is live; nobody can see it until `ACCOUNTS_LIVE` flips |
 > | 2 | Mail and password reset | **Unblocked: dilas.me was bought on 2 October 2026.** Resend only sends from a domain you own, and now there is one. Needs the Resend account, the domain verified with it, and `MAIL_FROM`. Accounts stay shut until this works |
 > | 3 | Sync between devices | Needs the profiles question answered |
