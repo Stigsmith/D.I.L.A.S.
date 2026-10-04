@@ -23,11 +23,12 @@ import { scoreItem } from "./lib/score.js";
 import { readBuild } from "./lib/build.js";
 import { presets } from "./lib/loadouts.js";
 import { withHeat } from "./lib/drop.js";
-import { ALL_RULES, GROUPS, ruleGroup, describeWhen, describeMatch, describeSize } from "./lib/rules.js";
+import { ALL_RULES, GROUPS, ruleGroup, describeWhen, describeMatch, describeSize, isPairing } from "./lib/rules.js";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 const MONO = { fontFamily: "'JetBrains Mono', monospace" };
 const NONE_OFF = new Set();
+const PAIRING_IDS = new Set(ALL_RULES.filter(isPairing).map((r) => r.id));
 
 /* A switch rather than a checkbox: it is on or off, and it says so. */
 function Switch({ on, onChange, label }) {
@@ -61,6 +62,24 @@ function RuleDetail({ rule, scenario, off, builds, buildsArePresets }) {
     if (!scenario.faction) return [];
     const withIt = new Set(off); withIt.delete(rule.id);
     const without = new Set(off); without.add(rule.id);
+    /* A pairing fires on a part of a build, never on a bare row, so it
+       lists each build it reads and the piece in it that moved. */
+    if (isPairing(rule)) {
+      return builds
+        .filter((l) => l.faction === scenario.faction)
+        .flatMap((l) => {
+          const a = readBuild(l, { ...scenario, rulesOff: withIt });
+          const b = readBuild(l, { ...scenario, rulesOff: without });
+          return a.parts
+            .map((p, i) => {
+              const hit = p.reasons.find((r) => r.id === rule.id);
+              if (!hit) return null;
+              return { key: `${l.id}-${p.item.id}`, name: `${p.item.name}, in ${l.name}`, points: hit.delta, withTier: p.tier, withoutTier: b.parts[i].tier };
+            })
+            .filter(Boolean);
+        })
+        .sort((x, y) => Math.abs(y.points) - Math.abs(x.points));
+    }
     if (rule.kind === "item") {
       return items
         .map((it) => {
@@ -103,7 +122,7 @@ function RuleDetail({ rule, scenario, off, builds, buildsArePresets }) {
 
       <div>
         <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>
-          {rule.kind === "item" ? "What it moves where you are dropping" : `Your builds it reads here${buildsArePresets ? ", the presets standing in" : ""}`}
+          {isPairing(rule) ? `What it moves in your builds here${buildsArePresets ? ", the presets standing in" : ""}` : rule.kind === "item" ? "What it moves where you are dropping" : `Your builds it reads here${buildsArePresets ? ", the presets standing in" : ""}`}
         </p>
         {!scenario.faction ? (
           <p className="text-xs text-base-500">Choose where you are dropping and this lists what the rule moves there.</p>
@@ -172,7 +191,12 @@ export default function Rules({ scenario, rulesOff, toggleRule, clearRules, stat
       tally.set(id, t);
     };
     for (const it of items) for (const r of scoreItem(it, all).reasons) add(r.id, r.delta);
-    for (const l of builds.filter((b) => b.faction === scenario.faction)) for (const n of readBuild(l, all).notes) add(n.id, n.delta || (n.severity ? -1 : 0));
+    for (const l of builds.filter((b) => b.faction === scenario.faction)) {
+      const reading = readBuild(l, all);
+      for (const n of reading.notes) add(n.id, n.delta || (n.severity ? -1 : 0));
+      /* Pairings move a part, so they are counted from inside each build. */
+      for (const p of reading.parts) for (const r of p.reasons) if (PAIRING_IDS.has(r.id)) add(r.id, r.delta);
+    }
     return tally;
   }, [scenario, builds]);
 

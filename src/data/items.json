@@ -9096,6 +9096,7 @@
     "flag": null,
     "patchNote": null,
     "effect": "+2 stim capacity, +2.0s stim duration",
+    "passive": {},
     "note": null
   },
   {
@@ -9147,6 +9148,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+20 weapon handling, +30% support weapon reload speed",
+    "passive": {
+      "supportReload": 30
+    },
     "note": null
   },
   {
@@ -9198,6 +9202,10 @@
     "flag": null,
     "patchNote": null,
     "effect": "-50% movement noise, -40% enemy detection range",
+    "passive": {
+      "movementNoise": 50,
+      "detectionRange": 40
+    },
     "note": null
   },
   {
@@ -9250,6 +9258,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+50% explosive resist, +30 armor rating",
+    "passive": {
+      "explosiveResist": 50
+    },
     "note": null
   },
   {
@@ -9303,6 +9314,10 @@
     "flag": null,
     "patchNote": null,
     "effect": "+50% explosive resist, +25% gas resist, -30% sidearm recoil",
+    "passive": {
+      "explosiveResist": 50,
+      "gasResist": 25
+    },
     "note": null
   },
   {
@@ -9355,6 +9370,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+50% explosive resist, +2 throwables capacity",
+    "passive": {
+      "explosiveResist": 50
+    },
     "note": null
   },
   {
@@ -9407,6 +9425,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+50% explosive resist, -30% recoil crouched or prone",
+    "passive": {
+      "explosiveResist": 50
+    },
     "note": null
   },
   {
@@ -9458,6 +9479,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+30% primary reload, +20% ammo capacity (excludes backpacks)",
+    "passive": {
+      "primaryReload": 30
+    },
     "note": null
   },
   {
@@ -9510,6 +9534,7 @@
     "flag": null,
     "patchNote": null,
     "effect": "-30% recoil crouched or prone, +2 throwables capacity",
+    "passive": {},
     "note": null
   },
   {
@@ -9561,6 +9586,7 @@
     "flag": null,
     "patchNote": null,
     "effect": "+10% walk and run speed, +160ms slide duration",
+    "passive": {},
     "note": null
   },
   {
@@ -9613,6 +9639,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+25% chest resist, +25% explosive resist, no bleed damage",
+    "passive": {
+      "explosiveResist": 25
+    },
     "note": null
   },
   {
@@ -9665,6 +9694,13 @@
     "flag": null,
     "patchNote": null,
     "effect": "+40% fire, gas, acid and electrical resist, +20% throw range",
+    "passive": {
+      "fireResist": 40,
+      "gasResist": 40,
+      "acidResist": 40,
+      "arcResist": 40,
+      "throwRange": 20
+    },
     "note": null
   },
   {
@@ -9716,6 +9752,12 @@
     "flag": null,
     "patchNote": null,
     "effect": "+50% fire, gas, acid and electrical resist",
+    "passive": {
+      "fireResist": 50,
+      "gasResist": 50,
+      "acidResist": 50,
+      "arcResist": 50
+    },
     "note": null
   },
   {
@@ -9767,6 +9809,7 @@
     "flag": null,
     "patchNote": null,
     "effect": "50% chance to survive lethal damage, no bleed damage",
+    "passive": {},
     "note": null
   },
   {
@@ -9819,6 +9862,7 @@
     "flag": null,
     "patchNote": null,
     "effect": "Reduced flinch, +25 armor rating, map marker radar",
+    "passive": {},
     "note": null
   },
   {
@@ -9871,6 +9915,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+40% melee damage, +30 ergonomics",
+    "passive": {
+      "meleeDamage": 40
+    },
     "note": null
   },
   {
@@ -9923,6 +9970,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+50% fire resist, 50% limb injury avoidance, -30% impact and collision damage",
+    "passive": {
+      "fireResist": 50
+    },
     "note": null
   },
   {
@@ -9974,6 +10024,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "Map marker radar, -40% enemy detection range",
+    "passive": {
+      "detectionRange": 40
+    },
     "note": null
   },
   {
@@ -10025,6 +10078,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+75% fire resist",
+    "passive": {
+      "fireResist": 75
+    },
     "note": null
   },
   {
@@ -10077,6 +10133,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "Revive on death if body intact then timed death, +2.0s stim duration, +50% electrical resist",
+    "passive": {
+      "arcResist": 50
+    },
     "note": null
   },
   {
@@ -10129,6 +10188,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "Reduced ragdolling, +40% melee damage",
+    "passive": {
+      "meleeDamage": 40
+    },
     "note": null
   },
   {
@@ -10181,6 +10243,10 @@
     "flag": null,
     "patchNote": null,
     "effect": "+30% primary reload, 50% limb injury avoidance, +20% melee damage",
+    "passive": {
+      "primaryReload": 30,
+      "meleeDamage": 20
+    },
     "note": null
   },
   {
@@ -10232,6 +10298,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+40% sidearm reload, +50% draw and holster speed, -70% sidearm recoil",
+    "passive": {
+      "sidearmReload": 40
+    },
     "note": null
   },
   {
@@ -10283,6 +10352,7 @@
     "flag": null,
     "patchNote": null,
     "effect": "+50 armor rating",
+    "passive": {},
     "note": null
   },
   {
@@ -10335,6 +10405,7 @@
     "flag": null,
     "patchNote": null,
     "effect": "Gain stamina when taking damage, +25 armor rating",
+    "passive": {},
     "note": null
   },
   {
@@ -10386,6 +10457,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "-50% movement noise, +30% POI detection range, leg injury immunity",
+    "passive": {
+      "movementNoise": 50
+    },
     "note": null
   },
   {
@@ -10437,6 +10511,7 @@
     "flag": null,
     "patchNote": null,
     "effect": "Armor explodes 1.5s after death, +2 throwables capacity",
+    "passive": {},
     "note": null
   },
   {
@@ -10488,6 +10563,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+80% gas resist",
+    "passive": {
+      "gasResist": 80
+    },
     "note": null
   },
   {
@@ -10540,6 +10618,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+30% throw range, +50% limb health",
+    "passive": {
+      "throwRange": 30
+    },
     "note": null
   },
   {
@@ -10591,6 +10672,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+95% electrical damage resist",
+    "passive": {
+      "arcResist": 95
+    },
     "note": null
   },
   {
@@ -12430,6 +12514,7 @@
     "flag": null,
     "patchNote": null,
     "effect": "Harder to knock down, 30% less damage from impacts and collisions, higher armor rating",
+    "passive": {},
     "note": null
   }
 ]

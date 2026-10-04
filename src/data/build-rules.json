@@ -145,11 +145,14 @@
     },
     {
       "id": "quiet-kit-loud-drop",
-      "name": "A quiet kit on a hard bot drop",
+      "name": "A quiet kit for one or two of you on a hard bot drop",
       "when": {
         "faction": [
           "bots"
         ],
+        "squad": {
+          "lte": 2
+        },
         "peril": {
           "gte": 22
         }
@@ -169,14 +172,13 @@
       },
       "scaleBy": {
         "path": "scenario.peril",
-        "from": 0,
-        "times": 0.4,
-        "clamp": 16
+        "from": 16,
+        "times": 0.25,
+        "clamp": 6
       },
       "severity": "grey",
-      "say": "Something you carry is silenced, which is worth more the fewer of you there are. Alone, a loud gun brings the whole base down on you and there is nobody holding the line while you run.",
-      "sayInverted": "A silenced weapon in this drop is effort spent on a problem you do not have. Four of you at this level are not sneaking anywhere.",
-      "measured": "The loadout mirror of peril-bots-wants-quiet, which fires on 5 of 232 items. At the build level it asks whether any of the five suppressed weapons is in a hand, which is a different and rarer question than whether a given weapon is one of them."
+      "say": "Something you carry is silenced, and with one or two of you this deep that is worth having. A loud gun brings the whole base down on you and there is nobody holding the line while you run.",
+      "measured": "The loadout mirror of peril-bots-wants-quiet, which fires on 5 of 232 items. At the build level it asks whether any of the five suppressed weapons is in a hand, which is a different and rarer question than whether a given weapon is one of them. Retuned on 4 October 2026 with the item rules: one or two of you only, from solo on Suicide Mission or two of you on Impossible, and never more than half a tier. The item rules already lift the weapon itself, so this is the small extra for the build carrying it."
     },
     {
       "id": "half-built",
@@ -242,7 +244,7 @@
   "knownGaps": [
     "The penetration rule varies strongly between builds and only weakly with the scenario. Its inputs are the front, which is fixed for any build shown in Drop Bay, and difficulty, which moves the roster a little: AP 3 on bugs opens 0.63 of the front at difficulty 7 and 0.67 at 10, both under the gate, so the rule fires either way. That is the right behaviour at this altitude, where the question is which build to bring rather than which item, but it means the rule is closer to a fact about the build than a fact about the drop.",
     "Role tags are ours, not a vote, and three of these rules rest entirely on them. The 27 anti-armor, 55 chaff and 22 objective tags come from scripts/tag-roles.mjs, and 134 rated rows carry none of the three. A build made entirely of untagged gear reads as covering nothing, which is a limit of the tagging rather than a fact about the build.",
-    "Nothing reads the booster or the armor passive. Both are in the parts average and neither is in a single loadout rule, so a build carrying Hellpod Space Optimization and one carrying Muscle Enhancement read identically. Boosters are squad wide and armor passives are situational, and neither has a field a rule could key on yet.",
+    "Nothing here reads the booster. Armour passives are read since 4 October 2026, by the pairing rules in context-rules.json, which score each part beside the rest of its build: True Grit beside a long reload, Inflammable beside a Cremator. Those move a part's score and so the gear badge, not this layer. Boosters are squad wide and still have no field a rule could key on, and armour weight is not recorded at all.",
     "There is no ammo economy axis and no range band axis. dilas-roadmap.md asks whether those become tagged axes or stay human judgement, and it is still open. A build of three magazine hungry weapons and no resupply is a real hole this cannot see.",
     "Nothing here reads the squad. readBuild judges one loadout and squad.js judges the combination, and neither knows the other ran. A build that is thin on armour is not thin if the other three brought Recoilless rifles, and until the drop screen exists there is nowhere that both readings appear together.",
     "The curated set scores high before the loadout layer touches it. Parts averages run from 74.6 to 99.1 with a median of 87.9, because 35 of the 39 use an S or S+ primary. dilas-roadmap.md already measured that as the set's weakness, and it means most of what this layer does to them is subtract. That is a fact about those 39 builds rather than about the engine, and it is the clearest argument yet for the offline authoring pass.",

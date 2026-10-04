@@ -398,6 +398,20 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
   const packs = backpackUsers(draft);
   const conflict = hasBackpackConflict(draft);
   const lockedHere = loadoutItemIds(draft).filter((id) => state.lockedSet.has(id));
+
+  /* The rest of the build, for one slot: what a pairing rule reads. The
+     Cremator's picker sees the armour you already chose, and the armour's
+     picker sees the Cremator. readBuild reads each part the same way, so a
+     slot and the gear badge never disagree about one weapon. */
+  const besides = (key, stratSlot) =>
+    [
+      ...SLOTS.filter((s) => s.key !== key).map((s) => draft[s.key]),
+      ...draft.strats.filter((_, i) => i !== stratSlot),
+    ]
+      .filter(Boolean)
+      .map(getItem)
+      .filter(Boolean);
+  const withBuild = (key, stratSlot) => ({ ...scenario, alongside: besides(key, stratSlot) });
   const filled = loadoutItemIds(draft).length;
   const theme = FACTION_THEME[draft.faction];
 
@@ -486,7 +500,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
           stratSlot={picking.stratSlot}
           current={picking.stratSlot != null ? draft.strats[picking.stratSlot] : draft[picking.key]}
           faction={draft.faction}
-          scenario={scenario}
+          scenario={withBuild(picking.key, picking.stratSlot)}
           takenBackpack={
             picking.stratSlot == null
               ? null
@@ -615,7 +629,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
           {SLOTS.map((s) => (
             <Slot key={s.key} label={s.label} itemId={draft[s.key]}
               locked={state.lockedSet.has(draft[s.key])}
-              faction={draft.faction} scenario={scenario}
+              faction={draft.faction} scenario={withBuild(s.key, null)}
               onOpen={() => setPicking({ key: s.key, slot: s.slot, stratSlot: null })} />
           ))}
         </div>
@@ -624,7 +638,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
             <Slot key={i} label={`Stratagem ${i + 1}`} itemId={draft.strats[i]}
               locked={state.lockedSet.has(draft.strats[i])}
               warn={conflict && draft.strats[i] && packs.some((p) => p.id === draft.strats[i])}
-              faction={draft.faction} scenario={scenario}
+              faction={draft.faction} scenario={withBuild(null, i)}
               onOpen={() => setPicking({ key: null, slot: "stratagem", stratSlot: i })} />
           ))}
           <div className="rounded-lg border border-base-800 bg-base-900/40 px-3 py-2 text-[11px] text-base-500">

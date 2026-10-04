@@ -43,11 +43,16 @@ export const GROUPS = [
   { id: "climate", label: "Climate", line: "A hot or frozen planet, all mission long." },
   { id: "weather", label: "Weather and terrain", line: "Storms, fog and tremors. They come and go, so these price a risk rather than a state." },
   { id: "mission", label: "The mission", line: "What the objective asks of you." },
+  { id: "pairing", label: "What it is paired with", line: "Rules that read one item beside the rest of its build: True Grit beside a long reload, a Cremator beside fire resistance. They fire in the builder and on every build, never on the tier list, where there is no build." },
   { id: "build", label: "How a build fits together", line: "Rules that read a whole build rather than one item. They move the build's own badge." },
 ];
 
+/* A pairing reads the rest of the build, wherever it sits in the match. */
+export const isPairing = (rule) => /"(?:alongside|notAlongside)"/.test(JSON.stringify(rule.match || {}));
+
 export function ruleGroup(rule) {
   if (rule.kind === "build") return "build";
+  if (isPairing(rule)) return "pairing";
   const w = rule.when || {};
   if (w.mission) return "mission";
   const scalesOffPeril = rule.scaleBy && String(rule.scaleBy.path).startsWith("scenario.");
@@ -84,8 +89,12 @@ export function describeWhen(rule) {
   if (w.squad) out.push(numberWords("with a squad of", w.squad));
   if (w.peril) out.push(numberWords("at peril", w.peril));
   if (rule.scaleBy && String(rule.scaleBy.path).startsWith("scenario.peril")) {
-    out.push("growing with difficulty and how few of you there are");
+    /* A rule held below zero peril grows the other way. */
+    out.push(w.peril && w.peril.lte !== undefined
+      ? "growing the easier the drop and the more of you there are"
+      : "growing with difficulty and how few of you there are");
   }
+  if (isPairing(rule)) out.push("inside a build");
   return out.length ? out : ["everywhere"];
 }
 
@@ -104,8 +113,22 @@ const PATHS = {
   "stats.ap": "armor penetration",
   "reach.openShare": "share of this front it gets through",
   "scenario.peril": "peril",
+  "wiki.reload.seconds": "reload time, in seconds",
+  "passive.fireResist": "fire resistance, in percent",
+  "passive.gasResist": "gas resistance, in percent",
+  "passive.arcResist": "arc resistance, in percent",
+  "passive.meleeDamage": "melee damage bonus, in percent",
+  "passive.supportReload": "support weapon reload bonus, in percent",
+  "passive.sidearmReload": "sidearm reload bonus, in percent",
+  "passive.throwRange": "throw range bonus, in percent",
+  "passive.detectionRange": "how much shorter enemies see you from, in percent",
+  "passive.movementNoise": "how much quieter you move, in percent",
 };
-const pathWords = (p) => PATHS[p] || p;
+const pathWords = (p) => {
+  if (PATHS[p]) return PATHS[p];
+  if (String(p).startsWith("alongside.") && PATHS[p.slice(10)]) return `the partner's ${PATHS[p.slice(10)]}`;
+  return p;
+};
 
 const MATCH_WORDS = {
   held: (v) => (v ? "a weapon you carry and aim" : "anything you do not aim yourself"),
@@ -123,21 +146,33 @@ const MATCH_WORDS = {
   idIn: (v) => `named by hand: ${list([].concat(v).map((id) => (getItem(id) || { name: id }).name))}`,
   notIdIn: (v) => `except ${list([].concat(v).map((id) => (getItem(id) || { name: id }).name))}`,
   hasWiki: (v) => (v ? "with published stats" : "with no published stats"),
+  "wiki.reload.stationary": (v) => (v ? "a reload that roots you to the spot" : "a reload you can walk through"),
 };
 
 /* What a rule looks at. Build rules read a whole build and say so. */
-export function describeMatch(rule) {
-  if (rule.kind === "build") return ["the build as a whole: what it carries, what it covers, and how it is held"];
-  const m = rule.match || {};
+function clauseWords(m) {
   const out = [];
-  for (const [key, v] of Object.entries(m)) {
+  for (const [key, v] of Object.entries(m || {})) {
     if (key === "number") {
       for (const t of [].concat(v)) out.push(numberWords(pathWords(t.path), t));
       continue;
     }
+    /* Either-or, and pairings, read their own clauses in the same words. */
+    if (key === "anyOf") {
+      out.push(`any of: ${[].concat(v).map((c) => clauseWords(c).join(", ")).join("; or ")}`);
+      continue;
+    }
+    if (key === "alongside") { out.push(`in a build that also carries ${clauseWords(v).join(", ")}`); continue; }
+    if (key === "notAlongside") { out.push(`in a build with nothing that is ${clauseWords(v).join(", ")}`); continue; }
     if (MATCH_WORDS[key]) { out.push(MATCH_WORDS[key](v)); continue; }
     out.push(`${pathWords(key)}: ${list([].concat(v).map(String))}`);
   }
+  return out;
+}
+
+export function describeMatch(rule) {
+  if (rule.kind === "build") return ["the build as a whole: what it carries, what it covers, and how it is held"];
+  const out = clauseWords(rule.match);
   return out.length ? out : ["every item"];
 }
 

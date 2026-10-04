@@ -404,6 +404,87 @@ async function articles(titles) {
   return out;
 }
 
+/* ------------------------------------------------------------------ */
+/* Reload times                                                        */
+/*                                                                     */
+/* Not in the data module. The weapon's own article carries it in the  */
+/* infobox, as reload_time for a magazine and rounds_reload_full_time  */
+/* for a weapon loaded a round at a time. Added on 4 October 2026 for  */
+/* the armour passives that shorten a reload: True Grit on support     */
+/* weapons, Gunslinger on sidearms, Siege-Ready on primaries.          */
+/* ------------------------------------------------------------------ */
+
+/* Article titles that are not the item's name. */
+const ARTICLE_TITLES = {
+  "m6c-socom": "M6C/SOCOM Pistol",
+};
+
+/* "4.65s<br>4.2s (Upgraded)<br>2.1s (Assisted)" is the base reload, then */
+/* what an upgrade and a squadmate make of it. The Railgun writes it the  */
+/* other way round, "1.2s {{*}} 1.35s (Base)", so a value marked Base wins */
+/* and otherwise the first unmarked one does.                             */
+function reloadSeconds(raw) {
+  if (!raw) return null;
+  const parts = String(raw).split(/<br\s*\/?>|\{\{\*\}\}/i).map((p) => p.trim()).filter(Boolean);
+  const pick =
+    parts.find((p) => /\(base\)/i.test(p)) || parts.find((p) => !/\(/.test(p)) || parts[0];
+  const n = pick ? wikiNumber(pick) : null;
+  return n && n > 0 ? n : null;
+}
+
+async function weaponReloads(items) {
+  const byTitle = new Map();
+  for (const it of items) byTitle.set(ARTICLE_TITLES[it.id] || it.name, it.id);
+  const titles = [...byTitle.keys()];
+  const out = {};
+  /* Weapon articles are long, and past a size limit the API answers a     */
+  /* batch with the text of only some of its pages and a continue token.   */
+  /* Ten at a time stays under it; a batch that still comes back short is   */
+  /* reported rather than read as a weapon with no reload.                  */
+  const ARTICLE_BATCH = 10;
+  for (let i = 0; i < titles.length; i += ARTICLE_BATCH) {
+    const batch = titles.slice(i, i + ARTICLE_BATCH);
+    const doc = await pull(
+      `weapon-pages-${i / ARTICLE_BATCH}`,
+      api({
+        action: "query",
+        prop: "revisions",
+        rvprop: "content",
+        rvslots: "main",
+        redirects: "1",
+        titles: batch.join("|"),
+      })
+    );
+    if (doc.continue) console.log(`  weapon articles ${i}: the API cut this batch short, some reloads are missing`);
+    const q = doc.query || {};
+    /* A title the API normalised or followed a redirect from comes back   */
+    /* under its new name, so walk both lists back to the one we asked for. */
+    const asked = new Map();
+    for (const n of q.normalized || []) asked.set(n.to, n.from);
+    for (const r of q.redirects || []) asked.set(r.to, asked.get(r.from) || r.from);
+    for (const page of q.pages || []) {
+      const id = byTitle.get(asked.get(page.title) || page.title);
+      const rev = page.revisions && page.revisions[0];
+      const text = rev && rev.slots && rev.slots.main ? rev.slots.main.content : null;
+      if (!id || !text) continue;
+      const field = (name) => {
+        /* Some infoboxes indent their fields, " | reload_time = 2.5s". */
+        const m = text.match(new RegExp(`^[ \\t]*\\|[ \\t]*${name}[ \\t]*=(.*)$`, "m"));
+        return m ? m[1].trim() : null;
+      };
+      const magazine = reloadSeconds(field("reload_time"));
+      const rounds = reloadSeconds(field("rounds_reload_full_time"));
+      const seconds = magazine ?? rounds;
+      /* Whether the reload roots you to the spot. The data module tags only
+         some of them; the infobox traits name the backpack fed ones too, the
+         Autocannon, Recoilless, Spear and W.A.S.P. among them. */
+      const stationary = /stationary reload/i.test(`${field("traits") || ""} ${field("weapon_traits") || ""}`);
+      if (seconds) out[id] = { seconds, perRound: magazine === null, stationary };
+    }
+  }
+  return out;
+}
+
 /* The wiki writes health as 1,800, durability as 60%, and a health that  */
 /* changes with difficulty as "250 [Default] 325 at Difficulty 4". So     */
 /* this takes the first number in the string rather than the whole of it, */
@@ -650,6 +731,19 @@ async function main() {
     else missing.push(it);
   }
 
+  /* Reload times, from each held weapon's own article. Only onto items   */
+  /* the data module already matched, so a reload never arrives alone.    */
+  const reloads = await weaponReloads(
+    wanted.filter((i) => stats[i.id] && (i.slot === "primary" || i.slot === "secondary" || i.stratType === "support"))
+  );
+  for (const [id, reload] of Object.entries(reloads)) {
+    /* The module tags the Anti-Materiel Rifle and Laser Cannon stationary
+       where their infoboxes do not, and the infoboxes tag four the module
+       misses, so either one saying so is enough. */
+    if ((stats[id].tags || []).includes("STATIONARY RELOAD")) reload.stationary = true;
+    stats[id].reload = reload;
+  }
+
   const expected = missing.filter((m) => NO_SOURCE_YET.test(m.name));
   const surprises = missing.filter((m) => !NO_SOURCE_YET.test(m.name));
 
@@ -764,6 +858,7 @@ async function main() {
   console.log(`
   call-ins  ${withCode} with an input code, ${withCooldown} with a cooldown`);
   console.log(`  tags      ${withTags} carry the game own tags`);
+  console.log(`  reload    ${Object.keys(reloads).length} carry a reload time from their article`);
   console.log(`\n  heat      ${vents.length} items actually vent heat`);
   console.log(`            ${flaggedThermal.length} are flagged thermal by damageType`);
   if (wrongly.length) {

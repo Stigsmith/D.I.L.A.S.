@@ -73,6 +73,9 @@ function scenariosFor(rule) {
     const want = satisfy(when.peril, 0);
     let found = null;
     for (let sq = 4; sq >= 1 && !found; sq -= 1) {
+      /* A rule may gate on squad as well as peril, one or two of you from
+         peril 16, and the gentlest pair has to satisfy both. */
+      if (when.squad && !score.numberTest(sq, when.squad)) continue;
       for (let d = 1; d <= 10; d += 1) {
         const p = score.peril({ difficulty: d, squad: sq });
         const ok =
@@ -100,8 +103,14 @@ function scenariosFor(rule) {
   return factions.map((faction) => ({ faction, hazards, biome, mission, difficulty, squad }));
 }
 
+/* A pairing fires only inside a build, so a tier row can never show one
+   and measuring it here would report every one as dead. npm run builds
+   measures them, each subject placed in random builds. */
+const isPairing = (rule) => JSON.stringify(rule.match || {}).match(/"(?:not)?[aA]longside"/);
+const PAIRINGS = RULES.filter(isPairing);
+
 const rows = [];
-for (const rule of RULES) {
+for (const rule of RULES.filter((r) => !isPairing(r))) {
   let fired = 0;
   let eligible = 0;
   let moved = 0;
@@ -178,6 +187,7 @@ if (clashes.length) {
 if (!dead.length && !loud.length) {
   console.log(`  ${rows.length} rules, all discriminating. Nothing is describing its own pool.`);
 }
+if (PAIRINGS.length) console.log(`  ${PAIRINGS.length} pairing rules fire only inside a build. npm run builds measures them.`);
 console.log("");
 
 /* Switching a rule off, from the Rules page. Off means its effect is gone
