@@ -36,6 +36,11 @@ const UI = load(
 const PLANETS = load(
   import.meta.glob("../assets/planets/*", { eager: true, query: "?url", import: "default" })
 );
+/* Armour set renders, by set id. Fetched by npm run armor-art and
+   gitignored, so a fresh clone has none and a set reads by its name. */
+const ARMOR_SETS = load(
+  import.meta.glob("../assets/armor-sets/*", { eager: true, query: "?url", import: "default" })
+);
 const planetSlug = (s) =>
   s.toLowerCase().replace(/['’.]/g, "").replace(/&/g, " and ")
     .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
@@ -88,8 +93,9 @@ export const itemArt = (id) => ITEMS.get(id) || null;
 export const warbondArt = (id) => WARBONDS.get(id) || null;
 export const uiArt = (name) => UI.get(name) || null;
 export const planetArt = (name) => (name ? PLANETS.get(planetSlug(name)) || null : null);
+export const armorSetArt = (id) => (id ? ARMOR_SETS.get(id) || null : null);
 
-export const artCounts = { items: ITEMS.size, warbonds: WARBONDS.size, ui: UI.size, planets: PLANETS.size };
+export const artCounts = { items: ITEMS.size, warbonds: WARBONDS.size, ui: UI.size, planets: PLANETS.size, armorSets: ARMOR_SETS.size };
 
 /* Named so a component does not have to know the file naming scheme. */
 export const SKULL = uiArt("ui_icon_booster_skull");

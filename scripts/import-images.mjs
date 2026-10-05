@@ -85,7 +85,7 @@ const walk = (dir, out = []) => {
       /* Themes and planets each have a pass of their own further down.
          The planet folder also keeps full size originals under the same
          names as the small copies, which must never be mistaken for them. */
-      if (d.name.toLowerCase() === "themes" || d.name.toLowerCase() === "planets") continue;
+      if (["themes", "planets", "armor sets"].includes(d.name.toLowerCase())) continue;
       walk(join(dir, d.name), out);
     } else {
       out.push({ name: d.name, path: join(dir, d.name) });
@@ -222,6 +222,20 @@ if (existsSync(PLANETS_SOURCE)) {
   }
 }
 
+/* Armour set renders: the cuts npm run armor-art made, by set id. Never
+   the Originals folder beside them. */
+const ARMOR_SETS_SOURCE = join(SOURCE, "Armor Sets");
+emptyInPlace(join(ASSETS, "armor-sets"));
+let armorSetArt = 0;
+if (existsSync(ARMOR_SETS_SOURCE)) {
+  for (const d of readdirSync(ARMOR_SETS_SOURCE, { withFileTypes: true })) {
+    const m = d.isFile() ? /^armorset_(.+).webp$/i.exec(d.name) : null;
+    if (!m) continue;
+    copyFileSync(join(ARMOR_SETS_SOURCE, d.name), join(ASSETS, "armor-sets", `${m[1]}.webp`));
+    armorSetArt += 1;
+  }
+}
+
 /* Anything in the source that no id claimed. Not an error, but if a    */
 /* file is here it is doing nothing, which is usually a naming slip.    */
 const claimed = new Set([...Object.values(manifest.items), ...Object.values(manifest.warbonds), ...manifest.ui]);
@@ -262,6 +276,7 @@ console.log(`items with art:    ${Object.keys(manifest.items).length} of ${items
 console.log(`warbonds with art: ${Object.keys(manifest.warbonds).length} of ${warbonds.length}`);
 console.log(`ui and other:      ${manifest.ui.length}`);
 console.log(`planets with art:  ${planetArt}${planetArt ? "" : " (npm run planet-art -- --write fetches them)"}`);
+console.log(`armour sets:       ${armorSetArt}${armorSetArt ? "" : " (npm run armor-art fetches them)"}`);
 if (missingItems.length) {
   console.log(`\nitems with no art (these fall back to text): ${missingItems.length}`);
   for (const m of missingItems) console.log(`  ${m.slot.padEnd(10)} ${m.id.padEnd(34)} ${m.name}`);

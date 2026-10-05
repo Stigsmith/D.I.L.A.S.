@@ -50,7 +50,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Activate TCS+ Station",
@@ -59,7 +60,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 20
     },
     {
       "name": "Activate Terminid Control System",
@@ -68,7 +70,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Annex Untapped Mineral Sites",
@@ -79,7 +82,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Blitz: Destroy Bio-Processors",
@@ -89,7 +93,8 @@
       "traits": [
         "blitz",
         "nest"
-      ]
+      ],
+      "minutes": 12
     },
     {
       "name": "Blitz: Destroy Illuminate Warp Gateways",
@@ -99,7 +104,8 @@
       "traits": [
         "blitz",
         "nest"
-      ]
+      ],
+      "minutes": 12
     },
     {
       "name": "Blitz: Destroy Illuminate Warp Ships",
@@ -109,7 +115,8 @@
       "traits": [
         "blitz",
         "nest"
-      ]
+      ],
+      "minutes": 12
     },
     {
       "name": "Blitz: Search and Destroy",
@@ -121,7 +128,8 @@
         "blitz",
         "nest"
       ],
-      "note": "Every nest or fabricator on the map, against a twelve minute clock."
+      "note": "Every nest or fabricator on the map, against a twelve minute clock.",
+      "minutes": 12
     },
     {
       "name": "Blitz: Secure Research Site",
@@ -132,7 +140,8 @@
       ],
       "traits": [
         "blitz"
-      ]
+      ],
+      "minutes": 12
     },
     {
       "name": "Blitz: Suppress Toxic Pollination",
@@ -141,7 +150,8 @@
       ],
       "traits": [
         "blitz"
-      ]
+      ],
+      "minutes": 12
     },
     {
       "name": "Chart Terminid Tunnels",
@@ -150,7 +160,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Cleanse Infested District",
@@ -159,7 +170,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Collect Gloom Spore Readings",
@@ -168,7 +180,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Collect Gloom-Infused Oil",
@@ -177,7 +190,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Collect Meteorological Data",
@@ -188,7 +202,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Commando: Acquire Evidence",
@@ -198,7 +213,8 @@
       "traits": [
         "commando"
       ],
-      "note": "Automaton only, from a Commando Operation on a liberation campaign, per the wiki's Commando Missions page. It listed all three fronts until 1 October 2026."
+      "note": "Automaton only, from a Commando Operation on a liberation campaign, per the wiki's Commando Missions page. It listed all three fronts until 1 October 2026.",
+      "minutes": 40
     },
     {
       "name": "Commando: Extract Intel",
@@ -208,7 +224,8 @@
       "traits": [
         "commando"
       ],
-      "note": "Automaton only, from a Commando Operation on a liberation campaign, per the wiki's Commando Missions page. It listed all three fronts until 1 October 2026."
+      "note": "Automaton only, from a Commando Operation on a liberation campaign, per the wiki's Commando Missions page. It listed all three fronts until 1 October 2026.",
+      "minutes": 40
     },
     {
       "name": "Commando: Secure Black Box",
@@ -219,7 +236,8 @@
         "commando",
         "carry"
       ],
-      "note": "Small squad, quiet approach, and a box to carry out. Automaton only, from a Commando Operation on a liberation campaign, per the wiki's Commando Missions page. It listed all three fronts until 1 October 2026."
+      "note": "Small squad, quiet approach, and a box to carry out. Automaton only, from a Commando Operation on a liberation campaign, per the wiki's Commando Missions page. It listed all three fronts until 1 October 2026.",
+      "minutes": 40
     },
     {
       "name": "Conduct Geological Survey",
@@ -230,7 +248,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Conduct Mobile E-711 Extraction",
@@ -239,7 +258,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Confiscate Assets",
@@ -250,7 +270,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Deactivate Terminid Control System",
@@ -259,7 +280,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 12
     },
     {
       "name": "Democratize the Void",
@@ -268,7 +290,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Deploy Dark Fluid",
@@ -279,7 +302,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Destroy Command Bunkers",
@@ -288,7 +312,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Destroy Exospire",
@@ -297,7 +322,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Destroy Gazer Spire",
@@ -306,7 +332,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Destroy Harvesters",
@@ -315,7 +342,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Destroy Spore Lung",
@@ -324,7 +352,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Destroy Transmission Network",
@@ -333,7 +362,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Eliminate Automaton Factory Strider",
@@ -342,7 +372,8 @@
       ],
       "traits": [
         "hvt"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Eliminate Automaton Hulks",
@@ -351,7 +382,8 @@
       ],
       "traits": [
         "hvt"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Eliminate Bile Titans",
@@ -360,7 +392,8 @@
       ],
       "traits": [
         "hvt"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Eliminate Brood Commanders",
@@ -369,7 +402,8 @@
       ],
       "traits": [
         "hvt"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Eliminate Chargers",
@@ -378,7 +412,8 @@
       ],
       "traits": [
         "hvt"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Eliminate Devastators",
@@ -387,7 +422,8 @@
       ],
       "traits": [
         "hvt"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Eliminate Impaler",
@@ -396,7 +432,8 @@
       ],
       "traits": [
         "hvt"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Emergency Evacuation",
@@ -409,7 +446,8 @@
         "evacuate",
         "defend"
       ],
-      "note": "Hold an evacuation zone while civilians board. It is a defence mission wearing an escort's name."
+      "note": "Hold an evacuation zone while civilians board. It is a defence mission wearing an escort's name.",
+      "minutes": 40
     },
     {
       "name": "Enable Oil Extraction",
@@ -420,7 +458,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Eradicate Automaton Forces",
@@ -430,7 +469,8 @@
       "traits": [
         "wave"
       ],
-      "note": "One arena, and they shoot back from range while you are pinned in it."
+      "note": "One arena, and they shoot back from range while you are pinned in it.",
+      "minutes": 15
     },
     {
       "name": "Eradicate Illuminate Forces",
@@ -439,7 +479,8 @@
       ],
       "traits": [
         "wave"
-      ]
+      ],
+      "minutes": 15
     },
     {
       "name": "Eradicate Terminid Swarm",
@@ -449,7 +490,8 @@
       "traits": [
         "wave"
       ],
-      "note": "One arena, no cover worth the name, and everything comes at once."
+      "note": "One arena, no cover worth the name, and everything comes at once.",
+      "minutes": 15
     },
     {
       "name": "Evacuate Colonists",
@@ -460,7 +502,8 @@
       ],
       "traits": [
         "evacuate"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Evacuate High-Value Assets",
@@ -471,7 +514,8 @@
       ],
       "traits": [
         "evacuate"
-      ]
+      ],
+      "minutes": 20
     },
     {
       "name": "Extract Anomalous Material",
@@ -482,7 +526,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Extract E-711",
@@ -491,7 +536,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Extract Research Probe Data",
@@ -502,7 +548,8 @@
       ],
       "traits": [
         "carry"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Free Colony",
@@ -513,7 +560,8 @@
       ],
       "traits": [
         "evacuate"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Halt Cyborg Production",
@@ -522,7 +570,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Infiltrate Illuminate Lair",
@@ -531,7 +580,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Launch ICBM",
@@ -543,7 +593,8 @@
       "traits": [
         "standard"
       ],
-      "note": "A long fixed sequence at one site, which means standing in a known place for a long time."
+      "note": "A long fixed sequence at one site, which means standing in a known place for a long time.",
+      "minutes": 40
     },
     {
       "name": "Neutralize Ground-to-Orbit Defenses",
@@ -552,7 +603,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Nuke Nursery",
@@ -562,7 +614,8 @@
       "traits": [
         "nest"
       ],
-      "note": "Get a hellbomb to the nursery and survive long enough to arm it."
+      "note": "Get a hellbomb to the nursery and survive long enough to arm it.",
+      "minutes": 40
     },
     {
       "name": "Purge Hatcheries",
@@ -572,7 +625,8 @@
       "traits": [
         "nest"
       ],
-      "note": "Bug holes, and a lot of them."
+      "note": "Bug holes, and a lot of them.",
+      "minutes": 40
     },
     {
       "name": "Rapid Acquisition",
@@ -583,7 +637,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 15
     },
     {
       "name": "Repel Invasion Fleet",
@@ -594,7 +649,8 @@
       ],
       "traits": [
         "defend"
-      ]
+      ],
+      "minutes": 20
     },
     {
       "name": "Restart Pumps",
@@ -605,7 +661,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Restore Air Quality",
@@ -616,7 +673,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Retrieve Essential Personnel",
@@ -627,7 +685,8 @@
       ],
       "traits": [
         "evacuate"
-      ]
+      ],
+      "minutes": 15
     },
     {
       "name": "Retrieve Recon Craft Intel",
@@ -638,7 +697,8 @@
       ],
       "traits": [
         "carry"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Retrieve Valuable Data",
@@ -650,7 +710,8 @@
       "traits": [
         "carry"
       ],
-      "note": "The SSD mission. You carry a drive between two terminals across open ground, twice."
+      "note": "The SSD mission. You carry a drive between two terminals across open ground, twice.",
+      "minutes": 40
     },
     {
       "name": "Sabotage Air Base",
@@ -659,7 +720,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Sabotage Orgo-Plasma Synthesis",
@@ -670,7 +732,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Sabotage Supply Bases",
@@ -679,7 +742,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Seize Industrial Complex",
@@ -690,7 +754,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Spread Democracy",
@@ -701,7 +766,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Start Fuel Pumps",
@@ -712,7 +778,8 @@
       ],
       "traits": [
         "standard"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Take Down Overship",
@@ -721,7 +788,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Terminate Illegal Broadcast",
@@ -732,7 +800,8 @@
       ],
       "traits": [
         "nest"
-      ]
+      ],
+      "minutes": 40
     },
     {
       "name": "Upload Escape Pod Data",
@@ -743,7 +812,8 @@
       ],
       "traits": [
         "carry"
-      ]
+      ],
+      "minutes": 40
     }
   ]
 }

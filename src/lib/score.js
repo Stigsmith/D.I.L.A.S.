@@ -23,6 +23,7 @@ import RULES from "../data/context-rules.json";
 import { statsFor, ventsHeat, TIER_ORDER } from "./items.js";
 import { isHeldWeapon } from "./loadouts.js";
 import { traitsOf } from "./scenario.js";
+import { terrainOf, hasMegacity, minutesOf } from "./place.js";
 import { frontReading } from "./enemies.js";
 
 /* ------------------------------------------------------------------ */
@@ -302,6 +303,47 @@ export function applies(scenario, when) {
     }
     if (key === "hazard") {
       if (!asArray(want).some((h) => (scenario.hazards || []).includes(h))) return false;
+      continue;
+    }
+    /* None of these. Muscle Enhancement does nothing on dry sand unless a
+       storm is slowing you, so its dry ground rule has to be able to say
+       "and no sandstorm". */
+    if (key === "notHazard") {
+      if (asArray(want).some((h) => (scenario.hazards || []).includes(h))) return false;
+      continue;
+    }
+    /* What the ground of the scenario's biome is like, from the terrain
+       table in vocabulary.json: { "ground": ["wet", "snow"] }. Each field
+       is a set, the fields are ANDed. No biome, or one nobody has walked,
+       and the rule does not fire. */
+    if (key === "terrain") {
+      const t = terrainOf(scenario.biome);
+      if (!t) return false;
+      for (const [field, values] of Object.entries(want)) {
+        if (!asArray(values).includes(t[field])) return false;
+      }
+      continue;
+    }
+    /* Whether the planet has a megacity, a guess at a drop between
+       buildings. No planet chosen and the rule does not fire either way. */
+    if (key === "city") {
+      const v = hasMegacity(scenario.planet);
+      if (v === null || v !== Boolean(want)) return false;
+      continue;
+    }
+    /* The weight of armour the build wears, from its armour set. Like
+       alongside, it only exists inside a build: readBuild and the builder
+       put it on the scenario, the tier list never does, and a build with
+       no set chosen has no weight. Either way the rule does not fire. */
+    if (key === "weight") {
+      if (!scenario.weight || !asArray(want).includes(scenario.weight)) return false;
+      continue;
+    }
+    /* The mission's time limit in minutes, a number test. No mission, or
+       one whose article states no limit, and the rule does not fire. */
+    if (key === "minutes") {
+      const v = minutesOf(scenario.mission);
+      if (v === null || !numberTest(v, want)) return false;
       continue;
     }
     if (key === "biome") {

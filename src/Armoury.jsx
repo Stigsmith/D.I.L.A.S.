@@ -30,7 +30,7 @@ import { useMemo, useState } from "react";
 import { Plus, Star, FilterX, Snowflake, Info, Lock, AlertTriangle, Rocket, History as HistoryIcon } from "lucide-react";
 
 import { LoadoutCard, FACTIONS, BIOMES, BIOME_THEME, MISSION_TYPES, FactionBar, FactionChooser, DifficultySlider, bandForLevel, TierBadge } from "./Tiers.jsx";
-import { presets, deriveHeat, loadoutItemIds } from "./lib/loadouts.js";
+import { presets, deriveHeat, loadoutLockIds } from "./lib/loadouts.js";
 import { withHeat } from "./lib/drop.js";
 import { coverage } from "./lib/coverage.js";
 import { usageOf, daysSince, STALE_DAYS } from "./lib/history.js";
@@ -116,7 +116,7 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
       if (source === "mine" && l.preset) return false;
       if (source === "presets" && !l.preset) return false;
       if (favesOnly && !state.favorites.includes(l.id)) return false;
-      if (gear === "owned" && loadoutItemIds(l).some((id) => state.lockedSet.has(id))) { lockCut += 1; return false; }
+      if (gear === "owned" && loadoutLockIds(l).some((id) => state.lockedSet.has(id))) { lockCut += 1; return false; }
       if (l.faction !== faction) return false;
       if (mission !== "any" && l.mission !== mission && !(l.alt || []).includes(mission)) return false;
       if (difficulty !== "any" && !(l.diff || []).includes(difficulty)) return false;

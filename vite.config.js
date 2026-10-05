@@ -46,4 +46,8 @@ export default defineConfig({
     /* lazy loading on the rows. Every asset stays a separate file.        */
     assetsInlineLimit: 0,
   },
+  /* 5173 unless told otherwise. Two Claude sessions in this folder each get
+     their own dev server, and the second is handed a free port through
+     PORT; nothing here depends on the number. */
+  server: { port: Number(process.env.PORT) || 5173 },
 });

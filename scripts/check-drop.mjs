@@ -165,3 +165,38 @@ ok(untried.length > 0 && untried.every((u) => !carried.has(u.item.id) && ["S+", 
   "untried gear is good here and never carried against this front");
 const lockFirst = new Set([untried[0].item.id]);
 ok(!drop.untriedHere(bots, { history: recent, lockedSet: lockFirst }).some((u) => u.item.id === untried[0].item.id), "gear you have not unlocked is never offered");
+
+/* ------------------------------------------------------------------ */
+/* Armour sets                                                         */
+/* ------------------------------------------------------------------ */
+{
+  const worn = { id: "a", name: "Worn", faction: "bots", armor: "scout", armorSet: "sc-34-infiltrator", strats: [] };
+  ok(loadouts.cleanLoadout(worn).armorSet === "sc-34-infiltrator", "a set that carries the build's passive is kept");
+  const forged = loadouts.cleanLoadout({ ...worn, armor: "med-kit" });
+  ok(forged.armorSet === null && forged.armor === "med-kit", "a set whose passive is not the build's is dropped, and the passive stays");
+  ok(loadouts.cleanLoadout({ ...worn, armor: null }).armor === "scout", "a set with no passive beside it brings its own");
+  ok(loadouts.cleanLoadout({ ...worn, armorSet: "not-a-set" }).armorSet === null, "a set that does not exist is dropped");
+  ok(loadouts.cleanLoadout({ id: "b", faction: "bugs", armor: "med-kit" }).armorSet === null, "a build from before sets keeps its passive and no set");
+  ok(share.readShareCode(share.shareCode(worn)).armorSet === "sc-34-infiltrator", "a share link carries the set");
+  ok(drop.unpackBuild(drop.packBuild(worn)).armorSet === "sc-34-infiltrator", "a party build carries the set");
+}
+
+/* ------------------------------------------------------------------ */
+/* Boosters do not stack                                               */
+/* ------------------------------------------------------------------ */
+{
+  const one = { id: "m1", name: "One", faction: "bots", booster: "stamina-enhancement", strats: [] };
+  const two = { ...one, id: "m2", name: "Two" };
+  const three = { ...one, id: "m3", name: "Three", booster: "vitality-enhancement" };
+  ok(squad.squadWarnings([one, two], { faction: "bots" }).some((w) => w.id === "booster-duplicate"), "two members with the same booster are told one slot is empty");
+  ok(!squad.squadWarnings([one, three], { faction: "bots" }).some((w) => w.id === "booster-duplicate"), "two different boosters say nothing");
+}
+
+/* A build wearing a set from a warbond you do not own needs locked gear,
+   the same as one carrying a locked weapon. ownership.js puts the set's
+   id in the locked set beside the items. */
+{
+  const worn = { id: "w1", name: "Worn", faction: "bots", armor: "scout", armorSet: "sc-34-infiltrator", diff: [], biomes: [], strats: [] };
+  const pool = drop.dropPool([worn], { faction: "bots" }, { lockedSet: new Set(["sc-34-infiltrator"]), showLocked: false });
+  ok(pool.shown.length === 0 && pool.cut.locked === 1, "a build wearing a locked armour set is hidden with the locked builds");
+}

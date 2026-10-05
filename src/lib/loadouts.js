@@ -7,6 +7,7 @@
 
 import PRESETS from "../data/loadouts.json";
 import { getItem, ventsHeat } from "./items.js";
+import { getArmorSet } from "./armor.js";
 
 export const presets = PRESETS;
 
@@ -24,6 +25,10 @@ export const loadoutItemIds = (l) =>
   [l.primary, l.secondary, l.grenade, l.armor, l.booster, ...(l.strats || [])].filter(Boolean);
 
 export const loadoutItems = (l) => loadoutItemIds(l).map(getItem).filter(Boolean);
+
+/* Everything in a build that can be locked: its items, and the armour set
+   it wears, which locks with its warbond. */
+export const loadoutLockIds = (l) => [...loadoutItemIds(l), l.armorSet].filter(Boolean);
 
 /* Gear you aim yourself. A sentry cannot pick a weak point and an        */
 /* orbital does not care where the armor is thin, which is why every      */
@@ -115,6 +120,9 @@ export function emptyLoadout(faction = "bugs") {
     secondary: null,
     grenade: null,
     armor: null,
+    /* The armour set, which carries the passive above and a weight. Null
+       on every build made before sets existed, and on the presets. */
+    armorSet: null,
     booster: null,
     strats: [null, null, null, null],
     blurb: "",
@@ -161,6 +169,14 @@ export function cleanLoadout(l) {
     const it = getItem(id);
     return it && it.slot === want ? id : null;
   };
+  /* The set and the passive must agree. A set with no passive beside it
+     brings its own; a set whose passive is not the one recorded is
+     dropped, since the passive is the rated item and the one a person
+     chose. An old name resolves to the set's id today. */
+  let armor = slotOk(l.armor, "armor");
+  let set = typeof l.armorSet === "string" ? getArmorSet(l.armorSet) : null;
+  if (set && !armor) armor = set.passive;
+  if (set && set.passive !== armor) set = null;
   return {
     ...emptyLoadout(l.faction),
     ...l,
@@ -168,7 +184,8 @@ export function cleanLoadout(l) {
     primary: slotOk(l.primary, "primary"),
     secondary: slotOk(l.secondary, "secondary"),
     grenade: slotOk(l.grenade, "throwable"),
-    armor: slotOk(l.armor, "armor"),
+    armor,
+    armorSet: set ? set.id : null,
     booster: slotOk(l.booster, "booster"),
     strats: Array.from({ length: STRAT_SLOTS }, (_, i) => slotOk((l.strats || [])[i], "stratagem")),
   };

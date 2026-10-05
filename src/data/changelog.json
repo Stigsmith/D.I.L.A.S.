@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.30.0",
+    "date": "2026-10-05",
+    "title": "Know the ground you die on",
+    "say": "Every armour set is now on file, and so is the planet. Excuses about the terrain will no longer be accepted.",
+    "changes": [
+      "Every armour set in the game, 110 of them with their art: pick one under its passive in the builder, and its weight, armour, speed and stamina come with it.",
+      "Armour weight counts: heavy armour wants Stamina Enhancement and a Jump or Warp Pack, light armour the Shield Generator Pack, and heavy is better against bots than bugs.",
+      "The ground matters: Muscle Enhancement on swamps and snow, Jump Packs on cliffs, Warp Packs through city walls and two person bunker doors, and FRVs that like dunes and hate rocks.",
+      "The mission's clock matters: three Orbital Lasers fit a fifteen minute Eradicate.",
+      "More pairings: explosive resistance beside your own blasts, Siege-Ready beside an Eruptor or a shotgun, Med-Kit beside the Stim Pistol, and the Ballistic Shield wants a one handed primary.",
+      "Armour sets from a warbond you do not own are hidden with the rest of your locked gear."
+    ]
+  },
+  {
     "version": "1.29.0",
     "date": "2026-10-04",
     "title": "Your armour has opinions now",

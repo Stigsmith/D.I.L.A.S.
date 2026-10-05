@@ -41,7 +41,8 @@ export const GROUPS = [
   { id: "front", label: "The front", line: "What each enemy is, whatever the planet." },
   { id: "peril", label: "How hard, and how many of you", line: "Difficulty and squad size, read together. None of these fire until you have said both." },
   { id: "climate", label: "Climate", line: "A hot or frozen planet, all mission long." },
-  { id: "weather", label: "Weather and terrain", line: "Storms, fog and tremors. They come and go, so these price a risk rather than a state." },
+  { id: "weather", label: "Weather", line: "Storms, fog and tremors. They come and go, so these price a risk rather than a state." },
+  { id: "terrain", label: "The ground and getting around", line: "What the planet is like underfoot, how steep it is, how it drives, and whether it has a city. The ground per biome is our reading, and a city is guessed from the planet." },
   { id: "mission", label: "The mission", line: "What the objective asks of you." },
   { id: "pairing", label: "What it is paired with", line: "Rules that read one item beside the rest of its build: True Grit beside a long reload, a Cremator beside fire resistance. They fire in the builder and on every build, never on the tier list, where there is no build." },
   { id: "build", label: "How a build fits together", line: "Rules that read a whole build rather than one item. They move the build's own badge." },
@@ -52,9 +53,10 @@ export const isPairing = (rule) => /"(?:alongside|notAlongside)"/.test(JSON.stri
 
 export function ruleGroup(rule) {
   if (rule.kind === "build") return "build";
-  if (isPairing(rule)) return "pairing";
+  if (isPairing(rule) || (rule.when && rule.when.weight)) return "pairing";
   const w = rule.when || {};
-  if (w.mission) return "mission";
+  if (w.mission || w.minutes) return "mission";
+  if (w.terrain || w.city !== undefined) return "terrain";
   const scalesOffPeril = rule.scaleBy && String(rule.scaleBy.path).startsWith("scenario.");
   if (w.peril || w.difficulty || w.squad || scalesOffPeril) return "peril";
   if (w.hazard) return w.hazard.every((h) => CLIMATE.has(h)) ? "climate" : "weather";
@@ -78,13 +80,27 @@ function numberWords(name, t) {
   return `${name} ${parts.join(" and ")}`;
 }
 
+/* The terrain table's three fields, in words. */
+const TERRAIN_WORDS = {
+  ground: (v) => `where the ground is ${list(v.map((g) => (g === "snow" ? "snowy" : g)))}`,
+  relief: (v) => `where the land is ${list(v)}`,
+  driving: (v) => `where driving is ${list(v)}`,
+};
+
 /* When a rule applies, as a short list of conditions. */
 export function describeWhen(rule) {
   const w = rule.when || {};
   const out = [];
   if (w.faction) out.push(`against ${list(w.faction.map((f) => FRONT[f] || f))}`);
   if (w.hazard) out.push(`on a planet with ${list(w.hazard.map((h) => hazardName(h).toLowerCase()))}`);
+  if (w.notHazard) out.push(`with no ${list(w.notHazard.map((h) => hazardName(h).toLowerCase()))}`);
+  if (w.terrain) {
+    for (const [field, values] of Object.entries(w.terrain)) out.push(TERRAIN_WORDS[field] ? TERRAIN_WORDS[field]([].concat(values)) : `${field} ${list([].concat(values))}`);
+  }
+  if (w.weight) out.push(`worn as ${list([].concat(w.weight))} armour`);
+  if (w.city !== undefined) out.push(w.city ? "on a planet with a megacity" : "on a planet with no megacity");
   if (w.mission) out.push(`on ${list(w.mission.map((t) => (missionTraits[t] ? missionTraits[t].name : t)))} missions`);
+  if (w.minutes) out.push(numberWords("on a mission timed at", w.minutes) + " minutes");
   if (w.difficulty) out.push(numberWords("at difficulty", w.difficulty));
   if (w.squad) out.push(numberWords("with a squad of", w.squad));
   if (w.peril) out.push(numberWords("at peril", w.peril));
@@ -94,7 +110,7 @@ export function describeWhen(rule) {
       ? "growing the easier the drop and the more of you there are"
       : "growing with difficulty and how few of you there are");
   }
-  if (isPairing(rule)) out.push("inside a build");
+  if (isPairing(rule) || w.weight) out.push("inside a build");
   return out.length ? out : ["everywhere"];
 }
 
@@ -123,6 +139,10 @@ const PATHS = {
   "passive.throwRange": "throw range bonus, in percent",
   "passive.detectionRange": "how much shorter enemies see you from, in percent",
   "passive.movementNoise": "how much quieter you move, in percent",
+  "passive.explosiveResist": "explosion resistance, in percent",
+  "passive.primaryReload": "primary reload bonus, in percent",
+  "passive.crouchRecoil": "recoil cut when crouched or prone, in percent",
+  "passive.stimDuration": "extra stim duration, in seconds",
 };
 const pathWords = (p) => {
   if (PATHS[p]) return PATHS[p];
@@ -147,6 +167,8 @@ const MATCH_WORDS = {
   notIdIn: (v) => `except ${list([].concat(v).map((id) => (getItem(id) || { name: id }).name))}`,
   hasWiki: (v) => (v ? "with published stats" : "with no published stats"),
   "wiki.reload.stationary": (v) => (v ? "a reload that roots you to the spot" : "a reload you can walk through"),
+  "wiki.reload.perRound": (v) => (v ? "loaded a round at a time" : "loaded a magazine at a time"),
+  "wiki.oneHanded": (v) => (v ? "held in one hand" : "held in two hands"),
 };
 
 /* What a rule looks at. Build rules read a whole build and say so. */

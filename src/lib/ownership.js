@@ -18,6 +18,7 @@
 
 import ownership from "../data/ownership.json";
 import { gateableWarbondIds, itemById } from "./items.js";
+import { ARMOR_SETS } from "./armor.js";
 
 /* The inversion, shared by the seed and by an imported file. */
 export function lockedFromOwnership(doc) {
@@ -141,6 +142,13 @@ export function buildLockedSet(lockedItems, lockedWarbonds) {
   if (warbonds.size) {
     for (const item of itemById.values()) {
       if (item.acquisition.type === "warbond" && warbonds.has(item.acquisition.warbond)) locked.add(item.id);
+    }
+    /* Armour sets from a warbond you do not own are locked with it. A set
+       id is never an item id, which the validator checks, so the two
+       share this set without colliding; a count of locked items has to
+       ask for items. */
+    for (const s of ARMOR_SETS) {
+      if (s.acquisition.type === "warbond" && warbonds.has(s.acquisition.warbond)) locked.add(s.id);
     }
   }
   return locked;

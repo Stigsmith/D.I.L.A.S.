@@ -42,6 +42,7 @@ import { statsFor } from "./items.js";
 import { loadoutItems, isHeldWeapon, backpackUsers } from "./loadouts.js";
 import { scoreItem, peril, applies, matches, numberTest, tierForScore, TIER_POINTS, rulesOffIn } from "./score.js";
 import { frontReading } from "./enemies.js";
+import { getArmorSet, weightOf } from "./armor.js";
 
 /* ------------------------------------------------------------------ */
 /* The scale                                                           */
@@ -107,6 +108,10 @@ export function buildFacts(loadout, scenario = {}) {
        reading over one build. */
     holeClosers: items.filter((i) => i.roles.includes("objective") && (i.stats.demoForce ?? 0) >= 40).length,
     backpacks: backpackUsers(loadout).length,
+    /* The armour set worn, and its weight. Null on a build with no set
+       chosen, every preset among them: that is no answer, not medium. */
+    armorSet: getArmorSet(loadout.armorSet),
+    weight: weightOf(loadout),
     /* How many of the nine are filled. A half built loadout should not
        read as a considered one, and the builder saves drafts. */
     filled: items.length,
@@ -235,7 +240,7 @@ export function readBuild(loadout, scenario = {}) {
      so a slot and the part behind it never disagree. */
   const parts = facts.items.map((item, i) => ({
     item,
-    ...scoreItem(item, { ...scenario, alongside: facts.items.filter((_, j) => j !== i) }),
+    ...scoreItem(item, { ...scenario, alongside: facts.items.filter((_, j) => j !== i), weight: facts.weight }),
   }));
   const rated = parts.filter((p) => typeof p.score === "number");
 

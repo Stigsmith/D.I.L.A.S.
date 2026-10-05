@@ -180,5 +180,177 @@
       "name": "Super Helldive",
       "band": "extreme"
     }
-  ]
+  ],
+  "terrain": {
+    "source": "curator",
+    "note": "What the ground of each biome is like, for the rules about getting around: Muscle Enhancement, the Jump and Warp Packs, and the FRVs. The curator's reading from play, 4 October 2026, drafted from his examples and the biome descriptions in planets.json, and his to correct. ground is what is underfoot: wet (water, mud, deep foliage), snow, dry or mixed. relief is how steep the land is: flat, rolling or steep. driving is how an FRV fares: easy, normal or rough. Null is a biome nobody has walked, and a rule asking about terrain does not fire on it.",
+    "fields": {
+      "ground": [
+        "wet",
+        "snow",
+        "dry",
+        "mixed"
+      ],
+      "relief": [
+        "flat",
+        "rolling",
+        "steep"
+      ],
+      "driving": [
+        "easy",
+        "normal",
+        "rough"
+      ]
+    },
+    "biomes": {
+      "arctic_glacier_base": {
+        "ground": "snow",
+        "relief": "steep",
+        "driving": "rough"
+      },
+      "arctic_glacier_coldrocky": {
+        "ground": "snow",
+        "relief": "steep",
+        "driving": "rough"
+      },
+      "arctic_glacier_tien_kwan": {
+        "ground": "snow",
+        "relief": "steep",
+        "driving": "rough"
+      },
+      "blackhole": null,
+      "bug_hiveworld": {
+        "ground": "mixed",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "cyberstan": {
+        "ground": "mixed",
+        "relief": "flat",
+        "driving": "normal"
+      },
+      "deciduous_autumn": {
+        "ground": "wet",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "deciduous_base": {
+        "ground": "wet",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "deciduous_crimson": {
+        "ground": "wet",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "deciduous_fall": {
+        "ground": "wet",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "magma_base": {
+        "ground": "dry",
+        "relief": "steep",
+        "driving": "rough"
+      },
+      "moor_arid": {
+        "ground": "dry",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "moor_baseplanet": {
+        "ground": "mixed",
+        "relief": "steep",
+        "driving": "rough"
+      },
+      "moor_red": {
+        "ground": "mixed",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "moor_tundra": {
+        "ground": "snow",
+        "relief": "rolling",
+        "driving": "rough"
+      },
+      "oasis_base": {
+        "ground": "dry",
+        "relief": "flat",
+        "driving": "easy"
+      },
+      "oasis_bleak": {
+        "ground": "dry",
+        "relief": "flat",
+        "driving": "easy"
+      },
+      "primordial_base": {
+        "ground": "wet",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "primordial_blue": {
+        "ground": "wet",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "primordial_bug": {
+        "ground": "wet",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "primordial_dead": {
+        "ground": "dry",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "primordial_purple": {
+        "ground": "wet",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "rift_active": null,
+      "sandy_acid": {
+        "ground": "dry",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "sandy_base": {
+        "ground": "dry",
+        "relief": "rolling",
+        "driving": "easy"
+      },
+      "sandy_mineral": {
+        "ground": "dry",
+        "relief": "steep",
+        "driving": "rough"
+      },
+      "sandy_moon": {
+        "ground": "dry",
+        "relief": "rolling",
+        "driving": "normal"
+      },
+      "sandy_spiky": {
+        "ground": "dry",
+        "relief": "steep",
+        "driving": "normal"
+      },
+      "super_earth": {
+        "ground": "mixed",
+        "relief": "flat",
+        "driving": "normal"
+      },
+      "swamp_base": {
+        "ground": "wet",
+        "relief": "flat",
+        "driving": "normal"
+      },
+      "swamp_haunted": {
+        "ground": "wet",
+        "relief": "flat",
+        "driving": "normal"
+      },
+      "unknown": null
+    }
+  }
 }
