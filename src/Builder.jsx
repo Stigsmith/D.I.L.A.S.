@@ -29,9 +29,11 @@ import { readBuild } from "./lib/build.js";
 import { scoreItem } from "./lib/score.js";
 import {
   presets, SLOTS, STRAT_SLOTS, emptyLoadout, forkPreset,
-  deriveHeat, heatSources, deriveFire, backpackUsers, hasBackpackConflict, loadoutItemIds,
+  deriveHeat, heatSources, deriveFire, backpackUsers, hasBackpackConflict, loadoutItemIds, loadoutLockIds,
 } from "./lib/loadouts.js";
 import { shareUrl } from "./lib/share.js";
+import { getArmorSet, setsForPassive, weightOf } from "./lib/armor.js";
+import { SetStrip, WeightFilter, ArmorSetArt, setLine } from "./ArmorSets.jsx";
 
 /* A fresh build with one item already in its slot, for "build around
    it" from Drop Bay: the curator's "you never tried this here". */
@@ -55,8 +57,16 @@ function rankedFor(factionMeta, scenario) {
 /* Picker overlay                                                      */
 /* ------------------------------------------------------------------ */
 
-function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, taken = [], lockedSet, favoriteItems, onPick, onClear, onClose }) {
+function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario, takenBackpack, taken = [], lockedSet, favoriteItems, onPick, onPickSet, onClear, onClose }) {
   const [query, setQuery] = useState("");
+  /* Armour only: which weight of set to show. A passive with no set at
+     that weight drops out of the list while the filter is on. */
+  const armour = slot === "armor";
+  const [weight, setWeight] = useState(null);
+  /* A set from a warbond you do not own hides with the locked passives,
+     behind the same toggle. */
+  const setsOf = (id) =>
+    setsForPassive(id).filter((x) => (!weight || x.weight === weight) && (showLocked || !lockedSet.has(x.id)));
   /* Unavailable gear is hidden by default. You are choosing what to    */
   /* actually drop with, and a list full of things you do not own is    */
   /* a list you have to read past every time.                           */
@@ -93,7 +103,9 @@ function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, ta
         /* sitting in another slot is not an option here.                 */
         if (taken.includes(it.id)) return false;
         if (!showLocked && lockedSet.has(it.id)) return false;
-        if (query && !it.name.toLowerCase().includes(query.toLowerCase())) return false;
+        if (query && !it.name.toLowerCase().includes(query.toLowerCase()) &&
+          !(armour && setsForPassive(it.id).some((x) => x.name.toLowerCase().includes(query.toLowerCase())))) return false;
+        if (armour && weight && !setsOf(it.id).length) return false;
         return true;
       })
       .slice()
@@ -109,7 +121,7 @@ function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, ta
         if (pa !== pb) return pb - pa;
         return a.name.localeCompare(b.name);
       });
-  }, [slot, query, showLocked, lockedSet, favSet, taken, scored]);
+  }, [slot, query, showLocked, lockedSet, favSet, taken, scored, weight]);
 
   /* The best reading actually available in this slot, so "top pick" means
      the top of what you can reach for this drop rather than a fixed tier. */
@@ -122,7 +134,10 @@ function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, ta
   const hiddenCount = useMemo(() => {
     const category = CATEGORIES.find((c) => c.slot === slot);
     if (!category) return 0;
-    return category.items.filter((it) => lockedSet.has(it.id)).length;
+    const items = category.items.filter((it) => lockedSet.has(it.id)).length;
+    /* The armour sets hidden for being from a warbond you do not own. */
+    const sets = slot === "armor" ? category.items.flatMap((it) => setsForPassive(it.id)).filter((x) => lockedSet.has(x.id)).length : 0;
+    return items + sets;
   }, [slot, lockedSet]);
 
   const title = stratSlot != null ? `Stratagem ${stratSlot + 1}` : (SLOTS.find((s) => s.slot === slot) || {}).label;
@@ -171,9 +186,11 @@ function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, ta
             {showLocked ? `Showing ${hiddenCount} locked` : `${hiddenCount} locked hidden`}
           </button>
         ) : null}
+        {armour ? <WeightFilter value={weight} onChange={setWeight} /> : null}
         <span className="text-[11px] text-base-500">
           {pool.length} to choose from
           {taken.length ? `, ${taken.length} already in this build` : ""}
+          {armour ? ". Pick a set to wear the passive at its weight, or the passive alone" : ""}
         </span>
       </div>
 
@@ -212,6 +229,10 @@ function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, ta
                     toggleLock={() => {}} isFav={favSet.has(it.id)} toggleFav={() => {}}
                     open={false} onToggleOpen={() => {}}
                     onSelect={() => onPick(it.id)} />
+                  {armour ? (
+                    <SetStrip sets={setsOf(it.id)} current={currentSet} accent={factionMeta.hex} lockedSet={lockedSet}
+                      onPick={(id) => onPickSet(id)} />
+                  ) : null}
                 </div>
               );
             })}
@@ -226,8 +247,12 @@ function Picker({ slot, stratSlot, current, faction, scenario, takenBackpack, ta
 /* Slot                                                                */
 /* ------------------------------------------------------------------ */
 
-function Slot({ label, itemId, locked, onOpen, warn, faction, scenario }) {
+function Slot({ label, itemId, setId = null, locked, onOpen, warn, faction, scenario }) {
   const item = itemId ? getItem(itemId) : null;
+  /* The armour slot, worn as a set: the set's render and name, with the
+     passive and the weight's numbers under it. The badge stays the
+     passive's, which is what is rated. */
+  const set = item ? getArmorSet(setId) : null;
   const stratMeta = item && item.slot === "stratagem" ? CAT_META[item.stratType] : null;
 
   /* One badge, for the front this build is for.
@@ -254,7 +279,9 @@ function Slot({ label, itemId, locked, onOpen, warn, faction, scenario }) {
         (item
           ? "border-base-800 bg-base-900 hover:border-base-600"
           : "border-dashed border-base-700 bg-base-900/40 hover:border-base-500")}>
-      {item ? (
+      {set ? (
+        <ArmorSetArt set={set} className="h-10 w-10" />
+      ) : item ? (
         <ItemArt item={item} className="h-10 w-10" dim={locked} />
       ) : (
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded border border-dashed border-base-700 text-base-600">
@@ -272,14 +299,14 @@ function Slot({ label, itemId, locked, onOpen, warn, faction, scenario }) {
             <span className={"flex items-center gap-1.5 truncate text-sm " + (locked ? "text-base-500 line-through" : "text-base-100")}
               style={{ fontFamily: "'JetBrains Mono', monospace" }}>
               {locked ? <Lock className="h-3 w-3 shrink-0 text-accent-500" /> : null}
-              {item.name}
+              {set ? set.name : item.name}
               {eatsBackpack(item) ? (
                 <span className={"h-1.5 w-1.5 shrink-0 rounded-full " + (warn ? "bg-red-500" : "bg-accent-500")}
                   title="Uses your backpack slot" />
               ) : null}
             </span>
             <span className="block truncate text-[11px] text-base-500">
-              {[sourceLabelFor(item), ...itemStatSummary(item)].join(" · ")}
+              {set ? `${item.name} · ${setLine(set)}` : [sourceLabelFor(item), ...itemStatSummary(item)].join(" · ")}
             </span>
           </>
         ) : (
@@ -397,7 +424,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
   const heatFrom = heatSources(draft);
   const packs = backpackUsers(draft);
   const conflict = hasBackpackConflict(draft);
-  const lockedHere = loadoutItemIds(draft).filter((id) => state.lockedSet.has(id));
+  const lockedHere = loadoutLockIds(draft).filter((id) => state.lockedSet.has(id));
 
   /* The rest of the build, for one slot: what a pairing rule reads. The
      Cremator's picker sees the armour you already chose, and the armour's
@@ -411,7 +438,9 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
       .filter(Boolean)
       .map(getItem)
       .filter(Boolean);
-  const withBuild = (key, stratSlot) => ({ ...scenario, alongside: besides(key, stratSlot) });
+  /* And the weight the build is worn at, from its armour set, for the rules
+     that read it: a heavy set lifts Stamina Enhancement in the booster picker. */
+  const withBuild = (key, stratSlot) => ({ ...scenario, alongside: besides(key, stratSlot), weight: weightOf(draft) });
   const filled = loadoutItemIds(draft).length;
   const theme = FACTION_THEME[draft.faction];
 
@@ -499,6 +528,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
           slot={picking.slot}
           stratSlot={picking.stratSlot}
           current={picking.stratSlot != null ? draft.strats[picking.stratSlot] : draft[picking.key]}
+          currentSet={picking.key === "armor" ? draft.armorSet : null}
           faction={draft.faction}
           scenario={withBuild(picking.key, picking.stratSlot)}
           takenBackpack={
@@ -518,9 +548,19 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
               const next = [...draft.strats];
               next[picking.stratSlot] = id;
               patch({ strats: next });
+            } else if (picking.key === "armor") {
+              /* The passive alone. A set already worn stays if it carries
+                 this passive, otherwise it goes: the two must agree. */
+              const worn = getArmorSet(draft.armorSet);
+              patch({ armor: id, armorSet: worn && worn.passive === id ? worn.id : null });
             } else {
               patch({ [picking.key]: id });
             }
+            setPicking(null);
+          }}
+          onPickSet={(setId) => {
+            const set = getArmorSet(setId);
+            if (set) patch({ armor: set.passive, armorSet: set.id });
             setPicking(null);
           }}
           onClear={() => {
@@ -529,7 +569,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
               next[picking.stratSlot] = null;
               patch({ strats: next });
             } else {
-              patch({ [picking.key]: null });
+              patch(picking.key === "armor" ? { armor: null, armorSet: null } : { [picking.key]: null });
             }
             setPicking(null);
           }}
@@ -616,7 +656,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
               <Lock className="mt-px h-3.5 w-3.5 shrink-0" />
               <span>
                 {lockedHere.length} {lockedHere.length === 1 ? "item is" : "items are"} marked as not unlocked:{" "}
-                {lockedHere.map(itemName).join(", ")}.
+                {lockedHere.map((id) => (getArmorSet(id) || {}).name || itemName(id)).join(", ")}.
               </span>
             </div>
           ) : null}
@@ -628,7 +668,8 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
         <div className="flex flex-col gap-2">
           {SLOTS.map((s) => (
             <Slot key={s.key} label={s.label} itemId={draft[s.key]}
-              locked={state.lockedSet.has(draft[s.key])}
+              setId={s.key === "armor" ? draft.armorSet : null}
+              locked={state.lockedSet.has(draft[s.key]) || (s.key === "armor" && state.lockedSet.has(draft.armorSet))}
               faction={draft.faction} scenario={withBuild(s.key, null)}
               onOpen={() => setPicking({ key: s.key, slot: s.slot, stratSlot: null })} />
           ))}

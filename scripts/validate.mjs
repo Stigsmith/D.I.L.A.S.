@@ -50,7 +50,9 @@ const TRAITS = set(vocab.armorTraits.map((t) => t.id));
 const PASSIVE_KEYS = set([
   "fireResist", "gasResist", "acidResist", "arcResist", "explosiveResist",
   "meleeDamage", "supportReload", "sidearmReload", "primaryReload",
-  "throwRange", "detectionRange", "movementNoise",
+  "throwRange", "detectionRange", "movementNoise", "crouchRecoil",
+  /* Seconds rather than a percentage, still inside the 1 to 100 check. */
+  "stimDuration",
 ]);
 const ROLES = set(vocab.roles);
 /* Ours, plus the sourced facts the fetch does not reach yet. Each one     */
@@ -244,6 +246,30 @@ for (const id of Object.keys(armorSets)) {
 }
 const armorWithoutSets = items.filter((i) => i.slot === "armor" && !armorSets[i.id]).map((i) => i.id);
 if (badArmorKey.length) fail(`armor-sets.json has ${badArmorKey.length} bad key(s):`, badArmorKey);
+
+/* Every armour set, from npm run armor. A set is joined to its passive
+   by id, and a build stores a set by id, so the same invariant holds
+   here as for items: unique slugs, and every reference resolving. */
+const armorDoc = load("armor.json");
+const armorProblems = [];
+const setIds = new Set();
+const WEIGHTS = set(["light", "medium", "heavy"]);
+for (const s of armorDoc.sets || []) {
+  if (setIds.has(s.id)) armorProblems.push(`duplicate set id ${s.id}`);
+  setIds.add(s.id);
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s.id)) armorProblems.push(`${s.id} is not a slug`);
+  if (ids.has(s.id)) armorProblems.push(`${s.id} is also an item id`);
+  const p = byId.get(s.passive);
+  if (!p || p.slot !== "armor") armorProblems.push(`${s.id} carries passive ${s.passive}, which is no armour item`);
+  if (!WEIGHTS.has(s.weight)) armorProblems.push(`${s.id} weighs ${JSON.stringify(s.weight)}`);
+  for (const k of ["armor", "speed", "stamina"]) if (!(Number.isFinite(s[k]) && s[k] > 0)) armorProblems.push(`${s.id}.${k} is ${JSON.stringify(s[k])}`);
+  if (!s.acquisition || !ACQUISITION.has(s.acquisition.type)) armorProblems.push(`${s.id} comes from ${JSON.stringify(s.acquisition)}`);
+  else if (s.acquisition.type === "warbond" && !warbondIds.has(s.acquisition.warbond)) armorProblems.push(`${s.id} names warbond ${s.acquisition.warbond}, which does not exist`);
+}
+const passivesWithoutSet = items.filter((i) => i.slot === "armor" && !(armorDoc.sets || []).some((s) => s.passive === i.id)).map((i) => i.id);
+if (passivesWithoutSet.length) armorProblems.push(`passives no set carries: ${passivesWithoutSet.join(", ")}`);
+if (!armorDoc.licence || !armorDoc.source) armorProblems.push("armor.json is missing its source or licence stamp");
+if (armorProblems.length) fail(`${armorProblems.length} problem(s) in armor.json:`, armorProblems);
 if (armorWithoutSets.length) fail(`${armorWithoutSets.length} armor passive(s) with no set listing:`, armorWithoutSets);
 
 /* ------------------------------------------------------------------ */
@@ -325,7 +351,52 @@ const collect = (node, out, keys) => {
 };
 
 /* Every scenario key applies() knows how to test. */
-const WHEN_KEYS = set(["faction", "hazard", "biome", "mission", "difficulty", "squad", "peril"]);
+const WHEN_KEYS = set([
+  "faction", "hazard", "notHazard", "biome", "mission", "difficulty", "squad", "peril",
+  "terrain", "city", "minutes", "weight",
+]);
+
+/* The hazards and biomes a rule may name, from the planet table. A typo
+   in either is a rule that never fires, or for notHazard one that never
+   stops firing. */
+const planetTable = load("planets.json");
+const HAZARDS = set(Object.keys(planetTable.hazards));
+const BIOMES = set(Object.keys(planetTable.biomes));
+
+/* ------------------------------------------------------------------ */
+/* Terrain                                                             */
+/*                                                                     */
+/* Every biome a planet can carry has an entry, null for one nobody     */
+/* has walked, so a new biome from the next wiki fetch stops the build  */
+/* rather than quietly reading as no terrain at all.                   */
+/* ------------------------------------------------------------------ */
+
+const terrainProblems = [];
+const TERRAIN_FIELDS = (vocab.terrain && vocab.terrain.fields) || {};
+if (!vocab.terrain || !vocab.terrain.biomes) terrainProblems.push("vocabulary.json has no terrain table");
+else {
+  if (vocab.terrain.source !== "curator" && vocab.terrain.source !== "wiki") {
+    terrainProblems.push(`terrain declares source ${JSON.stringify(vocab.terrain.source)}, not curator or wiki`);
+  }
+  for (const b of BIOMES) {
+    if (!(b in vocab.terrain.biomes)) terrainProblems.push(`biome ${b} has no terrain entry`);
+  }
+  for (const [b, t] of Object.entries(vocab.terrain.biomes)) {
+    if (!BIOMES.has(b)) terrainProblems.push(`terrain names biome ${b}, which planets.json does not carry`);
+    if (t === null) continue;
+    for (const [field, allowed] of Object.entries(TERRAIN_FIELDS)) {
+      if (!allowed.includes(t[field])) terrainProblems.push(`${b}.${field} is ${JSON.stringify(t[field])}`);
+    }
+  }
+}
+if (terrainProblems.length) fail(`${terrainProblems.length} problem(s) in the terrain table:`, terrainProblems);
+
+/* Every mission minutes value is a whole number of minutes, written by
+   npm run missions, never by hand. */
+const badMinutes = missions.missions
+  .filter((m) => m.minutes !== undefined && !(Number.isInteger(m.minutes) && m.minutes > 0 && m.minutes <= 120))
+  .map((m) => `${m.name}: ${JSON.stringify(m.minutes)}`);
+if (badMinutes.length) fail(`${badMinutes.length} mission(s) with a time limit that is not whole minutes:`, badMinutes);
 
 /* Both rule files. context-rules.json judges one item and build-rules.json
    judges nine of them together, and the two share this much: an id, a
@@ -396,6 +467,26 @@ for (const rule of rules) {
   for (const k of Object.keys(rule.when || {})) {
     if (!WHEN_KEYS.has(k)) ruleProblems.push(`${rule.id} gates on "${k}", which the engine does not read`);
   }
+  const w = rule.when || {};
+  for (const h of [].concat(w.hazard || [], w.notHazard || [])) {
+    if (!HAZARDS.has(h)) ruleProblems.push(`${rule.id} names hazard "${h}", which planets.json does not carry`);
+  }
+  for (const b of [].concat(w.biome || [])) {
+    if (!BIOMES.has(b)) ruleProblems.push(`${rule.id} names biome "${b}", which planets.json does not carry`);
+  }
+  if (w.terrain) {
+    for (const [field, values] of Object.entries(w.terrain)) {
+      const allowed = TERRAIN_FIELDS[field];
+      if (!allowed) ruleProblems.push(`${rule.id} asks about terrain "${field}", which the terrain table does not have`);
+      else for (const v of [].concat(values)) {
+        if (!allowed.includes(v)) ruleProblems.push(`${rule.id} asks for terrain ${field} "${v}", which is not one of ${allowed.join(", ")}`);
+      }
+    }
+  }
+  for (const v of [].concat(w.weight || [])) {
+    if (!["light", "medium", "heavy"].includes(v)) ruleProblems.push(`${rule.id} asks for armour weight "${v}", not light, medium or heavy`);
+  }
+  if (w.city !== undefined && typeof w.city !== "boolean") ruleProblems.push(`${rule.id} gates on city ${JSON.stringify(w.city)}, not true or false`);
 
   /* A mission trait nothing declares, or an armor trait nothing carries,
      makes a rule that can never fire, and nothing would ever say so. */

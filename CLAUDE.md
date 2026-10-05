@@ -380,16 +380,17 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 |---|---|
 | `items.json` | All 247 items. The authority for everything else |
 | `loadouts.json` | 39 curated builds, one readable object each, every slot an id |
-| `armor-sets.json` | All 109 armor sets, keyed by passive id, grouped by weight class |
+| `armor-sets.json` | The 109 armor set names, keyed by passive id, grouped by weight class. The curated index; `armor.json` is the fetched whole |
+| `armor.json` | **Generated** by `npm run armor`. All 110 armour sets: weight, armour, speed, stamina, passive, where each comes from. See Pairings, "Armour sets". Never edit by hand |
 | `warbonds.json` | The 25 gateable warbonds by tier, plus the labels for paths that are never gated |
-| `vocabulary.json` | The shared enums. The app and the validator both read this one so they cannot disagree |
+| `vocabulary.json` | The shared enums. The app and the validator both read this one so they cannot disagree. Since 1.30.0 also the `terrain` table, the curator's reading of each biome's ground |
 | `ownership.json` | What you own. Ships empty |
 | `ownership.template.json` | Every warbond listed as not owned, ready to fill in |
-| `wiki-stats.json` | **Generated.** The stats the tables never had, for 195 items, and since 4 October 2026 a reload time for 90 held weapons, read from each weapon's own wiki infobox. Never edit by hand |
+| `wiki-stats.json` | **Generated.** The stats the tables never had, for 195 items, and since 4 October 2026 a reload time for 91 held weapons and the One Handed trait for 35, read from each weapon's own wiki infobox. Never edit by hand |
 | `planets.json` | **Generated.** 281 planets: biome, hazards, sector, their cities by size, and for 274 of them a place on the galaxy map and the supply lines to their neighbours. Read by the scenario, the map and the drop planner |
 | `enemies.json` | **Generated.** 80 enemies, 594 body parts, each with an armor value, plus the difficulty each enemy starts appearing at. What every penetration figure is measured against. Never edit by hand |
-| `context-rules.json` | The 68 rules that move one item rating, each with a `name` for the Rules page. 20 of them are pairings, which read the rest of the build. Read by `score.js`, checked by `npm run rules`, and the pairings by `npm run builds` |
-| `missions.json` | The 70 missions by the game's names, the fronts each appears on, and the nine traits a rule keys on. Hand kept from the wiki; the names and fronts are the wiki's, the traits are ours |
+| `context-rules.json` | The 104 rules that move one item rating, each with a `name` for the Rules page. 41 of them read the build, pairings and armour weight, and fire only inside one. Read by `score.js`, checked by `npm run rules`, and the pairings by `npm run builds` |
+| `missions.json` | The 70 missions by the game's names, the fronts each appears on, the nine traits a rule keys on, and each one's time limit in `minutes`. Hand kept from the wiki; the names and fronts are the wiki's, the traits are ours, the minutes are written by `npm run missions` |
 | `build-rules.json` | The 9 rules that move a whole build. Read by `build.js`, checked by `npm run builds` |
 | `difficulty.json` | **Generated** by `npm run difficulty` from the table on the wiki's Difficulty page: per level, missions in an operation, medals, objectives, outposts by size, what the level introduces, and the reward multiplier. Read by the war room's difficulty bar through `src/lib/difficulty.js`. Never edit by hand |
 
@@ -428,7 +429,7 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 - **`tags`** is the other curated layer and it is not the same thing as `roles`. A role says what job an item does for a squad. A tag says something a scoring rule needs to ask about that no fetched field answers. Two exist, `long-range` and `suppressed`, and **each declares its own provenance in `vocabulary.json`**: `long-range` is `curator`, `suppressed` is `wiki`. See The Tag Layer.
 - **`flag`** is `"stale"` when the rating predates a confirmed change to that exact item, which requires a `patchNote`, or `"new"` when the item is in the game with no rating yet. **None is stale as of 1.23.0**: the nineteen that were all cleared when u.gg's votes came to postdate the changes, flag and note both set to null. Only the P/40-K Bolt Pistol is `new`. The machinery stays for the next patch.
 - **`effect` versus `note`.** Armor passives and boosters carry an `effect`, which is what the thing actually does. Everything else carries a `note`, which is opinion. They never both appear.
-- **`passive`**, on armor only since 4 October 2026: the effect's percentages as numbers a rule can scale off, `{ "fireResist": 75 }`. Read off the `effect` text, never judged. Every armor carries the object, empty when nothing in it is a number a rule asks about. The keys are a closed list in `validate.mjs` (`PASSIVE_KEYS`), because a misspelt key is a rule that never fires. **Change `effect` and `passive` together.**
+- **`passive`**, on armor only since 4 October 2026: the effect's percentages as numbers a rule can scale off, `{ "fireResist": 75 }`. Read off the `effect` text, never judged. Every armor carries the object, empty when nothing in it is a number a rule asks about. The keys are a closed list in `validate.mjs` (`PASSIVE_KEYS`), because a misspelt key is a rule that never fires. `stimDuration` is in seconds, the rest in percent. **Change `effect` and `passive` together.**
 - **`stats` are sparse, and that is now a gap rather than a principle.** AP, DPS, capacity, demo force, cooldown, uses and medal cost came out of the source tables. Magazine size, spare magazines, fire rate, recoil, reload time, projectile count and stagger were recorded here as **not in any source this project has**. The data spike on 20 August 2026 found all of them published, plus ergonomics, sway, durable damage, stagger, pushback and projectile drag. See `dilas-data-spike.md`. Still leave them absent rather than guessing, but the answer now is to fetch them rather than to shrug.
 
 > [!success] The hot biome gate was firing on weapons with no heat mechanic. Fixed in 1.4.0
@@ -805,8 +806,33 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > [!info] `npm run builds` measures them, not `npm run rules`
 > A pairing never fires on a tier row, so the item check skips them and says so. The build check places every item a pairing is about into 60 seeded random builds, 20 per front, in the gentlest scenario the rule's gate allows, and reports how often it fires: near 0% is a pairing nobody meets, 95% or more is a rule that fires whatever else you bring. All twenty fire; the highest is "a silenced weapon without stealth armour" at 92%, because a random build rarely carries stealth armour, which is the point of it.
 
-> [!todo] Armour weight is the next pairing, and it needs the build to record one
-> The curator wants heavy armour to want the stamina booster, a jump pack or a warp pack, and light armour to want a shield pack. A build records the passive and not the set, so there is no weight to read. Adding one touches the builder, `cleanLoadout`, share links and the party's packed build. Asked about on 4 October 2026, not built.
+> [!success] Round two, 1.30.0, 5 October 2026: the ground, the clock, the city and every armour set
+> The curator asked for more of the "Intelligent": what the planet is like underfoot, how long the mission gives you, whether there is a city, and every armour set with its art. The research and the full list of what was proposed, kept and cut is in the plan he approved; what shipped is here.
+>
+> | New | Where |
+> |---|---|
+> | **Terrain per biome** | `terrain` in `vocabulary.json`: `ground` wet, snow, dry or mixed; `relief` flat, rolling or steep; `driving` easy, normal or rough. **The curator's reading, drafted from his examples and his to correct**; null for a biome nobody has walked. Of the deserts only Rocky Canyons drives rough, his answer. `when.terrain` reads it through the scenario's biome |
+> | **The clock** | `minutes` on every mission, from its wiki article, by `npm run missions`. Eradicate 15, Blitz 12, most others 40. `when.minutes` is a number test |
+> | **The city** | `when.city`: true when the scenario's planet lists a megacity. **A guess, his call**: the mission may be outside the city, so city rules carry half weight and say so |
+> | **No storm** | `when.notHazard`, so Muscle Enhancement's dry ground rule can say "and no sandstorm" |
+> | **One handed** | `wiki.oneHanded`, the game's One Handed trait read from each weapon's infobox by `npm run wiki`. 35 carry it: every sidearm, most SMGs, the Crossbow. The Ballistic Shield reads it |
+> | **Two passive numbers** | `stimDuration` (Med-Kit, Adreno-Defibrillator) and `crouchRecoil` (Fortified, Engineering Kit) |
+> | **Every armour set** | See "Armour sets" below. Weight arrives with the set |
+>
+> `src/lib/place.js` holds the terrain, city and minutes lookups, pure, so `score.js` and the scripts read them. 36 rules came with it, 104 item rules in all: Muscle Enhancement on wet, snowy or stormy ground and down on dry, the Jump Pack up on steep ground and down in a city, the Warp Pack the other way round and up when you are alone (it opens two person bunker doors), FRVs on easy and rough ground, the Orbital Laser on a 15 minute clock, Stamina Enhancement in the heat, Integrated Extinguishers on burning planets and beside your own fire, the Shield Generator Pack in acid storms, sandstorms and blizzards (the bubble keeps them out; **he had not known that**), explosive resistance beside blasts you set off close, Siege-Ready beside a primary that eats ammo, crouched recoil beside a planted weapon (tentative), Vitality with gas armour, Med-Kit with the Stim Pistol, the Ballistic Shield with and without a one handed primary, and nine weight rules. The Rules page files them under **The ground and getting around**, **The mission** and **What it is paired with**.
+>
+> **Cut by the curator, recorded in `knownGaps`**: True Grit worth more solo and team weapons down solo ("nobody team reloads"), Peak Physique with heavy weapons ("they want other passives"), impact mitigation with jump packs and vehicles ("just get good"). **Fire against bots is not a gap**: the wiki has no front wide fire resistance, and the vote already prices flame's range against a front that shoots from afar.
+
+> [!success] Armour sets, 1.30.0. Every one, with its art, the curator's ask
+> `npm run armor` reads every article using the wiki's `Infobox Armor` into `src/data/armor.json` (**generated**): **110 sets**, 30 light, 50 medium, 30 heavy, each with armour, speed, stamina regen, its passive as an item id, and where it comes from. IX-Voidwalker is a helmet alone and is not a set. `npm run armor-art` fetches each render into `Image Library/Armor Sets/` and cuts a 256 pixel WebP, 1.3 MB for all 110; `npm run images` copies them into `src/assets/armor-sets/`, gitignored like all game art. **A set id is a slug of its name and keeps it through a wiki rename**, the old name going into `aliases`, the reference invariant. The validator checks every set id is a slug, never an item id, carries a real passive and a real warbond, and that every passive has at least one set.
+>
+> **The passive is still the rated item.** A build stores the set as `armorSet` beside the passive in `armor`; `cleanLoadout` keeps them agreeing (a set with no passive brings its own, a set with another passive is dropped, the passive stays). **Every build from before, and every preset, has no set and so no weight**, and the weight rules stay silent on them rather than guessing medium. Share links carry it as `w`, the party's packed build as `armorSet`; both clean it on arrival.
+>
+> **The picker** ranks passives exactly as before, and under each passive lists its sets with render, weight and armour / speed / stamina, with a weight filter. Picking a set picks its passive. The slot shows the set's render and name, the passive and the weight's numbers, and the passive's badge.
+>
+> **Sets lock with their warbond.** 62 sets come from a warbond, so a warbond you do not own hides its sets in the picker behind the usual locked toggle, and a build wearing one counts as needing locked gear on Drop Bay and in the Armoury. `buildLockedSet` puts set ids into the locked set beside item ids; **the header counts items only**. Superstore, starter and event sets have no per set lock yet.
+>
+> **Weight reaches the rules on the scenario as `scenario.weight`**, set by `readBuild` and the builder next to `alongside`, never by the tier list. Heavy wants Stamina Enhancement, Dead Sprint and a Jump or Warp Pack; light wants the Shield Generator Pack; heavy is up against bots and down against bugs, light up against bugs (community advice, his medium habit being the question); heavy is down in intense heat; sentries and emplacements are nudged up in heavy. `npm run builds` dresses its pairing hosts in a real set so these are measured: 4% to 27%.
 
 ---
 
@@ -1423,6 +1449,7 @@ It used to be 277 loose files in one directory. It is now sorted, and the import
 | Kind | Count | Notes |
 |---|---|---|
 | Item art | 235 of 247 | Electrical Conduit, and the eleven items added in 1.23.0 |
+| Armour set renders | 110 of 110 | From the wiki by `npm run armor-art`, gitignored. A set with none reads by its initials |
 | Warbond covers | 24 of 25 | 512px cover art. Ironclad Democracy has none, and its Collection tile shows the name alone |
 | Generic | 28 | Skull, faction marks, logos, category and tier badges |
 
@@ -1449,6 +1476,9 @@ npm install
 ```bash
 npm run dev
 ```
+
+> [!info] The dev server takes the port it is given
+> `vite.config.js` reads `PORT` and falls back to 5173, and `.claude/launch.json` sets `autoPort`, so two Claude sessions in this folder each get a dev server. Nothing here depends on the number. Added 5 October 2026, when a second session found 5173 taken.
 
 ```bash
 npm run build
@@ -1489,6 +1519,18 @@ npm run wiki
 ```
 
 Re-fetches the weapon stats and the planet table, and **reports what would change without writing anything**. Add `-- --write` to apply it and `-- --refresh` to go back to the network instead of the cache in `.wiki-cache`. It is deliberately not part of the build: a build that needs the internet is a build that breaks on a train.
+
+```bash
+npm run missions
+```
+
+Reads each mission's time limit from its wiki article into `minutes` in `missions.json`. Report by default, `-- --write` to apply, `-- --refresh` to go back to the network. A mission whose article states no limit keeps none.
+
+```bash
+npm run armor
+```
+
+Reads every armour set into `src/data/armor.json`, the same way. `npm run armor-art` fetches and cuts the renders.
 
 ```bash
 npm run difficulty

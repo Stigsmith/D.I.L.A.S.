@@ -147,6 +147,14 @@
       "say": "Once you have a few drops logged, Drop Bay suggests a build you have not taken in a while, and gear that is good here that you have never brought against that front."
     },
     {
+      "id": "ground-and-armour",
+      "title": "The ground, the clock and every armour set",
+      "status": "shipped",
+      "version": "1.30.0",
+      "track": "solo",
+      "say": "Rules for the ground you land on, the mission's clock and a city nearby, and every armour set in the game with its art and weight, which the rules read too."
+    },
+    {
       "id": "effects",
       "title": "Planet effects in the ratings",
       "status": "next",

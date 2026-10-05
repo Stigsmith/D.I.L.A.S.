@@ -36,7 +36,7 @@ import Account from "./Account.jsx";
 import { ACCOUNTS_LIVE } from "./lib/account.js";
 import TierBadgePlate, { FINISHES } from "./TierBadgePlate.jsx";
 import { useBadgeStyle } from "./lib/badge.js";
-import { CATEGORIES, warbonds } from "./lib/items.js";
+import { CATEGORIES, warbonds, getItem } from "./lib/items.js";
 import { useCollectionState } from "./lib/useCollectionState.js";
 import { useTheme, THEMES } from "./lib/theme.js";
 import { useRoute } from "./lib/router.js";
@@ -510,6 +510,9 @@ function Settings({ theme, setTheme, state, onTour }) {
 
 export default function App() {
   const state = useCollectionState();
+  /* Items only: the locked set also carries the armour sets of warbonds
+     you do not own, and the header has always counted items. */
+  const lockedItemCount = useMemo(() => [...state.lockedSet].filter((id) => getItem(id)).length, [state.lockedSet]);
   const { theme, setTheme } = useTheme();
   const { destination, param, navigate } = useRoute("bay");
   /* Where you are dropping. Faction today, the rest of the scenario next. */
@@ -861,9 +864,9 @@ export default function App() {
                   <Star className="h-3.5 w-3.5 fill-accent-400" />{state.favoriteItems.length} starred
                 </span>
               ) : null}
-              {state.lockedSet.size > 0 ? (
+              {lockedItemCount > 0 ? (
                 <span className="flex items-center gap-1.5 text-accent-500">
-                  <Lock className="h-3.5 w-3.5" />{state.lockedSet.size} locked
+                  <Lock className="h-3.5 w-3.5" />{lockedItemCount} locked
                 </span>
               ) : null}
             </div>

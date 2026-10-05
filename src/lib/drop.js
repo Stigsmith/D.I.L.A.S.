@@ -17,7 +17,7 @@
 /* ================================================================== */
 
 import vocabulary from "../data/vocabulary.json";
-import { deriveHeat, loadoutItemIds, cleanLoadout } from "./loadouts.js";
+import { deriveHeat, loadoutLockIds, cleanLoadout } from "./loadouts.js";
 import { traitsOf } from "./scenario.js";
 import { readBuild, byReading } from "./build.js";
 import { usageOf, itemsDroppedWith, dropsOn, daysSince, ENOUGH_DROPS, STALE_DAYS } from "./history.js";
@@ -127,7 +127,7 @@ export function dropPool(builds, scenario = {}, { lockedSet = new Set(), favorit
     if (l.faction !== scenario.faction) continue;
     const gate = gateOf(l, scenario);
     if (gate) { cut[gate] += 1; continue; }
-    const needsLocked = loadoutItemIds(l).some((id) => lockedSet.has(id));
+    const needsLocked = loadoutLockIds(l).some((id) => lockedSet.has(id));
     if (needsLocked && !showLocked) { cut.locked += 1; continue; }
     if (q && !l.name.toLowerCase().includes(q)) continue;
     shown.push({ ...l, needsLocked });
@@ -209,7 +209,7 @@ export function readDrop(drop, resolve) {
 /* field is the one thing on a shared screen worth not sending.         */
 /* ------------------------------------------------------------------ */
 
-const WIRE_FIELDS = ["id", "name", "faction", "preset", "primary", "secondary", "grenade", "armor", "booster", "strats", "diff", "biomes", "updatedAt"];
+const WIRE_FIELDS = ["id", "name", "faction", "preset", "primary", "secondary", "grenade", "armor", "armorSet", "booster", "strats", "diff", "biomes", "updatedAt"];
 
 export function packBuild(l) {
   if (!l) return null;

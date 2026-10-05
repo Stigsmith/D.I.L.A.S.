@@ -518,6 +518,20 @@ They also stopped being dead weight in the bundle. The eight images were being f
 
 ---
 
+## The ground, the clock and every armour set: done, 5 October 2026
+
+1.30.0. The curator asked for rules about how things work together and where you are, after a research pass over the wiki and community advice: terrain per biome, mission time limits, a megacity guess, every armour set with its art and weight, and 36 rules on top of them. CLAUDE.md, "Pairings", has what shipped and what he cut.
+
+Still open from it:
+
+- **The terrain table is a draft.** Drafted from his examples and the biome descriptions; he corrects it. Only Rocky Canyons among the deserts is rough to drive so far, his answer
+- **Superstore and event sets have no lock of their own.** Sets from a warbond lock with it; a Superstore set needs a per set lock in Collection's Items tab, which touches the profile shape
+- **A party could avoid duplicate boosters before the drop**, not only be warned after: Drop Bay's suggestions in a party could prefer a booster nobody has brought
+- **Held back for a source**: whether Med-Kit lengthens Experimental Infusion, Localization Confusion and squad size, the Hover Pack on steep ground
+- **The city is a guess from the planet.** A real answer needs the scenario to know which part of a planet a mission is on, which nothing publishes
+
+---
+
 ## Smaller items
 
 - **A roll the dice generator in the builder.** A deliberate roll you ask for, that picks something decent without simply taking the top rated item in every slot, plus playstyle options to steer it. Parked until the coverage logic is good enough to make it worth rolling.

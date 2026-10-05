@@ -49,3 +49,6 @@ Image Library/
 # Planet renders from the wiki, fetched by npm run planet-art, copied
 # here from the library. Not kept either.
 src/assets/planets/
+# Armour set renders from the wiki, fetched by npm run armor-art, copied
+# here from the library. Game art, not kept either.
+src/assets/armor-sets/

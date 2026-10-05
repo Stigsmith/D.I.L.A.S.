@@ -1,7 +1,7 @@
 {
   "name": "dilas",
   "private": true,
-  "version": "1.29.0",
+  "version": "1.30.0",
   "author": "Stigsmith",
   "type": "module",
   "scripts": {
@@ -17,6 +17,9 @@
     "preview": "vite preview",
     "wiki": "node scripts/fetch-wiki.mjs",
     "difficulty": "node scripts/fetch-difficulty.mjs",
+    "missions": "node scripts/fetch-missions.mjs",
+    "armor": "node scripts/fetch-armor.mjs",
+    "armor-art": "node scripts/fetch-armor.mjs --art",
     "planet-art": "node scripts/fetch-planet-art.mjs",
     "vehicles": "node scripts/add-vehicles.mjs",
     "rules": "node scripts/check-rules.mjs",

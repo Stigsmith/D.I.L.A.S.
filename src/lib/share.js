@@ -33,7 +33,7 @@ const MAX_NOTE = 280;
    shape, so a later one can be read alongside this one. */
 const KEYS = [
   ["n", "name"], ["f", "faction"], ["p", "primary"], ["s", "secondary"], ["g", "grenade"],
-  ["a", "armor"], ["b", "booster"], ["t", "strats"], ["d", "diff"], ["m", "biomes"], ["o", "blurb"],
+  ["a", "armor"], ["w", "armorSet"], ["b", "booster"], ["t", "strats"], ["d", "diff"], ["m", "biomes"], ["o", "blurb"],
 ];
 
 function toBase64Url(text) {

@@ -9096,7 +9096,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+2 stim capacity, +2.0s stim duration",
-    "passive": {},
+    "passive": {
+      "stimDuration": 2
+    },
     "note": null
   },
   {
@@ -9426,7 +9428,8 @@
     "patchNote": null,
     "effect": "+50% explosive resist, -30% recoil crouched or prone",
     "passive": {
-      "explosiveResist": 50
+      "explosiveResist": 50,
+      "crouchRecoil": 30
     },
     "note": null
   },
@@ -9534,7 +9537,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "-30% recoil crouched or prone, +2 throwables capacity",
-    "passive": {},
+    "passive": {
+      "crouchRecoil": 30
+    },
     "note": null
   },
   {
@@ -10134,7 +10139,8 @@
     "patchNote": null,
     "effect": "Revive on death if body intact then timed death, +2.0s stim duration, +50% electrical resist",
     "passive": {
-      "arcResist": 50
+      "arcResist": 50,
+      "stimDuration": 2
     },
     "note": null
   },

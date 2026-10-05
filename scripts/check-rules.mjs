@@ -23,6 +23,8 @@
 import { score, items, readJson, read, FACTIONS } from "./lib/app.mjs";
 
 const MISSIONS = readJson("src/data/missions.json");
+const PLANETS = readJson("src/data/planets.json");
+const TERRAIN = readJson("src/data/vocabulary.json").terrain;
 const ITEMS = items.items;
 const RULES = readJson("src/data/context-rules.json").rules;
 const RANK = { "S+": 6, S: 5, A: 4, B: 3, C: 2, D: 1 };
@@ -34,13 +36,30 @@ function scenariosFor(rule) {
   const when = rule.when || {};
   const factions = when.faction || FACTIONS;
   const hazards = when.hazard || [];
-  const biome = (when.biome || [])[0] || null;
-  /* Mission rules key on traits. Pick a real mission carrying the first  */
-  /* trait the rule wants, so the sample is a mission that exists.        */
+  let biome = (when.biome || [])[0] || null;
+  /* A terrain rule needs a biome whose ground answers it: the first one in
+     the table that matches every field the rule asks about. */
+  if (!biome && when.terrain) {
+    const hit = Object.entries(TERRAIN.biomes).find(
+      ([, t]) => t && Object.entries(when.terrain).every(([field, values]) => [].concat(values).includes(t[field]))
+    );
+    biome = hit ? hit[0] : null;
+  }
+  /* A city rule needs a planet that has a megacity, or one that has none. */
+  let planet = null;
+  if (when.city !== undefined) {
+    const hit = PLANETS.planets.find((p) => Boolean(p.cities && p.cities.megacity > 0) === when.city);
+    planet = hit ? hit.name : null;
+  }
+  /* Mission rules key on traits, and clock rules on minutes. Pick a real
+     mission answering both, so the sample is a mission that exists. */
   let mission = null;
-  if (when.mission) {
-    const want = when.mission;
-    const hit = MISSIONS.missions.find((m) => m.traits.some((t) => want.includes(t)));
+  if (when.mission || when.minutes) {
+    const hit = MISSIONS.missions.find(
+      (m) =>
+        (!when.mission || m.traits.some((t) => when.mission.includes(t))) &&
+        (!when.minutes || (typeof m.minutes === "number" && score.numberTest(m.minutes, when.minutes)))
+    );
     mission = hit ? hit.name : null;
   }
   /* A rule that asks about difficulty or squad size cannot fire against  */
@@ -100,13 +119,15 @@ function scenariosFor(rule) {
     squad = 1;
   }
 
-  return factions.map((faction) => ({ faction, hazards, biome, mission, difficulty, squad }));
+  return factions.map((faction) => ({ faction, hazards, biome, planet, mission, difficulty, squad }));
 }
 
 /* A pairing fires only inside a build, so a tier row can never show one
    and measuring it here would report every one as dead. npm run builds
    measures them, each subject placed in random builds. */
-const isPairing = (rule) => JSON.stringify(rule.match || {}).match(/"(?:not)?[aA]longside"/);
+/* A rule about armour weight reads the set a build wears, so it is build
+   only in the same way. */
+const isPairing = (rule) => JSON.stringify(rule.match || {}).match(/"(?:not)?[aA]longside"/) || (rule.when && rule.when.weight);
 const PAIRINGS = RULES.filter(isPairing);
 
 const rows = [];

@@ -417,6 +417,7 @@ async function articles(titles) {
 /* Article titles that are not the item's name. */
 const ARTICLE_TITLES = {
   "m6c-socom": "M6C/SOCOM Pistol",
+  "cb-9-explosive-crossbow": "CB-9 Exploding Crossbow",
 };
 
 /* "4.65s<br>4.2s (Upgraded)<br>2.1s (Assisted)" is the base reload, then */
@@ -437,6 +438,7 @@ async function weaponReloads(items) {
   for (const it of items) byTitle.set(ARTICLE_TITLES[it.id] || it.name, it.id);
   const titles = [...byTitle.keys()];
   const out = {};
+  const oneHanded = new Set();
   /* Weapon articles are long, and past a size limit the API answers a     */
   /* batch with the text of only some of its pages and a continue token.   */
   /* Ten at a time stays under it; a batch that still comes back short is   */
@@ -478,11 +480,16 @@ async function weaponReloads(items) {
       /* Whether the reload roots you to the spot. The data module tags only
          some of them; the infobox traits name the backpack fed ones too, the
          Autocannon, Recoilless, Spear and W.A.S.P. among them. */
-      const stationary = /stationary reload/i.test(`${field("traits") || ""} ${field("weapon_traits") || ""}`);
+      const traits = `${field("traits") || ""} ${field("weapon_traits") || ""}`;
+      const stationary = /stationary reload/i.test(traits);
       if (seconds) out[id] = { seconds, perRound: magazine === null, stationary };
+      /* The game's One Handed trait: what the Ballistic Shield needs in the
+         other hand. Every sidearm, most SMGs, the Crossbow. Written "One
+         Handed" and "One-Handed" by different articles. */
+      if (/one[\s-]handed/i.test(traits)) oneHanded.add(id);
     }
   }
-  return out;
+  return { reloads: out, oneHanded };
 }
 
 /* The wiki writes health as 1,800, durability as 60%, and a health that  */
@@ -733,7 +740,7 @@ async function main() {
 
   /* Reload times, from each held weapon's own article. Only onto items   */
   /* the data module already matched, so a reload never arrives alone.    */
-  const reloads = await weaponReloads(
+  const { reloads, oneHanded } = await weaponReloads(
     wanted.filter((i) => stats[i.id] && (i.slot === "primary" || i.slot === "secondary" || i.stratType === "support"))
   );
   for (const [id, reload] of Object.entries(reloads)) {
@@ -743,6 +750,9 @@ async function main() {
     if ((stats[id].tags || []).includes("STATIONARY RELOAD")) reload.stationary = true;
     stats[id].reload = reload;
   }
+  /* Added 4 October 2026, for the Ballistic Shield. Only ever true: an
+     article that does not say One Handed leaves the field absent. */
+  for (const id of oneHanded) stats[id].oneHanded = true;
 
   const expected = missing.filter((m) => NO_SOURCE_YET.test(m.name));
   const surprises = missing.filter((m) => !NO_SOURCE_YET.test(m.name));
@@ -859,6 +869,7 @@ async function main() {
   call-ins  ${withCode} with an input code, ${withCooldown} with a cooldown`);
   console.log(`  tags      ${withTags} carry the game own tags`);
   console.log(`  reload    ${Object.keys(reloads).length} carry a reload time from their article`);
+  console.log(`  one hand  ${oneHanded.size} carry the One Handed trait`);
   console.log(`\n  heat      ${vents.length} items actually vent heat`);
   console.log(`            ${flaggedThermal.length} are flagged thermal by damageType`);
   if (wrongly.length) {

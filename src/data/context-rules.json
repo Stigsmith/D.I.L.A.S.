@@ -1627,6 +1627,774 @@
         "clamp": 6
       },
       "judgement": "Ours. Servo-Assisted throws 30% further, Desert Stormer 20%. Fires only inside a build."
+    },
+    {
+      "id": "muscle-enhancement-wet-or-snowy-ground",
+      "name": "Muscle Enhancement where the ground drags at you",
+      "when": {
+        "terrain": {
+          "ground": [
+            "wet",
+            "snow"
+          ]
+        }
+      },
+      "match": {
+        "idIn": [
+          "muscle-enhancement"
+        ]
+      },
+      "delta": 10,
+      "say": "Water, mud, deep undergrowth or snow slow you down on this planet, and this booster takes most of that drag away.",
+      "source": "helldivers.wiki.gg, Muscle Enhancement: it reduces the slow from water, snow, mud, foliage, sandstorms, blizzards and barbed wire",
+      "judgement": "The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+    },
+    {
+      "id": "muscle-enhancement-in-storms",
+      "name": "Muscle Enhancement in sandstorms and blizzards",
+      "when": {
+        "hazard": [
+          "sandstorms",
+          "blizzards"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "muscle-enhancement"
+        ]
+      },
+      "delta": 6,
+      "say": "Sandstorms and blizzards slow you as well as blind you, and this booster takes the slow off.",
+      "source": "helldivers.wiki.gg, Muscle Enhancement, and the hazard text: both storms reduce mobility"
+    },
+    {
+      "id": "muscle-enhancement-dry-ground",
+      "name": "Muscle Enhancement on dry ground with no storm",
+      "when": {
+        "terrain": {
+          "ground": [
+            "dry"
+          ]
+        },
+        "notHazard": [
+          "sandstorms",
+          "blizzards"
+        ],
+        "faction": [
+          "bots",
+          "squids"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "muscle-enhancement"
+        ]
+      },
+      "delta": -10,
+      "say": "Dry, firm ground and no storm. This booster does nothing on sand, slopes or climbing, so here it is a slot spent on nothing.",
+      "source": "helldivers.wiki.gg, Muscle Enhancement: no benefit whatsoever on sand without weather, inclines, vaulting or tremors",
+      "judgement": "The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+    },
+    {
+      "id": "muscle-enhancement-dry-ground-bugs",
+      "name": "Muscle Enhancement on dry ground against the Terminids",
+      "when": {
+        "terrain": {
+          "ground": [
+            "dry"
+          ]
+        },
+        "notHazard": [
+          "sandstorms",
+          "blizzards"
+        ],
+        "faction": [
+          "bugs"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "muscle-enhancement"
+        ]
+      },
+      "delta": -4,
+      "say": "Dry ground and no storm, so the terrain half of this booster does nothing here. It still shortens the slow from bug acid, which is why it loses less on this front.",
+      "source": "helldivers.wiki.gg, Muscle Enhancement: it also covers acid from Terminid attacks and Bug Mine explosions",
+      "judgement": "The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+    },
+    {
+      "id": "jump-pack-steep-ground",
+      "name": "The Jump Pack on steep ground",
+      "when": {
+        "terrain": {
+          "relief": [
+            "steep"
+          ]
+        }
+      },
+      "match": {
+        "idIn": [
+          "lift-850-jump-pack"
+        ]
+      },
+      "delta": 8,
+      "say": "Steep ground, and the Jump Pack's landing thrusters cancel fall damage, so a cliff is a shortcut rather than a death.",
+      "source": "helldivers.wiki.gg, LIFT-850 Jump Pack: no fall damage when the landing thrusters engage",
+      "judgement": "The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+    },
+    {
+      "id": "warp-pack-steep-ground",
+      "name": "The Warp Pack on steep ground",
+      "when": {
+        "terrain": {
+          "relief": [
+            "steep"
+          ]
+        }
+      },
+      "match": {
+        "idIn": [
+          "lift-182-warp-pack"
+        ]
+      },
+      "delta": -8,
+      "say": "Steep ground. The Warp Pack carries you ten metres straight ahead and leaves you wherever that is, mid-air included, and nothing breaks the fall.",
+      "source": "helldivers.wiki.gg, LIFT-182 Warp Pack: a Helldiver warping in mid-air stays in mid-air and falls, potentially taking damage",
+      "judgement": "The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+    },
+    {
+      "id": "frv-easy-ground",
+      "name": "FRVs on open, even ground",
+      "when": {
+        "terrain": {
+          "driving": [
+            "easy"
+          ]
+        }
+      },
+      "match": {
+        "idIn": [
+          "m-102-gunner-frv",
+          "m-103-supply-frv",
+          "m-104-incinerator-frv"
+        ]
+      },
+      "delta": 8,
+      "say": "Open, even ground, where the FRV is fast and stays on its wheels.",
+      "judgement": "The curator's, from play: an oasis map drove easily. The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+    },
+    {
+      "id": "frv-rough-ground",
+      "name": "FRVs on broken, rocky or icy ground",
+      "when": {
+        "terrain": {
+          "driving": [
+            "rough"
+          ]
+        }
+      },
+      "match": {
+        "idIn": [
+          "m-102-gunner-frv",
+          "m-103-supply-frv",
+          "m-104-incinerator-frv"
+        ]
+      },
+      "delta": -10,
+      "say": "Broken, rocky or icy ground, where the FRV flips on a ledge it should have cleared and you end up walking anyway.",
+      "judgement": "The curator's, from play: snow, volcanic, rocky canyon and highland planets drive badly. Players on Steam report the same, that a small rise can roll it. The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+    },
+    {
+      "id": "jump-pack-in-a-city",
+      "name": "The Jump Pack between buildings",
+      "when": {
+        "city": true
+      },
+      "match": {
+        "idIn": [
+          "lift-850-jump-pack"
+        ]
+      },
+      "delta": -5,
+      "say": "This planet has a megacity, so odds are you fight between buildings, and clipping one mid-jump ragdolls you and costs you the seconds you jumped to save.",
+      "judgement": "The curator's call from play, 4 October 2026. Some community advice disagrees and favours fighting from the rooftops; his play wins here and that view is recorded. A guess: the planet has a megacity, which does not mean this mission is in it, so this carries about half the weight a sure fact would."
+    },
+    {
+      "id": "warp-pack-in-a-city",
+      "name": "The Warp Pack between buildings",
+      "when": {
+        "city": true
+      },
+      "match": {
+        "idIn": [
+          "lift-182-warp-pack"
+        ]
+      },
+      "delta": 5,
+      "say": "This planet has a megacity, so odds are you fight between buildings, and the Warp Pack goes through walls where everything else has to go round.",
+      "source": "helldivers.wiki.gg, LIFT-182 Warp Pack: it bypasses terrain, buildings, enemies and bunker doors",
+      "judgement": "A guess: the planet has a megacity, which does not mean this mission is in it, so this carries about half the weight a sure fact would."
+    },
+    {
+      "id": "warp-pack-alone",
+      "name": "The Warp Pack when you are alone",
+      "when": {
+        "squad": {
+          "lte": 1
+        }
+      },
+      "match": {
+        "idIn": [
+          "lift-182-warp-pack"
+        ]
+      },
+      "delta": 8,
+      "say": "Alone, a two person bunker door is shut to you. The Warp Pack goes straight through it.",
+      "source": "helldivers.wiki.gg, Bunker: two Helldivers press a button each, or one uses the Warp Pack to bypass the door"
+    },
+    {
+      "id": "orbital-laser-short-clock",
+      "name": "The Orbital Laser on a short mission",
+      "when": {
+        "minutes": {
+          "lte": 15
+        }
+      },
+      "match": {
+        "idIn": [
+          "orbital-laser"
+        ]
+      },
+      "delta": 8,
+      "say": "Three uses, five minutes apart. On a clock this short you throw every one of them, each clearing a base while you run for the next.",
+      "source": "helldivers.wiki.gg, Orbital Laser: 3 uses, 300 second cooldown. Time limits from each mission's article, read by npm run missions",
+      "judgement": "The curator's, 4 October 2026: on a forty minute mission the three are gone halfway through."
+    },
+    {
+      "id": "stamina-enhancement-in-the-heat",
+      "name": "Stamina Enhancement on a hot planet",
+      "when": {
+        "hazard": [
+          "intense_heat"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "stamina-enhancement"
+        ]
+      },
+      "delta": 8,
+      "say": "Intense heat halves your stamina, and this booster's extra capacity and faster recovery win a good part of it back.",
+      "source": "helldivers.wiki.gg, Stamina Enhancement: +22.5% max stamina and +40% regen; Intense Heat halves max stamina"
+    },
+    {
+      "id": "extinguishers-on-burning-planets",
+      "name": "Integrated Extinguishers where the planet burns",
+      "when": {
+        "hazard": [
+          "fire_tornadoes",
+          "volcanic_activity"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "integrated-extinguishers"
+        ]
+      },
+      "delta": 6,
+      "say": "This planet sets people on fire whether or not anybody brought any, and this booster puts you out sooner.",
+      "source": "The booster's own text, and the hazard text: fire tornadoes, and volcanoes throwing burning rocks",
+      "judgement": "Ours."
+    },
+    {
+      "id": "shield-pack-keeps-out-storms",
+      "name": "The Shield Generator Pack in acid storms, sandstorms and blizzards",
+      "when": {
+        "hazard": [
+          "acid_storms",
+          "sandstorms",
+          "blizzards"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "sh-32-shield-generator-pack"
+        ]
+      },
+      "delta": 6,
+      "say": "While it holds, the bubble also keeps out acid storms, sandstorms and blizzards. It does nothing about fire or gas.",
+      "source": "helldivers.wiki.gg, SH-32 Shield Generator Pack: blocks blizzards, sandstorms, acid storms and acid splash; not fire or gas"
+    },
+    {
+      "id": "extinguishers-with-own-fire",
+      "name": "Integrated Extinguishers with the fire you brought",
+      "when": {},
+      "match": {
+        "idIn": [
+          "integrated-extinguishers"
+        ],
+        "alongside": {
+          "damageType": [
+            "fire"
+          ],
+          "slot": [
+            "primary",
+            "secondary",
+            "stratagem"
+          ]
+        }
+      },
+      "delta": 6,
+      "say": "You brought fire, and sooner or later you stand in it. This puts you out faster.",
+      "source": "The booster's own text",
+      "judgement": "Ours. Throwables do not count: a thermite grenade is anti-tank, not a fire kit. Fires only inside a build."
+    },
+    {
+      "id": "explosive-resist-with-close-blasts",
+      "name": "Explosive resistance with blasts you set off close",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.explosiveResist",
+            "gte": 1
+          }
+        ],
+        "alongside": {
+          "idIn": [
+            "gl-21-grenade-launcher",
+            "r-36-eruptor",
+            "gp-20-ultimatum",
+            "gp-31-grenade-pistol",
+            "cb-9-explosive-crossbow",
+            "gl-28-belt-fed-grenade-launcher"
+          ]
+        }
+      },
+      "scaleBy": {
+        "path": "passive.explosiveResist",
+        "from": 0,
+        "times": 0.16,
+        "clamp": 10
+      },
+      "say": "You are bringing something that goes off close to you. A Helldiver already takes half of explosion damage, and this armour halves what is left.",
+      "source": "helldivers.wiki.gg: Helldivers take 50% of explosion damage. The passive's own effect, read as a number",
+      "judgement": "Named by hand: nothing published marks a weapon as one you set off close. The curator agreed the pairing, 4 October 2026. Fires only inside a build."
+    },
+    {
+      "id": "close-blasts-with-explosive-resist",
+      "name": "Close blasts with explosion resistant armour",
+      "when": {},
+      "match": {
+        "idIn": [
+          "gl-21-grenade-launcher",
+          "r-36-eruptor",
+          "gp-20-ultimatum",
+          "gp-31-grenade-pistol",
+          "cb-9-explosive-crossbow",
+          "gl-28-belt-fed-grenade-launcher"
+        ],
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.explosiveResist",
+              "gte": 25
+            }
+          ]
+        }
+      },
+      "scaleBy": {
+        "path": "alongside.passive.explosiveResist",
+        "from": 0,
+        "times": 0.08,
+        "clamp": 6
+      },
+      "say": "Your armour takes most of the sting out of your own blast, so you can use this closer than you otherwise would dare.",
+      "source": "helldivers.wiki.gg: Helldivers take 50% of explosion damage",
+      "judgement": "Named by hand, as its mirror. Fires only inside a build."
+    },
+    {
+      "id": "faster-primary-reload-with-hungry-primary",
+      "name": "A primary reload passive with a primary that eats ammo",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.primaryReload",
+            "gte": 1
+          }
+        ],
+        "alongside": {
+          "slot": "primary",
+          "anyOf": [
+            {
+              "wiki.reload.perRound": true
+            },
+            {
+              "number": [
+                {
+                  "path": "wiki.reload.seconds",
+                  "gte": 3.6
+                }
+              ]
+            },
+            {
+              "category": [
+                "Shotgun"
+              ]
+            }
+          ]
+        }
+      },
+      "delta": 8,
+      "say": "Your primary spends a long time reloading, or reloads a shell at a time, and this armour gets it done sooner.",
+      "source": "The passive's own effect. Reload times from each weapon's wiki infobox",
+      "judgement": "The curator's pairing, 4 October 2026, with the Eruptor and the shotguns as his examples. Long means 3.6 seconds or more, a round by round reload, or a shotgun. Fires only inside a build."
+    },
+    {
+      "id": "hungry-primary-with-faster-reload",
+      "name": "A primary that eats ammo with a primary reload passive",
+      "when": {},
+      "match": {
+        "slot": "primary",
+        "anyOf": [
+          {
+            "wiki.reload.perRound": true
+          },
+          {
+            "number": [
+              {
+                "path": "wiki.reload.seconds",
+                "gte": 3.6
+              }
+            ]
+          },
+          {
+            "category": [
+              "Shotgun"
+            ]
+          }
+        ],
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.primaryReload",
+              "gte": 1
+            }
+          ]
+        }
+      },
+      "delta": 5,
+      "say": "Your armour cuts this weapon's long reload, which is the part of it that gets you killed.",
+      "judgement": "Ours, the mirror of the above. Fires only inside a build."
+    },
+    {
+      "id": "crouch-recoil-with-planted-weapons",
+      "name": "Crouched recoil reduction with a weapon you fire planted",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.crouchRecoil",
+            "gte": 1
+          }
+        ],
+        "alongside": {
+          "idIn": [
+            "mg-43-machine-gun",
+            "mg-206-heavy-machine-gun",
+            "ac-8-autocannon",
+            "apw-1-anti-materiel-rifle",
+            "las-98-laser-cannon"
+          ]
+        }
+      },
+      "delta": 4,
+      "say": "You brought a weapon you fire from a crouch or prone anyway, and this armour cuts the recoil in exactly that stance.",
+      "source": "The passive's own effect: -30% recoil crouched or prone",
+      "judgement": "Tentative, and the curator was not sure of it, 4 October 2026. He added the Autocannon. Named by hand. Fires only inside a build."
+    },
+    {
+      "id": "vitality-with-gas-resistant-armour",
+      "name": "Vitality Enhancement with gas resistant armour",
+      "when": {},
+      "match": {
+        "idIn": [
+          "vitality-enhancement"
+        ],
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.gasResist",
+              "gte": 50
+            }
+          ]
+        }
+      },
+      "delta": 6,
+      "say": "Your armour already shrugs off most gas, and this booster's resistance closes the rest: together you can stand in your own cloud.",
+      "source": "helldivers.wiki.gg, Orbital Gas Strike: Advanced Filtration with Vitality Enhancement makes a Helldiver immune to gas",
+      "judgement": "Ours. Fires only inside a build."
+    },
+    {
+      "id": "stim-pistol-with-longer-stims",
+      "name": "The Stim Pistol with armour that lengthens stims",
+      "when": {},
+      "match": {
+        "idIn": [
+          "p-11-stim-pistol"
+        ],
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.stimDuration",
+              "gte": 1
+            }
+          ]
+        }
+      },
+      "delta": 6,
+      "say": "Your armour adds two seconds to every stim, and that reaches the stims this pistol fires into your squad as well.",
+      "source": "helldivers.wiki.gg, Med-Kit: the longer stim duration extends to the P-11 Stim Pistol",
+      "judgement": "Fires only inside a build."
+    },
+    {
+      "id": "longer-stims-with-stim-pistol",
+      "name": "Armour that lengthens stims with the Stim Pistol",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.stimDuration",
+            "gte": 1
+          }
+        ],
+        "alongside": {
+          "idIn": [
+            "p-11-stim-pistol"
+          ]
+        }
+      },
+      "delta": 6,
+      "say": "You brought the Stim Pistol, so the two extra seconds on every stim reach your whole squad, not only you.",
+      "source": "helldivers.wiki.gg, Med-Kit",
+      "judgement": "Fires only inside a build."
+    },
+    {
+      "id": "ballistic-shield-with-one-hand-free",
+      "name": "The Ballistic Shield with a one handed primary",
+      "when": {},
+      "match": {
+        "idIn": [
+          "sh-20-ballistic-shield"
+        ],
+        "alongside": {
+          "slot": "primary",
+          "wiki.oneHanded": true
+        }
+      },
+      "delta": 8,
+      "say": "The shield takes one hand, and your primary needs only the other, so you keep fighting with it behind the shield.",
+      "source": "helldivers.wiki.gg, Ballistic Shield Backpack: it needs a weapon with the One Handed trait. The trait from each weapon's infobox",
+      "judgement": "Fires only inside a build."
+    },
+    {
+      "id": "ballistic-shield-with-two-handed-primary",
+      "name": "The Ballistic Shield with a two handed primary",
+      "when": {},
+      "match": {
+        "idIn": [
+          "sh-20-ballistic-shield"
+        ],
+        "notAlongside": {
+          "slot": "primary",
+          "wiki.oneHanded": true
+        }
+      },
+      "delta": -8,
+      "say": "The shield takes one hand, and your primary needs two, so with the shield up you fight with your sidearm.",
+      "source": "helldivers.wiki.gg, Ballistic Shield Backpack",
+      "judgement": "Fires only inside a build, and on a build with no primary yet it fires too, which is the honest reading of what you could hold."
+    },
+    {
+      "id": "one-handed-primary-with-ballistic-shield",
+      "name": "A one handed primary with the Ballistic Shield",
+      "when": {},
+      "match": {
+        "slot": "primary",
+        "wiki.oneHanded": true,
+        "alongside": {
+          "idIn": [
+            "sh-20-ballistic-shield"
+          ]
+        }
+      },
+      "delta": 5,
+      "say": "One hand on this, the other on the shield: you get to fight and stay covered at once.",
+      "source": "helldivers.wiki.gg, Ballistic Shield Backpack",
+      "judgement": "Fires only inside a build."
+    },
+    {
+      "id": "heavy-armour-wants-stamina",
+      "name": "Stamina Enhancement in heavy armour",
+      "when": {
+        "weight": [
+          "heavy"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "stamina-enhancement"
+        ]
+      },
+      "delta": 8,
+      "say": "You are in heavy armour, which recovers stamina at half the rate of medium. This booster's faster recovery and deeper reserve win a lot of that back.",
+      "source": "helldivers.wiki.gg, Stamina Enhancement: +22.5% max stamina, +40% regen. Armor: heavy regen 50 against medium 100",
+      "judgement": "The curator's pairing, 4 October 2026. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+    },
+    {
+      "id": "heavy-armour-wants-dead-sprint",
+      "name": "Dead Sprint in heavy armour",
+      "when": {
+        "weight": [
+          "heavy"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "dead-sprint"
+        ]
+      },
+      "delta": 5,
+      "say": "Heavy armour runs out of stamina first, and this lets you keep running when it does, at the cost of health.",
+      "judgement": "Ours, after the curator's point that heavy armour wants something for its legs. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+    },
+    {
+      "id": "heavy-armour-wants-a-pack-that-moves-you",
+      "name": "The Jump or Warp Pack in heavy armour",
+      "when": {
+        "weight": [
+          "heavy"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "lift-850-jump-pack",
+          "lift-182-warp-pack"
+        ]
+      },
+      "delta": 6,
+      "say": "Heavy armour is the slowest thing you can wear, and this pack covers ground your legs cannot.",
+      "judgement": "The curator's pairing, 4 October 2026. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+    },
+    {
+      "id": "light-armour-wants-the-bubble",
+      "name": "The Shield Generator Pack in light armour",
+      "when": {
+        "weight": [
+          "light"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "sh-32-shield-generator-pack"
+        ]
+      },
+      "delta": 6,
+      "say": "Light armour leaves little between you and a hit, and the bubble takes the first 150 points of it from every side.",
+      "source": "helldivers.wiki.gg, SH-32 Shield Generator Pack: 150 shield health, 360 degrees",
+      "judgement": "The curator's pairing, 4 October 2026. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+    },
+    {
+      "id": "heavy-armour-against-the-bots",
+      "name": "Heavy armour against the Automatons",
+      "when": {
+        "weight": [
+          "heavy"
+        ],
+        "faction": [
+          "bots"
+        ]
+      },
+      "match": {
+        "slot": "armor"
+      },
+      "delta": 6,
+      "say": "Against a front that shoots, a heavy set soaks the small arms fire and the stray rocket that would have put you down.",
+      "judgement": "Community advice, read on Steam on 4 October 2026: heavy for bots, light for bugs, medium either way. The curator wears medium by habit and asked whether that is right. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+    },
+    {
+      "id": "heavy-armour-against-the-bugs",
+      "name": "Heavy armour against the Terminids",
+      "when": {
+        "weight": [
+          "heavy"
+        ],
+        "faction": [
+          "bugs"
+        ]
+      },
+      "match": {
+        "slot": "armor"
+      },
+      "delta": -6,
+      "say": "Bugs are dodged, not soaked: a Spewer or a Titan hits through any rating, and heavy armour is too slow to get out of the way.",
+      "judgement": "Community advice, read on Steam on 4 October 2026. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+    },
+    {
+      "id": "light-armour-against-the-bugs",
+      "name": "Light armour against the Terminids",
+      "when": {
+        "weight": [
+          "light"
+        ],
+        "faction": [
+          "bugs"
+        ]
+      },
+      "match": {
+        "slot": "armor"
+      },
+      "delta": 4,
+      "say": "Against bugs the speed is the armour: what cannot catch you cannot hurt you.",
+      "judgement": "Community advice, read on Steam on 4 October 2026, and a 304 mission survey reported in the press in which 70% of players wore light. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+    },
+    {
+      "id": "heavy-armour-in-the-heat",
+      "name": "Heavy armour on a hot planet",
+      "when": {
+        "weight": [
+          "heavy"
+        ],
+        "hazard": [
+          "intense_heat"
+        ]
+      },
+      "match": {
+        "slot": "armor"
+      },
+      "delta": -6,
+      "say": "Intense heat halves your stamina, and heavy armour already recovers it at half the medium rate. Here you will be walking.",
+      "source": "helldivers.wiki.gg, Stamina Enhancement: Intense Heat halves max stamina",
+      "judgement": "Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+    },
+    {
+      "id": "heavy-armour-holds-a-position",
+      "name": "Sentries and emplacements in heavy armour",
+      "when": {
+        "weight": [
+          "heavy"
+        ]
+      },
+      "match": {
+        "stratType": [
+          "sentry",
+          "emplacement"
+        ]
+      },
+      "delta": 3,
+      "say": "Heavy armour is built for holding ground, and these are built to be held next to.",
+      "judgement": "Community: of 304 missions logged in a survey reported in the press, three quarters of heavy armour players ran three turrets. A nudge. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
     }
   ],
   "knownGaps": [
@@ -1640,6 +2408,9 @@
     "The negative half is used once. easy-drop-wastes-stealth-armour takes up to half a tier off stealth passives below zero peril. The old inverted halves, silenced weapons marked down and loud ones lifted on an easy drop, were removed on 4 October 2026: not needing stealth is not a reason to mark it down. Nothing yet says that anti tank at difficulty 3 is firepower for an enemy that does not spawn.",
     "A rule scaling off peril must not name a squad size in its say. Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] and depth reaches it as readily as being alone does, so four players on Super Helldive sit at 30. All three bot peril rules shipped in 1.19.0 asserting the reader was outnumbered, and their inverted halves asserted the reader was not, both on a figure that says neither. Fixed on 22 August 2026 by describing the pressure instead. Nothing about how a squad size might get its own wording is solved here; the rule simply may not claim one it did not check.",
     "Pairing rules, those with an alongside or notAlongside clause, read the rest of the build and so never fire on a tier row. They show in the builder's picker and slots and on every build's parts. Twenty since 4 October 2026: stealth, True Grit, Gunslinger, melee, fire, arc and gas resistance, and C4 with throw range. npm run builds measures them by placing each subject in 60 random builds.",
-    "Armour weight is not modelled. A build records the passive and not the set, so light, medium and heavy armour, and what they want beside them (stamina boosters, jump packs and warp packs for heavy, a shield pack for light), cannot be read. The curator asked for it on 4 October 2026. It needs a weight on the build, which touches the builder, share links and the party."
+    "Considered and cut by the curator on 4 October 2026, recorded so nobody rebuilds them. True Grit worth more solo, and team weapons marked down solo: the wiki says assisted reloads skip True Grit and team weapons are built for a loader, but in practice nobody team reloads, so neither changes what is worth bringing. Peak Physique paired with low ergonomics support weapons: the +30 ergonomics is real, but those weapons are better served by other passives. Kinetic Displacement or Blunt Force Mitigation paired with a Jump Pack or a vehicle: nobody should pick a passive to soften their own bad landings.",
+    "Held back for want of a source, 4 October 2026: whether Med-Kit's longer stims also lengthen Experimental Infusion, whether Localization Confusion matters more for a small squad, and how the Hover Pack fares on steep ground. Fire against the Automatons is not a gap: the wiki gives no front wide fire resistance, and the vote already prices flame's short range against a front that shoots from far away.",
+    "The city rules guess from the planet: a planet with a megacity reads as a city fight wherever the mission actually is. The scenario does not know which part of a planet a mission is on, so those rules carry half weight and say they are a guess.",
+    "Armour weight comes from the set a build wears, since 4 October 2026, and every build made before then, and every preset, has no set and so no weight. The weight rules stay silent on those rather than guessing medium, the same contract as an unset difficulty."
   ]
 }

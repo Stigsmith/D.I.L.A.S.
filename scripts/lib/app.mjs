@@ -55,13 +55,19 @@ const scenarioUrl = asModule(
    export const traitsOf = (n) => (byName.get(n) || { traits: [] }).traits;`
 );
 
+const placeUrl = asModule(inlineJson(read("src/lib/place.js"), "planets", "missions", "vocabulary"));
+
+const armorUrl = asModule(inlineJson(read("src/lib/armor.js"), "armor"));
+
 let src = inlineJson(read("src/lib/loadouts.js"), "loadouts");
+src = swap(src, "armor", armorUrl);
 const loadoutsUrl = asModule(swap(src, "items", itemsUrl));
 
 src = inlineJson(read("src/lib/score.js"), "context-rules");
 src = swap(src, "items", itemsUrl);
 src = swap(src, "loadouts", loadoutsUrl);
 src = swap(src, "scenario", scenarioUrl);
+src = swap(src, "place", placeUrl);
 const scoreUrl = asModule(swap(src, "enemies", enemiesUrl));
 
 src = swap(read("src/lib/squad.js"), "items", itemsUrl);
@@ -73,6 +79,7 @@ src = swap(src, "items", itemsUrl);
 src = swap(src, "loadouts", loadoutsUrl);
 src = swap(src, "score", scoreUrl);
 src = swap(src, "squad", squadUrl);
+src = swap(src, "armor", armorUrl);
 const buildUrl = asModule(swap(src, "enemies", enemiesUrl));
 
 const historyUrl = asModule(swap(read("src/lib/history.js"), "loadouts", loadoutsUrl));
@@ -96,6 +103,8 @@ const galaxyUrl = asModule(inlineJson(read("src/lib/galaxy.js"), "planets"));
 const difficultyUrl = asModule(inlineJson(read("src/lib/difficulty.js"), "difficulty"));
 
 export const items = await import(itemsUrl);
+export const place = await import(placeUrl);
+export const armor = await import(armorUrl);
 export const enemies = await import(enemiesUrl);
 export const score = await import(scoreUrl);
 export const loadouts = await import(loadoutsUrl);

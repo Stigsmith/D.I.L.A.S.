@@ -16,7 +16,7 @@
 /* same check before anyone trusts them.                              */
 /* ================================================================== */
 
-import { build, loadouts, items, score, readJson, FACTIONS } from "./lib/app.mjs";
+import { build, loadouts, items, score, armor, readJson, FACTIONS } from "./lib/app.mjs";
 
 const RULES = readJson("src/data/build-rules.json").rules;
 const PRESETS = loadouts.presets;
@@ -263,7 +263,7 @@ for (const label of ["nothing set", "four at 7", "solo at 10"]) {
 
 const PAIRING_KEYS = ["alongside", "notAlongside"];
 const PAIRINGS = readJson("src/data/context-rules.json").rules.filter((r) =>
-  PAIRING_KEYS.some((k) => JSON.stringify(r.match || {}).includes(`"${k}"`))
+  PAIRING_KEYS.some((k) => JSON.stringify(r.match || {}).includes(`"${k}"`)) || (r.when && r.when.weight)
 );
 const SLOT_KEY = { primary: "primary", secondary: "secondary", throwable: "grenade", armor: "armor", booster: "booster" };
 
@@ -284,7 +284,16 @@ function pairingScenario(rule, faction) {
   return s;
 }
 
+/* Pairing hosts wear a real armour set, so a rule about weight has one to
+   read: one of the sets carrying the host's passive, chosen by a number so
+   a rerun draws the same sample. */
+const wearing = (loadout, n) => {
+  const sets = armor.setsForPassive(loadout.armor);
+  return sets.length ? { ...loadout, armorSet: sets[n % sets.length].id } : loadout;
+};
+
 function place(loadout, item) {
+  if (item.slot === "armor") return wearing({ ...loadout, armor: item.id }, loadout.id.length);
   if (item.slot !== "stratagem") return { ...loadout, [SLOT_KEY[item.slot]]: item.id };
   const strats = loadout.strats.filter((id) => id !== item.id).slice(0, 3);
   return { ...loadout, strats: [item.id, ...strats] };
@@ -295,7 +304,7 @@ console.log("  fires  items  rule");
 const pairRows = [];
 {
   const r = rng(20261004);
-  const hosts = FACTIONS.flatMap((faction) => Array.from({ length: 20 }, (_, n) => randomBuild(faction, r, n)));
+  const hosts = FACTIONS.flatMap((faction) => Array.from({ length: 20 }, (_, n) => wearing(randomBuild(faction, r, n), n)));
   for (const rule of PAIRINGS) {
     const subject = Object.fromEntries(Object.entries(rule.match).filter(([k]) => !PAIRING_KEYS.includes(k)));
     const subjects = ALL.filter((it) =>
