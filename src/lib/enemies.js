@@ -229,10 +229,10 @@ export function arrivalsAt(faction, difficulty) {
 export function arrivalsLine(faction, difficulty) {
   const a = arrivalsAt(faction, difficulty);
   if (!a) return "";
-  if (a.kind === "next") return ` Nothing new here. The next step up is ${a.level}, where the ${a.names[0]} arrives.`;
-  if (a.kind === "complete") return ` Nothing new here, and nothing left to come: this front has shown you everything by ${a.level}.`;
-  if (a.names.length === 1) return ` Level ${difficulty} is where the ${a.names[0]} starts turning up.`;
-  return ` Level ${difficulty} is where the ${a.names[0]} and the ${a.names[1]} start turning up.`;
+  if (a.kind === "next") return ` Nothing new at this level. Next new enemy: ${a.names[0]}, at difficulty ${a.level}.`;
+  if (a.kind === "complete") return ` Nothing new at this level. Every enemy on this front appears by difficulty ${a.level}.`;
+  if (a.names.length === 1) return ` New at this level: ${a.names[0]}.`;
+  return ` New at this level: ${a.names[0]} and ${a.names[1]}.`;
 }
 
 /* ------------------------------------------------------------------ */

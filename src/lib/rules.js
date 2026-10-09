@@ -67,125 +67,163 @@ export function ruleGroup(rule) {
 /* Plain words                                                         */
 /* ------------------------------------------------------------------ */
 
-const FRONT = { bots: "the Automatons", bugs: "the Terminids", squids: "the Illuminate" };
+const FRONT = { bots: "Automatons", bugs: "Terminids", squids: "Illuminate" };
 const list = (xs) => (xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1).join(", ")} or ${xs[xs.length - 1]}`);
 
-function numberWords(name, t) {
+/* A number test in words: "magazine 30 rounds or more". The short form,
+   "peril 22+", is the one rule names use, so the two read alike. */
+function numberWords(label, t, unit = "", short = false) {
+  /* "1 round", "2 rounds": a unit word loses its s on exactly one. */
+  const u = (n) => `${n}${Math.abs(n) === 1 ? unit.replace(/s$/, "") : unit}`;
   const parts = [];
-  if (t.gte !== undefined) parts.push(`${t.gte} or more`);
-  if (t.gt !== undefined) parts.push(`above ${t.gt}`);
-  if (t.lte !== undefined) parts.push(`${t.lte} or less`);
-  if (t.lt !== undefined) parts.push(`below ${t.lt}`);
-  if (t.eq !== undefined) parts.push(`exactly ${t.eq}`);
-  return `${name} ${parts.join(" and ")}`;
+  if (t.gte !== undefined) parts.push(short ? `${u(t.gte)}+` : `${u(t.gte)} or more`);
+  if (t.gt !== undefined) parts.push(`over ${u(t.gt)}`);
+  if (t.lte !== undefined) parts.push(`${u(t.lte)} or less`);
+  if (t.lt !== undefined) parts.push(`under ${u(t.lt)}`);
+  if (t.eq !== undefined) parts.push(`exactly ${u(t.eq)}`);
+  return `${label} ${parts.join(" and ")}`.trim();
+}
+
+/* Squad size the way rule names say it: "1 or 2 players". */
+function playerWords(t) {
+  if (t.eq !== undefined) return t.eq === 1 ? "1 player" : `${t.eq} players`;
+  if (t.lte !== undefined && t.gte === undefined) return t.lte === 1 ? "1 player" : t.lte === 2 ? "1 or 2 players" : `1 to ${t.lte} players`;
+  if (t.gte !== undefined && t.lte === undefined) return `${t.gte}+ players`;
+  return numberWords("players", t);
 }
 
 /* The terrain table's three fields, in words. */
 const TERRAIN_WORDS = {
-  ground: (v) => `where the ground is ${list(v.map((g) => (g === "snow" ? "snowy" : g)))}`,
-  relief: (v) => `where the land is ${list(v)}`,
-  driving: (v) => `where driving is ${list(v)}`,
+  ground: (v) => `${list(v.map((g) => (g === "snow" ? "snowy" : g)))} ground`,
+  relief: (v) => `${list(v)} land`,
+  driving: (v) => `${list(v)} driving`,
 };
 
-/* When a rule applies, as a short list of conditions. */
+/* When a rule applies, as a short list of conditions, in the words its
+   name uses. */
 export function describeWhen(rule) {
   const w = rule.when || {};
   const out = [];
-  if (w.faction) out.push(`against ${list(w.faction.map((f) => FRONT[f] || f))}`);
-  if (w.hazard) out.push(`on a planet with ${list(w.hazard.map((h) => hazardName(h).toLowerCase()))}`);
-  if (w.notHazard) out.push(`with no ${list(w.notHazard.map((h) => hazardName(h).toLowerCase()))}`);
+  if (w.faction) out.push(list(w.faction.map((f) => FRONT[f] || f)));
+  if (w.hazard) out.push(list(w.hazard.map((h) => hazardName(h).toLowerCase())));
+  if (w.notHazard) out.push(`no ${list(w.notHazard.map((h) => hazardName(h).toLowerCase()))}`);
   if (w.terrain) {
     for (const [field, values] of Object.entries(w.terrain)) out.push(TERRAIN_WORDS[field] ? TERRAIN_WORDS[field]([].concat(values)) : `${field} ${list([].concat(values))}`);
   }
-  if (w.weight) out.push(`worn as ${list([].concat(w.weight))} armour`);
-  if (w.city !== undefined) out.push(w.city ? "on a planet with a megacity" : "on a planet with no megacity");
-  if (w.mission) out.push(`on ${list(w.mission.map((t) => (missionTraits[t] ? missionTraits[t].name : t)))} missions`);
-  if (w.minutes) out.push(numberWords("on a mission timed at", w.minutes) + " minutes");
-  if (w.difficulty) out.push(numberWords("at difficulty", w.difficulty));
-  if (w.squad) out.push(numberWords("with a squad of", w.squad));
-  if (w.peril) out.push(numberWords("at peril", w.peril));
+  if (w.weight) out.push(`${list([].concat(w.weight))} armour`);
+  if (w.city !== undefined) out.push(w.city ? "megacity planet" : "no megacity");
+  if (w.mission) out.push(`${list(w.mission.map((t) => (missionTraits[t] ? missionTraits[t].name : t)))} missions`);
+  if (w.minutes) out.push(numberWords("missions of", w.minutes, " minutes"));
+  if (w.difficulty) out.push(numberWords("difficulty", w.difficulty, "", true));
+  if (w.squad) out.push(playerWords(w.squad));
+  if (w.peril) out.push(numberWords("peril", w.peril, "", true));
   if (rule.scaleBy && String(rule.scaleBy.path).startsWith("scenario.peril")) {
     /* A rule held below zero peril grows the other way. */
-    out.push(w.peril && w.peril.lte !== undefined
-      ? "growing the easier the drop and the more of you there are"
-      : "growing with difficulty and how few of you there are");
+    out.push(w.peril && w.peril.lte !== undefined ? "grows as peril falls" : "grows with peril");
   }
-  if (isPairing(rule) || w.weight) out.push("inside a build");
-  return out.length ? out : ["everywhere"];
+  if (isPairing(rule) || w.weight) out.push("builds only");
+  return out.length ? out : ["always"];
 }
 
-/* The fields a rule reads, in words. Anything unlisted shows its path,
-   which is honest and still beats nothing. */
+/* The fields a rule reads: a label, a unit, and a scale for the ones
+   stored as a share. Anything unlisted shows its path, which is honest
+   and still beats nothing. */
 const PATHS = {
-  "wiki.callIn.cooldown": "call-in cooldown, in seconds",
-  "wiki.heat.coldMultiplier": "how much longer it fires in the cold",
-  "wiki.heat.hotMultiplier": "how much sooner it overheats in the heat",
-  "wiki.handling.rpm": "rate of fire",
-  "wiki.handling.ergonomics": "ergonomics",
-  "wiki.primary.durableRatio": "share of its damage that is durable",
-  "wiki.ammo.magazine": "magazine size",
-  "wiki.ammo.feed": "what it feeds on",
-  "stats.demoForce": "demolition force",
-  "stats.ap": "armor penetration",
-  "reach.openShare": "share of this front it gets through",
-  "scenario.peril": "peril",
-  "wiki.reload.seconds": "reload time, in seconds",
-  "passive.fireResist": "fire resistance, in percent",
-  "passive.gasResist": "gas resistance, in percent",
-  "passive.arcResist": "arc resistance, in percent",
-  "passive.meleeDamage": "melee damage bonus, in percent",
-  "passive.supportReload": "support weapon reload bonus, in percent",
-  "passive.sidearmReload": "sidearm reload bonus, in percent",
-  "passive.throwRange": "throw range bonus, in percent",
-  "passive.detectionRange": "how much shorter enemies see you from, in percent",
-  "passive.movementNoise": "how much quieter you move, in percent",
-  "passive.explosiveResist": "explosion resistance, in percent",
-  "passive.primaryReload": "primary reload bonus, in percent",
-  "passive.crouchRecoil": "recoil cut when crouched or prone, in percent",
-  "passive.stimDuration": "extra stim duration, in seconds",
+  "wiki.callIn.cooldown": ["cooldown", " seconds"],
+  "wiki.heat.coldMultiplier": ["how much longer it fires in the cold"],
+  "wiki.heat.hotMultiplier": ["how much sooner it overheats in the heat"],
+  "wiki.handling.rpm": ["rate of fire", " rpm"],
+  "wiki.handling.ergonomics": ["ergonomics"],
+  "wiki.primary.durableRatio": ["durable damage", "%", 100],
+  "wiki.ammo.magazine": ["magazine", " rounds"],
+  "wiki.ammo.feed": ["ammo type"],
+  "stats.demoForce": ["demolition force"],
+  "stats.ap": ["armour penetration"],
+  "reach.openShare": ["the share of the front your weapons open", "%", 100],
+  "scenario.peril": ["peril"],
+  "wiki.reload.seconds": ["reload time", " seconds"],
+  "passive.fireResist": ["fire resistance", "%"],
+  "passive.gasResist": ["gas resistance", "%"],
+  "passive.arcResist": ["arc resistance", "%"],
+  "passive.meleeDamage": ["melee damage bonus", "%"],
+  "passive.supportReload": ["support weapon reload bonus", "%"],
+  "passive.sidearmReload": ["sidearm reload bonus", "%"],
+  "passive.throwRange": ["throw range bonus", "%"],
+  "passive.detectionRange": ["shorter detection range", "%"],
+  "passive.movementNoise": ["quieter movement", "%"],
+  "passive.explosiveResist": ["explosion resistance", "%"],
+  "passive.primaryReload": ["primary reload bonus", "%"],
+  "passive.crouchRecoil": ["recoil cut when crouched", "%"],
+  "passive.stimDuration": ["extra stim time", " seconds"],
 };
-const pathWords = (p) => {
+/* A partner's passive is always its armour's, the one thing in a build
+   that carries a passive. */
+const pathInfo = (p) => {
   if (PATHS[p]) return PATHS[p];
-  if (String(p).startsWith("alongside.") && PATHS[p.slice(10)]) return `the partner's ${PATHS[p.slice(10)]}`;
-  return p;
+  if (String(p).startsWith("alongside.") && PATHS[p.slice(10)]) {
+    const [label, unit, scale] = PATHS[p.slice(10)];
+    return [`your armour's ${label}`, unit, scale];
+  }
+  return [p];
 };
+const pathWords = (p) => pathInfo(p)[0];
+
+/* "1% or more" of a passive only asks whether there is any. */
+function numberClause(t) {
+  const [label, unit = "", scale = 1] = pathInfo(t.path);
+  const keys = ["gte", "gt", "lte", "lt", "eq"].filter((k) => t[k] !== undefined);
+  if (String(t.path).includes("passive.") && keys.length === 1 && t.gte === 1) return `any ${label}`;
+  const scaled = Object.fromEntries(keys.map((k) => [k, Math.round(t[k] * scale * 100) / 100]));
+  return numberWords(label, scaled, unit);
+}
+
+const SLOT_WORDS = { armor: "armour passive" };
+/* The stratagem kinds by the game's words for them. */
+const STRAT_WORDS = {
+  support: "support weapons", backpack: "backpacks", eagle: "Eagles", orbital: "orbitals",
+  sentry: "sentries", emplacement: "emplacements", mines: "mines", vehicle: "vehicles",
+};
+const ROLE_WORDS = { "anti-armor": "anti-armour", chaff: "crowd clear", objective: "objective" };
+const article = (w) => (/^[aeiou]/i.test(w) ? `an ${w}` : `a ${w}`);
+const names = (ids) => list([].concat(ids).map((id) => (getItem(id) || { name: id }).name));
 
 const MATCH_WORDS = {
-  held: (v) => (v ? "a weapon you carry and aim" : "anything you do not aim yourself"),
+  held: (v) => (v ? "a weapon you aim" : "anything you do not aim"),
   ventsHeat: (v) => (v ? "a weapon that overheats" : "a weapon that never overheats"),
-  stratType: (v) => `${list([].concat(v))} stratagems`,
-  slot: (v) => `a ${list([].concat(v))}`,
+  stratType: (v) => list([].concat(v).map((t) => STRAT_WORDS[t] || t)),
+  slot: (v) => article(list([].concat(v).map((x) => SLOT_WORDS[x] || x))),
   category: (v) => `${list([].concat(v))} weapons`,
   damageType: (v) => `${list([].concat(v))} damage`,
-  tags: (v) => `tagged ${list([].concat(v))}, our tag`,
-  notTags: (v) => `not tagged ${list([].concat(v))}`,
-  gameTags: (v) => `that the game tags ${list([].concat(v).map((t) => t.toLowerCase()))}`,
-  notGameTags: (v) => `that the game does not tag ${list([].concat(v).map((t) => t.toLowerCase()))}`,
-  roles: (v) => `doing the ${list([].concat(v))} job, our call`,
+  tags: (v) => `our ${list([].concat(v))} tag`,
+  notTags: (v) => `without our ${list([].concat(v))} tag`,
+  gameTags: (v) => `game tag ${list([].concat(v).map((t) => t.toLowerCase()))}`,
+  notGameTags: (v) => `no game tag ${list([].concat(v).map((t) => t.toLowerCase()))}`,
+  roles: (v) => `our ${list([].concat(v).map((r) => ROLE_WORDS[r] || r))} role`,
   traits: (v) => `armour with a ${list([].concat(v))} passive`,
-  idIn: (v) => `named by hand: ${list([].concat(v).map((id) => (getItem(id) || { name: id }).name))}`,
-  notIdIn: (v) => `except ${list([].concat(v).map((id) => (getItem(id) || { name: id }).name))}`,
+  idIn: (v) => `only ${names(v)}`,
+  notIdIn: (v) => `except ${names(v)}`,
   hasWiki: (v) => (v ? "with published stats" : "with no published stats"),
-  "wiki.reload.stationary": (v) => (v ? "a reload that roots you to the spot" : "a reload you can walk through"),
+  "wiki.reload.stationary": (v) => (v ? "a stationary reload" : "a reload you can move during"),
   "wiki.reload.perRound": (v) => (v ? "loaded a round at a time" : "loaded a magazine at a time"),
-  "wiki.oneHanded": (v) => (v ? "held in one hand" : "held in two hands"),
+  "wiki.oneHanded": (v) => (v ? "one handed" : "two handed"),
 };
 
-/* What a rule looks at. Build rules read a whole build and say so. */
+/* What a rule checks. Build rules check a whole build and say so. */
 function clauseWords(m) {
   const out = [];
   for (const [key, v] of Object.entries(m || {})) {
     if (key === "number") {
-      for (const t of [].concat(v)) out.push(numberWords(pathWords(t.path), t));
+      for (const t of [].concat(v)) out.push(numberClause(t));
       continue;
     }
     /* Either-or, and pairings, read their own clauses in the same words. */
     if (key === "anyOf") {
-      out.push(`any of: ${[].concat(v).map((c) => clauseWords(c).join(", ")).join("; or ")}`);
+      const branches = [].concat(v).map((c) => clauseWords(c).join(", "));
+      out.push(branches.every((b) => !b.includes(",")) ? branches.join(" or ") : `one of: ${branches.join("; or ")}`);
       continue;
     }
-    if (key === "alongside") { out.push(`in a build that also carries ${clauseWords(v).join(", ")}`); continue; }
-    if (key === "notAlongside") { out.push(`in a build with nothing that is ${clauseWords(v).join(", ")}`); continue; }
+    if (key === "alongside") { out.push(`with ${clauseWords(v).join(", ")} in the build`); continue; }
+    if (key === "notAlongside") { out.push(`with nothing in the build that is ${clauseWords(v).join(", ")}`); continue; }
     if (MATCH_WORDS[key]) { out.push(MATCH_WORDS[key](v)); continue; }
     out.push(`${pathWords(key)}: ${list([].concat(v).map(String))}`);
   }
@@ -193,24 +231,31 @@ function clauseWords(m) {
 }
 
 export function describeMatch(rule) {
-  if (rule.kind === "build") return ["the build as a whole: what it carries, what it covers, and how it is held"];
+  if (rule.kind === "build") return ["the whole build"];
   const out = clauseWords(rule.match);
   return out.length ? out : ["every item"];
 }
 
-/* How big a rule is, in the units the tool uses: a tier is about 14
-   points. Build rules may only flag, carrying a severity and no points. */
+/* How big a rule is, in tiers as well as points. How many points make a
+   tier is on About, How the rating works, rather than repeated here. */
+const sizeWords = (points) => {
+  const tiers = Math.abs(points) / 14;
+  if (tiers < 0.4) return "less than half a tier";
+  if (tiers < 0.75) return "about half a tier";
+  if (tiers < 1.25) return "about a tier";
+  return tiers < 1.75 ? "about a tier and a half" : "about 2 tiers";
+};
+
 export function describeSize(rule) {
   if (rule.scaleBy) {
-    const cap = rule.scaleBy.clamp ? `, never more than ${rule.scaleBy.clamp} points either way` : "";
-    return `Scales with ${pathWords(rule.scaleBy.path)}${cap}. A tier is about 14 points.`;
+    const cap = rule.scaleBy.clamp ? `, up to ${rule.scaleBy.clamp} points, ${sizeWords(rule.scaleBy.clamp)} at most` : "";
+    /* A rule scaling off its own passive is about an armour, so it says whose. */
+    const path = String(rule.scaleBy.path);
+    const what = path.startsWith("passive.") ? `this armour's ${pathWords(path)}` : pathWords(path);
+    return `Depends on ${what}${cap}.`;
   }
-  if (rule.delta) {
-    const tiers = Math.abs(rule.delta) / 14;
-    const size = tiers >= 1.9 ? "two tiers" : tiers >= 0.95 ? "a tier" : tiers >= 0.45 ? "half a tier" : "a nudge";
-    return `${rule.delta > 0 ? "+" : ""}${rule.delta} points, about ${size}.`;
-  }
-  if (rule.severity) return "No points: it flags a hole in the build without moving its badge.";
+  if (rule.delta) return `${rule.delta > 0 ? "+" : ""}${rule.delta} points, ${sizeWords(rule.delta)}.`;
+  if (rule.severity) return "No points. A warning only.";
   return "No points.";
 }
 

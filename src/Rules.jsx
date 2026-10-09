@@ -113,8 +113,8 @@ function RuleDetail({ rule, scenario, off, builds, buildsArePresets }) {
         {rule.sayInverted ? (
           <p className="text-base-400"><span className="text-base-500">When it runs the other way: </span>{rule.sayInverted}</p>
         ) : null}
-        <p><span className="text-base-500">Applies </span><span className="text-base-300">{describeWhen(rule).join(", ")}.</span></p>
-        <p><span className="text-base-500">Looks at </span><span className="text-base-300">{describeMatch(rule).join("; ")}.</span></p>
+        <p><span className="text-base-500">When: </span><span className="text-base-300">{describeWhen(rule).join(" · ")}</span></p>
+        <p><span className="text-base-500">Checks: </span><span className="text-base-300">{describeMatch(rule).join("; ")}.</span></p>
         <p><span className="text-base-500">Size: </span><span className="text-base-300">{describeSize(rule)}</span></p>
         {rule.source ? <p className="text-[11px] text-base-500">Source: {rule.source}.</p> : null}
         {rule.judgement ? <p className="text-[11px] text-accent-300">Our judgement: {rule.judgement}</p> : null}
@@ -129,9 +129,7 @@ function RuleDetail({ rule, scenario, off, builds, buildsArePresets }) {
         {!scenario.faction ? (
           <p className="text-xs text-base-500">Choose a front to see what this rule changes.</p>
         ) : rows.length === 0 ? (
-          <p className="text-xs text-base-500">
-            No effect in this scenario. It applies {describeWhen(rule).join(", ")}.
-          </p>
+          <p className="text-xs text-base-500">No effect in this scenario.</p>
         ) : (
           <div className="flex max-h-72 flex-col gap-1 overflow-y-auto pr-1">
             <div className="flex items-center gap-2 px-1 text-[10px] uppercase tracking-wider text-base-600">

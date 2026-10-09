@@ -81,9 +81,9 @@ const hasRole = (role) => (item) => item.roles.includes(role);
 /* no answer to armor; squids do not, and the tier data already warns    */
 /* off most dedicated anti-tank on that front.                           */
 const HEAVY_FRONTS = {
-  bugs: "Chargers come in pairs up here, and a Bile Titan will walk straight through this.",
-  bots: "Hulks up here arrive with a Factory Strider behind them.",
-  any: "Chargers and Hulks do not care which front you thought you were on.",
+  bugs: "At this level Chargers come in pairs, and Bile Titans appear.",
+  bots: "At this level Hulks appear, with Factory Striders behind them.",
+  any: "At this level you will meet Chargers or Hulks.",
 };
 
 /* ------------------------------------------------------------------ */
@@ -159,17 +159,15 @@ export function squadWarnings(builds, context = {}) {
 
   if (!quiet && armorMembers === 0) {
     if (heavyFront) {
-      add("armor-absent", "red", `Nothing between you opens armor. ${HEAVY_FRONTS[faction]}`);
+      add("armor-absent", "red", `No anti-tank in the squad. ${HEAVY_FRONTS[faction]}`);
     } else if (faction === "squids") {
       add("armor-absent-squids", "grey",
-        "No dedicated anti-tank, which is usually right against squids. The tier data warns off most of it on this front.");
+        "No anti-tank in the squad. Usually fine against the Illuminate: most anti-tank rates poorly on this front.");
     }
   } else if (!quiet && armorMembers === 1 && size >= 2 && faction !== "squids"
              && (p === null ? difficulty === "extreme" : p >= THIN_THREAD_PERIL)) {
     add("armor-thin", "amber",
-      size === 2
-        ? "One of you is carrying the anti-tank. If he goes down holding it, you are throwing grenades at a Charger."
-        : `One of ${size} is carrying the anti-tank. That is a thin thread at this difficulty.`);
+      `Only 1 of ${size === 2 ? "you" : size} carries anti-tank. If they go down, nobody can open heavy armour.`);
   }
 
   /* Bugs come at you in numbers. A squad of slow precise guns kills every */
@@ -178,32 +176,32 @@ export function squadWarnings(builds, context = {}) {
   if (!quiet && chaffMembers === 0 && (faction === "bugs" || faction === "squids")) {
     add("chaff-absent", "red",
       faction === "bugs"
-        ? "Nothing here holds off a swarm. Everything you have kills one thing at a time, and bugs do not come one at a time."
-        : "Nothing here holds off a crowd, and Voteless arrive in them.");
+        ? "No crowd clear in the squad. Terminids come in swarms."
+        : "No crowd clear in the squad. Voteless come in crowds.");
   } else if (!quiet && chaffMembers === 0 && faction === "bots") {
     add("chaff-absent-bots", "amber",
-      "No sustained chaff clear. Bots come in smaller numbers than bugs, but a trooper patrol still has to die somehow.");
+      "No crowd clear in the squad. Automatons come in smaller groups, but trooper patrols still need it.");
   } else if (!quiet && chaffMembers === 1 && size >= 3 && faction === "bugs") {
     add("chaff-thin", "amber",
-      `One of ${size} is carrying the horde clear. On bugs that is one reload away from being overrun.`);
+      `Only 1 of ${size} carries crowd clear, against a front that comes in swarms.`);
   }
 
   if (!quiet && faction === "bots" && penetrators === 0) {
     add("no-penetration", "amber",
-      "Nothing you hold punches above light armor. You can still headshot every Devastator you meet, but one of you bringing an Autocannon, an Anti-Materiel Rifle, a Laser Cannon or even a Senator stops the plate being the problem. All four are AP 4, and a Devastator is armored to 3.");
+      "Nothing in the squad is AP 4 or more, so Devastators take reduced damage everywhere but the head. An Autocannon, Anti-Materiel Rifle, Laser Cannon or Senator fixes that.");
   }
 
   if (!quiet && objectiveMembers === 0 && nestMission) {
     add("objective-absent-nest", "red",
-      "Nothing here closes a hole or a fabricator without spending a stratagem. That is the entire mission.");
+      "Nothing in the squad closes bug holes or fabricators without spending a stratagem, and this mission is about destroying them.");
   } else if (!quiet && objectiveItems <= size && biome === "cave") {
     /* Demo 40 closes a hole from outside. Demo 30 needs the throw to go  */
     /* in, and a cave rarely gives you that angle.                        */
     const outside = countItems(squad, (i) => i.roles.includes("objective") && (i.stats.demoForce ?? 0) >= 40);
     add("objective-thin-cave", "amber",
       outside === 0
-        ? "Thin on hole closers, and it is a cave map. Nothing you have closes one from outside, and caves do not give you the angle for an inside throw."
-        : "Thin on hole closers for a cave map. Most of what you have needs an inside throw.");
+        ? "Few hole closers for a cave map, and none closes a hole from outside. Caves rarely give the angle to throw inside."
+        : "Few hole closers for a cave map. Most need a throw inside the hole.");
   }
 
   /* ---------------------------------------------------------------- */
@@ -214,7 +212,7 @@ export function squadWarnings(builds, context = {}) {
   const dupeBooster = boosters.find((b, i) => boosters.indexOf(b) !== i);
   if (dupeBooster) {
     const name = (getItem(dupeBooster) || {}).name || dupeBooster;
-    add("booster-duplicate", "red", `Two of you brought ${name}. Boosters do not stack, so one of those slots is empty.`);
+    add("booster-duplicate", "red", `Two of you brought ${name}. Boosters do not stack, so one of those slots does nothing.`);
   }
 
   const teamkillers = [
@@ -222,7 +220,7 @@ export function squadWarnings(builds, context = {}) {
   ];
   if (teamkillers.length >= 2 && size <= 3) {
     add("teamkill", "amber",
-      `${teamkillers.join(" and ")} in a squad of ${size}. Fewer bodies over the same ground means you share more firing lines than a full squad does.`);
+      `${teamkillers.join(" and ")} in a squad of ${size}. A small squad shares more firing lines, so friendly fire is more likely.`);
   }
 
   /* Each of you has your own back, so this is never a conflict. It is a  */
@@ -231,7 +229,7 @@ export function squadWarnings(builds, context = {}) {
   const isBackpack = (i) => i.stratType === "backpack";
   if (countMembers(squad, isBackpack) === 0 && countMembers(squad, eatsBack) === size) {
     add("no-backpack", "grey",
-      "Every one of you is carrying a support weapon that eats the backpack slot, so nobody has a supply pack, a shield or a dog.");
+      "Every support weapon in the squad takes the backpack slot, so nobody brings a supply pack, a shield or a guard dog.");
   }
 
   const order = { red: 0, amber: 1, grey: 2 };
