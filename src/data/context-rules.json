@@ -123,7 +123,7 @@
       },
       "delta": -8,
       "say": "Sandstorms reduce visibility, so long range weapons are less useful. Each storm lasts about 3 minutes.",
-      "judgement": "Our call, not a sourced field. It rides on the long-range tag on the items now rather than being listed again in every rule that wants it, and vocabulary.json records the reasoning. Nothing published separates a long range support weapon from a close one: projectile velocity does not, since laser weapons read 1300 and assault rifles read 820."
+      "judgement": "No published stat marks a support weapon as long range, so we tag them by hand. Projectile speed does not separate them: lasers read 1300, assault rifles 820."
     },
     {
       "id": "sandstorm-favours-close",
@@ -173,7 +173,7 @@
       },
       "delta": -6,
       "say": "Blizzards reduce visibility while they last, so long range weapons are less useful.",
-      "judgement": "Our call, not a sourced field. It rides on the long-range tag on the items now rather than being listed again in every rule that wants it, and vocabulary.json records the reasoning. Nothing published separates a long range support weapon from a close one: projectile velocity does not, since laser weapons read 1300 and assault rifles read 820."
+      "judgement": "No published stat marks a support weapon as long range, so we tag them by hand. Projectile speed does not separate them: lasers read 1300, assault rifles 820."
     },
     {
       "id": "blizzard-favours-close",
@@ -223,7 +223,7 @@
       },
       "delta": -5,
       "say": "Thick fog slightly reduces visibility, so long range weapons are a little less useful.",
-      "judgement": "Our call, not a sourced field. It rides on the long-range tag on the items now rather than being listed again in every rule that wants it, and vocabulary.json records the reasoning. Nothing published separates a long range support weapon from a close one: projectile velocity does not, since laser weapons read 1300 and assault rifles read 820."
+      "judgement": "No published stat marks a support weapon as long range, so we tag them by hand. Projectile speed does not separate them: lasers read 1300, assault rifles 820."
     },
     {
       "id": "tremors-punish-standing-still",
@@ -491,7 +491,7 @@
       },
       "delta": 8,
       "say": "You defend one area while enemies keep coming. The Cremator's 500 rounds, fed from your backpack, cover the approach with fire.",
-      "judgement": "Ours, the curator's call of 4 October 2026: the Cremator shines in Eradicate and defence missions, huddled on a position against large groups. Deliberately not a front rule: the vote already prices how well fire does against bugs and bots, and a second bump for the same fact would count it twice. Named by id because no published field separates a backpack fed stream from a flamethrower that reloads."
+      "judgement": "The Cremator suits holding one position against large groups. This rule skips the front: the community tier already rates fire per front. Named by hand, since no published stat marks a backpack fed flamethrower."
     },
     {
       "id": "hvt-wants-antitank",
@@ -580,14 +580,14 @@
         ]
       },
       "say": "A silenced weapon is heard at 13 metres instead of 100. You can kill a sentry without alerting the rest of the base.",
-      "source": "The five suppressed weapons. Sourced rather than judged: the wiki carries Suppressed as a trait in each weapon's infobox and its Stealth page gives the audible range as 13 metres. A tag rather than a fetched field because the fetch reads only reload times from weapon infoboxes so far",
+      "source": "The 5 suppressed weapons. The wiki lists Suppressed in each weapon's infobox, and its Stealth page gives the audible range as 13 metres.",
       "scaleBy": {
         "path": "scenario.peril",
         "from": 16,
         "times": 0.6,
         "clamp": 16
       },
-      "judgement": "Ours, retuned on 4 October 2026 at the curator's word: a four stack that has reached Super Helldive knows what it is doing, and loud is how most of them play it. So this fires only for one or two of you, from solo on Suicide Mission or two of you on Impossible, and grows to about a tier alone on Super Helldive. It used to fire for every squad, reach a tier at peril 22, where four of you at difficulty 10 sat, and mark silenced weapons down below zero. Both are gone."
+      "judgement": "1 or 2 players only: solo from Suicide Mission, or 2 players from Impossible. A full squad on Super Helldive plays loud and does fine. Grows to about a tier for 1 player on Super Helldive."
     },
     {
       "id": "peril-bots-punishes-loud",
@@ -616,7 +616,7 @@
         "times": -0.25,
         "clamp": 8
       },
-      "judgement": "Ours, cut to a nudge on 4 October 2026: the curator's Autocannon and Leveller clear Super Helldive in a four stack, and this was marking them down there. It now fires only for one or two of you, from solo on Impossible or two of you on Helldive, and never reaches half a tier. It matches nearly half of everything you can hold, so it has to argue quietly."
+      "judgement": "Kept small: it matches nearly half of all held weapons. 1 or 2 players only, from solo on Impossible or 2 players on Helldive, and never half a tier."
     },
     {
       "id": "peril-storm-favours-stealth",
@@ -649,7 +649,7 @@
         "times": 0.3,
         "clamp": 8
       },
-      "judgement": "Ours. Stacks with the plain quiet rule, so a storm is worth a little extra on top. Same window as that rule since 4 October 2026."
+      "judgement": "Adds to the plain stealth rule, so a storm is worth a little extra."
     },
     {
       "id": "peril-wants-quiet-bugs-squids",
@@ -672,14 +672,14 @@
         ]
       },
       "say": "Terminids and Illuminate also find you by sound and sight, so a silenced weapon avoids some breaches and Watcher alerts. It matters less than against Automatons.",
-      "source": "helldivers.wiki.gg, Stealth: every faction detects by sound and then sight. Terminids open a breach and the Illuminate need a Watcher to call for help, each with a long cue that can be interrupted",
+      "source": "helldivers.wiki.gg, Stealth: every faction detects by sound, then sight. Terminids open a breach and the Illuminate need a Watcher to call for help, and both can be interrupted.",
       "scaleBy": {
         "path": "scenario.peril",
         "from": 16,
         "times": 0.35,
         "clamp": 10
       },
-      "judgement": "Ours. About six tenths of the bot rule, because stealth is most viable against the Automatons. Added 4 October 2026."
+      "judgement": "About six tenths of the Automaton rule: stealth matters most against the Automatons."
     },
     {
       "id": "peril-wants-stealth-armour",
@@ -717,14 +717,14 @@
         ]
       },
       "say": "This armour makes you quieter or harder to spot, so fewer patrols find you.",
-      "source": "The passive's own effect: Reduced Signature cuts movement noise by half and detection range by 40%, Scout the range alone, Feet First the noise alone",
+      "source": "The passives' own effects: Reduced Signature halves movement noise and cuts detection range by 40%, Scout cuts the range, Feet First the noise.",
       "scaleBy": {
         "path": "scenario.peril",
         "from": 16,
         "times": 0.5,
         "clamp": 12
       },
-      "judgement": "Ours, the curator's window from 4 October 2026: solo from Suicide Mission, two of you from Impossible, growing to nearly a tier alone on Super Helldive. Three or four of you get nothing, because a full squad at any level can hold the fight it starts. All three passives get the same points, and the vote already orders them."
+      "judgement": "1 or 2 players only: solo from Suicide Mission, 2 players from Impossible, growing to nearly a tier for 1 player on Super Helldive. All three passives get the same points; the community tier already orders them."
     },
     {
       "id": "peril-wants-stealth-armour-bugs-squids",
@@ -770,7 +770,7 @@
         "times": 0.3,
         "clamp": 8
       },
-      "judgement": "Ours. Six tenths of the bot rule, the ratio the quiet weapon rules keep."
+      "judgement": "Six tenths of the Automaton rule, like the silenced weapon rules."
     },
     {
       "id": "easy-drop-wastes-stealth-armour",
@@ -808,7 +808,7 @@
         "times": 0.3,
         "clamp": 8
       },
-      "judgement": "Ours. Only below zero peril, four of you through Challenging or alone on Easy, and never more than half a tier: four of you on Trivial lose about that. The curator: on a low difficulty it can come down."
+      "judgement": "Only at peril 0 or less, such as 4 players on Challenging or 1 player on Easy. Never more than half a tier."
     },
     {
       "id": "commando-no-reinforcement-boosters",
@@ -826,7 +826,7 @@
       },
       "delta": -28,
       "say": "The game does not allow reinforcement boosters on Commando missions, so this slot does nothing.",
-      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026"
+      "source": "helldivers.wiki.gg, Commando Missions"
     },
     {
       "id": "commando-repeat-call-ins-come-twice",
@@ -852,7 +852,7 @@
       },
       "delta": -10,
       "say": "Stratagems work only while the Super Destroyer is overhead, twice at most. This one is rated for its short cooldown, which barely matters here.",
-      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026"
+      "source": "helldivers.wiki.gg, Commando Missions"
     },
     {
       "id": "commando-long-cooldowns-cost-nothing",
@@ -877,7 +877,7 @@
       },
       "delta": 8,
       "say": "Stratagems work only while the Super Destroyer is overhead, twice at most, so a long cooldown costs nothing. What counts is how hard this hits.",
-      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026"
+      "source": "helldivers.wiki.gg, Commando Missions"
     },
     {
       "id": "commando-expendables-come-twice",
@@ -894,7 +894,7 @@
       },
       "delta": -12,
       "say": "Expendable launchers are rated for being called again every minute. Here the Super Destroyer is overhead twice at most.",
-      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026"
+      "source": "helldivers.wiki.gg, Commando Missions"
     },
     {
       "id": "commando-heat-weapons-need-no-ammo",
@@ -912,8 +912,8 @@
       },
       "delta": 14,
       "say": "Resupply is a stratagem, so it comes twice at most here. This weapon runs on heat and never runs out of ammo.",
-      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026",
-      "judgement": "That ammo runs short follows from resupply being a stratagem. That a weapon needing none is worth a full tier, and almost a given to bring, is the curator's call, 1 October 2026: the Quasar is S+ on these missions, not S."
+      "source": "helldivers.wiki.gg, Commando Missions",
+      "judgement": "Running short of ammo follows from resupply being a stratagem. Rating a weapon that needs none a full tier higher is our judgement: the Quasar is S+ on these missions."
     },
     {
       "id": "commando-arc-weapons-need-no-ammo",
@@ -931,8 +931,8 @@
       },
       "delta": 14,
       "say": "Resupply is a stratagem, so it comes twice at most here. Arc weapons use no ammo at all.",
-      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026",
-      "judgement": "That ammo runs short follows from resupply being a stratagem. That a weapon needing none is worth a full tier, and almost a given to bring, is the curator's call, 1 October 2026: the Quasar is S+ on these missions, not S."
+      "source": "helldivers.wiki.gg, Commando Missions",
+      "judgement": "Running short of ammo follows from resupply being a stratagem. Rating a weapon that needs none a full tier higher is our judgement: the Quasar is S+ on these missions."
     },
     {
       "id": "commando-supplies-are-the-resupply",
@@ -950,8 +950,8 @@
       },
       "delta": 10,
       "say": "Resupply is a stratagem, so it comes twice at most here. Supplies you bring make up for the missing resupplies.",
-      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026",
-      "judgement": "Named by hand: nothing published marks an item as carrying supplies for the squad."
+      "source": "helldivers.wiki.gg, Commando Missions",
+      "judgement": "Named by hand: no published stat marks an item as carrying supplies."
     },
     {
       "id": "commando-rewards-suppressed",
@@ -968,7 +968,7 @@
       },
       "delta": 8,
       "say": "Each bot that calls for help raises the threat level across the map. A silenced weapon is heard at 13 metres instead of 100.",
-      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026"
+      "source": "helldivers.wiki.gg, Commando Missions"
     },
     {
       "id": "commando-rewards-stealth-armour",
@@ -1001,7 +1001,7 @@
       },
       "delta": 8,
       "say": "Each bot that calls for help raises the threat level across the map. This armour makes you harder to find.",
-      "source": "helldivers.wiki.gg, Commando Missions, read 1 October 2026"
+      "source": "helldivers.wiki.gg, Commando Missions"
     },
     {
       "id": "quiet-weapon-loud-armour",
@@ -1043,7 +1043,7 @@
       },
       "delta": -5,
       "say": "Nobody hears the shot, but patrols can still see you. Without stealth armour, the silencer helps much less.",
-      "judgement": "Ours, the curator's call of 4 October 2026: go full or go not at all. Only where stealth is worth playing, solo from Suicide Mission or two of you from Impossible. Fires only inside a build."
+      "judgement": "Go fully quiet or not at all. Only where stealth pays: solo from Suicide Mission, or 2 players from Impossible."
     },
     {
       "id": "stealth-armour-quiet-weapon",
@@ -1085,7 +1085,7 @@
       },
       "delta": 5,
       "say": "The armour keeps patrols from finding you. The silenced weapon kills the ones you pick without alerting the rest.",
-      "judgement": "Ours, the other half of the same call, in the same window. Fires only inside a build."
+      "judgement": "The other half of the same judgement, in the same range."
     },
     {
       "id": "true-grit-long-reload",
@@ -1117,8 +1117,8 @@
       },
       "delta": 6,
       "say": "This takes 3.5 seconds or more to reload. True Grit cuts that by 30% every time.",
-      "source": "Reload times from each weapon's own wiki infobox, fetched by npm run wiki. True Grit: +30% support weapon reload speed",
-      "judgement": "Ours. A magazine over 120 is left out, the Stalwart, Machine Gun and Flamethrower among them: they reload so rarely that a faster reload barely shows. Heat weapons are left out too: the Laser Cannon swaps a heat sink it rarely needs. Fires only inside a build."
+      "source": "Reload times from each weapon's wiki infobox. True Grit: +30% support weapon reload speed.",
+      "judgement": "Magazines over 120 are left out (Stalwart, Machine Gun, Flamethrower): they reload too rarely for it to show. Heat weapons are left out too: the Laser Cannon rarely swaps its heat sink."
     },
     {
       "id": "true-grit-stationary-reload",
@@ -1141,8 +1141,8 @@
       },
       "delta": 4,
       "say": "You cannot move while this reloads. True Grit cuts that time by 30%.",
-      "source": "Stationary Reload from the weapon's wiki infobox or the game's own tag, whichever says so",
-      "judgement": "Ours. Stacks with the long reload rule, because a long reload you cannot walk out of is worse than either alone. Fires only inside a build."
+      "source": "Stationary Reload, from the weapon's wiki infobox or the game's own tag.",
+      "judgement": "Adds to the long reload rule: a long reload you cannot move during is worse than either alone."
     },
     {
       "id": "true-grit-every-shot",
@@ -1171,8 +1171,8 @@
       },
       "delta": 4,
       "say": "This reloads after every shot, so 30% faster reloads means close to 30% more shots.",
-      "source": "Magazine size and reload time from the wiki",
-      "judgement": "Ours. This is what puts the Railgun and the Speargun on the list: their reloads are short, and they do one after every shot. Fires only inside a build."
+      "source": "Magazine size and reload time from the wiki.",
+      "judgement": "This covers the Railgun and the Speargun: short reloads, but one after every shot."
     },
     {
       "id": "true-grit-big-belt",
@@ -1204,8 +1204,8 @@
       },
       "delta": 2,
       "say": "This reloads rarely, but each reload takes 3.5 seconds or more. True Grit cuts that by 30%.",
-      "source": "Reload times and magazine sizes from each weapon's wiki infobox. True Grit: +30% support weapon reload speed",
-      "judgement": "Ours, and the curator's correction of 9 October 2026: a big belt reloads rarely, which is why this is a third of the long reload rule, not nothing. Stacks with the stationary rule, which is what puts the Machine Gun above the Stalwart. Fires only inside a build."
+      "source": "Reload times and magazine sizes from each weapon's wiki infobox. True Grit: +30% support weapon reload speed.",
+      "judgement": "A third of the long reload rule, because a big belt reloads rarely. Adds to the stationary rule, which puts the Machine Gun above the Stalwart."
     },
     {
       "id": "true-grit-earns-its-keep",
@@ -1277,7 +1277,7 @@
       },
       "delta": 8,
       "say": "Your support weapon has a long, frequent or stationary reload. True Grit cuts each one by 30%.",
-      "judgement": "Ours. Fires only inside a build."
+      "judgement": "Our own pairing."
     },
     {
       "id": "true-grit-nothing-to-reload",
@@ -1302,7 +1302,7 @@
       },
       "delta": -6,
       "say": "No support weapon here reloads, so True Grit's +30% support reload does nothing. Only its +20 handling applies.",
-      "judgement": "Ours. Fires only inside a build."
+      "judgement": "Our own pairing."
     },
     {
       "id": "gunslinger-pistol",
@@ -1324,7 +1324,7 @@
       },
       "delta": 6,
       "say": "Gunslinger reloads this 40% faster, draws it 50% faster and cuts its recoil by 70%.",
-      "judgement": "Ours. The Pistol category only: the Ultimatum, the Grenade Pistol and the Stim Pistol are tools you fire once, not sidearms you fight with. Fires only inside a build."
+      "judgement": "Pistols only. The Ultimatum, Grenade Pistol and Stim Pistol are single shot tools."
     },
     {
       "id": "gunslinger-with-a-pistol",
@@ -1346,7 +1346,7 @@
       },
       "delta": 8,
       "say": "Every part of Gunslinger improves your pistol: reload, draw speed and recoil.",
-      "judgement": "Ours. Fires only inside a build."
+      "judgement": "Our own pairing."
     },
     {
       "id": "gunslinger-without-a-pistol",
@@ -1368,7 +1368,7 @@
       },
       "delta": -6,
       "say": "Every part of Gunslinger is for a pistol. A launcher, the Stim Pistol or a melee weapon gets almost nothing from it.",
-      "judgement": "Ours. Fires only inside a build."
+      "judgement": "Our own pairing."
     },
     {
       "id": "melee-weapon-with-melee-armour",
@@ -1398,7 +1398,7 @@
         "times": 0.2,
         "clamp": 8
       },
-      "judgement": "Ours. Scales with the armour's melee bonus: Peak Physique and Rock Solid add 40%, Reinforced Epaulettes 20%. Fires only inside a build."
+      "judgement": "Scales with the armour's melee bonus: Peak Physique and Rock Solid add 40%, Reinforced Epaulettes 20%."
     },
     {
       "id": "melee-armour-with-melee-weapon",
@@ -1428,7 +1428,7 @@
         "times": 0.25,
         "clamp": 10
       },
-      "judgement": "Ours. Scales with the bonus. No penalty without a melee weapon: everyone can melee, and Peak Physique's ergonomics are worth something to any gun. Fires only inside a build."
+      "judgement": "Scales with the bonus. No penalty without a melee weapon: anyone can melee, and Peak Physique's ergonomics help any gun."
     },
     {
       "id": "resists-own-fire",
@@ -1454,14 +1454,14 @@
         }
       },
       "say": "Fire spreads, including to where you stand. This armour cuts fire damage to you.",
-      "source": "The passive's own effect, read as a number. Inflammable resists 75%, Kinetic Displacement Mitigation and Acclimated 50%, Desert Stormer 40%",
+      "source": "The passive's own effect: Inflammable 75%, Kinetic Displacement Mitigation and Acclimated 50%, Desert Stormer 40%.",
       "scaleBy": {
         "path": "passive.fireResist",
         "from": 0,
         "times": 0.18,
         "clamp": 16
       },
-      "judgement": "Ours, the curator's pairing from 4 October 2026. Scales with how much it resists, so a single element passive beats one covering everything at a lower figure. Fires only inside a build."
+      "judgement": "Scales with the resistance, so a passive for one element beats a lower figure for all of them."
     },
     {
       "id": "fire-gear-with-resistant-armour",
@@ -1493,7 +1493,7 @@
         "times": 0.08,
         "clamp": 6
       },
-      "judgement": "Ours, and deliberately small: the armour does not make the weapon better, it makes its worst habit cheaper. Scales with the armour's figure. Fires only inside a build."
+      "judgement": "Kept small: the armour only makes the weapon's downside cheaper. Scales with the armour's figure."
     },
     {
       "id": "resists-own-arc",
@@ -1519,14 +1519,14 @@
         }
       },
       "say": "Arc jumps to the nearest target, you included, and a Tesla Tower most of all. This armour cuts arc damage to you.",
-      "source": "The passive's own effect, read as a number. Electrical Conduit resists 95%, Adreno-Defibrillator and Acclimated 50%, Desert Stormer 40%",
+      "source": "The passive's own effect: Electrical Conduit 95%, Adreno-Defibrillator and Acclimated 50%, Desert Stormer 40%.",
       "scaleBy": {
         "path": "passive.arcResist",
         "from": 0,
         "times": 0.18,
         "clamp": 16
       },
-      "judgement": "Ours, the curator's pairing from 4 October 2026. Scales with how much it resists, so a single element passive beats one covering everything at a lower figure. Fires only inside a build."
+      "judgement": "Scales with the resistance, so a passive for one element beats a lower figure for all of them."
     },
     {
       "id": "arc-gear-with-resistant-armour",
@@ -1558,7 +1558,7 @@
         "times": 0.08,
         "clamp": 6
       },
-      "judgement": "Ours, and deliberately small: the armour does not make the weapon better, it makes its worst habit cheaper. Scales with the armour's figure. Fires only inside a build."
+      "judgement": "Kept small: the armour only makes the weapon's downside cheaper. Scales with the armour's figure."
     },
     {
       "id": "resists-own-gas",
@@ -1584,14 +1584,14 @@
         }
       },
       "say": "Gas damages everyone, Helldivers included. This armour cuts gas damage to you.",
-      "source": "The passive's own effect, read as a number. Advanced Filtration resists 80%, Acclimated 50%, Desert Stormer 40%, Hazmat 25%",
+      "source": "The passive's own effect: Advanced Filtration 80%, Acclimated 50%, Desert Stormer 40%, Hazmat 25%.",
       "scaleBy": {
         "path": "passive.gasResist",
         "from": 0,
         "times": 0.18,
         "clamp": 16
       },
-      "judgement": "Ours, the curator's pairing from 4 October 2026. Scales with how much it resists, so a single element passive beats one covering everything at a lower figure. Fires only inside a build."
+      "judgement": "Scales with the resistance, so a passive for one element beats a lower figure for all of them."
     },
     {
       "id": "gas-gear-with-resistant-armour",
@@ -1623,7 +1623,7 @@
         "times": 0.08,
         "clamp": 6
       },
-      "judgement": "Ours, and deliberately small: the armour does not make the weapon better, it makes its worst habit cheaper. Scales with the armour's figure. Fires only inside a build."
+      "judgement": "Kept small: the armour only makes the weapon's downside cheaper. Scales with the armour's figure."
     },
     {
       "id": "c4-with-throw-range",
@@ -1649,7 +1649,7 @@
         "times": 0.25,
         "clamp": 8
       },
-      "judgement": "Ours, the curator's ask of 4 October 2026, read as throw range. Named by id because nothing else is a backpack of thrown charges. Fires only inside a build."
+      "judgement": "Named by hand: nothing else is a backpack of thrown charges."
     },
     {
       "id": "throw-range-with-c4",
@@ -1675,7 +1675,7 @@
         "times": 0.2,
         "clamp": 6
       },
-      "judgement": "Ours. Servo-Assisted throws 30% further, Desert Stormer 20%. Fires only inside a build."
+      "judgement": "Servo-Assisted throws 30% further, Desert Stormer 20%."
     },
     {
       "id": "muscle-enhancement-wet-or-snowy-ground",
@@ -1695,8 +1695,8 @@
       },
       "delta": 10,
       "say": "Water, mud, undergrowth and snow slow you down. This booster removes most of that slowdown.",
-      "source": "helldivers.wiki.gg, Muscle Enhancement: it reduces the slow from water, snow, mud, foliage, sandstorms, blizzards and barbed wire",
-      "judgement": "The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+      "source": "helldivers.wiki.gg, Muscle Enhancement: reduces the slow from water, snow, mud, foliage, sandstorms, blizzards and barbed wire.",
+      "judgement": "The ground for each biome is our own reading."
     },
     {
       "id": "muscle-enhancement-in-storms",
@@ -1714,7 +1714,7 @@
       },
       "delta": 6,
       "say": "Sandstorms and blizzards slow you down. This booster removes that slowdown.",
-      "source": "helldivers.wiki.gg, Muscle Enhancement, and the hazard text: both storms reduce mobility"
+      "source": "helldivers.wiki.gg, Muscle Enhancement, and the hazard text: both storms reduce mobility."
     },
     {
       "id": "muscle-enhancement-dry-ground",
@@ -1741,8 +1741,8 @@
       },
       "delta": -10,
       "say": "Dry, firm ground and no storm, so this booster has nothing to do.",
-      "source": "helldivers.wiki.gg, Muscle Enhancement: no benefit whatsoever on sand without weather, inclines, vaulting or tremors",
-      "judgement": "The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+      "source": "helldivers.wiki.gg, Muscle Enhancement: no effect on dry sand without weather, slopes, vaulting or tremors.",
+      "judgement": "The ground for each biome is our own reading."
     },
     {
       "id": "muscle-enhancement-dry-ground-bugs",
@@ -1768,8 +1768,8 @@
       },
       "delta": -4,
       "say": "Dry ground and no storm, so the terrain half does nothing. It still shortens the slow from bug acid.",
-      "source": "helldivers.wiki.gg, Muscle Enhancement: it also covers acid from Terminid attacks and Bug Mine explosions",
-      "judgement": "The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+      "source": "helldivers.wiki.gg, Muscle Enhancement: also covers the slow from Terminid acid and Bug Mine explosions.",
+      "judgement": "The ground for each biome is our own reading."
     },
     {
       "id": "jump-pack-steep-ground",
@@ -1788,8 +1788,8 @@
       },
       "delta": 8,
       "say": "The Jump Pack's landing cancels fall damage, so you can drop off cliffs safely.",
-      "source": "helldivers.wiki.gg, LIFT-850 Jump Pack: no fall damage when the landing thrusters engage",
-      "judgement": "The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+      "source": "helldivers.wiki.gg, LIFT-850 Jump Pack: no fall damage when the landing thrusters fire.",
+      "judgement": "The ground for each biome is our own reading."
     },
     {
       "id": "warp-pack-steep-ground",
@@ -1808,8 +1808,8 @@
       },
       "delta": -8,
       "say": "The Warp Pack moves you 10 metres straight ahead, even into mid-air, and nothing breaks the fall.",
-      "source": "helldivers.wiki.gg, LIFT-182 Warp Pack: a Helldiver warping in mid-air stays in mid-air and falls, potentially taking damage",
-      "judgement": "The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+      "source": "helldivers.wiki.gg, LIFT-182 Warp Pack: warping in mid-air leaves you in mid-air, and the fall can hurt.",
+      "judgement": "The ground for each biome is our own reading."
     },
     {
       "id": "frv-easy-ground",
@@ -1830,7 +1830,7 @@
       },
       "delta": 8,
       "say": "Flat, open ground. The FRV drives fastest here and rarely flips.",
-      "judgement": "The curator's, from play: an oasis map drove easily. The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+      "judgement": "From play: an oasis map drove easily. The ground for each biome is our own reading."
     },
     {
       "id": "frv-rough-ground",
@@ -1851,7 +1851,7 @@
       },
       "delta": -10,
       "say": "On broken, rocky or icy ground the FRV flips on ledges, and you end up walking.",
-      "judgement": "The curator's, from play: snow, volcanic, rocky canyon and highland planets drive badly. Players on Steam report the same, that a small rise can roll it. The ground per biome is the curator's reading, 4 October 2026, kept in the terrain table in vocabulary.json and his to correct."
+      "judgement": "From play: snow, volcanic, rocky canyon and highland planets drive badly, and players on Steam agree. The ground for each biome is our own reading."
     },
     {
       "id": "jump-pack-in-a-city",
@@ -1866,7 +1866,7 @@
       },
       "delta": -5,
       "say": "This planet has a megacity, so you may fight between buildings. Hitting one mid-jump ragdolls you.",
-      "judgement": "The curator's call from play, 4 October 2026. Some community advice disagrees and favours fighting from the rooftops; his play wins here and that view is recorded. A guess: the planet has a megacity, which does not mean this mission is in it, so this carries about half the weight a sure fact would."
+      "judgement": "From play. Some players prefer fighting from rooftops instead. Counts half: a megacity on the planet does not mean your mission is in it."
     },
     {
       "id": "warp-pack-in-a-city",
@@ -1881,8 +1881,8 @@
       },
       "delta": 5,
       "say": "This planet has a megacity, so you may fight between buildings. The Warp Pack goes through walls.",
-      "source": "helldivers.wiki.gg, LIFT-182 Warp Pack: it bypasses terrain, buildings, enemies and bunker doors",
-      "judgement": "A guess: the planet has a megacity, which does not mean this mission is in it, so this carries about half the weight a sure fact would."
+      "source": "helldivers.wiki.gg, LIFT-182 Warp Pack: passes through terrain, buildings, enemies and bunker doors.",
+      "judgement": "Counts half: a megacity on the planet does not mean your mission is in it."
     },
     {
       "id": "warp-pack-alone",
@@ -1899,7 +1899,7 @@
       },
       "delta": 8,
       "say": "Alone, you cannot open two person bunker doors. The Warp Pack goes straight through them.",
-      "source": "helldivers.wiki.gg, Bunker: two Helldivers press a button each, or one uses the Warp Pack to bypass the door"
+      "source": "helldivers.wiki.gg, Bunker: two Helldivers press a button each, or one uses the Warp Pack."
     },
     {
       "id": "orbital-laser-short-clock",
@@ -1916,8 +1916,8 @@
       },
       "delta": 8,
       "say": "It has 3 uses, 5 minutes apart. On a mission this short you use all 3, each on a base.",
-      "source": "helldivers.wiki.gg, Orbital Laser: 3 uses, 300 second cooldown. Time limits from each mission's article, read by npm run missions",
-      "judgement": "The curator's, 4 October 2026: on a forty minute mission the three are gone halfway through."
+      "source": "helldivers.wiki.gg, Orbital Laser: 3 uses, 300 second cooldown. Mission time limits from each mission's article.",
+      "judgement": "On a short mission you get the most from all 3 uses. On a 40 minute mission they are gone halfway through."
     },
     {
       "id": "stamina-enhancement-in-the-heat",
@@ -1952,8 +1952,8 @@
       },
       "delta": 6,
       "say": "This planet sets Helldivers on fire. This booster puts you out sooner.",
-      "source": "The booster's own text, and the hazard text: fire tornadoes, and volcanoes throwing burning rocks",
-      "judgement": "Ours."
+      "source": "The booster's own text, and the hazard text: fire tornadoes, and burning rocks from volcanoes.",
+      "judgement": "Our own reading of the hazards."
     },
     {
       "id": "shield-pack-keeps-out-storms",
@@ -1996,7 +1996,7 @@
       "delta": 6,
       "say": "Fire spreads, including to where you stand. This booster puts you out faster.",
       "source": "The booster's own text",
-      "judgement": "Ours. Throwables do not count: a thermite grenade is anti-tank, not a fire kit. Fires only inside a build."
+      "judgement": "Throwables do not count: a thermite grenade is anti-tank."
     },
     {
       "id": "explosive-resist-with-close-blasts",
@@ -2022,8 +2022,8 @@
         "clamp": 10
       },
       "say": "Something in this build explodes close to you. Helldivers already take half explosion damage, and this armour reduces it further.",
-      "source": "helldivers.wiki.gg: Helldivers take 50% of explosion damage. The passive's own effect, read as a number",
-      "judgement": "Ours: the close-blast tag is named by hand, since nothing published marks a weapon as one you set off close. The curator agreed the pairing, 4 October 2026. Fires only inside a build."
+      "source": "helldivers.wiki.gg: Helldivers take 50% of explosion damage. The passive's own effect.",
+      "judgement": "The close blast tag is ours: nothing published marks a weapon you set off close."
     },
     {
       "id": "close-blasts-with-explosive-resist",
@@ -2050,7 +2050,7 @@
       },
       "say": "Your armour reduces damage from your own explosions, so you can use this closer.",
       "source": "helldivers.wiki.gg: Helldivers take 50% of explosion damage",
-      "judgement": "Ours, through the close-blast tag, as its mirror. Fires only inside a build."
+      "judgement": "Through our close blast tag."
     },
     {
       "id": "faster-primary-reload-with-hungry-primary",
@@ -2100,7 +2100,7 @@
       "delta": 8,
       "say": "Your primary reloads slowly or one shell at a time. This armour speeds that up.",
       "source": "The passive's own effect. Reload times from each weapon's wiki infobox",
-      "judgement": "The curator's pairing, 4 October 2026, with the Eruptor and the shotguns as his examples. Long means 3.6 seconds or more, a round by round reload, a shotgun, or since 9 October 2026 a magazine of six or fewer with a reload of three seconds or more, which brings in the Explosive Crossbow. Fires only inside a build."
+      "judgement": "Slow means 3.6 seconds or more, a round by round reload, a shotgun, or a magazine of 6 or fewer with a reload of 3 seconds or more."
     },
     {
       "id": "hungry-primary-with-faster-reload",
@@ -2149,7 +2149,7 @@
       },
       "delta": 5,
       "say": "This weapon reloads slowly. Your armour speeds up its reload.",
-      "judgement": "Ours, the mirror of the above. Fires only inside a build."
+      "judgement": "The mirror of the rule above."
     },
     {
       "id": "crouch-recoil-with-planted-weapons",
@@ -2175,7 +2175,7 @@
       "delta": 4,
       "say": "Your build has a weapon you fire crouched or prone, and this armour cuts recoil in those stances.",
       "source": "The passive's own effect: -30% recoil crouched or prone",
-      "judgement": "Tentative, and the curator was not sure of it, 4 October 2026. He added the Autocannon. Named by hand. Fires only inside a build."
+      "judgement": "Tentative. The weapons are named by hand."
     },
     {
       "id": "vitality-with-gas-resistant-armour",
@@ -2197,7 +2197,7 @@
       "delta": 6,
       "say": "Your armour resists most gas, and this booster adds more resistance. Together you can stand in your own gas.",
       "source": "helldivers.wiki.gg, Orbital Gas Strike: Advanced Filtration with Vitality Enhancement makes a Helldiver immune to gas",
-      "judgement": "Ours. Fires only inside a build."
+      "judgement": "Our own pairing."
     },
     {
       "id": "stim-pistol-with-longer-stims",
@@ -2218,8 +2218,7 @@
       },
       "delta": 6,
       "say": "Your armour adds 2 seconds to every stim, including the ones this pistol fires at your squad.",
-      "source": "helldivers.wiki.gg, Med-Kit: the longer stim duration extends to the P-11 Stim Pistol",
-      "judgement": "Fires only inside a build."
+      "source": "helldivers.wiki.gg, Med-Kit: the longer stim duration extends to the P-11 Stim Pistol"
     },
     {
       "id": "longer-stims-with-stim-pistol",
@@ -2240,8 +2239,7 @@
       },
       "delta": 6,
       "say": "With the Stim Pistol, the 2 extra seconds on every stim reach your squad too.",
-      "source": "helldivers.wiki.gg, Med-Kit",
-      "judgement": "Fires only inside a build."
+      "source": "helldivers.wiki.gg, Med-Kit"
     },
     {
       "id": "ballistic-shield-with-one-hand-free",
@@ -2258,8 +2256,7 @@
       },
       "delta": 8,
       "say": "The shield takes one hand and your primary needs only one, so you can fire from behind the shield.",
-      "source": "helldivers.wiki.gg, Ballistic Shield Backpack: it needs a weapon with the One Handed trait. The trait from each weapon's infobox",
-      "judgement": "Fires only inside a build."
+      "source": "helldivers.wiki.gg, Ballistic Shield Backpack: it needs a weapon with the One Handed trait. The trait from each weapon's infobox"
     },
     {
       "id": "ballistic-shield-with-two-handed-primary",
@@ -2277,7 +2274,7 @@
       "delta": -8,
       "say": "The shield takes one hand and your primary needs two, so behind the shield you fight with your sidearm.",
       "source": "helldivers.wiki.gg, Ballistic Shield Backpack",
-      "judgement": "Fires only inside a build, and on a build with no primary yet it fires too, which is the honest reading of what you could hold."
+      "judgement": "Also applies when the build has no primary yet."
     },
     {
       "id": "one-handed-primary-with-ballistic-shield",
@@ -2294,8 +2291,7 @@
       },
       "delta": 5,
       "say": "You can fire this with one hand while holding the shield in the other.",
-      "source": "helldivers.wiki.gg, Ballistic Shield Backpack",
-      "judgement": "Fires only inside a build."
+      "source": "helldivers.wiki.gg, Ballistic Shield Backpack"
     },
     {
       "id": "heavy-armour-wants-stamina",
@@ -2312,8 +2308,8 @@
       },
       "delta": 8,
       "say": "Heavy armour recovers stamina at half the rate of medium. This booster gives a lot of that back.",
-      "source": "helldivers.wiki.gg, Stamina Enhancement: +22.5% max stamina, +40% regen. Armor: heavy regen 50 against medium 100",
-      "judgement": "The curator's pairing, 4 October 2026. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+      "source": "helldivers.wiki.gg, Stamina Enhancement: +22.5% max stamina, +40% regen. Armour: heavy regen 50, medium 100.",
+      "judgement": "Our own pairing. Needs a chosen armour set, for its weight."
     },
     {
       "id": "heavy-armour-wants-dead-sprint",
@@ -2330,7 +2326,7 @@
       },
       "delta": 5,
       "say": "Heavy armour runs out of stamina first. Dead Sprint lets you keep running at the cost of health.",
-      "judgement": "Ours, after the curator's point that heavy armour wants something for its legs. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+      "judgement": "Heavy armour needs help with stamina. Needs a chosen armour set, for its weight."
     },
     {
       "id": "heavy-armour-wants-a-pack-that-moves-you",
@@ -2348,7 +2344,7 @@
       },
       "delta": 6,
       "say": "Heavy armour is the slowest weight. This pack covers ground faster than you can run.",
-      "judgement": "The curator's pairing, 4 October 2026. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+      "judgement": "Our own pairing. Needs a chosen armour set, for its weight."
     },
     {
       "id": "light-armour-wants-the-bubble",
@@ -2366,7 +2362,7 @@
       "delta": 6,
       "say": "Light armour has a low armour rating. The bubble blocks the first 150 damage from any direction.",
       "source": "helldivers.wiki.gg, SH-32 Shield Generator Pack: 150 shield health, 360 degrees",
-      "judgement": "The curator's pairing, 4 October 2026. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+      "judgement": "Our own pairing. Needs a chosen armour set, for its weight."
     },
     {
       "id": "heavy-armour-against-the-bots",
@@ -2384,7 +2380,7 @@
       },
       "delta": 6,
       "say": "Automatons mostly shoot. Heavy armour takes small arms fire and stray rockets better.",
-      "judgement": "Community advice, read on Steam on 4 October 2026: heavy for bots, light for bugs, medium either way. The curator wears medium by habit and asked whether that is right. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+      "judgement": "Community advice from Steam: heavy for Automatons, light for Terminids, medium either way. Needs a chosen armour set, for its weight."
     },
     {
       "id": "heavy-armour-against-the-bugs",
@@ -2402,7 +2398,7 @@
       },
       "delta": -6,
       "say": "Against Terminids you survive by dodging, and heavy armour is too slow for that. Spewers and Bile Titans hit hard through any armour rating.",
-      "judgement": "Community advice, read on Steam on 4 October 2026. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+      "judgement": "Community advice from Steam. Needs a chosen armour set, for its weight."
     },
     {
       "id": "light-armour-against-the-bugs",
@@ -2420,7 +2416,7 @@
       },
       "delta": 4,
       "say": "Terminids attack up close. Light armour is the fastest weight.",
-      "judgement": "Community advice, read on Steam on 4 October 2026, and a 304 mission survey reported in the press in which 70% of players wore light. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+      "judgement": "Community advice from Steam, and a survey of 304 missions in which 70% of players wore light. Needs a chosen armour set, for its weight."
     },
     {
       "id": "heavy-armour-in-the-heat",
@@ -2439,7 +2435,7 @@
       "delta": -6,
       "say": "Intense heat halves your stamina, and heavy armour already recovers it at half the medium rate.",
       "source": "helldivers.wiki.gg, Stamina Enhancement: Intense Heat halves max stamina",
-      "judgement": "Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+      "judgement": "Needs a chosen armour set, for its weight."
     },
     {
       "id": "heavy-armour-holds-a-position",
@@ -2457,7 +2453,7 @@
       },
       "delta": 3,
       "say": "Heavy armour suits holding one position, which is where sentries and emplacements work best.",
-      "judgement": "Community: of 304 missions logged in a survey reported in the press, three quarters of heavy armour players ran three turrets. A nudge. Reads the weight of the armour set the build wears, so it fires only inside a build that has chosen a set. The weights' numbers are the wiki's: light 550 speed and 125 stamina regen, medium 500 and 100, heavy 450 and 50."
+      "judgement": "From a survey of 304 missions: three quarters of heavy armour players brought 3 turrets. A small effect. Needs a chosen armour set, for its weight."
     }
   ],
   "knownGaps": [
