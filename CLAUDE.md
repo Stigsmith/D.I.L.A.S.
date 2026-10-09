@@ -389,9 +389,9 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 | `wiki-stats.json` | **Generated.** The stats the tables never had, for 195 items, and since 4 October 2026 a reload time for 91 held weapons and the One Handed trait for 35, read from each weapon's own wiki infobox. Never edit by hand |
 | `planets.json` | **Generated.** 281 planets: biome, hazards, sector, their cities by size, and for 274 of them a place on the galaxy map and the supply lines to their neighbours. Read by the scenario, the map and the drop planner |
 | `enemies.json` | **Generated.** 80 enemies, 594 body parts, each with an armor value, plus the difficulty each enemy starts appearing at. What every penetration figure is measured against. Never edit by hand |
-| `context-rules.json` | The 104 rules that move one item rating, each with a `name` for the Rules page. 41 of them read the build, pairings and armour weight, and fire only inside one. Read by `score.js`, checked by `npm run rules`, and the pairings by `npm run builds` |
+| `context-rules.json` | The 105 rules that move one item rating, each with a `name` for the Rules page. 42 of them read the build, pairings and armour weight, and fire only inside one. Read by `score.js`, checked by `npm run rules`, and the pairings by `npm run builds` |
 | `missions.json` | The 70 missions by the game's names, the fronts each appears on, the nine traits a rule keys on, and each one's time limit in `minutes`. Hand kept from the wiki; the names and fronts are the wiki's, the traits are ours, the minutes are written by `npm run missions` |
-| `build-rules.json` | The 9 rules that move a whole build. Read by `build.js`, checked by `npm run builds` |
+| `build-rules.json` | The 10 rules that move a whole build. Read by `build.js`, checked by `npm run builds` |
 | `difficulty.json` | **Generated** by `npm run difficulty` from the table on the wiki's Difficulty page: per level, missions in an operation, medals, objectives, outposts by size, what the level introduces, and the reward multiplier. Read by the war room's difficulty bar through `src/lib/difficulty.js`. Never edit by hand |
 
 ### Item shape
@@ -426,7 +426,7 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 - **A tier of `null`** means no rating exists. Those rows render a dashed `?` badge and sort last. This is a first class state, not missing data, and a rating with a tier always carries its source and patch.
 - **`damageType`** drives the damage type filter and the row icon. **`heat` and `arc` are the thermally affected ones**, which is what the hot exclusion and the cold advantage key off.
 - **`roles`** is the editorial layer. Three values, `anti-armor`, `chaff` and `objective`, and `chaff` is the most used of the three. An empty array is the normal case: 145 rated rows carry nothing, and there is deliberately no validator rule demanding otherwise.
-- **`tags`** is the other curated layer and it is not the same thing as `roles`. A role says what job an item does for a squad. A tag says something a scoring rule needs to ask about that no fetched field answers. Two exist, `long-range` and `suppressed`, and **each declares its own provenance in `vocabulary.json`**: `long-range` is `curator`, `suppressed` is `wiki`. See The Tag Layer.
+- **`tags`** is the other curated layer and it is not the same thing as `roles`. A role says what job an item does for a squad. A tag says something a scoring rule needs to ask about that no fetched field answers. Three exist, `long-range`, `close-blast` and `suppressed`, and **each declares its own provenance in `vocabulary.json`**: `long-range` and `close-blast` are `curator`, `suppressed` is `wiki`. See The Tag Layer.
 - **`flag`** is `"stale"` when the rating predates a confirmed change to that exact item, which requires a `patchNote`, or `"new"` when the item is in the game with no rating yet. **None is stale as of 1.23.0**: the nineteen that were all cleared when u.gg's votes came to postdate the changes, flag and note both set to null. Only the P/40-K Bolt Pistol is `new`. The machinery stays for the next patch.
 - **`effect` versus `note`.** Armor passives and boosters carry an `effect`, which is what the thing actually does. Everything else carries a `note`, which is opinion. They never both appear.
 - **`passive`**, on armor only since 4 October 2026: the effect's percentages as numbers a rule can scale off, `{ "fireResist": 75 }`. Read off the `effect` text, never judged. Every armor carries the object, empty when nothing in it is a number a rule asks about. The keys are a closed list in `validate.mjs` (`PASSIVE_KEYS`), because a misspelt key is a rule that never fires. `stimDuration` is in seconds, the rest in percent. **Change `effect` and `passive` together.**
@@ -717,7 +717,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 # **The Loadout Reading**
 
 > [!success] A build is scored as a build. 1.20.0, 22 August 2026
-> `src/lib/build.js`, 9 rules in `src/data/build-rules.json`, `npm run builds` to check them. Pure, same shape as `score.js`, `squad.js` and `enemies.js`: no React, no storage, runnable from a script.
+> `src/lib/build.js`, 10 rules in `src/data/build-rules.json`, `npm run builds` to check them. Pure, same shape as `score.js`, `squad.js` and `enemies.js`: no React, no storage, runnable from a script.
 >
 > **Two readings, and the difference between them is the product.** The gear badge is the mean of what the nine items are worth where you are dropping, each scored by `scoreItem` against the same 34 rules the tier list shows. The build badge is that plus what the combination adds or takes off. A kit whose parts average an A and which fits together like a B is the interesting case, and showing only the B makes it a verdict nobody can argue with.
 
@@ -796,6 +796,8 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 | **Fire, arc, gas resistance** | armour resisting what the build brings | armour by its figure, 75% fire is +14; the gear up to +6 |
 | **C4 and throw range** | the C4 Pack beside Servo-Assisted or Desert Stormer | C4 up to +8, armour up to +6 |
 | **Stealth** | one or two of you from peril 22: a silenced weapon with or without stealth armour | -5 without, +5 to the armour with |
+| **True Grit, big belt** | beside a support weapon with a reload of 3.5s or more and a magazine **over** 120 (Stalwart, Machine Gun, Flamethrower, Sterilizer). 1.31.0 | weapon +2, and it counts for True Grit's own +8 |
+| **Siege-Ready, small magazine** | a primary with 6 rounds or fewer and a reload of 3s or more, which adds the Explosive Crossbow. 1.31.0 | as the other Siege-Ready cases |
 
 > [!warning] Points preserve order, so the vote still decides a lot
 > With a Cremator on bots, Acclimated goes A to S and Inflammable B to A: Inflammable gains more, +14 to +9, but the vote puts it two tiers lower to start. On bugs, where the vote has Inflammable at S+, it tops the picker. **This is deliberate and the curator should know it.** A pairing is a strong argument, not a floor, and making it one would be the floor mistake again.
@@ -833,6 +835,14 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > **Sets lock with their warbond.** 62 sets come from a warbond, so a warbond you do not own hides its sets in the picker behind the usual locked toggle, and a build wearing one counts as needing locked gear on Drop Bay and in the Armoury. `buildLockedSet` puts set ids into the locked set beside item ids; **the header counts items only**. Superstore, starter and event sets have no per set lock yet.
 >
 > **Weight reaches the rules on the scenario as `scenario.weight`**, set by `readBuild` and the builder next to `alongside`, never by the tier list. Heavy wants Stamina Enhancement, Dead Sprint and a Jump or Warp Pack; light wants the Shield Generator Pack; heavy is up against bots and down against bugs, light up against bugs (community advice, his medium habit being the question); heavy is down in intense heat; sentries and emplacements are nudged up in heavy. `npm run builds` dresses its pairing hosts in a real set so these are measured: 4% to 27%.
+
+> [!success] Round three, 1.31.0, 9 October 2026: the curator's notes on reloads, blasts and launchers
+> Written up with another assistant, judged here against the code; `dilas-roadmap.md`, "Reloads, blasts and launchers", has every verdict. Most was already built. What changed:
+>
+> - **The picker says what a candidate closes.** `closedGaps` in `build.js` compares the build's red and amber notes before and after trying each candidate in the open slot; the builder shows "Closes: No crowd clear" above it. **It marks, it never reorders.** Ninety three trial readings take about 40 ms
+> - **`expendable-beside-a-support-weapon`**, a build rule at **zero points, grey**: carrying an expendable and a permanent support weapon means dropping one to fire the other, and bringing launchers for the squad is a real reason. The Solo Silo is left out. 15% of random builds
+> - **The close blast list is the `close-blast` tag**, and it took in the Plasma Punisher. `npm run rules` and `npm run builds` were identical before it was added. The Autocannon stays off, the curator's default
+> - **Cut after measuring**: a primary and a sidearm that both explode. 0% random, 29% curated, all through the Grenade Pistol, which closes holes rather than fighting up close. In `knownGaps`
 
 ---
 
@@ -1082,12 +1092,13 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 
 # **The Tag Layer**
 
-Two tags on items, read by the scoring rules. They exist because six rules used to spell out the same
+Three tags on items, read by the scoring rules. They exist because six rules used to spell out the same
 lists of item ids, and a concept written down six times is a concept that drifts.
 
 | Tag | Provenance | Carried by | What it means |
 |---|---|---|---|
 | `long-range` | `curator` | 6 support weapons | The ones you aim at something far away |
+| `close-blast` | `curator` | 7 weapons | Their own blast reaches you when you fire close. Since 1.31.0, replacing an id list typed twice |
 | `suppressed` | `wiki` | 5 weapons | Audible at 12 metres rather than 100 |
 
 > [!danger] A tag declares where it came from, and that is the whole point

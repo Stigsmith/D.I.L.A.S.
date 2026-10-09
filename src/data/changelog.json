@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.31.0",
+    "date": "2026-10-09",
+    "title": "Reload discipline",
+    "say": "The Ministry has reviewed how long you spend reloading and finds it excessive. Corrective armour is available.",
+    "changes": [
+      "The picker says what a pick fixes: open the support slot on an Eruptor build and the Stalwart reads \"Closes: All punch, no volume\".",
+      "True Grit does a little for big belts with a long reload, so the Stalwart and the Machine Gun now gain from it.",
+      "Siege-Ready reaches the Explosive Crossbow, and explosive resistance counts the Plasma Punisher as a blast you set off close.",
+      "An expendable launcher beside another support weapon warns you that one gets dropped for the other. No points lost: bringing launchers for the squad is allowed.",
+      "Reloading the page while editing a saved build opens that build again, not an empty one."
+    ]
+  },
+  {
     "version": "1.30.0",
     "date": "2026-10-05",
     "title": "Know the ground you die on",

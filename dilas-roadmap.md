@@ -532,6 +532,16 @@ Still open from it:
 
 ---
 
+## Reloads, blasts and launchers: 1.31.0, started 9 October 2026
+
+The curator's observations from a session outside this repo, judged against what already shipped. Most of it was already built in 1.29.0 and 1.30.0; CLAUDE.md, "Pairings", has what changed.
+
+- **Done.** True Grit gives a small step to a big belt with a long reload (Stalwart, Machine Gun, Flamethrower, Sterilizer). Siege-Ready reaches the Explosive Crossbow. The close blast list became a `close-blast` tag and took in the Plasma Punisher. The picker says which of the build's holes a candidate closes. An expendable beside a permanent support weapon is a warning that moves no points
+- **Corrected.** The Expendable Anti-Tank and the Recoilless are not the same rocket: the wiki gives the Recoilless 3200 direct damage against the EAT-17's 2000. Same job, not the same numbers
+- **Cut after measuring.** A primary and a sidearm that both explode, as a build rule: 0% of random builds, 29% of the curated ones, all through the Grenade Pistol, which is there to close holes. Recorded in `knownGaps`
+- **The curator's calls, defaults applied**: the Autocannon is not `close-blast`; the Stalwart gets +2 beside True Grit; the juggling warning moves no points
+- **Held back for a source**: whether the Shield Generator Pack stops your own blast throwing you; whether a Solo Silo already on the ground keeps firing through an ion storm or a jammer
+
 ## Smaller items
 
 - **A roll the dice generator in the builder.** A deliberate roll you ask for, that picks something decent without simply taking the top rated item in every slot, plus playstyle options to steer it. Parked until the coverage logic is good enough to make it worth rolling.
