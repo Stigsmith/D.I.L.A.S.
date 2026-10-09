@@ -9,7 +9,8 @@
       "True Grit does a little for big belts with a long reload, so the Stalwart and the Machine Gun now gain from it.",
       "Siege-Ready reaches the Explosive Crossbow, and explosive resistance counts the Plasma Punisher as a blast you set off close.",
       "An expendable launcher beside another support weapon warns you that one gets dropped for the other. No points lost: bringing launchers for the squad is allowed.",
-      "Reloading the page while editing a saved build opens that build again, not an empty one."
+      "Reloading the page while editing a saved build opens that build again, not an empty one.",
+      "An opened tier row is shorter: armour reads as full damage, reduced and weak points by name, missing figures are marked, and hovering a label explains it. The reasoning moved to About."
     ]
   },
   {

@@ -30,7 +30,8 @@ import {
 } from "./lib/scenario.js";
 import { scoreItem, scenarioIsSet } from "./lib/score.js";
 import { readBuild, explainScore } from "./lib/build.js";
-import { describeArmour, EXPOSURE_GAP, enemySource } from "./lib/enemies.js";
+import { describeArmour } from "./lib/enemies.js";
+import { Tip, MissingData, HAS_TIP } from "./Tip.jsx";
 import TierBadgePlate from "./TierBadgePlate.jsx";
 import { agoText } from "./lib/war.js";
 import { useBadgeStyle } from "./lib/badge.js";
@@ -991,48 +992,30 @@ const FILTER_SHAPE = {
 
 /* A labelled fact. Kept flat rather than a table so it reflows on a     */
 /* phone without turning into a scrolling grid.                          */
-function Fact({ label, children }) {
-  if (children === null || children === undefined || children === "") return null;
+/* `tip` explains the label on hover. `missing` shows the Missing data  */
+/* marker when there is no value, with `why` as its hover text.         */
+function Fact({ label, tip = null, missing = false, why, tone = null, children }) {
+  const empty = children === null || children === undefined || children === "";
+  if (empty && !missing) return null;
+  const head = "w-[104px] shrink-0 uppercase tracking-wide text-base-500";
   return (
     <div className="flex items-baseline gap-2 text-[11px]">
-      <span className="w-[104px] shrink-0 uppercase tracking-wide text-base-500">{label}</span>
-      <span className="min-w-0 text-base-300">{children}</span>
+      {tip ? <Tip text={tip} className={head}><span className={HAS_TIP}>{label}</span></Tip> : <span className={head}>{label}</span>}
+      <span className={"min-w-0 " + (tone || "text-base-300")}>{empty ? <MissingData why={why} /> : children}</span>
     </div>
   );
 }
 
-function Section({ title, children }) {
+function Section({ title, tip = null, children }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-base-500">{title}</p>
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-base-500">
+        {tip ? <Tip text={tip}><span className={HAS_TIP}>{title}</span></Tip> : title}
+      </p>
       {children}
     </div>
   );
 }
-
-/* What the source tables do not carry. Saying so is the point: an       */
-/* admitted gap beats a hedged guess, and it stops anyone assuming the   */
-/* absence means zero.                                                   */
-/* This used to name seven fields as missing from every source. The wiki  */
-/* fetch filled all but two of them and the line kept apologising for     */
-/* their absence anyway, which is worse than never claiming the gap: it   */
-/* tells you the tool does not know something it is holding.              */
-/*                                                                        */
-/* Reload time arrived on 4 October 2026, read from each weapon's own wiki */
-/* infobox, so the admission narrowed again. A weapon with no reload on    */
-/* its page either never reloads, a Quasar or an Arc Thrower, or the page  */
-/* does not say, and the line admits it cannot tell those apart.           */
-const STILL_MISSING =
-  "Projectile count is still not in any source this project has. Everything above is fetched from helldivers.wiki.gg.";
-const NO_RELOAD =
-  "Its wiki page gives no reload time: it never reloads, or the page does not say. Projectile count is not in any source this project has either. Everything above is fetched from helldivers.wiki.gg.";
-
-/* A weapon the wiki has no data page for gets the admission rather than  */
-/* an empty section. This was six of the nine melee weapons until 26     */
-/* September 2026, when the wiki published them; it is kept for the next  */
-/* item that arrives before its page does.                                */
-const NO_FETCHED_STATS =
-  "No handling or ammo figures for this one. The wiki has no data page for it yet, so magazine, rate of fire, recoil and ergonomics are genuinely unknown rather than merely unlisted.";
 
 function RowDetail({ item, faction, scored, difficulty }) {
   const sets = item.slot === "armor" ? ARMOR_SETS[item.id] : null;
@@ -1109,13 +1092,13 @@ function RowDetail({ item, faction, scored, difficulty }) {
             ) : null}
             {item.slot === "stratagem" ? (
               <Fact label="Backpack">
-                {item.usesBackpackSlot === null
-                  ? <span className="text-base-500">not recorded in the source yet</span>
-                  : item.stratType === "backpack"
-                    ? "This is the backpack"
+                {item.stratType === "backpack"
+                  ? "Is a backpack"
+                  : item.usesBackpackSlot === null
+                    ? <MissingData />
                     : item.usesBackpackSlot
-                      ? <span className="text-accent-400">Takes your backpack slot</span>
-                      : "Leaves your backpack free"}
+                      ? <span className="text-accent-400">Uses it</span>
+                      : "Free"}
               </Fact>
             ) : null}
             {item.effect ? <Fact label="Effect">{item.effect}</Fact> : null}
@@ -1129,15 +1112,22 @@ function RowDetail({ item, faction, scored, difficulty }) {
           {/* wiki and joined on read. This row apologised for their        */}
           {/* absence for a week after the fetch had already filled them.   */}
           {wiki ? (
-            <Section title="Handling and ammo">
+            <Section title="Handling and ammo" tip="From helldivers.wiki.gg.">
               <Fact label="Magazine">
                 {wiki.ammo && wiki.ammo.magazine !== undefined
                   ? `${wiki.ammo.magazine}${wiki.ammo.spareMagazines !== undefined ? `, ${wiki.ammo.spareMagazines} spare` : ""}`
                   : null}
               </Fact>
-              <Fact label="Reload">
+              <Fact label="Reload" missing why="Never reloads, or no source has it yet.">
                 {wiki.reload
-                  ? <>{wiki.reload.seconds}s{wiki.reload.perRound ? <span className="text-base-500"> · a round at a time, for a full load</span> : null}{wiki.reload.stationary ? <span className="text-base-500"> · you cannot move while it reloads</span> : null}</>
+                  ? <>
+                    {wiki.reload.seconds}s{wiki.reload.perRound ? <span className="text-base-500"> total · one round at a time</span> : null}
+                    {wiki.reload.stationary ? (
+                      <Tip text="You cannot move while it reloads." className="ml-1.5 cursor-help">
+                        <span className="inline-block rounded border border-base-700 px-1.5 text-[10px] uppercase leading-4 tracking-wider text-base-400">Stationary</span>
+                      </Tip>
+                    ) : null}
+                  </>
                   : null}
               </Fact>
               <Fact label="From a resupply">
@@ -1146,35 +1136,34 @@ function RowDetail({ item, faction, scored, difficulty }) {
               <Fact label="Rate of fire">
                 {wiki.handling && wiki.handling.rpm !== undefined ? `${wiki.handling.rpm} rpm` : null}
               </Fact>
-              <Fact label="Ergonomics">
-                {wiki.handling && wiki.handling.ergonomics !== undefined
-                  ? <>{wiki.handling.ergonomics}<span className="text-base-500"> · how fast the barrel follows the camera</span></>
-                  : null}
+              <Fact label="Ergonomics" tip="How fast the barrel follows your aim.">
+                {wiki.handling && wiki.handling.ergonomics !== undefined ? `${wiki.handling.ergonomics}` : null}
               </Fact>
-              <Fact label="Recoil">
-                {wiki.handling && wiki.handling.recoilClimb !== undefined ? `${wiki.handling.recoilClimb} climb` : null}
+              <Fact label="Recoil" tip="How far the barrel climbs per shot.">
+                {wiki.handling && wiki.handling.recoilClimb !== undefined ? `${wiki.handling.recoilClimb}` : null}
               </Fact>
               <Fact label="Sway">
                 {wiki.handling && wiki.handling.sway !== undefined ? `${wiki.handling.sway}` : null}
               </Fact>
-              <Fact label="Durable damage">
+              <Fact label="Durable damage" tip="Share of damage that still counts against tough flesh, like a Charger's body.">
                 {wiki.primary && wiki.primary.durableRatio !== undefined
-                  ? <>{Math.round(wiki.primary.durableRatio * 100)}%<span className="text-base-500"> of its damage survives against the big fleshy parts</span></>
+                  ? `${Math.round(wiki.primary.durableRatio * 100)}%`
                   : null}
               </Fact>
-              <Fact label="Stagger">
+              <Fact label="Stagger" tip="How hard a hit staggers them, then how far it pushes them back.">
                 {wiki.primary && wiki.primary.stun !== undefined
-                  ? `${wiki.primary.stun}${wiki.primary.push !== undefined ? `, ${wiki.primary.push} pushback` : ""}`
+                  ? `${wiki.primary.stun}${wiki.primary.push !== undefined ? ` · pushback ${wiki.primary.push}` : ""}`
                   : null}
               </Fact>
               <Fact label="Pellets">
                 {wiki.projectile && wiki.projectile.pellets !== undefined && wiki.projectile.pellets > 1
                   ? `${wiki.projectile.pellets}` : null}
               </Fact>
-              <p className="text-[10px] leading-relaxed text-base-600">{wiki.reload ? STILL_MISSING : NO_RELOAD}</p>
             </Section>
           ) : isWeapon ? (
-            <p className="text-[10px] leading-relaxed text-base-600">{NO_FETCHED_STATS}</p>
+            <Section title="Handling and ammo">
+              <div><MissingData why="The wiki has no data page for this yet." /></div>
+            </Section>
           ) : null}
 
           {/* What the penetration number in Numbers is actually up        */}
@@ -1182,26 +1171,17 @@ function RowDetail({ item, faction, scored, difficulty }) {
           {/* it by, which is what this row showed from the day it first   */}
           {/* had an armor pen line. Now it has the other half.            */}
           {armour ? (
-            <Section title={armour.title}>
-              {armour.lines.map((l) => (
-                <p key={l.say}
-                  className={"text-[11px] leading-relaxed " +
-                    (l.tone === "good" ? "text-emerald-400" : l.tone === "bad" ? "text-red-400" : "text-base-300")}>
-                  {l.say}
-                </p>
+            <Section title={armour.title} tip="For reference only. Armour is scored in the build reading.">
+              {armour.facts.map((f) => (
+                <Fact key={f.key} label={f.label} tip={f.tip}
+                  tone={f.tone === "good" ? "text-emerald-400" : f.tone === "bad" ? "text-red-400" : null}>
+                  {f.say}
+                </Fact>
               ))}
-              <p className="text-[10px] leading-relaxed text-base-600">
-                <span className="text-base-500">This does not move the rating.</span> Almost every primary reads the
-                same here, so charging one for it would be charging it for being a primary, which the community tier
-                has already accounted for. You bring an assault rifle knowing something else in your kit opens armor.
-                Whether your kit actually does is a question about the whole loadout, and that is where this comes
-                back.
-              </p>
-              <p className="text-[10px] leading-relaxed text-base-600">
-                Armor values per body part come from {enemySource.source}, counted over the {armour.reading.total}{" "}
-                enemies that front always fields. The special strains and brigades are left out: they only exist while
-                a galactic effect is running, and the tool has no way to know whether one is. {EXPOSURE_GAP}
-              </p>
+              <a href="#/about/armour" onClick={(e) => e.stopPropagation()}
+                className="self-start text-[10px] text-base-500 underline decoration-base-700 underline-offset-2 hover:text-base-300">
+                How armour is counted
+              </a>
             </Section>
           ) : null}
 
@@ -1233,11 +1213,6 @@ function RowDetail({ item, faction, scored, difficulty }) {
                   <span className="text-base-300">{r.say}</span>
                 </div>
               ))}
-              <p className="text-[10px] leading-relaxed text-base-600">
-                Ours, not a community vote. The first column is the u.gg tier and this is what we make of it for your
-                scenario, meaning the front, planet, biome, hazards and mission you picked above. Roughly 14 points is
-                one tier, and no scenario can move a rating by more than two.
-              </p>
             </Section>
           ) : null}
 
@@ -1527,14 +1502,24 @@ function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, loc
             }}>
             <TierBadge tier={tier} quiet={sortBy !== "ugg"} className={ROW_BADGE} />
           </div>
-          <div className="w-12 sm:w-16 flex items-center justify-center border-l px-1 py-1.5"
+          <Tip as="div" className="w-12 sm:w-16 flex items-center justify-center border-l px-1 py-1.5"
             style={{
               backgroundColor: sortBy === "ours" ? factionMeta.hex + "14" : "transparent",
               borderColor: factionMeta.hex + "33",
             }}
-            title={scored && scored.reasons.length
-              ? scored.reasons.map((r) => r.say).join(" ")
-              : scored ? "Nothing about where you are dropping changes where this sits" : undefined}>
+            title={scored && scored.reasons.length ? "What changes this tier" : null}
+            text={scored && scored.reasons.length ? (
+              <span className="flex flex-col gap-1">
+                {scored.reasons.map((r) => (
+                  <span key={r.id} className="flex items-start gap-1.5">
+                    <span className={"shrink-0 font-bold tabular-nums " + (r.delta > 0 ? "text-emerald-400" : "text-red-400")}>
+                      {r.delta > 0 ? "+" : ""}{r.delta}
+                    </span>
+                    <span>{r.say}</span>
+                  </span>
+                ))}
+              </span>
+            ) : scored ? "No effect from this scenario." : null}>
             {!scored || !scored.tier ? (
               <PendingBadge />
             ) : (
@@ -1553,7 +1538,7 @@ function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, loc
                 ) : null}
               </span>
             )}
-          </div>
+          </Tip>
         </div>
 
         <div className="w-6 shrink-0 flex items-center justify-center gap-0.5 sm:w-9">

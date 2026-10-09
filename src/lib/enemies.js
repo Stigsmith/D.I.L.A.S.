@@ -152,6 +152,8 @@ export function frontReading(ap, faction, difficulty) {
       anywhere: anywhere.map((e) => e.name),
       weakpoint: weakpoint.map((e) => e.name),
       bounces: bounces.map((e) => e.name),
+      /* The ones you hurt only at 65%, named for the expanded row. */
+      grazing: reads.filter((r) => r.state === "anywhere" && r.grazes).map((r) => r.enemy).sort(bySize).map((e) => e.name),
     },
   };
   cache.set(key, out);
@@ -242,7 +244,7 @@ export function arrivalsLine(faction, difficulty) {
 /* mean.                                                                */
 /* ------------------------------------------------------------------ */
 
-const FRONT = { bots: "Automaton", bugs: "Terminid", squids: "Illuminate" };
+const FRONT_PLURAL = { bots: "Automatons", bugs: "Terminids", squids: "Illuminate" };
 
 /* Three names then a count. Naming eleven enemies is a list nobody      */
 /* reads; naming none is a claim with nothing behind it.                */
@@ -256,63 +258,47 @@ function nameList(names, limit = 3) {
 }
 
 /**
- * The expanded row's armour block. Returns null when there is nothing
- * worth saying, so the caller can leave the section out rather than
- * render an empty one.
+ * The expanded row's armour block: up to four labelled facts, the
+ * writing guide's shape (dilas-writing.md). Returns null when there is
+ * nothing worth saying, so the caller can leave the section out.
+ *
+ * Full damage is the enemies you hurt everywhere at full damage, which
+ * leaves out the ones you only tie: those are Reduced. The four lines
+ * add up to the front's total.
  */
 export function describeArmour(ap, faction, difficulty) {
   const r = frontReading(ap, faction, difficulty);
   if (!r) return null;
 
-  const front = FRONT[faction] || faction;
-  const lines = [];
+  const front = FRONT_PLURAL[faction] || faction;
+  const full = r.anywhere - r.grazing;
+  const facts = [];
 
-  if (r.anywhere === r.total) {
-    lines.push({
-      tone: "good",
-      say: `AP ${ap} gets through all ${r.total} ${front} enemies wherever you hit them. Nothing on this front turns it away, so you never have to go looking for a weak point.`,
-    });
-  } else if (r.anywhere === 0) {
-    lines.push({
-      tone: "bad",
-      say: `AP ${ap} does not open a single ${front} enemy from every angle. Every one of the ${r.total} has armor somewhere that stops this.`,
-    });
-  } else {
-    lines.push({
-      tone: "neutral",
-      say: `AP ${ap} gets through ${r.anywhere} of the ${r.total} ${front} enemies wherever you hit them.`,
-    });
-  }
-
+  facts.push({
+    key: "full",
+    label: "Full damage",
+    tip: "Your AP is above their armour everywhere.",
+    tone: full === r.total ? "good" : full === 0 ? "bad" : "neutral",
+    say: full === r.total ? `All ${r.total} enemies` : full === 0 ? `None of the ${r.total}` : `${full} of ${r.total} enemies`,
+  });
   if (r.grazing) {
-    lines.push({
-      tone: "neutral",
-      say: `${r.grazing} of those only just. Where your penetration matches the armor exactly you do 65% rather than full damage, which is a hit and a slow one.`,
-    });
+    facts.push({ key: "reduced", label: "Reduced damage", tip: "65% damage: your AP equals their armour.",
+      tone: "neutral", say: nameList(r.names.grazing) });
   }
-
   if (r.weakpoint) {
-    lines.push({
-      tone: "neutral",
-      say: `${r.weakpoint} need a weak point: ${nameList(r.names.weakpoint)}. Armor somewhere on them turns this away, so hitting the right spot is the whole job.`,
-    });
+    facts.push({ key: "weak", label: "Weak points only", tip: "Heavy armour on part of the body. Hit the weak points.",
+      tone: "neutral", say: nameList(r.names.weakpoint) });
   }
-
   if (r.bounces) {
-    lines.push({
-      tone: "bad",
-      say: `${r.bounces === 1 ? "One bounces this off completely" : `${r.bounces} bounce this off completely`}: ${nameList(r.names.bounces)}. There is no angle on ${r.bounces === 1 ? "it" : "them"} that this hurts.`,
-    });
+    facts.push({ key: "none", label: "No damage", tip: "Their armour is above your AP everywhere.",
+      tone: "bad", say: nameList(r.names.bounces) });
   }
 
-  /* Naming the difficulty in the heading matters more than it looks. The */
-  /* same weapon reads very differently at 3 and at 10, and a sentence    */
-  /* that does not say which one it counted is a sentence you cannot      */
-  /* check. With no level set it says so rather than implying the top.    */
-  const scope = r.difficulty ? ` at difficulty ${r.difficulty}` : "";
+  /* The level goes in the heading: the same weapon reads very
+     differently at 3 and at 10. */
   return {
     reading: r,
-    title: `What AP ${ap} opens on the ${front} front${scope}`,
-    lines,
+    title: `Armour · ${front}${r.difficulty ? ` · difficulty ${r.difficulty}` : ""}`,
+    facts,
   };
 }
