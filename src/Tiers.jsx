@@ -95,9 +95,9 @@ const tierStyle = (tier) => {
 /* rather than information. The kinds that keep an icon are the ones that  */
 /* change how the item behaves, including the two the biome gating uses.   */
 const KIND_META = {
-  heat: { Icon: Thermometer, label: "Vents heat", note: "Better in cold, worse in hot" },
-  arc: { Icon: Zap, label: "Arc", note: "Vents heat, chains between targets" },
-  fire: { Icon: Flame, label: "Fire", note: "Fire resist armor recommended" },
+  heat: { Icon: Thermometer, label: "Vents heat", note: "Fires longer in the cold, overheats sooner in the heat" },
+  arc: { Icon: Zap, label: "Arc", note: "Chains between targets" },
+  fire: { Icon: Flame, label: "Fire", note: "Fire resistant armour advised" },
   explosive: { Icon: Bomb, label: "Explosive", note: "" },
   ballistic: { Icon: null, label: "Ballistic", note: "" },
   gas: { Icon: Wind, label: "Gas", note: "" },
@@ -370,7 +370,7 @@ function TierChips({ label, value, onChange }) {
           const active = t === value;
           return (
             <button key={t} onClick={() => onChange(t)} aria-pressed={active}
-              title={active ? `Showing ${t} and above` : `Drop the floor to ${t}`}
+              title={active ? `Showing ${t} and above` : `Show ${t} and above`}
               className={"rounded p-0.5 transition-all " +
                 (active
                   ? "opacity-100 ring-2 ring-base-100"
@@ -1219,7 +1219,7 @@ function RowDetail({ item, faction, scored, difficulty }) {
 
           <Section title="Where the ratings come from">
             {rated.length === 0 ? (
-              <p className="text-[11px] text-base-500">Nothing rated yet, on any front.</p>
+              <p className="text-[11px] text-base-500">No community rating on any front yet.</p>
             ) : stamps.length === 1 ? (
               <p className="text-[11px] text-base-400">
                 {sourceName[rated[0].r.source] || rated[0].r.source}, patch{" "}
@@ -1243,21 +1243,17 @@ function RowDetail({ item, faction, scored, difficulty }) {
           </Section>
 
           {sets ? (
-            <Section title="Armor sets with this passive">
+            <Section title="Armour sets with this passive"
+              tip="Heavy: 10% slower, 25% less damage taken. Light: 10% faster, 25% more. Brackets show armour, speed and stamina where a set differs from its weight.">
               {["light", "medium", "heavy"].map((wt) => (
                 <Fact key={wt} label={wt}>
                   {sets[wt].length === 0 ? (
-                    <span className="text-base-600">not available</span>
+                    <span className="text-base-600">none</span>
                   ) : (
                     <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>{sets[wt].join(", ")}</span>
                   )}
                 </Fact>
               ))}
-              <p className="text-[10px] leading-relaxed text-base-600">
-                Weight vs medium: heavy is 10% slower with 25% less damage taken, light is 10% faster with 25% more.
-                Numbers in brackets are armor/speed/stamina where the set differs from the standard for its class.
-                Helmets and capes do nothing.
-              </p>
             </Section>
           ) : null}
         </div>
@@ -1281,8 +1277,8 @@ function RowDetail({ item, faction, scored, difficulty }) {
 /* went blank on scroll. It docks below the shell chrome, which is what */
 /* --shell-chrome carries.                                              */
 const RATING_COLUMNS = [
-  { id: "ugg", label: "u.gg", title: "u.gg community vote" },
-  { id: "ours", label: BRAND.short, title: "Our rating for the scenario you set" },
+  { id: "ugg", label: "u.gg", title: "Community tier: the u.gg vote" },
+  { id: "ours", label: BRAND.short, title: `${BRAND.short} tier: changed for your scenario` },
 ];
 
 function RatingHeader({ faction, left, sortBy, setSortBy }) {
@@ -1303,7 +1299,7 @@ function RatingHeader({ faction, left, sortBy, setSortBy }) {
           const on = c.id === sortBy;
           return (
             <button key={c.id} onClick={() => setSortBy(c.id)} aria-pressed={on}
-              title={on ? `Sorted by ${c.label}` : `Sort by ${c.label}. ${c.title}`}
+              title={on ? `${c.title}. Sorted by this` : `${c.title}. Sort by this`}
               className="w-11 sm:w-16 flex flex-col items-center justify-center gap-0.5 py-1.5 rounded-t border-l transition-colors"
               style={{
                 backgroundColor: on ? f.hex + "26" : "transparent",
@@ -1338,7 +1334,7 @@ function PendingBadge() {
   return (
     <span className="flex w-8 items-center justify-center rounded border border-dashed border-base-800 sm:w-9"
       style={{ aspectRatio: "44 / 58" }}
-      title="Say where you are dropping and this fills in">
+      title="Choose a front to see this tier">
       <span className="h-1 w-3 rounded-full bg-base-800" />
     </span>
   );
@@ -1365,7 +1361,8 @@ export function statSummary(item) {
   if (s.demoForce !== null) parts.push(`demo ${s.demoForce}`);
   if (s.cooldown !== null) parts.push(`${s.cooldown}s cooldown`);
   if (s.uses !== null) {
-    parts.push(s.usesUpgraded === null ? `${s.uses} uses` : `${s.uses} uses, ${s.usesUpgraded} upgraded`);
+    const uses = `${s.uses} ${s.uses === 1 ? "use" : "uses"}`;
+    parts.push(s.usesUpgraded === null ? uses : `${uses}, ${s.usesUpgraded} upgraded`);
   }
   if (s.medals !== null) parts.push(`${s.medals} medals`);
   return parts;
@@ -1430,7 +1427,7 @@ function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, loc
           <span className="flex shrink-0 flex-col gap-0.5 sm:flex-row sm:gap-2">
             <button onClick={stop(() => toggleLock(id))} disabled={lockedByWarbond}
               aria-label={isLocked ? `Mark ${name} as unlocked` : `Mark ${name} as not unlocked`}
-              title={lockedByWarbond ? `Locked by the ${sourceLabel} warbond. Change it in the Warbonds tab.` : "Tap to mark as not unlocked"}
+              title={lockedByWarbond ? `You do not own the ${sourceLabel} warbond. Change it in Collection.` : isLocked ? "Mark as unlocked" : "Mark as not unlocked"}
               className={"shrink-0 rounded p-1 " + (lockedByWarbond ? "cursor-default" : "hover:bg-base-800")}>
               {isLocked ? <Lock className={"w-4 h-4 " + (lockedByWarbond ? "text-accent-700" : "text-accent-500")} />
                 : <Unlock className="w-4 h-4 text-base-700 hover:text-base-400" />}
@@ -1702,7 +1699,7 @@ export function ScenarioBar({ scenario, onAdjust, rulesOff = 0, onRules }) {
       <Chip icon={d ? <DifficultyIcon level={d.level} className="h-3.5 w-6" /> : null}>
         {d ? d.name : "any difficulty"}
       </Chip>
-      <Chip>{scenario.squad === 1 ? "solo" : scenario.squad ? `${scenario.squad} of you` : "squad not said"}</Chip>
+      <Chip>{scenario.squad === 1 ? "solo" : scenario.squad ? `${scenario.squad} players` : "squad size not set"}</Chip>
 
       {/* A switched off rule changes every rating on screen, so it is never
           out of sight: the same rule the folded filter pane keeps. */}
@@ -1738,12 +1735,9 @@ function FactionChooser({ onChoose }) {
     <div className="flex flex-col items-center gap-6 rounded-lg border border-dashed border-base-700 px-4 py-10">
       <div className="text-center">
         <p className="text-lg font-bold text-base-200" style={{ fontFamily: "'Oswald', sans-serif" }}>
-          Which front are you dropping on
+          Which front are you dropping on?
         </p>
-        <p className="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-base-500">
-          Every rating here is per front, and so is everything that comes after it. Pick one and the list ranks for
-          that war. You can change it at any time from the buttons at the top.
-        </p>
+        <p className="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-base-500">Every rating is per front.</p>
       </div>
       <div className="flex w-full max-w-3xl items-stretch justify-center gap-3 sm:gap-6">
         {FACTIONS.map((f) => (
@@ -1788,7 +1782,6 @@ export function TierBrowser({ catId, faction, scenario, sortBy, setSortBy, filte
   const category = CATEGORIES.find((c) => c.id === catId);
   const shape = FILTER_SHAPE[catId] || {};
   const fTheme = FACTION_THEME[faction] || FACTION_THEME.all;
-  const isArmor = catId === "armor";
   const favSet = useMemo(() => new Set(favoriteItems), [favoriteItems]);
   const toggleOpen = useCallback((n) => setOpenRow((p) => (p === n ? null : n)), []);
 
@@ -1953,7 +1946,7 @@ export function TierBrowser({ catId, faction, scenario, sortBy, setSortBy, filte
         {!advanced && hiddenFilters.length > 0 ? (
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded border border-accent-800/60 bg-accent-950/40 px-2.5 py-1.5 text-[11px] text-accent-300">
             <FilterX className="w-3.5 h-3.5 shrink-0" />
-            <span>Still filtering by {hiddenFilters.join(", ")}, folded away below.</span>
+            <span>Still filtering by {hiddenFilters.join(", ")}, in More filters.</span>
             <button onClick={clearAdvanced} className="underline hover:text-accent-200">clear</button>
           </div>
         ) : null}
@@ -1962,34 +1955,30 @@ export function TierBrowser({ catId, faction, scenario, sortBy, setSortBy, filte
           <span>{rows.length} of {category.items.length} shown</span>
           {lockedInCategory > 0 ? <span className="text-accent-500">{lockedInCategory} locked here</span> : null}
           {favInCategory > 0 ? (
-            <span className="flex items-center gap-1 text-accent-400"><Star className="w-3.5 h-3.5 fill-accent-400" /> {favInCategory} favorited here</span>
+            <span className="flex items-center gap-1 text-accent-400"><Star className="w-3.5 h-3.5 fill-accent-400" /> {favInCategory} {favInCategory === 1 ? "favourite" : "favourites"} here</span>
           ) : null}
-          {shape.kind ? <span className="flex items-center gap-1"><Thermometer className="w-3.5 h-3.5" /> vents heat: better in cold, worse in hot</span> : null}
+          {shape.kind ? <span className="flex items-center gap-1"><Thermometer className="w-3.5 h-3.5" /> vents heat</span> : null}
           {backpackHere > 0 ? (
-            <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-accent-500" /> {backpackHere} eat your backpack slot</span>
+            <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-accent-500" /> {backpackHere} use your backpack slot</span>
           ) : null}
           {unratedInCategory > 0 ? (
-            <span>{unratedInCategory} unrated, always shown at the bottom whatever the tier floor</span>
+            <span>{unratedInCategory} unrated, always at the bottom</span>
           ) : null}
           {flaggedInCategory > 0 ? (
-            <span className="flex items-center gap-1"><HelpCircle className="w-3.5 h-3.5 text-accent-500" /> {flaggedInCategory} with a rating caveat, tap to read it</span>
+            <span className="flex items-center gap-1"><HelpCircle className="w-3.5 h-3.5 text-accent-500" /> {flaggedInCategory} with a rating caveat</span>
           ) : null}
-          <span className="flex items-center gap-1">
-            <ChevronDown className="w-3.5 h-3.5" />
-            {isArmor ? "tap a row for its numbers, provenance and the sets that carry it" : "tap a row for its numbers and where the rating came from"}
-          </span>
           {itemLockCount > 0 ? (
             <button onClick={clearItemLocks} className="text-base-400 underline hover:text-base-100">clear {itemLockCount} item locks</button>
           ) : null}
           {favoriteItems.length > 0 ? (
-            <button onClick={clearFavItems} className="text-base-400 underline hover:text-base-100">clear {favoriteItems.length} favorites</button>
+            <button onClick={clearFavItems} className="text-base-400 underline hover:text-base-100">clear {favoriteItems.length} {favoriteItems.length === 1 ? "favourite" : "favourites"}</button>
           ) : null}
         </div>
         </div>
 
         <button onClick={() => setView(advanced ? "simple" : "advanced")}
           aria-expanded={advanced}
-          title={advanced ? "Fold the filters away" : "Damage type, categories, locks, favorites and search"}
+          title={advanced ? undefined : "Damage type, category, locks, favourites and search"}
           className="flex w-full items-center justify-center gap-1.5 border-t border-base-800 py-1.5 text-[11px] text-base-500 transition-colors hover:bg-base-800/60 hover:text-base-200">
           <ChevronDown className={"w-4 h-4 transition-transform " + (advanced ? "rotate-180" : "")} />
           {advanced ? "Fewer filters" : "More filters"}
@@ -2001,8 +1990,8 @@ export function TierBrowser({ catId, faction, scenario, sortBy, setSortBy, filte
         {rows.length === 0 ? (
           <div className="rounded-lg border border-dashed border-base-700 py-8 text-center text-sm text-base-400">
             {f.fav === "only" && favInCategory === 0
-              ? "Nothing favorited in this list yet. Tap a star on any row to keep it here."
-              : "Nothing matches those filters. Drop the minimum tier, clear the search, or reset the category chips."}
+              ? "No favourites in this list yet. Star a row to keep it here."
+              : "Nothing matches these filters. Lower the minimum tier, clear the search or reset the categories."}
           </div>
         ) : (
           rows.map((it) => (
