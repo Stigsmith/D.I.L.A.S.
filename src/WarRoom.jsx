@@ -280,13 +280,13 @@ export function WarLine({ war }) {
       {war && war.fresh ? (
         <>
           <span className="text-base-400">Live, read {agoText(war.age)}.</span>{" "}
-          {war.fronts === 1 ? "One front is" : `${war.fronts} fronts are`} open, ringed in the colour of who you would
-          fight. Choose one and your front fills itself in too.
+          {war.fronts === 1 ? "1 front" : `${war.fronts} fronts`} open, ringed in the enemy's colour. Picking one sets
+          your front.
         </>
       ) : war ? (
-        `The live war was last read ${agoText(war.age)}, too long ago to trust, so the map is not coloured in.`
+        `The live war was last read ${agoText(war.age)}, too old to show.`
       ) : (
-        "Click a sector to go in, then a planet to drop there. Zoom out, or press Escape, to go back to the galaxy."
+        "No live war data here."
       )}
     </p>
   );
@@ -364,7 +364,7 @@ export function DifficultyStepper({ value, onChange }) {
   return (
     <div className="flex items-center gap-2" role="group" aria-label="Difficulty">
       <button type="button" className={arrow} onClick={() => step(-1)} disabled={level === 0}
-        aria-label={level === 1 ? "Difficulty not said" : "Easier"} title={level === 1 ? "Not said" : "Easier"}>
+        aria-label={level === 1 ? "Difficulty not set" : "Easier"} title={level === 1 ? "Not set" : "Easier"}>
         <ChevronLeft className="h-4 w-4" />
       </button>
       <div className="flex w-[11.5rem] items-center gap-2">
@@ -376,7 +376,7 @@ export function DifficultyStepper({ value, onChange }) {
             {d ? d.name : "Difficulty"}
           </span>
           <span className="mt-1 block text-[10px] leading-none text-base-500">
-            {d ? `Level ${d.level} of 10` : "not said"}
+            {d ? `Level ${d.level} of 10` : "not set"}
           </span>
         </span>
       </div>
@@ -409,7 +409,7 @@ function DifficultyCard({ level, faction, onChange, squad }) {
         <LevelTiles facts={f} level={level} faction={faction} fresh={fresh} />
       ) : (
         <p className="max-w-sm text-center text-[11px] leading-relaxed text-base-500">
-          Set a level and the ratings count only the enemies that turn up there, and this says what the level brings.
+          Set a difficulty to see what the level brings.
         </p>
       )}
     </div>
@@ -432,8 +432,8 @@ function LevelTiles({ facts: f, level, faction, fresh }) {
   const out = outpostSummary(f.outposts);
   const arrival = faction ? arrivalsAt(faction, level) : null;
   const enemyNote = faction
-    ? `Ratings count the ${enemiesUpTo(faction, level)} enemies this front fields here.` + arrivalsLine(faction, level)
-    : "Choose a front and this says how many of its enemies the ratings count here.";
+    ? `Ratings count the ${enemiesUpTo(faction, level)} enemies this front has at this level.` + arrivalsLine(faction, level)
+    : "Choose a front to see its enemies at this level.";
   return (
     <div className="flex max-w-full flex-wrap items-start justify-center divide-x divide-base-800 border-t border-base-800 pt-2"
       title={fresh.length ? "New at this level: " + fresh.join("; ") : undefined}>
@@ -486,14 +486,14 @@ export function SquadCount({ value, onChange, party }) {
       </span>
     );
   }
-  const options = [[0, "Not said"], [1, "Solo"], [2, "2"], [3, "3"], [4, "4"]];
+  const options = [[0, "Not set"], [1, "Solo"], [2, "2"], [3, "3"], [4, "4"]];
   return (
     <div className="flex items-center gap-2" role="group" aria-label="How many of you">
       <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>How many of you</span>
       <div className="flex overflow-hidden rounded border border-base-700">
         {options.map(([k, label]) => (
           <button key={k} type="button" onClick={() => onChange(k)} aria-pressed={n === k}
-            title={k === 0 ? "Not said: nothing that depends on it will fire" : k === 1 ? "Just you" : `${k} of you`}
+            title={k === 0 ? "Not set: rules that need squad size do not apply" : k === 1 ? "Just you" : `${k} players`}
             className={"border-l border-base-700 px-2 py-1 text-[11px] transition-colors first:border-l-0 " +
               (n === k ? (k ? "bg-brand/15 text-base-100" : "bg-base-800 text-base-100") : "bg-base-900 text-base-500 hover:text-base-200")}>
             {label}

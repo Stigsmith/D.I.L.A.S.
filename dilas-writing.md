@@ -190,7 +190,8 @@ For every line:
 | **Pass 4, Drop Bay**, 1.32.0 | **Done, 9 October 2026.** The brief, the slots, the suggestions, the picker, the party line and the squad check. Text now says "drop" where the button says Drop, rather than "confirm". The nine mission kind lines in `missions.json`, which the brief and the planner show |
 | **Pass 5, Collection**, 1.32.0 | **Done, 9 October 2026.** The nudge, the guide and its cards, the quick start, profiles, both tabs and their footnotes. A profile option said "the few things he has", and now says "they". The Righteous Revenants inference moved to About |
 | **Pass 6, the Armoury**, 1.32.0 | **Done, 9 October 2026.** The builds grid and its biome notes (plasma never vented heat), Coverage and its situation names, History, the editor, the build card and shared links. "Hard gate" became "filters builds". Every visible "Armor" label is "Armour" now; the stat label is "Penetration", since its value already says AP |
-| Still to do, one surface per pass | The war room and the Star Map; Party, Settings and About; the Rules page's judgement, source and measured notes |
+| **Pass 7, the war room and the Star Map**, 1.32.0 | **Done, 9 October 2026.** The planner, the place and mission bar, the difficulty card and its tiles, how many of you, the live war lines, the Star Map's panels and history, and the galaxy map's hover cards. "Not said" became "Not set" |
+| Still to do, one surface per pass | Party, Settings and About; the Rules page's judgement, source and measured notes |
 
 > [!danger] A wording change must not move a score
 > Run `npm run rules`, `npm run builds` and `npm run drop` before and after. All three must give identical output. Rule names and sentences live in the rules data and feed the tier rows, the suggestions and the Rules page at once.

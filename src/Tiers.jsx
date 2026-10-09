@@ -454,7 +454,7 @@ function PlanetBar({ scenario, setMission, clearEnvironment, kind = null, onClea
     : byHand ? "set by hand" : "pick it on the map";
   const missionSub = scenario.mission
     ? traitsOf(scenario.mission).map((t) => (missionTraits[t] || {}).name || t).join(" · ") || "no special demands"
-    : onFront.length + (kind ? " " + missionTraits[kind].name.toLowerCase() + " missions" : "") + " on this front";
+    : `${onFront.length} ${kind ? missionTraits[kind].name.toLowerCase() + " " : ""}${onFront.length === 1 ? "mission" : "missions"} on this front`;
 
   return (
     <div className="rounded-lg border border-base-800 bg-base-900/60 p-3">
@@ -496,16 +496,16 @@ function PlanetBar({ scenario, setMission, clearEnvironment, kind = null, onClea
           query={query} setQuery={setQuery}>
           {kind ? (
             <p className="flex flex-wrap items-center gap-x-2 px-2 pb-1 text-[11px] text-base-500">
-              Only {missionTraits[kind].name.toLowerCase()} missions, as the planner asked.
+              Showing {missionTraits[kind].name.toLowerCase()} missions only.
               {onClearKind ? (
                 <button onClick={onClearKind} className="text-base-400 underline hover:text-base-100">show every mission</button>
               ) : null}
             </p>
           ) : null}
           <PickRow on={!scenario.mission} onClick={() => { setMission(""); setOpen(null); }}
-            title="Not set" sub="judge everything without a mission in mind" tags={[]} />
+            title="Not set" sub="rate gear for any mission" tags={[]} />
           {missionHits.length === 0 ? (
-            <Empty>No mission by that name on this front. The list genuinely differs per war.</Empty>
+            <Empty>No mission by that name on this front.</Empty>
           ) : missionHits.map((m) => (
             <PickRow key={m.name} on={m.name === scenario.mission}
               onClick={() => { setMission(m.name); setOpen(null); }}
@@ -631,9 +631,8 @@ function Planner({ scenario, setFaction, prefs, setPrefs, war, plan, onChoose, b
         {prefs.kind ? (
           <p className="text-[11px] leading-relaxed text-base-500">
             {kindCount
-              ? `${kindCount} ${missionTraits[prefs.kind].name.toLowerCase()} mission${kindCount === 1 ? "" : "s"} against the ${f ? f.label : "enemy"}, and the mission list below narrows to them.`
-              : `The ${f ? f.label : "enemy"} have none of these.`}{" "}
-            Every front offers nearly every kind, so this does not choose the planet.
+              ? `${kindCount} ${missionTraits[prefs.kind].name.toLowerCase()} mission${kindCount === 1 ? "" : "s"} against the ${f ? f.label : "enemy"}. This narrows the mission list only.`
+              : `The ${f ? f.label : "enemy"} have none of these.`}
           </p>
         ) : null}
       </PlanStep>
@@ -643,8 +642,8 @@ function Planner({ scenario, setFaction, prefs, setPrefs, war, plan, onChoose, b
           <ThreeWay label="Caves" value={prefs.caves} onChange={(caves) => setPrefs({ caves })}
             options={[
               ["avoid", "Avoid", "Hides the Hive Worlds, where the caves are"],
-              ["any", "Any", "Caves or not, it makes no difference"],
-              ["only", "Only", "Only the Hive Worlds, for when the caves are what you came for"],
+              ["any", "Any", "Caves make no difference"],
+              ["only", "Only", "Only Hive Worlds, where the caves are"],
             ]} />
           <ThreeWay label="Megacities" value={prefs.megacities} onChange={(megacities) => setPrefs({ megacities })}
             options={[
@@ -653,7 +652,7 @@ function Planner({ scenario, setFaction, prefs, setPrefs, war, plan, onChoose, b
               ["more", "More", "Planets with a megacity come before every planet without one"],
             ]} />
         </div>
-        <span className="text-[10px] text-base-600">Rather not have</span>
+        <span className="text-[10px] text-base-600">Avoid hazards</span>
         <div className="flex flex-wrap gap-1.5">
           {AVOIDABLE.map((h) => (
             <PrefChip key={h.slug} on={prefs.avoidHazards.includes(h.slug)} title={h.description}
@@ -678,8 +677,8 @@ function GoHere({ war, plan, front, chosen, onChoose }) {
       <span className="text-[10px] font-semibold uppercase tracking-wider text-brand" style={{ fontFamily: "'Oswald', sans-serif" }}>
         Go here
       </span>
-      {!war ? say("The live war is not here, so there are no fronts to point you at. Every planet on the map still works.")
-        : !war.fresh ? say(`The live war was last read ${agoText(war.age)}, too long ago to point you anywhere.`)
+      {!war ? say("No live war data here, so no fronts to suggest. You can still pick any planet on the map.")
+        : !war.fresh ? say(`The live war was last read ${agoText(war.age)}, too old to use.`)
         : !plan || plan.count === 0 ? say(
             (front ? `No front against the ${front.label} fits right now.` : "No front fits right now.") +
             (plan && plan.caves === "only" ? " None of its fronts is on a Hive World, where the caves are."
