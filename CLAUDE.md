@@ -6,7 +6,7 @@
 > **The product name still lives in exactly one file.** `src/lib/brand.js`, unchanged. Renaming the repo did not change that, and it must not: the folder is a path, the brand is a value.
 
 > [!warning] Every word on screen follows `dilas-writing.md`
-> The curator's writing guide, 9 October 2026: the answer at a glance, the reason one click away, meanings and sources on hover through `Tip` (`src/Tip.jsx`), the maths and the limits on About. Read it before writing or changing any UI text. Open samples for the next round are in `docs/writing/round-1.md`.
+> The curator's writing guide, final since 9 October 2026: **say what it does, in the game's words, and stop.** The answer at a glance, the reason one click away, meanings and the longer reason on hover through `Tip` (`src/Tip.jsx`), the maths and the limits on About. Read it before writing or changing any UI text. His annotated samples are in `docs/writing/round-1.md`.
 
 > Everything a fresh session needs before touching this repo. What the tool is, which decisions are settled and must not be quietly reversed, the one invariant that has broken twice, how ownership and lock state work, and how to run the thing. Read this before the code.
 
