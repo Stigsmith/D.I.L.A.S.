@@ -48,7 +48,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "charge for AOE, best chaff clear on every front"
+    "note": "charge for area damage"
   },
   {
     "id": "r-36-eruptor",
@@ -203,7 +203,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "staggers, see the source split note"
+    "note": "staggers enemies"
   },
   {
     "id": "plas-1-scorcher",
@@ -303,7 +303,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "assault rifle"
+    "note": null
   },
   {
     "id": "sg-97-sweeper",
@@ -354,7 +354,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "shotgun"
+    "note": null
   },
   {
     "id": "smg-203-gallant",
@@ -405,7 +405,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "SMG, hipfires at full sprint"
+    "note": "fires while sprinting"
   },
   {
     "id": "dbs-2-double-freedom",
@@ -456,7 +456,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "double barrel shotgun"
+    "note": "double barrel"
   },
   {
     "id": "smg-flam-34-stoker",
@@ -507,7 +507,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "SMG with underbarrel flamethrower"
+    "note": "underbarrel flamethrower"
   },
   {
     "id": "vg-70-variable",
@@ -556,7 +556,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "rocket jump tech"
+    "note": "can rocket jump"
   },
   {
     "id": "r-72-censor",
@@ -607,7 +607,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "marksman"
+    "note": null
   },
   {
     "id": "r-63-diligence",
@@ -656,7 +656,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "marksman"
+    "note": null
   },
   {
     "id": "r-2-amendment",
@@ -705,7 +705,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "marksman"
+    "note": null
   },
   {
     "id": "las-13-trident",
@@ -758,7 +758,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "energy, vents heat"
+    "note": "vents heat"
   },
   {
     "id": "las-17-double-edge-sickle",
@@ -858,7 +858,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "heavy explosive rifle"
+    "note": "explosive rounds"
   },
   {
     "id": "las-5-scythe",
@@ -958,7 +958,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "Killzone crossover, highest listed DPS in the game"
+    "note": "Killzone crossover, highest DPS listed"
   },
   {
     "id": "r-63cs-diligence-counter-sniper",
@@ -1007,7 +1007,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "marksman"
+    "note": null
   },
   {
     "id": "r-4-hyena",
@@ -1056,7 +1056,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "marksman, campaign reward"
+    "note": "campaign reward"
   },
   {
     "id": "smg-32-reprimand",
@@ -1107,7 +1107,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "SMG"
+    "note": null
   },
   {
     "id": "ar-61-tenderizer",
@@ -1158,7 +1158,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "assault rifle"
+    "note": null
   },
   {
     "id": "ar-23-liberator",
@@ -1209,7 +1209,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "starter rifle, A against bugs and squids"
+    "note": "starter rifle"
   },
   {
     "id": "ar-23a-liberator-carbine",
@@ -1262,7 +1262,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "assault rifle"
+    "note": null
   },
   {
     "id": "mp-98-knight",
@@ -1313,7 +1313,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "SMG"
+    "note": null
   },
   {
     "id": "br-14-adjudicator",
@@ -1364,7 +1364,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "assault rifle, A against bugs"
+    "note": null
   },
   {
     "id": "ar-23p-liberator-penetrator",
@@ -1415,7 +1415,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "A against bugs"
+    "note": null
   },
   {
     "id": "ar-gl-21-one-two",
@@ -1466,7 +1466,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "assault rifle with underbarrel grenade launcher"
+    "note": "underbarrel grenade launcher"
   },
   {
     "id": "sg-20-halt",
@@ -1517,7 +1517,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "shotgun, A against bugs"
+    "note": null
   },
   {
     "id": "ar-32-pacifier",
@@ -1568,7 +1568,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "SMG"
+    "note": null
   },
   {
     "id": "ar-59-suppressor",
@@ -1621,7 +1621,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "assault rifle"
+    "note": "silenced"
   },
   {
     "id": "las-16-sickle",
@@ -1672,7 +1672,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "topped every list through 2025, now B across the board"
+    "note": "vents heat"
   },
   {
     "id": "sg-225ie-breaker-incendiary",
@@ -1723,7 +1723,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "applies fire, A against bugs"
+    "note": "sets enemies on fire"
   },
   {
     "id": "sg-225-breaker",
@@ -1774,7 +1774,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "free shotgun, A against bugs and squids"
+    "note": "free"
   },
   {
     "id": "ma5c-assault-rifle",
@@ -1825,7 +1825,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "Halo crossover, no weapon customization"
+    "note": "Halo crossover, no customisation"
   },
   {
     "id": "sg-451-cookout",
@@ -1874,7 +1874,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "incendiary shotgun"
+    "note": "sets enemies on fire"
   },
   {
     "id": "sg-8-punisher",
@@ -1925,7 +1925,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "pump shotgun"
+    "note": "pump action"
   },
   {
     "id": "sta-52-assault-rifle",
@@ -2078,7 +2078,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "hard squid specialist"
+    "note": "flamethrower"
   },
   {
     "id": "m7s-smg",
@@ -2131,7 +2131,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "Halo crossover, no weapon customization"
+    "note": "Halo crossover, silenced, no customisation"
   },
   {
     "id": "smg-37-defender",
@@ -2182,7 +2182,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "SMG"
+    "note": null
   },
   {
     "id": "sg-225sp-breaker-spray-and-pray",
@@ -2235,7 +2235,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "shotgun"
+    "note": null
   },
   {
     "id": "r-6-deadeye",
@@ -2284,7 +2284,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "marksman"
+    "note": null
   },
   {
     "id": "arc-12-blitzer",
@@ -2335,7 +2335,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "infinite ammo, unusable against bots"
+    "note": "infinite ammo"
   },
   {
     "id": "m90a-shotgun",
@@ -2435,7 +2435,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "shotgun"
+    "note": null
   },
   {
     "id": "smg-72-pummeler",
@@ -2486,7 +2486,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "SMG"
+    "note": null
   },
   {
     "id": "ar-23c-liberator-concussive",
@@ -2537,7 +2537,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "bottom of the list"
+    "note": null
   },
   {
     "id": "r-2124-constitution",
@@ -2586,7 +2586,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "bolt action, stripper clip reload added in 7.0.0"
+    "note": "bolt action, stripper clip reload"
   },
   {
     "id": "r-40-k-hot-shot-marksman-rifle",
@@ -2635,7 +2635,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "Hot-Shot Lasgun, energy semi-auto, 35 medals"
+    "note": "semi-auto energy"
   },
   {
     "id": "gp-20-ultimatum",
@@ -2742,7 +2742,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "pocket objective clear"
+    "note": "closes holes and fabricators"
   },
   {
     "id": "p-4-senator",
@@ -2840,7 +2840,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "laser"
+    "note": "laser, vents heat"
   },
   {
     "id": "plas-15-loyalist",
@@ -3185,7 +3185,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "zero damage, heals teammates"
+    "note": "heals squadmates, no damage"
   },
   {
     "id": "p-33-missile-pistol",
@@ -3336,7 +3336,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "Halo crossover"
+    "note": "Halo crossover, silenced"
   },
   {
     "id": "cqc-42-machete",
@@ -3826,7 +3826,7 @@
     "flag": "new",
     "patchNote": null,
     "effect": null,
-    "note": "versatile sidearm, high stopping power, 50 medals"
+    "note": "high stopping power"
   },
   {
     "id": "ac-8-autocannon",
@@ -3878,7 +3878,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "the answer when you do not know what you are facing"
+    "note": "handles armour and crowds on every front"
   },
   {
     "id": "gr-8-recoilless-rifle",
@@ -3930,7 +3930,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "craters against squids"
+    "note": "team reloadable"
   },
   {
     "id": "b-flam-80-cremator",
@@ -4343,7 +4343,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "free of the backpack slot"
+    "note": "leaves your backpack free"
   },
   {
     "id": "las-99-quasar-cannon",
@@ -4397,7 +4397,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "cycle multiple copies"
+    "note": "no ammo, cools down between shots"
   },
   {
     "id": "flam-40-flamethrower",
@@ -4500,7 +4500,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "never stops firing"
+    "note": "huge magazine"
   },
   {
     "id": "rl-77-airburst-rocket-launcher",
@@ -4600,7 +4600,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "dedicated squid tool"
+    "note": "homing rockets"
   },
   {
     "id": "mgx-42-bullet-storm",
@@ -4858,7 +4858,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "charge up, unsafe mode"
+    "note": "charge shots, unsafe mode for more damage"
   },
   {
     "id": "faf-14-spear",
@@ -5069,7 +5069,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "chains, infinite ammo"
+    "note": "chains between targets, infinite ammo"
   },
   {
     "id": "gl-52-de-escalator",
@@ -5373,7 +5373,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "only handheld gas gun"
+    "note": "sprays gas"
   },
   {
     "id": "cqc-9-defoliation-tool",
@@ -5471,7 +5471,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "it is a flag"
+    "note": "melee"
   },
   {
     "id": "40-k-meltagun",
@@ -5520,7 +5520,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "anti-armor focus"
+    "note": "anti-armour"
   },
   {
     "id": "g-123-thermite",
@@ -5623,7 +5623,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "AP3 blast, AP4 fire effect"
+    "note": "AP 3 blast, AP 4 fire"
   },
   {
     "id": "g-10-incendiary",
@@ -5674,7 +5674,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "AP3 blast, AP4 fire effect"
+    "note": "AP 3 blast, AP 4 fire"
   },
   {
     "id": "g-4-gas",
@@ -5725,7 +5725,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "panics enemies"
+    "note": "confuses enemies"
   },
   {
     "id": "g-23-stun",
@@ -5774,7 +5774,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "sets up every anti-tank shot"
+    "note": "stuns heavy enemies"
   },
   {
     "id": "g-sh-39-shield",
@@ -6329,7 +6329,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "superstore smoke"
+    "note": null
   },
   {
     "id": "g-3-smoke",
@@ -6378,7 +6378,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "key for hostage rescue"
+    "note": "blocks line of sight"
   },
   {
     "id": "g-31-arc",
@@ -6578,7 +6578,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "anti-armor focus"
+    "note": "anti-armour"
   },
   {
     "id": "eagle-strafing-run",
@@ -7027,7 +7027,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "sleeper pick"
+    "note": "lingering gas cloud"
   },
   {
     "id": "orbital-gatling-barrage",
@@ -7078,7 +7078,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "sleeper pick"
+    "note": null
   },
   {
     "id": "orbital-precision-strike",
@@ -7472,7 +7472,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "trap pick"
+    "note": "long, scattered barrage"
   },
   {
     "id": "orbital-smoke-strike",
@@ -7619,7 +7619,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "purple orb safe, orange hurts, red kills"
+    "note": "charge colour: purple safe, orange hurts you, red kills you"
   },
   {
     "id": "b-1-supply-pack",
@@ -7668,7 +7668,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "feeds both of you"
+    "note": "resupplies you and squadmates"
   },
   {
     "id": "b-100-portable-hellbomb",
@@ -7717,7 +7717,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "shoot it from range"
+    "note": "detonate it by shooting it from range"
   },
   {
     "id": "lift-850-jump-pack",
@@ -7766,7 +7766,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "15s recharge, sprint first"
+    "note": "15s recharge, sprint before you jump"
   },
   {
     "id": "sh-32-shield-generator-pack",
@@ -7864,7 +7864,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "recall to force reload"
+    "note": "recall it to force a reload"
   },
   {
     "id": "lift-860-hover-pack",
@@ -8109,7 +8109,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "weakest of the shields"
+    "note": "one handed shield"
   },
   {
     "id": "sh-51-directional-shield",
@@ -8158,7 +8158,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "bottom of every front"
+    "note": "shields one direction"
   },
   {
     "id": "a-ac-8-autocannon-sentry",
@@ -8509,7 +8509,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "notorious teamkiller"
+    "note": "hits squadmates too"
   },
   {
     "id": "a-g-16-gatling-sentry",
@@ -8560,7 +8560,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "teamkiller"
+    "note": "hits squadmates too"
   },
   {
     "id": "a-flam-40-flame-sentry",
@@ -8662,7 +8662,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "teamkiller"
+    "note": "hits squadmates too"
   },
   {
     "id": "a-m-12-mortar-sentry",
@@ -8711,7 +8711,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "notorious teamkiller"
+    "note": "hits squadmates too"
   },
   {
     "id": "md-17-anti-tank-mines",
@@ -8763,7 +8763,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "demo 40 as of 7.0.0, closes holes from outside"
+    "note": "closes holes from outside"
   },
   {
     "id": "a-m-23-ems-mortar-sentry",
@@ -9273,7 +9273,7 @@
     ],
     "flag": null,
     "patchNote": null,
-    "effect": "+50% explosive resist, +30 armor rating",
+    "effect": "+50% explosive resist, +30 armour rating",
     "passive": {
       "explosiveResist": 50
     },
@@ -9880,7 +9880,7 @@
     ],
     "flag": null,
     "patchNote": null,
-    "effect": "Reduced flinch, +25 armor rating, map marker radar",
+    "effect": "Reduced flinch, +25 armour rating, map marker radar",
     "passive": {},
     "note": null
   },
@@ -10151,7 +10151,7 @@
     ],
     "flag": null,
     "patchNote": null,
-    "effect": "Revive on death if body intact then timed death, +2.0s stim duration, +50% electrical resist",
+    "effect": "Revives you on death if your body is intact, then a death timer runs, +2.0s stim duration, +50% electrical resist",
     "passive": {
       "arcResist": 50,
       "stimDuration": 2
@@ -10371,7 +10371,7 @@
     ],
     "flag": null,
     "patchNote": null,
-    "effect": "+50 armor rating",
+    "effect": "+50 armour rating",
     "passive": {},
     "note": null
   },
@@ -10424,7 +10424,7 @@
     ],
     "flag": null,
     "patchNote": null,
-    "effect": "Gain stamina when taking damage, +25 armor rating",
+    "effect": "Gain stamina when taking damage, +25 armour rating",
     "passive": {},
     "note": null
   },
@@ -10530,7 +10530,7 @@
     ],
     "flag": null,
     "patchNote": null,
-    "effect": "Armor explodes 1.5s after death, +2 throwables capacity",
+    "effect": "Armour explodes 1.5s after death, +2 throwables capacity",
     "passive": {},
     "note": null
   },
@@ -10841,7 +10841,7 @@
     "traits": [],
     "flag": null,
     "patchNote": null,
-    "effect": "Stamina buff, critical with Heavy armor",
+    "effect": "More stamina and faster stamina recovery",
     "note": null
   },
   {
@@ -10890,7 +10890,7 @@
     "traits": [],
     "flag": null,
     "patchNote": null,
-    "effect": "-10% damage taken, not extra health",
+    "effect": "-10% damage taken",
     "note": null
   },
   {
@@ -11233,7 +11233,7 @@
     "traits": [],
     "flag": null,
     "patchNote": null,
-    "effect": "+15% time between reinforcement calls only, not patrols or objectives",
+    "effect": "+15% time between enemy reinforcement calls. Patrols and objectives unchanged",
     "note": null
   },
   {
@@ -11677,7 +11677,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "resupply that drives to you. The turret is incidental"
+    "note": "carries resupplies"
   },
   {
     "id": "m-104-incinerator-frv",
@@ -11728,7 +11728,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "heavier hull, a roof flamethrower and a ramming grille. Seats three instead of four"
+    "note": "roof flamethrower, ramming grille, seats 3"
   },
   {
     "id": "exo-45-patriot-exosuit",
@@ -11780,7 +11780,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "gatling in one hand, rockets in the other. The rockets are the reason to bring it"
+    "note": "gatling and rockets"
   },
   {
     "id": "exo-49-emancipator-exosuit",
@@ -11831,7 +11831,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "two autocannons. Opens medium armor from either arm and keeps doing it"
+    "note": "two autocannons"
   },
   {
     "id": "exo-51-lumberer-exosuit",
@@ -11883,7 +11883,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "flamethrower and an anti-tank cannon on the same frame, which is a strange and useful pair"
+    "note": "flamethrower and anti-tank cannon"
   },
   {
     "id": "exo-55-breakthrough-exosuit",
@@ -11934,7 +11934,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "a scattergun exosuit. Close range, and the only exosuit with nothing that opens heavy armor"
+    "note": "scattergun, no anti-tank"
   },
   {
     "id": "td-220-bastion-mk-xvi",
@@ -11986,7 +11986,7 @@
     "flag": null,
     "patchNote": null,
     "effect": null,
-    "note": "a tank destroyer. 8000 hull, a 120mm cannon and demolition 40, which closes holes from outside"
+    "note": "tank destroyer, 120mm cannon, closes holes from outside"
   },
   {
     "id": "ar-11-arbitrator",
@@ -12433,7 +12433,7 @@
     "traits": [],
     "flag": null,
     "patchNote": null,
-    "effect": "Two free Expendable Anti-Tank call-ins per mission",
+    "effect": "Two free Expendable Anti-Tank stratagems per mission",
     "note": null
   },
   {
@@ -12533,7 +12533,7 @@
     ],
     "flag": null,
     "patchNote": null,
-    "effect": "Harder to knock down, 30% less damage from impacts and collisions, higher armor rating",
+    "effect": "Harder to knock down, 30% less damage from impacts and collisions, higher armour rating",
     "passive": {},
     "note": null
   }

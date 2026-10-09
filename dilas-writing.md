@@ -91,7 +91,7 @@ For every line:
 > [!danger] A hover never holds the only copy of something you need to decide what to bring
 > If the hover spot is taken by something more important, the text goes to About.
 
-**Use `Tip`, never `title=`.** The browser's own tooltip is slow, unstyled and missing on a phone. A label with a tip gets the dotted underline, `HAS_TIP`. A missing value is `<MissingData />`, or `Fact`'s `missing` prop in the expanded row.
+**Use `Tip` for anything that explains.** The browser's own tooltip (`title=`) is slow, unstyled and missing on a phone. An icon button may keep a short `title` that only names its action, such as "Delete". A label with a tip gets the dotted underline, `HAS_TIP`. A missing value is `<MissingData />`, or `Fact`'s `missing` prop in the expanded row.
 
 ---
 
@@ -186,7 +186,8 @@ For every line:
 | The expanded tier row, the rating badge's hover, About's How the rating works | **The pilot, 9 October 2026.** |
 | **Pass 1, rule text**, 1.32.0 | **Done, 9 October 2026.** All 115 rule names and sentences. A reason shows as its rule's name with the sentence on hover, in the tier row, the badge and editor slot hovers, the build reading and the Drop Bay suggestions. The build caption, the Rules page's headers and empty states, the Role footnote moved to hover, and Gear and Build plus Ground and megacities on About |
 | **Pass 2, generated sentences**, 1.32.0 | **Done, 9 October 2026.** The Rules page's When, Checks and Size lines, in the words the rule names use; the war room's "new at this level" line; every squad warning on Drop Bay. One of them said "if he goes down", and now says "they" |
-| Still to do, one surface per pass | The rest of the tier row (item notes, damage type glosses, filter labels); Drop Bay; Collection; the Armoury; the war room and the Star Map; Party, Settings and About; the Rules page's judgement, source and measured notes |
+| **Pass 3, the tier list**, 1.32.0 | **Done, 9 October 2026.** Every item note: 89 cut to the one fact the row does not already show, 22 dropped because they only repeated the category or the tier. 11 effect lines. The damage type glosses (arc weapons never vented heat), the filter pane's counts and empty states, the column and lock tooltips, the scenario bar |
+| Still to do, one surface per pass | Drop Bay; Collection; the Armoury; the war room and the Star Map; Party, Settings and About; the Rules page's judgement, source and measured notes |
 
 > [!danger] A wording change must not move a score
 > Run `npm run rules`, `npm run builds` and `npm run drop` before and after. All three must give identical output. Rule names and sentences live in the rules data and feed the tier rows, the suggestions and the Rules page at once.
