@@ -278,6 +278,7 @@ export function readBuild(loadout, scenario = {}) {
 
     notes.push({
       id: rule.id,
+      name: rule.name,
       severity: rule.severity || null,
       say: inverted ? rule.sayInverted : rule.say,
       delta,
@@ -350,18 +351,22 @@ export function closedGaps(before, after) {
 /* same place an unrated item sorts on a tier list.                      */
 export const byReading = (a, b) => (b.score ?? -1) - (a.score ?? -1);
 
-/* What the number is made of, in one line, for a tooltip or a caption.  */
-/* Written here rather than in a component for the reason squad.js and   */
-/* enemies.js both give: the wording and the arithmetic have to move     */
-/* together.                                                             */
+/* What the combination did, in one line, for the caption beside the     */
+/* Gear and Build badges. Written here rather than in a component for    */
+/* the reason squad.js and enemies.js both give: the wording and the     */
+/* arithmetic have to move together. Plain words, per dilas-writing.md.  */
+const TIER_STEPS = ["D", "C", "B", "A", "S", "S+"];
+
 export function explainScore(reading) {
-  if (reading.score === null) return "No slot in this build carries a community rating, so there is nothing to score.";
-  const parts = `The gear averages ${Math.round(reading.partsScore)} where you are dropping`;
-  if (!reading.adjust) return `${parts}, and nothing about the combination changes that.`;
-  const dir = reading.adjust > 0 ? "adds" : "takes off";
-  const said = `${parts}, and how it fits together ${dir} ${Math.abs(Math.round(reading.adjust))}`;
+  if (reading.score === null) return "Nothing in this build is rated yet.";
+  const adjust = Math.round(reading.adjust || 0);
+  if (!adjust) return "Fits together fine.";
+  const how = adjust > 0 ? `Fits together well: +${adjust} points` : `Fits together poorly: ${adjust} points`;
   /* Points that do not cross a band are still points, and a reader looking
-     at two identical badges under a green number deserves to be told which
-     of the two things happened. */
-  return reading.tier === reading.partsTier ? `${said}, which is not enough to move the badge.` : `${said}.`;
+     at two identical badges beside a green number deserves to be told
+     which of the two things happened. */
+  const steps = TIER_STEPS.indexOf(reading.tier) - TIER_STEPS.indexOf(reading.partsTier);
+  if (!steps) return `${how}, same tier.`;
+  const n = Math.abs(steps);
+  return `${how}, ${n} ${n === 1 ? "tier" : "tiers"} ${steps > 0 ? "up" : "down"}.`;
 }

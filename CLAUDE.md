@@ -763,7 +763,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > The engine **throws** on an unknown match key rather than skipping it, and `npm run validate` checks every key, path, role and severity so the throw never reaches a browser.
 
 > [!info] Where it renders, and the one contradiction that got caught
-> `LoadoutReading` in `Tiers.jsx`, on the Drop Bay card in `compact` form and in the Builder with the arithmetic underneath. The Builder recomputes on every edit, which is the point of putting it there: change a slot and watch the gap close.
+> `LoadoutReading` in `Tiers.jsx`, on the Drop Bay card and in the Builder. Each note shows its rule's name, with the sentence on hover; how the two badges work is on About since 1.32.0. The Builder recomputes on every edit, which is the point of putting it there: change a slot and watch the gap close.
 >
 > **The caption keys on the points, not on the badge.** It chose its sentence on whether the tier moved at first, so a build that gained 8 points without crossing a band rendered "nothing about how this fits together changes what the gear is worth" directly above a green +8. Three states, three sentences: the badge moved, the points moved but the badge did not, and genuinely nothing happened.
 
@@ -1142,7 +1142,7 @@ lists of item ids, and a concept written down six times is a concept that drifts
 | | |
 |---|---|
 | **Groups** | The front; how hard and how many of you; climate; weather and terrain; the mission; how a build fits together. **Derived from each rule's own `when`**, so a new rule files itself |
-| **A closed row** | The switch, the name, where it applies, a "judgement" tag on rules that are our call, and how many items it moves here, up and down |
+| **A closed row** | The switch, the name, which says when the rule applies since 1.32.0, a "judgement" tag on rules that are our call, and how many items it moves here, up and down |
 | **An open row** | The sentence, the inverted sentence, when it applies and what it looks at in plain words (`describeWhen`, `describeMatch`), its size against "a tier is about 14 points", its source and judgement, its id, and **every item or build it moves here, with the tier now and the tier the other way round** |
 | **Scale** | Search, folding groups, and two filters: changing something here, and switched off. Built for dozens of rules |
 
@@ -1176,7 +1176,7 @@ lists of item ids, and a concept written down six times is a concept that drifts
 Three tags, `anti-armor`, `chaff` and `objective`, and a panel in Drop Bay that uses them to tell you what is going to hurt.
 
 > [!danger] These tags are ours. Nothing else in this project is
-> Every per-faction rating is a u.gg vote aggregate carrying a source and a patch stamp. Role tags are a judgment we made. The expanded row states this in its own block with its own provenance line, and the filter is labelled "our call, not a vote". Never let the two sit together looking equally weighed.
+> Every per-faction rating is a u.gg vote aggregate carrying a source and a patch stamp. Role tags are a judgment we made. The expanded row keeps roles in their own block and says so on hover over its Role heading (a footnote until 1.32.0, the writing guide), and the filter is labelled "our call, not a vote". Never let the two sit together looking equally weighed.
 
 ### The tagging
 

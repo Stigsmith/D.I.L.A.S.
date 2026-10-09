@@ -58,6 +58,7 @@ import {
 import { SQUAD_CAP } from "./lib/party.js";
 import { entryFor, TAKE_BACK_MS, daysSince } from "./lib/history.js";
 import { agoText } from "./lib/war.js";
+import { Tip, HAS_TIP } from "./Tip.jsx";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 const MONO = { fontFamily: "'JetBrains Mono', monospace" };
@@ -263,10 +264,13 @@ function SuggestionCard({ build, reading, usage, fromPresets, on, onTake, change
       {why ? (
         <p className={"flex items-start gap-1.5 text-[11px] leading-relaxed " + (why.tone === "up" ? "text-emerald-300" : "text-accent-300")}>
           {why.tone === "up" ? <ArrowUp className="mt-px h-3 w-3 shrink-0" /> : <AlertTriangle className="mt-px h-3 w-3 shrink-0" />}
-          <span>{why.item ? <span className="text-base-300">{why.item}. </span> : null}{why.text}</span>
+          <span>
+            {why.item ? <span className="text-base-300">{why.item}: </span> : null}
+            <Tip text={why.text}><span className={HAS_TIP}>{why.name || why.text}</span></Tip>
+          </span>
         </p>
       ) : (
-        <p className="text-[11px] text-base-500">Nothing about this drop moves it. It is what its gear is worth anywhere.</p>
+        <p className="text-[11px] text-base-500">No effect from this scenario.</p>
       )}
       <div className="mt-auto flex items-center justify-between gap-2">
         <span className="min-w-0 text-[10px] leading-snug text-base-600">

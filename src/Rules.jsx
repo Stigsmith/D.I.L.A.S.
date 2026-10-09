@@ -24,6 +24,8 @@ import { readBuild } from "./lib/build.js";
 import { presets } from "./lib/loadouts.js";
 import { withHeat } from "./lib/drop.js";
 import { ALL_RULES, GROUPS, ruleGroup, describeWhen, describeMatch, describeSize, isPairing } from "./lib/rules.js";
+import { BRAND } from "./lib/brand.js";
+import { Tip } from "./Tip.jsx";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 const MONO = { fontFamily: "'JetBrains Mono', monospace" };
@@ -43,14 +45,14 @@ function Switch({ on, onChange, label }) {
 
 function Effect({ effect, off }) {
   if (!effect) return <span className="text-[10px] text-base-600">no front chosen</span>;
-  if (!effect.up && !effect.down) return <span className="text-[10px] text-base-600">quiet here</span>;
+  if (!effect.up && !effect.down) return <span className="text-[10px] text-base-600">no effect here</span>;
   return (
-    <span className={"flex shrink-0 items-center gap-1.5 text-[10px] tabular-nums " + (off ? "opacity-50" : "")}
-      title={off ? "What it would move here if it were on" : "What it moves here"}>
+    <Tip passive className={"flex shrink-0 items-center gap-1.5 text-[10px] tabular-nums " + (off ? "opacity-50" : "")}
+      text={off ? "How many items or builds it would raise and lower here, if switched on." : "How many items or builds it raises and lowers here."}>
       {effect.up ? <span className="flex items-center text-emerald-400"><ArrowUp className="h-3 w-3" />{effect.up}</span> : null}
       {effect.down ? <span className="flex items-center text-red-400"><ArrowDown className="h-3 w-3" />{effect.down}</span> : null}
-      <span className="text-base-600">{off ? "would move" : "here"}</span>
-    </span>
+      <span className="text-base-600">{off ? "if on" : "here"}</span>
+    </Tip>
   );
 }
 
@@ -122,13 +124,13 @@ function RuleDetail({ rule, scenario, off, builds, buildsArePresets }) {
 
       <div>
         <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>
-          {isPairing(rule) ? `What it moves in your builds here${buildsArePresets ? ", the presets standing in" : ""}` : rule.kind === "item" ? "What it moves where you are dropping" : `Your builds it reads here${buildsArePresets ? ", the presets standing in" : ""}`}
+          {isPairing(rule) ? `What it changes in your builds here${buildsArePresets ? ", using the presets until you have builds" : ""}` : rule.kind === "item" ? "What it changes here" : `Your builds it applies to here${buildsArePresets ? ", using the presets until you have builds" : ""}`}
         </p>
         {!scenario.faction ? (
-          <p className="text-xs text-base-500">Choose where you are dropping and this lists what the rule moves there.</p>
+          <p className="text-xs text-base-500">Choose a front to see what this rule changes.</p>
         ) : rows.length === 0 ? (
           <p className="text-xs text-base-500">
-            Nothing, for the scenario you are in. It applies {describeWhen(rule).join(", ")}; change the scenario to see it work.
+            No effect in this scenario. It applies {describeWhen(rule).join(", ")}.
           </p>
         ) : (
           <div className="flex max-h-72 flex-col gap-1 overflow-y-auto pr-1">
@@ -228,12 +230,11 @@ export default function Rules({ scenario, rulesOff, toggleRule, clearRules, stat
         <div className="flex flex-wrap items-start gap-3">
           <Scale className="mt-0.5 h-5 w-5 shrink-0 text-brand" />
           <div className="min-w-[16rem] flex-1">
-            <p className="text-sm font-bold text-base-200" style={OSWALD}>The rules behind our rating</p>
+            <p className="text-sm font-bold text-base-200" style={OSWALD}>The rules behind the {BRAND.short} tier</p>
             <p className="mt-1 text-xs leading-relaxed text-base-500">
-              Every rating in our column starts from the community vote and moves by these rules, for where you are
-              dropping. {itemCount} read one item, {buildCount} read a whole build. Open one to see what it does and
-              exactly what it moves right now. Switch any of them off and every rating in the tool is worked out
-              without it, in this browser only: the vote never changes, and nobody else sees your switches.
+              Each {BRAND.short} tier starts from the community tier, then these rules change it for where you are
+              dropping. {itemCount} rules check one item, {buildCount} check a whole build. Switching a rule off affects
+              this browser only.
             </p>
           </div>
           {off.size ? (
@@ -246,7 +247,7 @@ export default function Rules({ scenario, rulesOff, toggleRule, clearRules, stat
         {!scenario.faction ? (
           <p className="mt-3 flex items-start gap-1.5 text-xs text-accent-300">
             <Info className="mt-px h-3.5 w-3.5 shrink-0" />
-            No front is chosen yet, so nothing here can say what it moves. Choose where you are dropping on Drop Bay.
+            Choose a front to see what each rule changes.
           </p>
         ) : null}
       </div>
@@ -270,8 +271,8 @@ export default function Rules({ scenario, rulesOff, toggleRule, clearRules, stat
 
       {shown.length === 0 ? (
         <div className="rounded-lg border border-dashed border-base-700 px-4 py-10 text-center text-sm text-base-400">
-          {filter === "off" ? "Every rule is on. Switch one off below the All rules filter and it shows here."
-            : filter === "here" ? "Nothing about where you are dropping moves anything. Adjust the scenario and rules start to fire."
+          {filter === "off" ? "Every rule is on."
+            : filter === "here" ? "No rule applies to this scenario."
               : "No rule matches that search. Clear it to see them all."}
         </div>
       ) : GROUPS.map((g) => {
@@ -287,7 +288,7 @@ export default function Rules({ scenario, rulesOff, toggleRule, clearRules, stat
               <span className="text-sm font-bold uppercase tracking-wide text-base-100" style={OSWALD}>{g.label}</span>
               <span className="hidden text-[11px] text-base-500 sm:inline">{g.line}</span>
               <span className="ml-auto shrink-0 text-[11px] text-base-500">
-                {rules.length} {rules.length === 1 ? "rule" : "rules"}{effects ? `, ${busy} at work here` : ""}
+                {rules.length} {rules.length === 1 ? "rule" : "rules"}{effects ? `, ${busy} apply here` : ""}
               </span>
             </button>
             {isFolded ? null : (
@@ -302,10 +303,8 @@ export default function Rules({ scenario, rulesOff, toggleRule, clearRules, stat
                         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(isOpen ? null : rule.id); } }}
                         className="flex cursor-pointer items-center gap-3 px-3 py-2 hover:bg-base-800/40">
                         <Switch on={!isOff} onChange={() => toggleRule(rule.id)} label={`${isOff ? "Switch on" : "Switch off"}: ${rule.name}`} />
-                        <span className="min-w-0 flex-1">
-                          <span className={"block truncate text-xs " + (isOff ? "text-base-500 line-through" : "text-base-100")}>{rule.name}</span>
-                          <span className="block truncate text-[10px] text-base-600">{describeWhen(rule).join(", ")}</span>
-                        </span>
+                        {/* The name says when the rule applies, so the closed row needs no second line. */}
+                        <span className={"min-w-0 flex-1 truncate text-xs " + (isOff ? "text-base-500 line-through" : "text-base-100")}>{rule.name}</span>
                         {rule.judgement ? <span className="hidden shrink-0 rounded border border-accent-800/60 px-1 text-[9px] uppercase tracking-wider text-accent-400 sm:inline">judgement</span> : null}
                         <Effect effect={effectOf(rule)} off={isOff} />
                         {isOpen ? <ChevronDown className="h-4 w-4 shrink-0 text-base-500" /> : <ChevronRight className="h-4 w-4 shrink-0 text-base-600" />}

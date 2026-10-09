@@ -32,6 +32,7 @@ import {
   deriveHeat, heatSources, deriveFire, backpackUsers, hasBackpackConflict, loadoutItemIds, loadoutLockIds,
 } from "./lib/loadouts.js";
 import { shareUrl } from "./lib/share.js";
+import { Tip } from "./Tip.jsx";
 import { getArmorSet, setsForPassive, weightOf } from "./lib/armor.js";
 import { SetStrip, WeightFilter, ArmorSetArt, setLine } from "./ArmorSets.jsx";
 
@@ -327,10 +328,20 @@ function Slot({ label, itemId, setId = null, locked, onOpen, warn, faction, scen
             <stratMeta.Icon className="h-4 w-4" style={{ color: STRAT_GROUP[stratMeta.group].hex }} />
           ) : null}
           {scored ? (
-            <span className="relative flex items-center"
-              title={scored.reasons.length
-                ? `${scored.base || "unrated"} on the vote. ${scored.reasons.map((r) => r.say).join(" ")}`
-                : "Nothing about where you are dropping changes where this sits"}>
+            <Tip passive className="relative flex items-center" title="What affects this tier"
+              text={
+                <span className="flex flex-col gap-1">
+                  <span className="text-base-400">Community tier: {scored.base || "unrated"}</span>
+                  {scored.reasons.length ? scored.reasons.map((r) => (
+                    <span key={r.id} className="flex items-start gap-1.5">
+                      <span className={"shrink-0 font-bold tabular-nums " + (r.delta > 0 ? "text-emerald-400" : "text-red-400")}>
+                        {r.delta > 0 ? "+" : ""}{r.delta}
+                      </span>
+                      <span>{r.name}</span>
+                    </span>
+                  )) : <span>No effect from this scenario.</span>}
+                </span>
+              }>
               <TierBadge tier={shown} />
               {/* Top left, the square corner. The top right is the chamfer
                   and a round marker over a cut corner reads as damage. */}
@@ -341,7 +352,7 @@ function Slot({ label, itemId, setId = null, locked, onOpen, warn, faction, scen
                     : <ArrowDown className="h-2 w-2" strokeWidth={3} />}
                 </span>
               ) : null}
-            </span>
+            </Tip>
           ) : null}
         </span>
       ) : null}

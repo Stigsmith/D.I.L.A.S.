@@ -124,6 +124,7 @@ For every line:
 | peril 22+ | a hard drop, this deep | always with its number. Explained on About, and on hover wherever it appears |
 | 1 or 2 players | alone or in pairs, with this few of you | |
 | Missing data | not in any source, not recorded, genuinely unknown | |
+| helps, less useful, advised, not needed, risky | rewards, punishes, favours, pays, wasted, earns its keep | the verbs in a rule name. Say what happens when a verb can: "Loud weapons draw patrols" |
 | Automatons, Terminids, Illuminate | a mix of bots, bugs and squids | the names on the front buttons |
 
 # **Spelling, Numbers, Punctuation**
@@ -160,18 +161,18 @@ For every line:
 | A13 | Why this scenario moves it | What affects this tier |
 | A14 | +9 Terminids are mostly large fleshy parts, and durable damage is what hurts those. This one keeps most of its damage against them where a chaff gun loses it. | **+9 Durable damage helps · Terminids**, and on hover: "Big Terminids are mostly tough flesh. Weapons with high durable damage keep most of their damage against it." |
 | A14 | -8 Poor ergonomics means the barrel lags behind the camera, and Hunters do not wait for you to catch up. | **-8 Slow handling hurts · Terminids**, and on hover: "Low ergonomics makes the barrel slow to follow your aim. Hunters close in fast." |
-| A16 | Changed after the vote. {patch note} The tiers above were voted before this change and have not absorbed it. | Changed in patch {x}: {patch note}. The community tier is from before this change. |
-| A17 | Released 12 August 2026 in Castellan's Creed. No community rating exists yet. Re-check u.gg around early September 2026. | New in Castellan's Creed. No community rating yet. |
+| A16 | Changed after the vote. {patch note} The tiers above were voted before this change and have not absorbed it. | Changed after the vote. {patch note} The community tier is from before this change. |
+| A17 | Released 12 August 2026 in Castellan's Creed. No community rating exists yet. Re-check u.gg around early September 2026. | New in Castellan's Creed. No community rating yet. *(the warbond is filled in per item)* |
 | A18 | four wheels and a Heavy Machine Gun. Someone has to drive, so it costs you a gun and a pair of hands | mounted Heavy Machine Gun |
 | B1 | Against bugs the speed is the armour: what cannot catch you cannot hurt you. | Terminids attack up close. Light armour is the fastest weight. |
 | B1 | A gas cloud does not care whose it is, and your armour lets you stand in yours. | Gas damages everyone, Helldivers included. Your armour resists gas damage. |
 | B1 | Open, even ground, where the FRV is fast and stays on its wheels. | Flat, open ground. The FRV drives fastest here and rarely flips. |
 | B2 | A storm cuts their sight as much as yours, and with this few of you this deep you are not trying to win the firefight... | A storm reduces line of sight for both sides. With a silenced weapon, enemies are less likely to find you. |
 | B3 | ...everything else means putting it down first. It does not make a bad sidearm good, it makes a good one indispensable. | You carry an objective for most of this mission. A one handed weapon can fire while you carry it. |
-| B4 | ...and no support weapon is no support weapon. You keep the handling and lose the half that makes it S+. | Nothing in this build reloads, so True Grit's +30% reload speed does nothing. Only its +20 handling applies. |
+| B4 | ...and no support weapon is no support weapon. You keep the handling and lose the half that makes it S+. | No support weapon here reloads, so True Grit's +30% support reload does nothing. Only its +20 handling applies. |
 | B5 | ...They are weather rather than climate though: roughly three minutes at a time, so this is a risk you carry rather than a state you are in. | Sandstorms reduce visibility, so long range weapons are less useful. Each storm lasts about 3 minutes. |
 | B6 | Alone or in pairs on a hard bot drop, quiet wins | Stealth advised · Automatons, 1 or 2 players, peril 22+ |
-| B6 | Alone or in pairs on a very hard bot drop, noise costs | Loud weapons hurt · Automatons, 1 or 2 players, peril 28+ |
+| B6 | Alone or in pairs on a very hard bot drop, noise costs | Loud weapons draw patrols · Automatons, 1 or 2 players, peril 28+ |
 | B6 | Stealth armour is wasted on an easy drop | Stealth armour not needed · peril 0 or less |
 | C2 | How hard, and how many of you · Difficulty and squad size, read together. None of these fire until you have said both. | Difficulty and squad size · These apply once you set both. |
 | D1 | Nothing about how this fits together changes what the gear is worth. | Fits together fine. |
@@ -182,8 +183,9 @@ For every line:
 
 | Surface | State |
 |---|---|
-| The expanded tier row, the rating badge's hover, About's How the rating works | **Pilot, done 9 October 2026.** Two leftovers for the first pass: the badge hover's "What changes this tier" becomes "What affects this tier", and "the build reading" becomes "the Build badge" |
-| Everything else | **The rollout**, one surface per pass, each planned with its before and after first: rule names and sentences; generated sentences; the rest of the tier row; Drop Bay; Collection; the Armoury; the war room and the Star Map; Party, Settings and About; the Rules page |
+| The expanded tier row, the rating badge's hover, About's How the rating works | **The pilot, 9 October 2026.** |
+| **Pass 1, rule text**, 1.32.0 | **Done, 9 October 2026.** All 115 rule names and sentences. A reason shows as its rule's name with the sentence on hover, in the tier row, the badge and editor slot hovers, the build reading and the Drop Bay suggestions. The build caption, the Rules page's headers and empty states, the Role footnote moved to hover, and Gear and Build plus Ground and megacities on About |
+| Still to do, one surface per pass | Generated sentences (the Rules page's Applies, Looks at and Size lines, the armour arrivals line, the squad warnings); the rest of the tier row (item notes, damage type glosses, filter labels); Drop Bay; Collection; the Armoury; the war room and the Star Map; Party, Settings and About; the Rules page's judgement, source and measured notes |
 
 > [!danger] A wording change must not move a score
 > Run `npm run rules`, `npm run builds` and `npm run drop` before and after. All three must give identical output. Rule names and sentences live in the rules data and feed the tier rows, the suggestions and the Rules page at once.
@@ -191,6 +193,5 @@ For every line:
 # **Still Open**
 
 - **Peril on screen.** Rule names show it as a number, so it needs its explanation on About (a placeholder is there) and a hover wherever it appears.
-- **Reasons as names.** The tier row's reason lines become the rule's name with its points, and the sentence moves to hover. That changes how the row draws them; it lands with the rule pass.
 - **An AP table**, one reference of enemy armour per front, linked from the armour block.
 - **A contact channel**, so Missing data can say where to send a source. It waits on the feedback form.

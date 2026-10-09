@@ -20,8 +20,10 @@ const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 
 /* `text` is the body, a string or a node. `title` is an optional small
    heading. `as` picks the anchor element, so a tip can wrap a whole
-   table cell as readily as one word. */
-export function Tip({ text, title = null, as: Tag = "span", className = "", style, children }) {
+   table cell as readily as one word. `passive` is for a tip inside
+   something you click, such as a button: hover only, so focus and a tap
+   go to the button underneath. */
+export function Tip({ text, title = null, as: Tag = "span", className = "", style, passive = false, children }) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState(null);
   const anchor = useRef(null);
@@ -64,12 +66,12 @@ export function Tip({ text, title = null, as: Tag = "span", className = "", styl
   const show = () => { setPos(null); setOpen(true); };
   return (
     <>
-      <Tag ref={anchor} tabIndex={0} aria-describedby={open ? id : undefined}
+      <Tag ref={anchor} tabIndex={passive ? undefined : 0} aria-describedby={open ? id : undefined}
         className={className} style={style}
         onPointerEnter={(e) => { if (e.pointerType === "mouse") show(); }}
         onPointerLeave={(e) => { if (e.pointerType === "mouse") setOpen(false); }}
-        onPointerUp={(e) => { if (e.pointerType !== "mouse") (open ? setOpen(false) : show()); }}
-        onFocus={show} onBlur={() => setOpen(false)}>
+        onPointerUp={(e) => { if (!passive && e.pointerType !== "mouse") (open ? setOpen(false) : show()); }}
+        onFocus={passive ? undefined : show} onBlur={passive ? undefined : () => setOpen(false)}>
         {children}
       </Tag>
       {open ? createPortal(

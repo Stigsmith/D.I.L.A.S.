@@ -38,14 +38,14 @@ const KNOWN = new Set(ALL_RULES.map((r) => r.id));
 const CLIMATE = new Set(["intense_heat", "extreme_cold"]);
 
 export const GROUPS = [
-  { id: "front", label: "The front", line: "What each enemy is, whatever the planet." },
-  { id: "peril", label: "How hard, and how many of you", line: "Difficulty and squad size, read together. None of these fire until you have said both." },
-  { id: "climate", label: "Climate", line: "A hot or frozen planet, all mission long." },
-  { id: "weather", label: "Weather", line: "Storms, fog and tremors. They come and go, so these price a risk rather than a state." },
-  { id: "terrain", label: "The ground and getting around", line: "What the planet is like underfoot, how steep it is, how it drives, and whether it has a city. The ground per biome is our reading, and a city is guessed from the planet." },
-  { id: "mission", label: "The mission", line: "What the objective asks of you." },
-  { id: "pairing", label: "What it is paired with", line: "Rules that read one item beside the rest of its build: True Grit beside a long reload, a Cremator beside fire resistance. They fire in the builder and on every build, never on the tier list, where there is no build." },
-  { id: "build", label: "How a build fits together", line: "Rules that read a whole build rather than one item. They move the build's own badge." },
+  { id: "front", label: "The front", line: "Rules for each enemy faction." },
+  { id: "peril", label: "Difficulty and squad size", line: "These apply once you set both." },
+  { id: "climate", label: "Climate", line: "Intense heat and extreme cold. They last the whole mission." },
+  { id: "weather", label: "Weather", line: "Storms, fog and tremors come and go, so their effects are smaller." },
+  { id: "terrain", label: "The ground", line: "Footing, slopes, driving and megacities." },
+  { id: "mission", label: "The mission", line: "Rules for each kind of mission." },
+  { id: "pairing", label: "Pairings", line: "One item beside the rest of its build, like True Grit with a long reload. These apply to builds only, so the Tier Lists never show them." },
+  { id: "build", label: "How a build fits together", line: "These check a whole build and change its Build badge." },
 ];
 
 /* A pairing reads the rest of the build, wherever it sits in the match. */
