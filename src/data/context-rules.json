@@ -707,6 +707,126 @@
       "judgement": "The size is ours: under a tier at solo Super Helldive. Large and huge classes: the Autocannon, the Anti-Materiel Rifle, the expendable and recoilless launchers. 1 or 2 players only."
     },
     {
+      "id": "peril-small-noise-bugs-squids",
+      "name": "Quieter weapons draw fewer patrols · Terminids, Illuminate, 1 or 2 players, peril 28+",
+      "when": {
+        "faction": [
+          "bugs",
+          "squids"
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 28
+        }
+      },
+      "match": {
+        "held": true,
+        "notTags": [
+          "suppressed"
+        ],
+        "number": [
+          {
+            "path": "wiki.noise",
+            "eq": 1
+          }
+        ]
+      },
+      "say": "This weapon is quieter than most and starts fewer breaches and Watcher alerts. With 1 or 2 players, nobody covers you while you deal with it.",
+      "source": "The game's own noise template for each weapon. helldivers.wiki.gg, Stealth: every faction detects by sound, then sight.",
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": -0.09,
+        "clamp": 3
+      },
+      "judgement": "Six tenths of the Automaton rule, like the other stealth rules on these fronts."
+    },
+    {
+      "id": "peril-loud-bugs-squids",
+      "name": "Loud weapons draw patrols · Terminids, Illuminate, 1 or 2 players, peril 28+",
+      "when": {
+        "faction": [
+          "bugs",
+          "squids"
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 28
+        }
+      },
+      "match": {
+        "held": true,
+        "notTags": [
+          "suppressed"
+        ],
+        "anyOf": [
+          {
+            "number": [
+              {
+                "path": "wiki.noise",
+                "eq": 2
+              }
+            ]
+          },
+          {
+            "noNumber": [
+              "wiki.noise"
+            ]
+          }
+        ]
+      },
+      "say": "Every shot from this is heard up to 100 metres away and can start a breach or a Watcher alert. With 1 or 2 players, nobody covers you while you deal with it.",
+      "source": "The game's own noise template for each weapon. helldivers.wiki.gg, Stealth: every faction detects by sound, then sight.",
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": -0.15,
+        "clamp": 5
+      },
+      "judgement": "Six tenths of the Automaton rule, like the other stealth rules on these fronts."
+    },
+    {
+      "id": "peril-very-loud-bugs-squids",
+      "name": "Very loud weapons draw patrols · Terminids, Illuminate, 1 or 2 players, peril 28+",
+      "when": {
+        "faction": [
+          "bugs",
+          "squids"
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 28
+        }
+      },
+      "match": {
+        "held": true,
+        "notTags": [
+          "suppressed"
+        ],
+        "number": [
+          {
+            "path": "wiki.noise",
+            "gte": 3
+          }
+        ]
+      },
+      "say": "This weapon is heard further than most and can start breaches and Watcher alerts from far away. With 1 or 2 players, nobody covers you while you deal with it.",
+      "source": "The game's own noise template for each weapon. helldivers.wiki.gg, Stealth: every faction detects by sound, then sight.",
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": -0.24,
+        "clamp": 7
+      },
+      "judgement": "Six tenths of the Automaton rule, like the other stealth rules on these fronts."
+    },
+    {
       "id": "peril-storm-favours-stealth",
       "name": "Stealth advised · storms, Automatons, 1 or 2 players, peril 22+",
       "when": {
@@ -738,6 +858,40 @@
         "clamp": 8
       },
       "judgement": "Adds to the plain stealth rule, so a storm is worth a little extra."
+    },
+    {
+      "id": "peril-storm-stealth-bugs-squids",
+      "name": "Stealth helps · storms, Terminids, Illuminate, 1 or 2 players, peril 22+",
+      "when": {
+        "faction": [
+          "bugs",
+          "squids"
+        ],
+        "hazard": [
+          "sandstorms",
+          "blizzards",
+          "thick_fog"
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 22
+        }
+      },
+      "match": {
+        "tags": [
+          "suppressed"
+        ]
+      },
+      "say": "A storm reduces line of sight for both sides. With a silenced weapon, enemies are less likely to find you.",
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": 0.18,
+        "clamp": 5
+      },
+      "judgement": "Adds to the plain stealth rule. Six tenths of the Automaton rule, like the other stealth rules on these fronts."
     },
     {
       "id": "peril-wants-quiet-bugs-squids",
