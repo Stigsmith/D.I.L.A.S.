@@ -398,10 +398,7 @@ function Settings({ theme, setTheme, state, onTour }) {
           <h3 className="text-sm font-bold uppercase tracking-wide text-base-100" style={{ fontFamily: "'Oswald', sans-serif" }}>
             Theme
           </h3>
-          <p className="text-[11px] text-base-500">
-            Three base themes and eight warbond skins. Each skin comes from a palette study that fixes its colours
-            before any of it reaches here.
-          </p>
+          <p className="text-[11px] text-base-500">3 base themes and {THEMES.length - 3} skins.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3 p-4">
           <select value={theme} onChange={(e) => setTheme(e.target.value)}
@@ -420,9 +417,7 @@ function Settings({ theme, setTheme, state, onTour }) {
           <h3 className="text-sm font-bold uppercase tracking-wide text-base-100" style={{ fontFamily: "'Oswald', sans-serif" }}>
             Tier badge
           </h3>
-          <p className="text-[11px] text-base-500">
-            How the badge is finished. Purely cosmetic, and separate from the theme: changing skin does not move it.
-          </p>
+          <p className="text-[11px] text-base-500">How the tier badge looks. Changing theme does not change it.</p>
         </div>
         <div className="flex flex-col gap-4 p-4 lg:flex-row">
           <div className="flex min-w-0 flex-1 flex-col gap-3">
@@ -437,14 +432,12 @@ function Settings({ theme, setTheme, state, onTour }) {
               <SurfaceToggle on={surface.sheen} onClick={() => toggleSurface("sheen")}
                 label="Sheen" note="A light sweep across the face" />
               <SurfaceToggle on={surface.glow} onClick={() => toggleSurface("glow")}
-                label="Glow" note="Bleeds the tier colour outward" />
+                label="Glow" note="Tier colour glows outward" />
               <SurfaceToggle on={surface.grain} onClick={() => toggleSurface("grain")}
-                label="Grain" note="Film over the interior" />
+                label="Grain" note="Film grain inside" />
             </div>
             <p className="text-[10px] leading-relaxed text-base-600">
-              Sheen and glow both ramp with the tier, so S+ carries the most and D the least. Neither ever costs a
-              badge its legibility: a D reads exactly as clearly as an S+, which is why nothing here shrinks or
-              fades a letter.
+              Sheen and glow are strongest on S+ and weakest on D. Every letter stays equally readable.
             </p>
           </div>
 
@@ -479,7 +472,8 @@ function Settings({ theme, setTheme, state, onTour }) {
             Reset local data
           </h3>
           <p className="text-[11px] text-base-500">
-            Clears every lock, warbond and favorite stored in this browser. Export first if you want it back.
+            Clears your collection, profiles, favourites, builds and drop history in this browser. Export first to keep
+            a copy.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2 p-3">

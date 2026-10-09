@@ -2040,8 +2040,8 @@ export function BackupPanel({ onExport, onImport }) {
           Backup and transfer
         </h3>
         <p className="text-[11px] text-base-500">
-          Export writes one file holding your warbonds, item locks and favorites. Import takes that file back, or an
-          ownership list in the same shape as src/data/ownership.json.
+          Export saves your collection, profiles, favourites, builds and drop history to one file. Import loads that
+          file back, or an ownership list.
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2 p-3">

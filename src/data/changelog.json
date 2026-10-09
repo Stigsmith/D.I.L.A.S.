@@ -9,7 +9,7 @@
       "Hovering a label, a rating or a reason opens a tooltip in the tool's own style.",
       "An opened tier row is shorter: armour reads as full damage, reduced damage and weak points by name, and missing figures are marked.",
       "Item notes keep only the one fact the row does not already show.",
-      "Build and squad warnings, suggestions and the Rules page say less, and say it plainly.",
+      "Every screen says less and says it plainly: warnings, suggestions, Collection, the Armoury, the war room and the Rules page.",
       "About has a new How the rating works section: the maths, the sources and the list of missing data."
     ]
   },

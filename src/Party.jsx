@@ -38,7 +38,7 @@ export function PartyButton({ party, open, onToggle, compact = false }) {
   const live = party.status === "live";
   return (
     <button onClick={onToggle} aria-expanded={open} aria-haspopup="dialog" data-tour="party"
-      title={inParty ? `Party ${party.code}` : "Squad up with friends who use the tool"}
+      title={inParty ? `Party ${party.code}` : "Play with friends: share a party code"}
       className={"flex shrink-0 items-center gap-1.5 rounded border px-2 py-1 text-[11px] transition-colors " +
         (open ? "border-base-500 bg-base-800 text-base-100" : "border-base-700 bg-base-900 text-base-300 hover:border-base-500 hover:text-base-100")}>
       {inParty && !live ? <Loader2 className="h-3.5 w-3.5 animate-spin text-accent-400 motion-reduce:animate-none" />
@@ -129,7 +129,7 @@ export function PartyPanel({ party, sync, onClose, onDropBay }) {
   const members = party.state ? party.state.members : [];
   const line = party.status === "live"
     ? `${members.length} of ${SQUAD_CAP}. ` + (party.isHost
-      ? "You are the host, so the scenario is yours to set."
+      ? "You set the scenario."
       : party.host ? `Following ${party.host.name}'s scenario.` : "")
     : `${STATUS_LINE[party.status] || "Connecting"}...`;
 
@@ -148,8 +148,8 @@ export function PartyPanel({ party, sync, onClose, onDropBay }) {
       {!inParty ? (
         <div className="flex flex-col gap-3">
           <p className="text-xs leading-relaxed text-base-500">
-            Open a party and read its code out, or type the code a friend gave you. Everybody's confirmed loadout lands in
-            their slot on Drop Bay, and the host's scenario becomes everyone's. No account needed.
+            Open a party and share its code, or join with a friend's code. Each player's dropped loadout shows on Drop Bay,
+            and everyone follows the host's scenario. No account needed.
           </p>
           <label className="flex flex-col gap-1">
             <span className="text-[10px] uppercase tracking-wider text-base-500">Your name</span>
@@ -229,7 +229,7 @@ export function PartyPanel({ party, sync, onClose, onDropBay }) {
       ) : null}
 
       <p className="mt-4 border-t border-base-800 pt-3 text-[10px] leading-relaxed text-base-600">
-        Friends and finding a group will live here once accounts exist. Until then, a code does the job.
+        Friends and group finding come with accounts. For now, share a code.
       </p>
     </div>
   );

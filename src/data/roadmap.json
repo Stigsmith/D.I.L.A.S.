@@ -7,7 +7,7 @@
     },
     "social": {
       "label": "Needs the server",
-      "note": "Passes something between browsers or keeps it somewhere other than yours, so it waits on the server rather than running in this tab."
+      "note": "Needs the tool's server, because it passes things between browsers."
     }
   },
   "milestones": [
@@ -21,11 +21,11 @@
     },
     {
       "id": "themes",
-      "title": "Eleven themes",
+      "title": "Thirteen themes",
       "status": "shipped",
       "version": "1.2.0",
       "track": "solo",
-      "say": "Three base skins and eight warbond ones, each with its own atmosphere behind the panels."
+      "say": "3 base themes and 10 skins, each with its own look behind the panels."
     },
     {
       "id": "scenario",
@@ -33,7 +33,7 @@
       "status": "shipped",
       "version": "1.9.0",
       "track": "solo",
-      "say": "Say the front, planet and mission and every row gets a second rating next to the community vote, with a sentence for every point of difference."
+      "say": "Set the front, planet and mission, and every row gets a second tier for your scenario beside the community tier, with the reasons."
     },
     {
       "id": "armour",
@@ -41,7 +41,7 @@
       "status": "shipped",
       "version": "1.10.0",
       "track": "solo",
-      "say": "What your penetration actually opens on this front, and what it bounces off, measured against every body part of all 80 enemies."
+      "say": "What your armour penetration opens on each front, measured against every body part of 80 enemies."
     },
     {
       "id": "difficulty",
@@ -49,21 +49,21 @@
       "status": "shipped",
       "version": "1.11.0",
       "track": "solo",
-      "say": "Ratings judged against the enemies you can meet at the level you play at, rather than everything the front can field."
+      "say": "Ratings count only the enemies you meet at your difficulty."
     },
     {
       "id": "tags",
       "title": "The last judgement calls",
       "status": "next",
       "track": "solo",
-      "say": "A handful of things no source records, like which support weapons are the ones you aim at something far away, currently named by hand and admitted to."
+      "say": "A few traits no source records, like which support weapons are long range, set by hand for now."
     },
     {
       "id": "loadout-scoring",
       "title": "Scoring a whole build",
       "status": "shipped",
       "track": "solo",
-      "say": "Every build now carries two readings, what its gear is worth where you are dropping and what the nine pieces are worth together, which is where armour penetration finally means something: the question was never whether your rifle opens a Hulk, it is whether anything you brought does.",
+      "say": "Every build gets two tiers: its gear for your scenario, and the build as a whole. Armour penetration counts here.",
       "version": "1.20.0"
     },
     {
@@ -71,7 +71,7 @@
       "title": "Drop Bay becomes the drop screen",
       "status": "shipped",
       "track": "solo",
-      "say": "The moment before you dive: the mission brief, a slot for each of your squad, your loadout confirmed in yours, and what is going to hurt.",
+      "say": "The mission brief, your loadout and your squad's, and warnings about what is missing.",
       "version": "1.24.0"
     },
     {
@@ -79,7 +79,7 @@
       "title": "Live party",
       "status": "shipped",
       "track": "social",
-      "say": "Open a party, read its code out, and your squadmates' confirmed loadouts land in their slots as they commit, with no account needed.",
+      "say": "Open a party, share its code, and see your squadmates' loadouts as they drop. No account needed.",
       "version": "1.25.0"
     },
     {
@@ -87,7 +87,7 @@
       "title": "The galaxy map",
       "status": "shipped",
       "track": "solo",
-      "say": "Set where you are dropping in the war room: the galaxy map across the screen, coloured with the live war, with the Major Order, the war so far and what each difficulty brings laid over it.",
+      "say": "Set where you are dropping on the galaxy map, coloured by the live war, with the Major Order and each difficulty's details.",
       "version": "1.25.0"
     },
     {
@@ -96,7 +96,7 @@
       "status": "shipped",
       "version": "1.25.0",
       "track": "solo",
-      "say": "The galaxy map as its own place for reading the war: every front, each planet's intel and how it has moved hour by hour, and one click to drop there."
+      "say": "The galaxy map for following the war: every front, each planet's details and history, and one click to drop there."
     },
     {
       "id": "front-door",
@@ -104,7 +104,7 @@
       "status": "shipped",
       "version": "1.25.0",
       "track": "solo",
-      "say": "The tool opens on Drop Bay, suggests from your own builds for where you are going, and lets you adjust one without leaving, with the tier list as the picker inside every build."
+      "say": "The tool opens on Drop Bay, which suggests your best builds for the drop and lets you edit them in place."
     },
     {
       "id": "armoury",
@@ -112,7 +112,7 @@
       "status": "shipped",
       "version": "1.25.0",
       "track": "solo",
-      "say": "Your builds kept and named, and a coverage view that shows what you have for each occasion on each front, and where the gaps are."
+      "say": "Your saved builds, and a coverage view of what you have for each situation on each front."
     },
     {
       "id": "rules",
@@ -120,7 +120,7 @@
       "status": "shipped",
       "version": "1.25.0",
       "track": "solo",
-      "say": "Every rule behind our rating, what it moves where you are dropping, and a switch to turn any of it off and see what changes."
+      "say": "Every rule behind the second tier, what it changes for your scenario, and a switch to turn it off."
     },
     {
       "id": "commando",
@@ -128,7 +128,7 @@
       "status": "shipped",
       "version": "1.25.0",
       "track": "solo",
-      "say": "Automaton Commando missions read the way they play: twelve reinforcements, every call-in twice at most, and weapons that need no ammo near the top."
+      "say": "Commando missions rated for how they play: 12 reinforcements, stratagems twice at most, and weapons that need no ammo ranked high."
     },
     {
       "id": "share",
@@ -136,7 +136,7 @@
       "status": "shipped",
       "version": "1.25.0",
       "track": "solo",
-      "say": "A link that carries the build itself, so a friend can keep a copy without either of you needing an account."
+      "say": "Share a build as a link. No account needed."
     },
     {
       "id": "nudges",
@@ -144,7 +144,7 @@
       "status": "shipped",
       "version": "1.25.0",
       "track": "solo",
-      "say": "Once you have a few drops logged, Drop Bay suggests a build you have not taken in a while, and gear that is good here that you have never brought against that front."
+      "say": "After a few drops, Drop Bay suggests builds you have not used lately and good gear you have never tried on that front."
     },
     {
       "id": "ground-and-armour",
@@ -152,21 +152,21 @@
       "status": "shipped",
       "version": "1.30.0",
       "track": "solo",
-      "say": "Rules for the ground you land on, the mission's clock and a city nearby, and every armour set in the game with its art and weight, which the rules read too."
+      "say": "Rules for terrain, mission time limits and megacities, and every armour set with its art and weight."
     },
     {
       "id": "effects",
       "title": "Planet effects in the ratings",
       "status": "next",
       "track": "solo",
-      "say": "The strains, surges and other live effects on a planet changing what the tool tells you to bring."
+      "say": "Live planet effects, like strains and surges, changing what the tool suggests."
     },
     {
       "id": "accounts",
       "title": "Accounts",
       "status": "later",
       "track": "social",
-      "say": "Log in somewhere else and your collection is there. Opens once password reset can send mail from dilas.me, because a forgotten password needs an email to come back from.",
+      "say": "Sign in anywhere and your collection is there. Waits on password reset by email from dilas.me.",
       "release": "v2"
     },
     {
@@ -174,7 +174,7 @@
       "title": "Friends and finding a group",
       "status": "later",
       "track": "social",
-      "say": "A friends list, so a party invite comes from your list instead of a code, and an LFG board. Arrives with accounts.",
+      "say": "A friends list for party invites, and a board for finding a group. Comes with accounts.",
       "release": "v3"
     },
     {
@@ -182,7 +182,7 @@
       "title": "Exchange",
       "status": "later",
       "track": "social",
-      "say": "Browse other people's builds, and keep the ones worth keeping.",
+      "say": "Browse other players' builds and keep the ones you like.",
       "release": "v3"
     }
   ]

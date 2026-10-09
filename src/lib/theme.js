@@ -15,8 +15,8 @@ const KEY = "hd2-theme";
 /* the source and argues its own reasoning, so read it before arguing    */
 /* with a value. Adding one is a block in index.css and a line here.     */
 export const THEMES = [
-  { id: "dark", label: "Dark", note: "Grey, not black" },
-  { id: "light", label: "Light", note: "Off white, not white" },
+  { id: "dark", label: "Dark", note: "Dark grey" },
+  { id: "light", label: "Light", note: "Off white" },
   { id: "neon", label: "Neon", note: "Near black with the logo yellow" },
   { id: "castellans-creed", label: "Castellan's Creed", note: "Cadian green and gold, the first warbond skin" },
   { id: "automaton", label: "Automaton", note: "Foundry steel and warning red" },
@@ -25,7 +25,7 @@ export const THEMES = [
   { id: "odst", label: "ODST", note: "New Mombasa at night, Superintendent green and rain" },
   { id: "hellpod-drop-bay", label: "Hellpod Drop Bay", note: "Deck plate and hazard yellow" },
   { id: "malevelon-creek", label: "Malevelon Creek", note: "Blue night and tracer fire" },
-  { id: "ministry-of-truth", label: "Ministry of Truth", note: "Bureau paper and stamp navy. The second light one" },
+  { id: "ministry-of-truth", label: "Ministry of Truth", note: "Bureau paper and stamp navy, a light theme" },
   { id: "super-destroyer", label: "Super Destroyer", note: "Hull grey and console amber" },
   { id: "viper-commandos", label: "Viper Commandos", note: "Woodland camo with viper teal lighting" },
 ];
