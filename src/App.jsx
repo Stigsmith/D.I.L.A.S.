@@ -752,7 +752,7 @@ export default function App() {
       case "support":
         return <Support />;
       case "about":
-        return <About />;
+        return <About section={param} />;
       case "changelog":
         return <Changelog />;
       case "roadmap":

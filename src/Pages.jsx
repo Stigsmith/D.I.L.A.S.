@@ -10,10 +10,10 @@
 /* Support only, or the two pages start saying the same thing.         */
 /* ================================================================== */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AlertTriangle, Bug, ChevronDown } from "lucide-react";
 import { artCounts } from "./lib/assets.js";
-import { items, warbonds } from "./lib/items.js";
+import { items, warbonds, statsFor } from "./lib/items.js";
 import CHANGELOG from "./data/changelog.json";
 import ROADMAP from "./data/roadmap.json";
 import { BRAND } from "./lib/brand.js";
@@ -60,8 +60,93 @@ export function Footer() {
 
 /* ------------------------------------------------------------------ */
 
-export function About() {
+/* ------------------------------------------------------------------ */
+/* How the rating works. The explanations the rows used to carry in     */
+/* small grey paragraphs live here once, per dilas-writing.md: the row  */
+/* shows the answer, this page shows the reasoning. Each part has its   */
+/* own address, #/about/<id>, so a row can link straight to it.         */
+/* ------------------------------------------------------------------ */
+
+const isWeapon = (i) => i.slot === "primary" || i.slot === "secondary"
+  || (i.slot === "stratagem" && i.stratType === "support");
+
+/* Built from the data, so the list cannot fall behind it. The same
+   three gaps the expanded row marks Missing data. */
+function missingLists() {
+  const weapons = items.filter(isWeapon);
+  return [
+    { what: "No wiki stats", names: weapons.filter((i) => !statsFor(i.id)).map((i) => i.name) },
+    { what: "No reload time", names: weapons.filter((i) => statsFor(i.id) && !statsFor(i.id).reload).map((i) => i.name) },
+    { what: "Backpack slot unknown", names: items.filter((i) => i.slot === "stratagem" && i.stratType !== "backpack" && i.usesBackpackSlot === null).map((i) => i.name) },
+  ].filter((g) => g.names.length);
+}
+
+function Part({ id, title, children }) {
+  return (
+    <div id={`about-${id}`} className="flex scroll-mt-24 flex-col gap-1.5">
+      <p className="text-xs font-semibold uppercase tracking-wider text-base-200" style={{ fontFamily: "'Oswald', sans-serif" }}>{title}</p>
+      {children}
+    </div>
+  );
+}
+
+function MissingGroup({ what, names }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div>
+      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open}
+        className="flex items-center gap-1.5 text-base-300 hover:text-base-100">
+        <ChevronDown className={"h-3.5 w-3.5 transition-transform " + (open ? "rotate-180" : "")} />
+        {what} ({names.length})
+      </button>
+      {open ? <p className="mt-1 pl-5 text-[13px] text-base-500">{names.join(", ")}</p> : null}
+    </div>
+  );
+}
+
+function HowItWorks() {
+  return (
+    <Panel title="How the rating works">
+      <Part id="columns" title="The two columns">
+        <p>
+          Left: the u.gg community vote for that front. Right: our rating for where you are dropping. It starts from
+          the vote and moves by the rules on the Rules page.
+        </p>
+      </Part>
+      <Part id="points" title="Points">
+        <p>
+          About 14 points make a tier. A scenario moves a rating two tiers at most. On the hardest drops for one or
+          two players, that limit grows a little.
+        </p>
+      </Part>
+      <Part id="peril" title="Peril">
+        <p className="text-base-500">Coming soon: how difficulty and squad size combine into one number.</p>
+      </Part>
+      <Part id="armour" title="How armour is counted">
+        <ul className="flex list-disc flex-col gap-1 pl-5">
+          <li>Armour per body part: helldivers.wiki.gg.</li>
+          <li>AP above armour: full damage. AP equal to armour: 65%. AP below: no damage.</li>
+          <li>Counted: the enemies a front always has at your difficulty. Event-only strains and brigades are left out.</li>
+          <li>Some weak points only open up after armour breaks, like a Charger's legs. The count treats them as always open.</li>
+          <li>Armour does not change an item's rating. The build reading checks it across the whole loadout.</li>
+        </ul>
+      </Part>
+      <Part id="missing" title="Missing data">
+        <p>Fields marked Missing data have no source yet.</p>
+        {missingLists().map((g) => <MissingGroup key={g.what} {...g} />)}
+        <p className="text-base-500">Projectile count: not in any of our sources.</p>
+      </Part>
+    </Panel>
+  );
+}
+
+export function About({ section = null }) {
   const rated = items.filter((i) => Object.values(i.ratings).some((r) => r && r.tier)).length;
+  useEffect(() => {
+    if (!section) return;
+    const el = document.getElementById(`about-${section}`);
+    if (el) el.scrollIntoView({ block: "start" });
+  }, [section]);
   return (
     <div className="flex flex-col gap-4">
       <Panel title="What this is" note="A fan-made reference, built for two people and a Tuesday night">
@@ -79,6 +164,8 @@ export function About() {
           separate switches.
         </p>
       </Panel>
+
+      <HowItWorks />
 
       <Panel title="Where the numbers come from">
         <div className="flex flex-col gap-1.5">
@@ -187,8 +274,8 @@ const KNOWN = [
     detail: "The eleven added in 1.23.0, eight of them from the Ironclad Democracy warbond, and Electrical Conduit. They fall back to their initials until art for them is added. The Ironclad Democracy warbond has no cover yet either, so its tile in Collection shows the name alone.",
   },
   {
-    what: "Some weapon stats are absent, not zero",
-    detail: "Reload time and projectile count are in no source this project has, and the TD-110 Maelstrom has no data on the wiki yet. Rows say so, rather than showing a blank and letting you read it as nothing.",
+    what: "Some stats have no source yet",
+    detail: "Rows show Missing data where that happens. The full list is on About.",
   },
   {
     what: "The curated builds lean hard on high tiers",
