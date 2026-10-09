@@ -206,8 +206,8 @@ function Fronts({ war, live, query, setQuery, onSelect, onFold }) {
         )) : (
           <p className="text-xs leading-relaxed text-base-500">
             {war && !war.fresh
-              ? "The live war was read too long ago to list its fronts. The map still works: click a sector, then a planet, to read about it."
-              : "The fronts come from the tool's own server, and this address does not have one, or it has not read the war yet. The map still works: click a sector, then a planet, to read about it."}
+              ? "The live war data is too old to list its fronts. You can still read any planet on the map."
+              : "No live war data here yet. You can still read any planet on the map."}
           </p>
         )}
         <WarLine war={war} />
@@ -267,7 +267,7 @@ function Intel({ name, war, onBack, onSelect, onDropHere, onFold }) {
         <div className="flex flex-col gap-1.5 rounded border border-base-800 bg-base-900/60 px-3 py-2"
           style={st.hex ? { boxShadow: `inset 3px 0 0 ${st.hex}` } : undefined}>
           <p className="text-xs leading-relaxed" style={st.hex ? { color: st.hex } : undefined}>
-            {war ? st.text : "The live war is not here, so this says what the planet is rather than who holds it."}
+            {war ? st.text : "No live war data here, so this shows the planet only."}
           </p>
           {war && st.share !== null ? <Bar share={st.share} hex={st.hex} /> : null}
           {w && w.players ? (
@@ -298,7 +298,7 @@ function Intel({ name, war, onBack, onSelect, onDropHere, onFold }) {
             <p key={h} className="text-xs leading-relaxed text-base-300">
               <span className="text-accent-300">{hazardName(h)}.</span> {hazardEffect(h)}
             </p>
-          )) : <p className="text-xs text-base-500">Nothing permanent here changes what you bring.</p>}
+          )) : <p className="text-xs text-base-500">Nothing special to bring here.</p>}
           {cities.length ? <p className="text-[11px] text-base-500">Cities: {cities.join(", ")}.</p> : null}
         </Section>
 
@@ -371,14 +371,14 @@ function Spark({ points, max = 1, hex = "#60a5fa", height = 44 }) {
 function PlanetHistory({ history, hex }) {
   if (history.status === "loading") return <p className="text-[11px] text-base-600">Reading the history.</p>;
   if (history.status === "no-server") {
-    return <p className="text-[11px] leading-relaxed text-base-500">History is kept by the tool's own server, and this address does not have one.</p>;
+    return <p className="text-[11px] leading-relaxed text-base-500">History needs the tool's server, which this address does not have.</p>;
   }
   if (history.status !== "ok") {
     return (
       <p className="text-[11px] leading-relaxed text-base-500">
         {history.data
           ? `Nothing has happened here since the server started watching on ${dateText(history.data.from)}.`
-          : "Nobody publishes the war's history, so the tool's server keeps its own, one reading an hour for thirty days, from the day it first runs. Nothing is kept yet."}
+          : "No history kept yet. The server records one reading an hour, for 30 days."}
       </p>
     );
   }

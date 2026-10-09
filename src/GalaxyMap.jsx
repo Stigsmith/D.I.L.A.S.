@@ -1173,7 +1173,7 @@ export default function GalaxyMap({
             {loudHazards(detail.hazards).length ? (
               <p className="mt-0.5 text-[10px] text-accent-300">{loudHazards(detail.hazards).map(hazardName).join(" · ")}</p>
             ) : (
-              <p className="mt-0.5 text-[10px] text-base-500">Nothing permanent here changes what you bring</p>
+              <p className="mt-0.5 text-[10px] text-base-500">Nothing special to bring here</p>
             )}
             {done !== null ? (
               <div className="mt-1.5">
@@ -1263,7 +1263,7 @@ export default function GalaxyMap({
       {focus ? (
         <div className="absolute z-10 flex flex-col gap-1" style={place.zoom}>
           <MapButton label="Zoom in" onClick={() => zoomBy(1.5)} disabled={view.k >= MAX_ZOOM}><Plus className="h-3.5 w-3.5" /></MapButton>
-          <MapButton label="Zoom out, and back to the galaxy past a point" onClick={() => zoomBy(1 / 1.5)}><Minus className="h-3.5 w-3.5" /></MapButton>
+          <MapButton label="Zoom out" onClick={() => zoomBy(1 / 1.5)}><Minus className="h-3.5 w-3.5" /></MapButton>
         </div>
       ) : null}
     </div>
