@@ -137,6 +137,7 @@ const PATHS = {
   "wiki.primary.durableRatio": ["durable damage", "%", 100],
   "wiki.ammo.magazine": ["magazine", " rounds"],
   "wiki.ammo.feed": ["ammo type"],
+  "wiki.noise": ["loudness"],
   "stats.demoForce": ["demolition force"],
   "stats.ap": ["armour penetration"],
   "reach.openShare": ["the share of the front your weapons open", "%", 100],
@@ -169,7 +170,16 @@ const pathInfo = (p) => {
 const pathWords = (p) => pathInfo(p)[0];
 
 /* "1% or more" of a passive only asks whether there is any. */
+/* The game's loudness classes by name, as game-stats.json numbers them. */
+const NOISE_WORDS = ["suppressed", "small", "medium", "large", "huge"];
+
 function numberClause(t) {
+  if (t.path === "wiki.noise") {
+    const fits = (n) => (t.eq === undefined || n === t.eq) && (t.gte === undefined || n >= t.gte)
+      && (t.gt === undefined || n > t.gt) && (t.lte === undefined || n <= t.lte) && (t.lt === undefined || n < t.lt);
+    const cls = NOISE_WORDS.filter((w, n) => fits(n));
+    return `${list(cls)} loudness`;
+  }
   const [label, unit = "", scale = 1] = pathInfo(t.path);
   const keys = ["gte", "gt", "lte", "lt", "eq"].filter((k) => t[k] !== undefined);
   if (String(t.path).includes("passive.") && keys.length === 1 && t.gte === 1) return `any ${label}`;
@@ -214,6 +224,10 @@ function clauseWords(m) {
   for (const [key, v] of Object.entries(m || {})) {
     if (key === "number") {
       for (const t of [].concat(v)) out.push(numberClause(t));
+      continue;
+    }
+    if (key === "noNumber") {
+      out.push(`no ${list([].concat(v).map(pathWords))} in the game file`);
       continue;
     }
     /* Either-or, and pairings, read their own clauses in the same words. */

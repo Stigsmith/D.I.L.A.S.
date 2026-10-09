@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.33.0",
+    "date": "2026-10-10",
+    "title": "Straight from the source",
+    "say": "Weapon figures now come from the game itself. The Ministry thanks the wiki for its years of loyal service, which continue for everything else.",
+    "changes": [
+      "Damage, armour penetration, magazines, rate of fire and handling for 105 weapons come from the game files.",
+      "Each weapon shows its loudness: Suppressed, Small, Medium, Large or Huge.",
+      "With 1 or 2 players against the Automatons, louder weapons draw more patrols: quiet SMGs lose less, the Autocannon and launchers more.",
+      "The Rocket Sentry now has damage figures, and the Belt-Fed Grenade Launcher fires at 240 rpm.",
+      "About lists the game files as the source, and the wiki for what they do not cover."
+    ]
+  },
+  {
     "version": "1.32.0",
     "date": "2026-10-09",
     "title": "Plain speech",

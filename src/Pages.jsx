@@ -13,7 +13,7 @@
 import { useState, useEffect } from "react";
 import { AlertTriangle, Bug, ChevronDown } from "lucide-react";
 import { artCounts } from "./lib/assets.js";
-import { items, warbonds, statsFor } from "./lib/items.js";
+import { items, warbonds, statsFor, statsSourceFor, gameSource } from "./lib/items.js";
 import CHANGELOG from "./data/changelog.json";
 import ROADMAP from "./data/roadmap.json";
 import { BRAND } from "./lib/brand.js";
@@ -196,12 +196,27 @@ export function About({ section = null }) {
         </p>
       </Panel>
 
+      <Panel title="Weapon stats come from the game">
+        <p>
+          Damage, armour penetration, magazines, rate of fire, handling and loudness for{" "}
+          {items.filter((i) => statsSourceFor(i.id) === "game").length} weapons come from the game's own files,
+          through the snapshot{" "}
+          <a href={gameSource.url} target="_blank" rel="noreferrer noopener"
+            className="text-base-200 underline hover:text-base-100">filediver</a> publishes
+          {gameSource.snapshotDate
+            ? `, dated ${new Date(`${gameSource.snapshotDate}T12:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`
+            : ""}.
+        </p>
+        <p className="text-base-500">The tool reads that published snapshot. It never opens your game install.</p>
+      </Panel>
+
       {/* Attribution is a licence condition, not a courtesy. The fetched  */}
       {/* stats are CC BY-NC-SA, which requires credit, requires derived   */}
       {/* data to carry the same licence, and forbids commercial use.      */}
-      <Panel title="Weapon stats come from the Helldivers Wiki">
+      <Panel title="Everything else comes from the Helldivers Wiki">
         <p>
-          Handling and ammo figures, reload times and every enemy's armour per body part come from{" "}
+          Reload times, stratagem data, the weapons the game files do not cover and every enemy's armour per body
+          part come from{" "}
           <a href="https://helldivers.wiki.gg" target="_blank" rel="noreferrer noopener"
             className="text-base-200 underline hover:text-base-100">helldivers.wiki.gg</a>, which the community
           updates within days of a patch.

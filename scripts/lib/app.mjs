@@ -42,7 +42,7 @@ const swap = (src, file, url) => src.replaceAll(`from "./${file}.js"`, `from "${
 
 const enemiesUrl = asModule(inlineJson(read("src/lib/enemies.js"), "enemies"));
 
-const itemsUrl = asModule(inlineJson(read("src/lib/items.js"), "items", "warbonds", "vocabulary", "wiki-stats"));
+const itemsUrl = asModule(inlineJson(read("src/lib/items.js"), "items", "warbonds", "vocabulary", "wiki-stats", "game-stats"));
 
 /* scenario.js pulls in React for useScenario, which a script has no use
    for and cannot load. Only the mission traits are ever reached from the

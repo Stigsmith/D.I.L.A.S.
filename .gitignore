@@ -52,3 +52,7 @@ src/assets/planets/
 # Armour set renders from the wiki, fetched by npm run armor-art, copied
 # here from the library. Game art, not kept either.
 src/assets/armor-sets/
+
+# The game data fetch: filediver's source, our built dump tool and its
+# JSON output. Re-made by npm run game -- --refresh. Never committed.
+.game-data/
