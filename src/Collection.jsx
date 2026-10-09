@@ -70,8 +70,8 @@ const availabilityOf = (id, itemLocks, warbondLocks) => {
 /* ================================================================== */
 
 const START_MODES = [
-  { id: "empty", label: "Nothing owned", note: "Everything locked. Fastest for a new player: add the few things he has." },
-  { id: "copy", label: "Copy of this one", note: "Starts as whatever the active profile owns right now." },
+  { id: "empty", label: "Nothing owned", note: "Everything locked. Best for a new player: add the few things they own." },
+  { id: "copy", label: "Copy of this one", note: "Starts with what the current profile owns." },
   { id: "full", label: "Everything owned", note: "Nothing locked, the way a fresh browser starts." },
 ];
 
@@ -100,8 +100,7 @@ export function CollectionNudge({ onSetUp, onAllOwned }) {
           Tell {BRAND.short} what you own first
         </p>
         <p className="text-xs leading-relaxed text-base-300">
-          Nothing in your collection is marked yet, so the tool assumes you own every warbond and every item, and it will
-          suggest gear you do not have. It takes a few minutes, once.
+          Until you do, the tool assumes you own everything and may suggest gear you do not have. It takes a few minutes.
         </p>
       </div>
       <div className="flex shrink-0 flex-wrap gap-2">
@@ -126,19 +125,19 @@ export function CollectionNudge({ onSetUp, onAllOwned }) {
 const HOW = [
   {
     icons: [Unlock, Lock], title: "Warbonds you bought",
-    say: "Click a warbond's name to switch it between owned and not owned. That is the Super Credit purchase. Own all and Own none do a whole tier at once.",
+    say: "Click a warbond's name to mark it owned or not owned. Own all and Own none set a whole tier.",
   },
   {
     icons: [CheckCheck, X], title: "What you unlocked inside",
-    say: "Inside a warbond, items cost Medals. The tick marks every item in it unlocked, the cross marks them all not yet. The number says how many you have. Both are greyed out until you own the warbond.",
+    say: "Items inside a warbond cost Medals. The tick unlocks them all, the cross locks them all, and the number counts what you have. Both need the warbond owned first.",
   },
   {
     icons: [Lock, ListChecks], title: "One item at a time",
-    say: "The Items tab lists every item, armour included, each with its own padlock. Filter by source or slot, then lock or unlock everything shown in one click.",
+    say: "The Items tab has a padlock per item, armour included. Filter, then lock or unlock everything shown at once.",
   },
   {
     icons: [User], title: "One profile per player",
-    say: "Each profile is its own collection, so two players on one browser do not fight over padlocks. New can start from nothing owned, everything owned, or a copy.",
+    say: "Each profile is its own collection, so two players can share one browser. A new one starts empty, full or as a copy.",
   },
 ];
 
@@ -157,8 +156,7 @@ function CollectionGuide({ state }) {
             {fresh ? "Start here: what do you own?" : "How your collection works"}
           </h3>
           <p className="text-[11px] text-base-500">
-            Everything else in the tool reads this page. A locked item never turns up in a suggestion or a picker unless
-            you ask to see it.
+            Locked gear stays out of suggestions and pickers unless you ask for it.
           </p>
         </div>
         {fresh ? null : <ChevronDown className={"h-4 w-4 shrink-0 text-base-500 transition-transform " + (shown ? "rotate-180" : "")} />}
@@ -169,22 +167,21 @@ function CollectionGuide({ state }) {
           {fresh ? (
             <div className="flex flex-col gap-2" data-tour="collection-quickstart">
               <p className="text-xs leading-relaxed text-base-300">
-                Nothing is marked yet, so right now the tool thinks you own everything. Pick the starting point closer to
-                the truth, then fix the difference below.
+                Nothing is marked yet. Pick the closer starting point, then adjust below.
               </p>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button type="button" onClick={() => state.resetActiveTo("empty")}
                   className="rounded-lg border border-base-700 bg-base-950/60 p-3 text-left hover:border-accent-500">
                   <span className="block text-sm font-bold uppercase tracking-wide text-base-100" style={OSWALD}>I am fairly new</span>
                   <span className="block text-[11px] leading-relaxed text-base-400">
-                    Start from nothing owned, then switch on the warbonds you bought and tick what you unlocked, starter gear included.
+                    Start with nothing owned, then mark what you have, starter gear included.
                   </span>
                 </button>
                 <button type="button" onClick={() => state.resetActiveTo("full")}
                   className="rounded-lg border border-base-700 bg-base-950/60 p-3 text-left hover:border-accent-500">
                   <span className="block text-sm font-bold uppercase tracking-wide text-base-100" style={OSWALD}>I have played a lot</span>
                   <span className="block text-[11px] leading-relaxed text-base-400">
-                    Start from everything owned, then switch off the warbonds you never bought and cross out what you have not unlocked.
+                    Start with everything owned, then remove what you do not have.
                   </span>
                 </button>
               </div>
@@ -299,7 +296,7 @@ function ProfileBar({ state }) {
           <button onClick={close} className="rounded border border-base-700 px-3 py-1.5 text-xs text-base-300 hover:border-base-500">
             Cancel
           </button>
-          <span className="text-[11px] text-base-600">The name changes, nothing it owns does.</span>
+          <span className="text-[11px] text-base-600">Only the name changes.</span>
         </div>
       ) : null}
 
@@ -307,7 +304,7 @@ function ProfileBar({ state }) {
         <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-base-800 pt-3">
           <span className="flex items-center gap-1.5 text-[11px] text-red-300">
             <AlertTriangle className="h-3.5 w-3.5" />
-            Delete {active.name}? Everything it records about what that player owns goes with it.
+            Delete {active.name}? Its whole collection goes with it.
           </span>
           <button onClick={() => { state.deleteProfile(active.id); close(); }}
             className="rounded border border-red-700 bg-red-950/40 px-3 py-1.5 text-xs text-red-300 hover:border-red-500">
@@ -384,14 +381,9 @@ function WarbondsTab({ lockedItems, lockedWarbonds, toggleWarbond, setWarbondGro
   return (
     <div className="flex flex-col gap-4">
       <div className="rounded-lg border border-base-800 bg-base-900/60 p-4 text-xs leading-relaxed text-base-400">
-        Mark a warbond you do not own and every item in it is held across the tier lists and the loadout picker at once.
-        That is separate from per item unlocking, so turning a warbond back on will not wipe the individual items you
-        locked by hand, and marking one as owned does not hand you its contents. Use the tick and the cross on the right
-        of a warbond for that.
-        <span className="mt-2 block text-base-500">
-          Armor passives are not listed here. The source data maps passives to armor sets, not to warbonds, so armor
-          stays on per item unlocking in the Items tab.
-        </span>
+        A warbond you do not own locks everything in it. Owning one does not unlock its items: use the tick and the
+        cross for that.
+        <span className="mt-2 block text-base-500">Armour passives unlock per item, in the Items tab.</span>
       </div>
 
       {WARBOND_TIERS.map((g, gi) => {
@@ -444,11 +436,9 @@ function WarbondsTab({ lockedItems, lockedWarbonds, toggleWarbond, setWarbondGro
       <div className="overflow-hidden rounded-lg border border-base-800 bg-base-900">
         <div className="border-b border-base-800 px-4 py-2.5">
           <h3 className="text-sm font-bold uppercase tracking-wide text-base-100" style={{ fontFamily: "'Oswald', sans-serif" }}>
-            Not warbond gated <span className="font-normal text-base-600">({UNGATED_PATHS.length})</span>
+            Not from a warbond <span className="font-normal text-base-600">({UNGATED_PATHS.length})</span>
           </h3>
-          <p className="text-[11px] text-base-500">
-            Requisition slips, starter kit, rotating store or event. Never gated here, only per item in the Items tab.
-          </p>
+          <p className="text-[11px] text-base-500">Requisition, starter kit, the Superstore and events. Lock these per item in the Items tab.</p>
         </div>
         <div className="grid grid-cols-1 gap-1.5 p-3 sm:grid-cols-2 lg:grid-cols-3">
           {UNGATED_PATHS.map((path) => (
@@ -461,9 +451,7 @@ function WarbondsTab({ lockedItems, lockedWarbonds, toggleWarbond, setWarbondGro
       </div>
 
       <p className="text-[11px] leading-relaxed text-base-600">
-        Counts are items this tool tracks from that warbond, not total warbond contents. Cosmetics, capes, player cards and
-        vehicle patterns are not tracked. Righteous Revenants is the Killzone crossover; the reference tables never label it
-        by tier, so its placement under Legendary is inferred from how many warbonds those tables list.
+        Counts cover gear only. Cosmetics are not tracked.
       </p>
     </div>
   );
@@ -511,7 +499,7 @@ function ItemRow({ item, availability, source, onToggle, tour }) {
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(); }
       }}
       title={byWarbond
-        ? `Held by the ${source} warbond. Change it in the Warbonds tab.`
+        ? `You do not own the ${source} warbond. Change it in the Warbonds tab.`
         : held ? `Mark ${item.name} as unlocked` : `Mark ${item.name} as not unlocked`}
       className={"flex items-center gap-2 rounded-lg border border-base-800 px-2.5 py-2 " +
         (byWarbond ? "bg-base-900/40" : "cursor-pointer bg-base-900 hover:bg-base-800/50")}>
@@ -589,9 +577,8 @@ function ItemsTab({ lockedItems, warbondLockedSet, toggleLock, setItemGroup }) {
     <div className="flex flex-col gap-4">
       <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
         <p className="mb-4 text-xs leading-relaxed text-base-400">
-          Every item this tool tracks, and whether you can actually take it. A warbond item is available only when you own
-          the warbond and have spent the medals on the item. Everything from requisition, the store, a campaign or an armor
-          set ignores the warbond axis and answers to this list alone.
+          Every item and whether you can bring it. A warbond item needs the warbond owned and the item unlocked.
+          Everything else only needs the item unlocked.
         </p>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -661,7 +648,7 @@ function ItemsTab({ lockedItems, warbondLockedSet, toggleLock, setItemGroup }) {
       <div className="flex flex-col gap-1.5">
         {rows.length === 0 ? (
           <div className="rounded-lg border border-dashed border-base-700 py-8 text-center text-sm text-base-400">
-            Nothing matches those filters. Clear the search, widen the source, or set availability back to All.
+            Nothing matches these filters. Clear the search or widen the source and availability.
           </div>
         ) : (
           rows.map((it, i) => (
@@ -673,9 +660,7 @@ function ItemsTab({ lockedItems, warbondLockedSet, toggleLock, setItemGroup }) {
       </div>
 
       <p className="text-[11px] leading-relaxed text-base-600">
-        A dimmer padlock means the item is held by a warbond you do not own, and its own toggle is disabled: change the
-        warbond and it comes back with whatever per item state it already had. The brighter padlock is a per item lock,
-        which is yours to set here or on any tier row.
+        Dim padlock: locked by a warbond you do not own, so change the warbond first. Bright padlock: locked by you.
       </p>
     </div>
   );

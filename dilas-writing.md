@@ -188,7 +188,8 @@ For every line:
 | **Pass 2, generated sentences**, 1.32.0 | **Done, 9 October 2026.** The Rules page's When, Checks and Size lines, in the words the rule names use; the war room's "new at this level" line; every squad warning on Drop Bay. One of them said "if he goes down", and now says "they" |
 | **Pass 3, the tier list**, 1.32.0 | **Done, 9 October 2026.** Every item note: 89 cut to the one fact the row does not already show, 22 dropped because they only repeated the category or the tier. 11 effect lines. The damage type glosses (arc weapons never vented heat), the filter pane's counts and empty states, the column and lock tooltips, the scenario bar |
 | **Pass 4, Drop Bay**, 1.32.0 | **Done, 9 October 2026.** The brief, the slots, the suggestions, the picker, the party line and the squad check. Text now says "drop" where the button says Drop, rather than "confirm". The nine mission kind lines in `missions.json`, which the brief and the planner show |
-| Still to do, one surface per pass | Collection; the Armoury; the war room and the Star Map; Party, Settings and About; the Rules page's judgement, source and measured notes |
+| **Pass 5, Collection**, 1.32.0 | **Done, 9 October 2026.** The nudge, the guide and its cards, the quick start, profiles, both tabs and their footnotes. A profile option said "the few things he has", and now says "they". The Righteous Revenants inference moved to About |
+| Still to do, one surface per pass | The Armoury; the war room and the Star Map; Party, Settings and About; the Rules page's judgement, source and measured notes |
 
 > [!danger] A wording change must not move a score
 > Run `npm run rules`, `npm run builds` and `npm run drop` before and after. All three must give identical output. Rule names and sentences live in the rules data and feed the tier rows, the suggestions and the Rules page at once.
