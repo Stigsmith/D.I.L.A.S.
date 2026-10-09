@@ -146,6 +146,10 @@ function HowItWorks() {
       </Part>
       <Part id="missing" title="Missing data">
         <p>Fields marked Missing data have no source yet.</p>
+        <p className="text-base-500">
+          Righteous Revenants, the Killzone crossover, is placed under Legendary by inference: the reference tables
+          never give its tier.
+        </p>
         {missingLists().map((g) => <MissingGroup key={g.what} {...g} />)}
         <p className="text-base-500">Projectile count: not in any of our sources.</p>
       </Part>
