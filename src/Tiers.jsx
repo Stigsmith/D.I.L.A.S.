@@ -131,11 +131,11 @@ const BIOME_THEME = {
   /* The panel is tinted from the biome's own colour at low alpha rather */
   /* than a fixed dark wash, so it reads as a tint in either theme.      */
   any: { dot: "#71717A", note: null },
-  hot: { dot: "#F59E0B", note: "Intense heat speeds up weapon heat buildup. Heat-venting weapons are filtered out. Fire resist armor earns its slot." },
-  cold: { dot: "#38BDF8", note: "Cold slows heat buildup, so laser and plasma fire longer before venting. Snow drains stamina." },
-  foggy: { dot: "#2DD4BF", note: "Low visibility cuts both ways. Stealth passives and close-range tools beat marksman weapons." },
-  urban: { dot: "#94A3B8", note: "Verticality and tight corridors. Climb for a sightline instead of fighting street level." },
-  cave: { dot: "#C084FC", note: "Enclosed and ambush heavy. Close range and stagger beat long-range precision." },
+  hot: { dot: "#F59E0B", note: "Weapons overheat sooner, so heat venting builds are left out. Fire resistant armour helps." },
+  cold: { dot: "#38BDF8", note: "Laser weapons fire longer before venting. Snow drains stamina." },
+  foggy: { dot: "#2DD4BF", note: "Low visibility for both sides. Stealth and close range gear beat marksman rifles." },
+  urban: { dot: "#94A3B8", note: "Tall buildings and tight streets. Climb for a sightline." },
+  cave: { dot: "#C084FC", note: "Tight spaces and ambushes. Close range and stagger beat long range." },
 };
 
 const MISSION_TYPES = [
@@ -1055,7 +1055,7 @@ function RowDetail({ item, faction, scored, difficulty }) {
 
         <div className="flex min-w-0 flex-1 flex-col gap-3">
           <Section title={strat ? "Call in" : "Numbers"}>
-            <Fact label="Armor pen">
+            <Fact label="Penetration">
               {s.ap !== null ? `AP${s.ap}${s.apClass ? ` ${s.apClass}` : ""}` : null}
             </Fact>
             <Fact label="Damage">{s.dps !== null ? `${s.dps} DPS` : null}</Fact>
@@ -2200,7 +2200,7 @@ export function LoadoutCard({ loadout, isFavorite, onToggleFavorite, rankLabel, 
     /* items whose caveat had been retired, for as long as a note survived. */
     .filter((it) => it && it.flag === "stale" && it.patchNote)
     .map((it) => it.name);
-  const rows = [["Primary", loadout.primary], ["Secondary", loadout.secondary], ["Grenade", loadout.grenade], ["Armor", loadout.armor], ["Booster", loadout.booster]];
+  const rows = [["Primary", loadout.primary], ["Secondary", loadout.secondary], ["Grenade", loadout.grenade], ["Armour", loadout.armor], ["Booster", loadout.booster]];
 
   return (
     <div className={`flex flex-col rounded-lg border bg-base-900 overflow-hidden ${biomeMatch ? theme.cardBorder : "border-base-800"}`}>
@@ -2218,7 +2218,7 @@ export function LoadoutCard({ loadout, isFavorite, onToggleFavorite, rankLabel, 
               <button onClick={() => onToggleCompare(loadout.id)} aria-pressed={inCompare}
                 disabled={!inCompare && compareFull}
                 title={inCompare ? "Remove from the comparison"
-                  : compareFull ? "Four is the squad cap. Drop one first." : "Add to the comparison"}
+                  : compareFull ? "4 is the most. Remove one first." : "Add to the comparison"}
                 aria-label={inCompare ? `Remove ${loadout.name} from the comparison` : `Add ${loadout.name} to the comparison`}
                 className={"rounded p-1.5 " + (inCompare
                   ? "text-brand hover:bg-base-800"
@@ -2270,7 +2270,7 @@ export function LoadoutCard({ loadout, isFavorite, onToggleFavorite, rankLabel, 
 
         {fireNote ? (
           <div className="flex items-start gap-1.5 rounded border border-accent-800/60 bg-accent-950/40 px-2 py-1.5 text-[11px] text-accent-300">
-            <Flame className="w-3.5 h-3.5 shrink-0 mt-px" /><span>Fire-based kit. Watch out on fire tornado planets.</span>
+            <Flame className="w-3.5 h-3.5 shrink-0 mt-px" /><span>Uses fire. Risky on fire tornado planets.</span>
           </div>
         ) : null}
 

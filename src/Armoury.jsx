@@ -180,12 +180,12 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
 
       <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Row label="Biome" hint="hard gate" value={biome} onChange={setBiome}
+          <Row label="Biome" hint="filters builds" value={biome} onChange={setBiome}
             options={[ANY, ...BIOMES.filter((b) => b.id !== "any")]} />
           <Row label="Mission" value={mission} onChange={setMission}
             options={[ANY, ...MISSION_TYPES]} />
           <div className="sm:col-span-2">
-            <DifficultySlider value={level} onChange={setLevel} hint="hard gate" />
+            <DifficultySlider value={level} onChange={setLevel} hint="filters builds" />
           </div>
           <Row label="Source" value={source} onChange={setSource}
             options={[{ id: "all", label: "Everything" }, { id: "mine", label: "Mine" }, { id: "presets", label: "Presets" }]} />
@@ -193,7 +193,7 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
             options={[{ id: "all", label: "All builds" }, { id: "owned", label: "Only unlocked gear" }]} />
           <div>
             <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-base-500"
-              style={{ fontFamily: "'Oswald', sans-serif" }}>Favorites</span>
+              style={{ fontFamily: "'Oswald', sans-serif" }}>Favourites</span>
             <button onClick={() => setFavesOnly((v) => !v)} aria-pressed={favesOnly}
               className={"flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-xs transition-colors " +
                 (favesOnly ? "border-accent-400 bg-accent-400 text-accent-950"
@@ -215,7 +215,7 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
           <span>{shown.length} of {everything.length} shown</span>
           {removedByHeat > 0 ? (
             <span className="flex items-center gap-1 text-accent-500">
-              <FilterX className="h-3.5 w-3.5" />{removedByHeat} heat venting build{removedByHeat === 1 ? "" : "s"} excluded, hot planet
+              <FilterX className="h-3.5 w-3.5" />{removedByHeat} heat venting build{removedByHeat === 1 ? "" : "s"} left out: hot planet
             </span>
           ) : null}
           {removedByLock > 0 ? (
@@ -225,7 +225,7 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
           ) : null}
           {coldBonus > 0 ? (
             <span className="flex items-center gap-1 text-sky-400">
-              <Snowflake className="h-3.5 w-3.5" />{coldBonus} heat venting build{coldBonus === 1 ? "" : "s"} run longer here
+              <Snowflake className="h-3.5 w-3.5" />{coldBonus} heat venting build{coldBonus === 1 ? "" : "s"} fire longer in the cold
             </span>
           ) : null}
           {filtering ? (
@@ -236,11 +236,11 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
 
       {shown.length === 0 ? (
         <div className="rounded-lg border border-dashed border-base-700 px-4 py-10 text-center">
-          <p className="text-sm text-base-400">Nothing survives that scenario.</p>
+          <p className="text-sm text-base-400">No build fits these filters.</p>
           <p className="mx-auto mt-1 max-w-md text-xs text-base-600">
             {removedByHeat > 0
-              ? "Every build that fit was heat venting, and hot planets rule those out. Try a different biome, or build something ballistic."
-              : "Drop the difficulty band or widen the biome. Or start a new loadout for this scenario."}
+              ? "Every build that fit vents heat, which a hot planet rules out. Try another biome, or build without heat weapons."
+              : "Widen the difficulty or biome, or start a new loadout."}
           </p>
         </div>
       ) : (
@@ -267,8 +267,8 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
             <h3 className="text-sm font-bold uppercase tracking-wide text-base-100"
               style={{ fontFamily: "'Oswald', sans-serif" }}>Delete this loadout</h3>
             <p className="mt-1 text-xs text-base-400">
-              <span className="text-base-200">{confirmDelete.name}</span> goes for good. Presets are never touched, so
-              anything you forked can be forked again.
+              <span className="text-base-200">{confirmDelete.name}</span> is deleted for good. Presets stay, so you can copy
+              them again.
             </p>
             <div className="mt-3 flex justify-end gap-2">
               <button onClick={() => setConfirmDelete(null)}
@@ -348,8 +348,8 @@ function FrontColumn({ front, rows, navigate }) {
           {gaps.length
             ? `Nothing for ${gaps.map((g) => g.situation.label.toLowerCase()).join(", ")}.`
             : thin.length
-              ? `Something for everything, but only a B or worse for ${thin.map((g) => g.situation.label.toLowerCase()).join(", ")}.`
-              : "An A or better for every situation here."}
+              ? `Only B or worse for ${thin.map((g) => g.situation.label.toLowerCase()).join(", ")}.`
+              : "A or better for every situation."}
         </p>
         <div className="flex flex-col gap-1">
           {rows.map((r) => (
@@ -382,18 +382,15 @@ export function Coverage({ state, navigate, scenario }) {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-start gap-3 rounded-lg border border-base-800 bg-base-900/60 p-4">
         <div className="min-w-[16rem] flex-1">
-          <p className="text-sm font-bold text-base-200" style={OSWALD}>Do you have something for each occasion</p>
+          <p className="text-sm font-bold text-base-200" style={OSWALD}>Do you have a build for each situation?</p>
           <p className="mt-1 text-xs leading-relaxed text-base-500">
-            Your best build for each situation, per front, by the same reading every badge in the tool shows and
-            through the same gates the drop screen applies. Read at Suicide Mission with four of you unless a row says
-            otherwise. An A or better counts as covered; a B is thin. Only builds you can field: gear you have not
-            unlocked rules a build out here.
+            Your best build per situation and front. A or better is covered, B is thin. Rated at Suicide Mission with 4
+            players unless the row says otherwise, using only gear you have unlocked.
           </p>
           {own.length === 0 ? (
             <p className="mt-2 flex items-start gap-1.5 text-xs text-accent-300">
               <Info className="mt-px h-3.5 w-3.5 shrink-0" />
-              You have no builds of your own yet, so this shows what the curated presets cover. Build or fork your own and
-              this becomes yours.
+              No builds of your own yet, so this shows the curated presets.
             </p>
           ) : null}
         </div>
@@ -412,8 +409,7 @@ export function Coverage({ state, navigate, scenario }) {
 
       <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-base-600">
         <AlertTriangle className="mt-px h-3.5 w-3.5 shrink-0" />
-        A gap is worth a build, not an emergency. Every reading here is the tool's own, from the rules on the Rules page,
-        and a rule you have switched off there is switched off here too.
+        Rules switched off on the Rules page are off here too.
       </p>
     </div>
   );
@@ -480,8 +476,8 @@ export function History({ state, navigate, onUseForDrop }) {
         <HistoryIcon className="mx-auto h-6 w-6 text-base-600" />
         <p className="mt-2 text-sm text-base-300">No drops yet.</p>
         <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-base-500">
-          Every time you confirm your loadout on Drop Bay it lands here: the build, the planet, the mission. After a few,
-          Drop Bay starts suggesting builds you have not taken in a while and gear you have never tried.
+          Every drop you make on Drop Bay is recorded here. After a few, Drop Bay suggests builds you have not used lately
+          and gear you have never tried.
         </p>
         <button onClick={() => navigate("bay")}
           className="mx-auto mt-3 flex items-center gap-1.5 rounded border border-base-200 bg-base-200 px-3 py-1.5 text-xs text-base-900 hover:bg-base-100">
@@ -499,7 +495,7 @@ export function History({ state, navigate, onUseForDrop }) {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
           <p className="mb-1 text-sm font-bold text-base-200" style={OSWALD}>{history.length} {history.length === 1 ? "drop" : "drops"}</p>
-          <p className="mb-3 text-[11px] text-base-500">Since {day(history[0].at)}. Every Confirm on Drop Bay.</p>
+          <p className="mb-3 text-[11px] text-base-500">Since {day(history[0].at)}.</p>
           <div className="flex flex-col gap-1.5">
             {FACTIONS.map((f) => <Count key={f.id} label={f.label} n={summary.fronts.get(f.id) || 0} total={history.length} hex={f.hex} />)}
           </div>
@@ -514,7 +510,7 @@ export function History({ state, navigate, onUseForDrop }) {
         </div>
 
         <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
-          <p className="mb-3 text-sm font-bold text-base-200" style={OSWALD}>The builds you keep coming back to</p>
+          <p className="mb-3 text-sm font-bold text-base-200" style={OSWALD}>Your most used builds</p>
           <div className="flex flex-col gap-1.5">
             {summary.top.map((b) => {
               const live = byId.get(b.id);
@@ -535,7 +531,7 @@ export function History({ state, navigate, onUseForDrop }) {
 
         <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
           <p className="mb-1 text-sm font-bold text-base-200" style={OSWALD}>Gathering dust</p>
-          <p className="mb-3 text-[11px] text-base-500">Your builds you have not taken in {STALE_DAYS} days, or ever.</p>
+          <p className="mb-3 text-[11px] text-base-500">Builds you have not dropped with in {STALE_DAYS} days, or ever.</p>
           {dust.length ? (
             <div className="flex flex-col gap-1.5">
               {dust.map(({ build, days }) => (
@@ -551,7 +547,7 @@ export function History({ state, navigate, onUseForDrop }) {
               ))}
             </div>
           ) : (
-            <p className="text-xs text-base-500">Nothing. Every build of yours has had an outing this month.</p>
+            <p className="text-xs text-base-500">None. You have used every build in the last {STALE_DAYS} days.</p>
           )}
         </div>
       </div>
@@ -569,7 +565,7 @@ export function History({ state, navigate, onUseForDrop }) {
                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: f ? f.hex : undefined }} title={f ? f.label : ""} />
                 <span className={"min-w-0 flex-1 truncate " + (live ? "text-base-200" : "text-base-500")}>{e.name}{live ? "" : " (deleted)"}</span>
                 <span className="min-w-0 truncate text-[11px] text-base-500">
-                  {[e.planet, e.mission, d ? d.name : null, e.squad ? (e.squad === 1 ? "solo" : `${e.squad} of you`) : null].filter(Boolean).join(" · ")}
+                  {[e.planet, e.mission, d ? d.name : null, e.squad ? (e.squad === 1 ? "solo" : `${e.squad} players`) : null].filter(Boolean).join(" · ")}
                 </span>
               </div>
             );

@@ -26,5 +26,5 @@
     { "id": "righteous-revenants", "name": "Righteous Revenants", "tier": "legendary" },
     { "id": "castellans-creed", "name": "Castellan's Creed", "tier": "legendary" }
   ],
-  "acquisitionLabels": { "warbond": "Warbond", "requisition": "Requisition", "starter": "Starter", "superstore": "Superstore", "campaign": "Campaign Reward", "superCitizen": "Super Citizen Edition", "armorSet": "Armor sets" }
+  "acquisitionLabels": { "warbond": "Warbond", "requisition": "Requisition", "starter": "Starter", "superstore": "Superstore", "campaign": "Campaign Reward", "superCitizen": "Super Citizen Edition", "armorSet": "Armour sets" }
 }

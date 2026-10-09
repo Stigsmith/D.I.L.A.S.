@@ -26,10 +26,8 @@ export default function Shared({ code, state, scenario, navigate, onUseForDrop }
     return (
       <div className="mx-auto max-w-md rounded-lg border border-dashed border-base-700 px-4 py-10 text-center">
         <AlertTriangle className="mx-auto h-6 w-6 text-accent-400" />
-        <p className="mt-2 text-sm text-base-300">This link does not hold a build the tool can read.</p>
-        <p className="mt-1 text-xs text-base-500">
-          It may have been cut short when it was copied. Ask for it again, or open Drop Bay and start your own.
-        </p>
+        <p className="mt-2 text-sm text-base-300">This link does not contain a readable build.</p>
+        <p className="mt-1 text-xs text-base-500">It may have been cut short when copied. Ask for it again.</p>
         <button onClick={() => navigate("bay")}
           className="mx-auto mt-3 rounded border border-base-700 px-3 py-1.5 text-xs text-base-300 hover:border-base-500 hover:text-base-100">
           Go to Drop Bay
@@ -55,8 +53,8 @@ export default function Shared({ code, state, scenario, navigate, onUseForDrop }
           <Link2 className="h-4 w-4 text-brand" /> A build somebody shared with you
         </p>
         <p className="mt-1 text-xs leading-relaxed text-base-500">
-          Read against your own scenario, so the badge is what it is worth where you are dropping, not where they were.
-          {filled < 9 ? ` ${9 - filled} of its slots arrived empty: either they left them empty, or they held something this version of the tool does not know.` : ""}
+          Rated for your scenario.
+          {filled < 9 ? ` ${9 - filled} ${9 - filled === 1 ? "slot is" : "slots are"} empty: left empty, or holding gear this version does not know.` : ""}
         </p>
         {build.blurb ? <p className="mt-2 text-xs italic leading-relaxed text-base-300">"{build.blurb}"</p> : null}
         <div className="mt-3 flex flex-wrap gap-2">
