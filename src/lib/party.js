@@ -46,10 +46,10 @@ const validToken = (t) => typeof t === "string" && /^[A-Za-z0-9_-]{32,128}$/.tes
 /* The endings the server announces, each with the sentence that says
    what happened. Anything else is a dropped line and worth another try. */
 const FINAL = {
-  4001: "That party is full. A squad is four.",
+  4001: "That party is full: 4 players at most.",
   4003: "The host removed you from the party.",
   4004: "That party has ended.",
-  4029: "Too many messages too fast, so the party closed your connection. Join again to carry on.",
+  4029: "Too many messages too fast, so the party disconnected you. Join again.",
 };
 
 /* How long to wait before each retry. Never faster than a second, never
@@ -57,7 +57,7 @@ const FINAL = {
 const BACKOFF = [1000, 2000, 5000, 10000, 20000, 30000];
 
 const NO_SERVER =
-  "Parties need the tool's own server, and this address does not have one. They work on the Cloudflare address for now.";
+  "Parties need the tool's server, which this address does not have.";
 
 const EMPTY_SESSION = { name: "", code: null, token: null };
 

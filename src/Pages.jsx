@@ -166,19 +166,16 @@ export function About({ section = null }) {
   }, [section]);
   return (
     <div className="flex flex-col gap-4">
-      <Panel title="What this is" note="A fan-made reference, built for two people and a Tuesday night">
+      <Panel title="What this is" note="A fan-made Helldivers 2 tool">
         <p className="text-base-300">
-          A Helldivers 2 tier browser and loadout tool. It exists because deciding what to bring should not mean
-          holding six browser tabs open, and because a rating with no date on it is worth very little.
+          A Helldivers 2 tier list and loadout tool: ratings, stats, the live war and your own builds in one place.
         </p>
         <p>
-          Every rating says where it came from and when. Anything the source has not caught up on is flagged rather
-          than quietly presented as current. An item nobody has rated shows a question mark instead of a guess.
+          Every rating shows its source and date. A rating older than a game change is flagged. An unrated item shows
+          a question mark.
         </p>
         <p>
-          It tracks {items.length} items across six slots, {rated} of them rated, 39 curated builds, and {warbonds.length} warbonds
-          with both ownership axes: owning the warbond and unlocking the item are separate purchases, so they are
-          separate switches.
+          It tracks {items.length} items across 6 slots ({rated} rated), 39 curated builds and {warbonds.length} warbonds.
         </p>
       </Panel>
 
@@ -190,14 +187,12 @@ export function About({ section = null }) {
           <p><span className="text-base-200">Ratings</span> u.gg community vote aggregates, stamped {PATCH.ratings}, read on {PATCH.readOn}.</p>
         </div>
         <p>
-          u.gg dates each of its lists separately, so the ratings carry more than one stamp and every expanded row
-          says which one it has. Where a confirmed change touches an item after the vote was cast, that row carries a
-          caveat you can expand and read. None does right now.
+          u.gg dates each list separately, so ratings carry different patch stamps. An item changed after its vote
+          carries a caveat.
         </p>
         <p className="text-base-500">
-          Facts rather than opinions, the armor classes, damage figures, capacities, demolition force, armor set
-          numbers and warbond contents, come from the reference tables in this project and helldivers.wiki.gg.
-          Balance changes come from Arrowhead patch notes.
+          Armour classes, damage, capacities, demolition force, armour sets and warbond contents come from this
+          project's reference tables and helldivers.wiki.gg. Balance changes come from Arrowhead's patch notes.
         </p>
       </Panel>
 
@@ -206,12 +201,10 @@ export function About({ section = null }) {
       {/* data to carry the same licence, and forbids commercial use.      */}
       <Panel title="Weapon stats come from the Helldivers Wiki">
         <p>
-          Magazine size, spare magazines, fire rate, recoil, ergonomics, sway, projectile drag, durable damage,
-          stagger and pushback are not in this project's own tables, and neither is the armor value of every body
-          part of every enemy, which is what makes a penetration number mean anything. They are fetched from{" "}
+          Handling and ammo figures, reload times and every enemy's armour per body part come from{" "}
           <a href="https://helldivers.wiki.gg" target="_blank" rel="noreferrer noopener"
             className="text-base-200 underline hover:text-base-100">helldivers.wiki.gg</a>, which the community
-          maintains and restamps within days of a patch.
+          updates within days of a patch.
         </p>
         <p className="text-base-500">
           That data is published under the{" "}
@@ -233,17 +226,15 @@ export function About({ section = null }) {
 
       <Panel title="The galaxy map and the live war">
         <p>
-          Where every planet sits and the supply lines between them come from the{" "}
+          Planet positions and supply lines come from the{" "}
           <a href="https://api.helldivers2.dev" target="_blank" rel="noreferrer noopener"
-            className="text-base-200 underline hover:text-base-100">helldivers-2 community API</a>, read once and
-          shipped with the tool, so the map draws with nothing fetched.
+            className="text-base-200 underline hover:text-base-100">helldivers-2 community API</a> and ship with the
+          tool.
         </p>
         <p className="text-base-500">
-          Who holds each planet, where the fronts are, how they are going and the Major Order come from the same
-          API, live. This
-          tool's own server asks it every five minutes and keeps the answer, and your browser only ever asks this
-          tool's server, never anybody else. Nothing about you goes with the question. An answer more than half an
-          hour old is not drawn, because an out of date map looks exactly like a current one.
+          Live data comes from the same API: who holds each planet, the fronts and the Major Order. The tool's server
+          reads it every 5 minutes. Your browser only talks to the tool's server and sends nothing about you. Data
+          older than 30 minutes is not shown.
         </p>
       </Panel>
 
@@ -261,11 +252,9 @@ export function About({ section = null }) {
           or connect to the game client or your account.
         </p>
         <p className="text-base-500">
-          Art is used for identification and reference. {artCounts.items} item illustrations and {artCounts.warbonds}{" "}
-          warbond covers
-          {artCounts.planets ? `, and ${artCounts.planets} planet renders from helldivers.wiki.gg, shown inside a sector on the map` : ""}.
-          Every one of them is optional: with the art removed, every item still reads through its text and every planet is
-          drawn as a point of light.
+          Art is used for identification and reference: {artCounts.items} item illustrations, {artCounts.warbonds} warbond
+          covers{artCounts.planets ? ` and ${artCounts.planets} planet renders from helldivers.wiki.gg` : ""}. The tool works
+          without any of it.
         </p>
       </Panel>
     </div>
@@ -280,15 +269,15 @@ export function About({ section = null }) {
 const KNOWN = [
   {
     what: "The ratings carry three different stamps",
-    detail: `u.gg dates its lists separately. Primaries are stamped 7.1.1; support weapons, backpacks, eagles and sentries 7.0.2; the other six lists print no stamp but already include the 7.1.0 warbond, so they are read as 7.1.0. The P-33 Missile Pistol has dropped off u.gg's list while staying in the game, so it keeps its 6.3.1 rating.`,
+    detail: `u.gg dates its lists separately: primaries 7.1.1; support weapons, backpacks, eagles and sentries 7.0.2; the other six lists read as 7.1.0. The P-33 Missile Pistol left u.gg's list and keeps its 6.3.1 rating.`,
   },
   {
     what: "One item has no rating at all",
-    detail: "The P/40-K Bolt Pistol is in the game with no community data yet. It renders a dashed question mark and survives every tier floor, because being seen is the only way it ever gets tried.",
+    detail: "The P/40-K Bolt Pistol has no community rating yet. It shows a question mark and is never hidden by the tier filter.",
   },
   {
     what: "Twelve items have no art",
-    detail: "The eleven added in 1.23.0, eight of them from the Ironclad Democracy warbond, and Electrical Conduit. They fall back to their initials until art for them is added. The Ironclad Democracy warbond has no cover yet either, so its tile in Collection shows the name alone.",
+    detail: "The 11 added in 1.23.0 and Electrical Conduit show their initials. The Ironclad Democracy warbond has no cover yet.",
   },
   {
     what: "Some stats have no source yet",
@@ -296,7 +285,7 @@ const KNOWN = [
   },
   {
     what: "The curated builds lean hard on high tiers",
-    detail: "35 of 39 use an S or S+ primary, and only 13 distinct primaries appear across all of them. Known, and being reworked: a high rating is not the same as a good fit.",
+    detail: "35 of 39 use an S or S+ primary, and only 13 different primaries appear. A new set is planned.",
   },
 ];
 
@@ -319,28 +308,25 @@ export function Support() {
 
       <Panel title="Found something else" note="Bugs and feature requests both welcome">
         <p>
-          There is no form here yet. Until there is, the fastest route is to say what you were doing, what you
-          expected, and what happened instead.
+          There is no form yet. When you report a problem, say what you did, what you expected and what happened.
         </p>
         <div className="flex items-start gap-2 rounded border border-base-800 bg-base-950/40 px-3 py-2.5">
           <Bug className="mt-0.5 h-3.5 w-3.5 shrink-0 text-base-500" />
           <p className="text-[13px] text-base-500">
-            Useful in a report: which theme you were on, which page, and whether a reload fixed it. If it involves
-            your collection, Settings has an Export that produces a file describing exactly what the tool thinks you
-            own.
+            Useful in a report: the theme, the page, and whether a reload fixed it. For a collection problem, attach the
+            file from Export in Settings.
           </p>
         </div>
       </Panel>
 
       <Panel title="Your data stays yours">
         <p>
-          Locks, favorites, profiles and your own builds live in this browser and nowhere else, and there are no
-          accounts yet. Clearing your browser data clears them, which is what Export in Settings is for.
+          Your collection, favourites, profiles and builds stay in this browser. There are no accounts yet. Clearing
+          browser data clears them, so use Export in Settings to keep a copy.
         </p>
         <p className="mt-2">
-          The one thing that leaves is a party, and only while you are in one. The name you give, the loadout you
-          confirm and the host's scenario pass through the tool's server to the others in that party, and the party is
-          deleted twelve hours after it goes quiet. Nothing else about you goes with it.
+          Only a party sends anything: your name, your dropped loadout and the host's scenario pass through the tool's
+          server to the others in it. A party is deleted 12 hours after it goes quiet. Nothing else about you is sent.
         </p>
       </Panel>
     </div>

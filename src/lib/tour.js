@@ -29,6 +29,8 @@
 /* middle instead. The words still hold without the pointing.          */
 /* ================================================================== */
 
+import { BRAND } from "./brand.js";
+
 export const TOUR = [
   {
     title: "Welcome aboard, Helldiver",
@@ -73,7 +75,7 @@ export const TOUR = [
     speech:
       "Owning a Warbond is not the same as earning its contents. Every item inside must be bought with Medals, earned in blood, sweat and paperwork.",
     plain:
-      "The tick marks every item in that warbond unlocked, the cross marks them all not yet, and the number says how many you have. Both stay greyed out until you own the warbond. For a few items here and there, use the Items tab.",
+      "The tick unlocks every item in that warbond, the cross locks them all, and the number counts what you have. Both need the warbond owned first. For single items, use the Items tab.",
   },
   {
     route: "collection/warbonds",
@@ -109,7 +111,7 @@ export const TOUR = [
     speech:
       "Select a difficulty appropriate to your patriotism, then report how many of you are deploying. Solo deployment is a courageous choice, and has been forwarded to your next of kin.",
     plain:
-      "Difficulty and squad size decide which enemies count and which gear rises. The same rifle rates differently solo on Super Helldive and four of you on Hard.",
+      "Difficulty and squad size decide which enemies count and which gear rises. The same rifle rates differently solo on Super Helldive and with 4 players on Hard.",
   },
   {
     route: "bay",
@@ -138,7 +140,7 @@ export const TOUR = [
     speech:
       "Every loadout you have ever trusted with your life, filed in one place. Name them, copy them, share them. Hoarding equipment is a sign of preparedness, not of a problem.",
     plain:
-      "Your builds. Builds browses them, Coverage shows what you have for each occasion on each front, and History shows what you actually dropped with.",
+      "Your builds. Builds lists them, Coverage shows what you have for each situation on each front, and History shows what you dropped with.",
   },
   {
     route: "tiers/primary",
@@ -147,7 +149,7 @@ export const TOUR = [
     speech:
       "On the left, the vote of the people. On the right, our reading for where you are actually dropping. Where they disagree, a sentence explains why. Disagreement is healthy. Within limits.",
     plain:
-      "The u.gg community tier beside ours for your scenario. Click a row to see what moved it. Either column sorts the list.",
+      `The community tier beside the ${BRAND.short} tier for your scenario. Open a row to see what affects it. Either column sorts the list.`,
   },
   {
     route: "rules",
@@ -156,7 +158,7 @@ export const TOUR = [
     speech:
       "Every rule behind our rating, published in full, because Super Earth has nothing to hide. You may switch any rule off. The rule will not take it personally.",
     plain:
-      "The Rules page lists each rule, what it moves where you are dropping, and a switch to turn it off in this browser.",
+      "The Rules page lists each rule, what it changes where you are dropping, and a switch to turn it off in this browser.",
   },
   {
     at: "party",
@@ -164,7 +166,7 @@ export const TOUR = [
     speech:
       "Helldivers do not dive alone. Unless they do, in which case they dive bravely. Open a party, read the code to your squad, and their loadouts land in your Drop Bay the moment they commit.",
     plain:
-      "A six character code and no account. Each member's confirmed build shows in their slot, and the host's scenario becomes everybody's.",
+      "A six character code and no account. Each member's dropped build shows in their slot, and everyone follows the host's scenario.",
   },
   {
     route: "settings",
