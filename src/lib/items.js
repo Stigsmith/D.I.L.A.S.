@@ -46,7 +46,7 @@ export const CATEGORIES = [
   { id: "secondary", label: "Secondaries", slot: "secondary" },
   { id: "throwable", label: "Throwables", slot: "throwable" },
   { id: "strat", label: "Stratagems", slot: "stratagem" },
-  { id: "armor", label: "Armor passives", slot: "armor" },
+  { id: "armor", label: "Armour passives", slot: "armor" },
   { id: "booster", label: "Boosters", slot: "booster" },
 ].map((c) => ({ ...c, items: ITEMS.filter((i) => i.slot === c.slot) }));
 
@@ -102,7 +102,7 @@ export const SLOT_LABEL = {
   secondary: "Secondary",
   throwable: "Throwable",
   stratagem: "Stratagem",
-  armor: "Armor",
+  armor: "Armour",
   booster: "Booster",
 };
 

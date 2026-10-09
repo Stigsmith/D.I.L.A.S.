@@ -24,8 +24,8 @@ const BASE = { difficulty: 7, squad: 4, hazards: [] };
 
 export const SITUATIONS = [
   { id: "solo-top", label: "Solo on Super Helldive", scenario: { difficulty: 10, squad: 1 } },
-  { id: "squad-top", label: "Four of you on Super Helldive", scenario: { difficulty: 10, squad: 4 } },
-  { id: "squad-hard", label: "Four of you on Hard", scenario: { difficulty: 5, squad: 4 } },
+  { id: "squad-top", label: "4 players on Super Helldive", scenario: { difficulty: 10, squad: 4 } },
+  { id: "squad-hard", label: "4 players on Hard", scenario: { difficulty: 5, squad: 4 } },
   { id: "hot", label: "A hot planet", scenario: { hazards: ["intense_heat"] } },
   { id: "cold", label: "A frozen planet", scenario: { hazards: ["extreme_cold"] } },
   { id: "sand", label: "Sandstorms", scenario: { hazards: ["sandstorms"] } },

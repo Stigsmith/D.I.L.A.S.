@@ -189,7 +189,8 @@ For every line:
 | **Pass 3, the tier list**, 1.32.0 | **Done, 9 October 2026.** Every item note: 89 cut to the one fact the row does not already show, 22 dropped because they only repeated the category or the tier. 11 effect lines. The damage type glosses (arc weapons never vented heat), the filter pane's counts and empty states, the column and lock tooltips, the scenario bar |
 | **Pass 4, Drop Bay**, 1.32.0 | **Done, 9 October 2026.** The brief, the slots, the suggestions, the picker, the party line and the squad check. Text now says "drop" where the button says Drop, rather than "confirm". The nine mission kind lines in `missions.json`, which the brief and the planner show |
 | **Pass 5, Collection**, 1.32.0 | **Done, 9 October 2026.** The nudge, the guide and its cards, the quick start, profiles, both tabs and their footnotes. A profile option said "the few things he has", and now says "they". The Righteous Revenants inference moved to About |
-| Still to do, one surface per pass | The Armoury; the war room and the Star Map; Party, Settings and About; the Rules page's judgement, source and measured notes |
+| **Pass 6, the Armoury**, 1.32.0 | **Done, 9 October 2026.** The builds grid and its biome notes (plasma never vented heat), Coverage and its situation names, History, the editor, the build card and shared links. "Hard gate" became "filters builds". Every visible "Armor" label is "Armour" now; the stat label is "Penetration", since its value already says AP |
+| Still to do, one surface per pass | The war room and the Star Map; Party, Settings and About; the Rules page's judgement, source and measured notes |
 
 > [!danger] A wording change must not move a score
 > Run `npm run rules`, `npm run builds` and `npm run drop` before and after. All three must give identical output. Rule names and sentences live in the rules data and feed the tier rows, the suggestions and the Rules page at once.

@@ -15,7 +15,7 @@ export const SLOTS = [
   { key: "primary", label: "Primary", slot: "primary" },
   { key: "secondary", label: "Secondary", slot: "secondary" },
   { key: "grenade", label: "Grenade", slot: "throwable" },
-  { key: "armor", label: "Armor", slot: "armor" },
+  { key: "armor", label: "Armour", slot: "armor" },
   { key: "booster", label: "Booster", slot: "booster" },
 ];
 

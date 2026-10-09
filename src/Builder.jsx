@@ -191,7 +191,7 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
         <span className="text-[11px] text-base-500">
           {pool.length} to choose from
           {taken.length ? `, ${taken.length} already in this build` : ""}
-          {armour ? ". Pick a set to wear the passive at its weight, or the passive alone" : ""}
+
         </span>
       </div>
 
@@ -199,8 +199,8 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
         {pool.length === 0 ? (
           <div className="rounded-lg border border-dashed border-base-700 py-10 text-center text-sm text-base-400">
             {hiddenCount > 0 && !showLocked
-              ? "Everything here is marked as not unlocked. Show the locked ones, or open Collection to fix what you own."
-              : "Nothing matches that search. Clear it to see the full list."}
+              ? "Everything here is locked. Show the locked ones, or update Collection."
+              : "Nothing matches that search."}
           </div>
         ) : (
           <div className="mx-auto flex max-w-4xl flex-col gap-1.5">
@@ -318,7 +318,7 @@ function Slot({ label, itemId, setId = null, locked, onOpen, warn, faction, scen
             </span>
           </>
         ) : (
-          <span className="block text-sm text-base-600">Empty, tap to choose</span>
+          <span className="block text-sm text-base-600">Empty</span>
         )}
       </span>
 
@@ -544,7 +544,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
               {stored ? "Adjust your build" : preset ? "Adjust a copy of this preset" : "A new build"}
             </p>
             <p className="text-[11px] text-base-500">
-              Saving puts it in your slot on the drop screen, still to confirm.
+              Saving puts it in your Drop Bay slot.
             </p>
           </div>
           {leaving ? (
@@ -552,7 +552,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
               <span className="text-[11px] text-accent-400">Unsaved changes.</span>
               <button onClick={() => overlay.onClose()}
                 className="rounded border border-red-700 bg-red-950/40 px-2.5 py-1 text-xs text-red-300 hover:border-red-500">
-                Throw them away
+                Discard
               </button>
               <button onClick={() => setLeaving(false)}
                 className="rounded border border-base-700 px-2.5 py-1 text-xs text-base-300 hover:border-base-500">
@@ -649,13 +649,13 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
               {dirty ? (overlay ? "Save and use it" : "Save") : justSaved ? "Saved" : "No changes"}
             </button>
             {overlay && stored && dirty ? (
-              <button onClick={saveAsNew} title="Keep the original as it was and use a new copy with these changes"
+              <button onClick={saveAsNew} title="Keep the original and save these changes as a new build"
                 className="flex items-center gap-1.5 rounded border border-base-700 px-3 py-1.5 text-xs text-base-300 hover:border-base-500 hover:text-base-100">
                 <Copy className="h-3.5 w-3.5" /> Save as a new build
               </button>
             ) : null}
             <button onClick={copyLink} disabled={filled === 0}
-              title="Copy a link to this build. Whoever opens it can keep a copy"
+              title="Copy a link to this build"
               className="flex items-center gap-1.5 rounded border border-base-700 px-2.5 py-1.5 text-xs text-base-300 hover:border-base-500 hover:text-base-100 disabled:opacity-40">
               {copied ? <Check className="h-3.5 w-3.5" /> : <Link2 className="h-3.5 w-3.5" />}
               {copied ? "Link copied" : "Share"}
@@ -679,8 +679,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
 
         {preset && !stored ? (
           <p className="border-t border-base-800 bg-base-800/40 px-3 py-2 text-[11px] text-base-400">
-            Forked from the curated build <span className="text-base-200">{preset.name}</span>. The original is untouched;
-            save to keep this copy.
+            A copy of the curated build <span className="text-base-200">{preset.name}</span>. Save to keep it.
           </p>
         ) : null}
       </div>
@@ -699,9 +698,8 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
             <div className="flex items-start gap-2 rounded-lg border border-red-800/60 bg-red-950/30 px-3 py-2 text-[11px] text-red-300">
               <Backpack className="mt-px h-3.5 w-3.5 shrink-0" />
               <span>
-                <span className="font-semibold">Two things want your back: </span>
-                {packs.map((p) => p.name).join(" and ")}. Only one can come. Left as a warning rather than blocked, since
-                a squadmate can carry a pack for you.
+                <span className="font-semibold">Two things need your backpack slot: </span>
+                {packs.map((p) => p.name).join(" and ")}. Only one fits, unless a squadmate carries a pack for you.
               </span>
             </div>
           ) : null}
@@ -766,10 +764,10 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
             </div>
           </div>
 
-          <MultiToggle label="Difficulty" hint="hard gate" options={DIFFICULTIES}
+          <MultiToggle label="Difficulty" hint="filters builds" options={DIFFICULTIES}
             value={draft.diff} onChange={(v) => patch({ diff: v })} />
 
-          <MultiToggle label="Built for these biomes" hint="leave empty for anywhere"
+          <MultiToggle label="Built for these biomes" hint="none means anywhere"
             options={BIOMES.filter((b) => b.id !== "any")}
             value={draft.biomes} onChange={(v) => patch({ biomes: v })} />
 
@@ -780,12 +778,10 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
               <span className={"flex items-center gap-1.5 " + (heat ? "text-base-200" : "text-base-500")}>
                 <Thermometer className="h-3.5 w-3.5" />
                 {heat
-                  ? `Heat dependent, from ${heatFrom.map((i) => i.name).join(", ")}`
-                  : "Not heat dependent"}
+                  ? `Vents heat: ${heatFrom.map((i) => i.name).join(", ")}`
+                  : "No heat weapons"}
               </span>
-              <span className="text-base-600">
-                Worked out from the gear you hold, so hot biomes gate it automatically.
-              </span>
+              <span className="text-base-600">Set from your gear. Hot planets rule heat builds out.</span>
               <button onClick={() => patch({ fire: !draft.fire })} aria-pressed={draft.fire}
                 className={"mt-1 flex w-fit items-center gap-1.5 rounded border px-2.5 py-1.5 transition-colors " +
                   (draft.fire ? "border-accent-500 bg-accent-500 text-accent-950"
@@ -805,7 +801,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
             <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-base-500"
               style={{ fontFamily: "'Oswald', sans-serif" }}>Note</span>
             <textarea value={draft.blurb} onChange={(e) => patch({ blurb: e.target.value })} rows={2}
-              placeholder="What this build is for. Short and opinionated beats hedged."
+              placeholder="What this build is for"
               className="w-full rounded border border-base-700 bg-base-900 px-2.5 py-1.5 text-xs text-base-100 placeholder-base-600 outline-none focus:border-base-500" />
           </div>
         </div>
