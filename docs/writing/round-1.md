@@ -1,6 +1,6 @@
 # D.I.L.A.S. writing review, round 1: the rest
 
-The samples not yet annotated. A1 to A11 are done and applied; see `dilas-writing.md`. Write a note under any line: "cut", "move to hover", "fine", a rewrite, or a rule. Silence means no strong opinion.
+The second half of round 1, with the curator's notes, 9 October 2026. His notes run from A12 to C2; C3 onward were not reviewed, because by then the pattern was clear. The guide built from them is `dilas-writing.md`.
 
 `{...}` is a value the tool fills in. *(footnote)* means small grey type.
 
@@ -11,34 +11,34 @@ The samples not yet annotated. A1 to A11 are done and applied; see `dilas-writin
 > Closes objectives: Closes bug holes and fabricators from your carried kit, without spending a call-in
 > *(footnote)* Our call, not a community vote. Every tier on this row is a u.gg aggregate; this line is a judgment we made.
 
-Note:
+Note: without spending a call-in i would say spending a strategem. You know my comments on the footnote.
 
 **A13. Reasons heading.**
 > Why this scenario moves it / Why this scenario does not move it
 
-Note:
+Note: you know my stance on moves it 
 
 **A14. Reason lines**, with green and red point chips.
 > +9 Terminids are mostly large fleshy parts, and durable damage is what hurts those. This one keeps most of its damage against them where a chaff gun loses it.
 > -8 Poor ergonomics means the barrel lags behind the camera, and Hunters do not wait for you to catch up.
 
-Note:
+Note: shorten drasrically. + That should all be tooltip and ofcourse rewritten with more direct abd clear language. 
 
 **A16. Stale rating caveat.**
 > Changed after the vote. {patch note} The tiers above were voted before this change and have not absorbed it.
 
-Note:
+Note: absorbed is a no. This whole thing is usefull but written too cleverly. More direct snd to the point. 
 
 **A17. Unrated item.**
 > Released 12 August 2026 in Castellan's Creed. No community rating exists yet. Re-check u.gg around early September 2026.
 
-Note:
+Note: users/players wont recheck themselves. We recheck for them xD
 
 **A18. Row subtitle and item notes.**
 > Cutting Edge · AP3 · 333 DPS · infinite ammo, unusable against bots
 > four wheels and a Heavy Machine Gun. Someone has to drive, so it costs you a gun and a pair of hands
 
-Note:
+Note: four wheels... just no. Its a car. People aint stupid. So it costs you a gun and a pair of hands. Its just all a no. The fact that it has a heavy machine gun is good info. Just that. 
 
 ## B. Rule sentences (shown in rows, suggestion cards and the Rules page)
 
@@ -47,34 +47,34 @@ Note:
 > A gas cloud does not care whose it is, and your armour lets you stand in yours.
 > Open, even ground, where the FRV is fast and stays on its wheels.
 
-Note:
+Note: what cabnot catch you cant hurt you. Just no. The speed is the armour also no xD. Clever writing again. All of this is horrible. Instead "a gas cloud damages everyone including helldivers. This armour negates gas damage"
 
 **B2. The longest.**
 > A storm cuts their sight as much as yours, and with this few of you this deep you are not trying to win the firefight. Reduced visibility plus a weapon nobody hears is the difference between crossing an outpost and being chased out of one.
 
-Note:
+Note: you are not trying to win the firefight = no. The diffirence of crossing an putpost and being.... instead id write "reduced visibility and silenxed weapons will benefit here" also "a storm or decreases line of sight"
 
 **B3. Carry missions** (the same text on two rules).
 > You will have an objective in one hand for most of this mission. A one handed weapon lets you shoot while carrying it; everything else means putting it down first. It does not make a bad sidearm good, it makes a good one indispensable.
 
-Note:
+Note: last sentence is baaaad xD
 
 **B4. True Grit with nothing to reload.**
 > No support weapon here has a reload for True Grit to shorten: an Arc Thrower or a Quasar never reloads, an expendable is thrown away, and no support weapon is no support weapon. You keep the handling and lose the half that makes it S+.
 
-Note:
+Note: "no support weapon is no support weapon" ugh no xD trying to be clever again
 
 **B5. Sandstorms** (the same text on two rules).
 > Sandstorms greatly reduce visibility while they last, and range stops being an advantage. They are weather rather than climate though: roughly three minutes at a time, so this is a risk you carry rather than a state you are in.
 
-Note:
+Note: yeah, you know the drill
 
 **B6. Rule names.**
 > Alone or in pairs on a hard bot drop, quiet wins
 > Alone or in pairs on a very hard bot drop, noise costs
 > Stealth armour is wasted on an easy drop
 
-Note:
+Note: "quiet wins" no instead "stealth is advised" npise costs also no. Also reference peril here and keep it all direct to the poikt and factual. 
 
 ## C. Rules page
 
@@ -86,7 +86,7 @@ Note:
 **C2. Group header.**
 > HOW HARD, AND HOW MANY OF YOU · Difficulty and squad size, read together. None of these fire until you have said both.
 
-Note:
+Note: none of these fire = technically rules fire is a thing i get it. But i would keep it simpler for users. 
 
 **C3. Grey line under each rule name** (generated).
 > against the Automatons, with a squad of 2 or less, at peril 22 or more, growing with difficulty and how few of you there are
