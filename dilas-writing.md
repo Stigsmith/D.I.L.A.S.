@@ -192,7 +192,8 @@ For every line:
 | **Pass 6, the Armoury**, 1.32.0 | **Done, 9 October 2026.** The builds grid and its biome notes (plasma never vented heat), Coverage and its situation names, History, the editor, the build card and shared links. "Hard gate" became "filters builds". Every visible "Armor" label is "Armour" now; the stat label is "Penetration", since its value already says AP |
 | **Pass 7, the war room and the Star Map**, 1.32.0 | **Done, 9 October 2026.** The planner, the place and mission bar, the difficulty card and its tiles, how many of you, the live war lines, the Star Map's panels and history, and the galaxy map's hover cards. "Not said" became "Not set" |
 | **Pass 8, Party, Settings and the pages**, 1.32.0 | **Done, 9 October 2026.** The party menu and its errors, Settings (it said eight skins; ten ship), the reset warning (it never said it deletes your builds and drop history), the backup panel, the theme notes, the tour's plain lines, About, Support and the Roadmap summaries |
-| Still to do | The Rules page's judgement, source and measured notes. The account screen, switched off, waits for accounts |
+| **Pass 9, the Rules page's notes**, 1.32.0 | **Done, 9 October 2026.** Every Source, Judgement and Reasoning note (the field is `measured`): no dates of our own decisions, no names, no file names, no history. A rule backed only by the wiki lost a "judgement" that only said it applies in builds, and with it the judgement chip |
+| Still to do | The account screen, switched off until accounts open. New text follows this guide from the start |
 
 > [!danger] A wording change must not move a score
 > Run `npm run rules`, `npm run builds` and `npm run drop` before and after. All three must give identical output. Rule names and sentences live in the rules data and feed the tier rows, the suggestions and the Rules page at once.

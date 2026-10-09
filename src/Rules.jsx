@@ -116,9 +116,9 @@ function RuleDetail({ rule, scenario, off, builds, buildsArePresets }) {
         <p><span className="text-base-500">When: </span><span className="text-base-300">{describeWhen(rule).join(" · ")}</span></p>
         <p><span className="text-base-500">Checks: </span><span className="text-base-300">{describeMatch(rule).join("; ")}.</span></p>
         <p><span className="text-base-500">Size: </span><span className="text-base-300">{describeSize(rule)}</span></p>
-        {rule.source ? <p className="text-[11px] text-base-500">Source: {rule.source}.</p> : null}
-        {rule.judgement ? <p className="text-[11px] text-accent-300">Our judgement: {rule.judgement}</p> : null}
-        {rule.measured ? <p className="text-[11px] text-base-500">Measured: {rule.measured}</p> : null}
+        {rule.source ? <p className="text-[11px] text-base-500">Source: {rule.source.replace(/\.$/, "")}.</p> : null}
+        {rule.judgement ? <p className="text-[11px] text-accent-300">Judgement: {rule.judgement}</p> : null}
+        {rule.measured ? <p className="text-[11px] text-base-500">Reasoning: {rule.measured}</p> : null}
         <p className="text-[10px] text-base-600" style={MONO}>{rule.id}</p>
       </div>
 
