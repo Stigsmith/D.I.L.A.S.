@@ -1,16 +1,28 @@
 [
   {
+    "version": "1.32.0",
+    "date": "2026-10-09",
+    "title": "Plain speech",
+    "say": "The Ministry has reviewed every sentence in the tool and found most of them too long. Fewer words, same truth.",
+    "changes": [
+      "Every rule has a short name that says what it does and when, with its full reason on hover.",
+      "Hovering a label, a rating or a reason opens a tooltip in the tool's own style.",
+      "An opened tier row is shorter: armour reads as full damage, reduced damage and weak points by name, and missing figures are marked.",
+      "Build warnings, suggestions and the Rules page say less, and say it plainly.",
+      "About has a new How the rating works section: the maths, the sources and the list of missing data."
+    ]
+  },
+  {
     "version": "1.31.0",
     "date": "2026-10-09",
     "title": "Reload discipline",
     "say": "The Ministry has reviewed how long you spend reloading and finds it excessive. Corrective armour is available.",
     "changes": [
-      "The picker says what a pick fixes: open the support slot on an Eruptor build and the Stalwart reads \"Closes: All punch, no volume\".",
+      "The picker says what a pick fixes: open the support slot on an Eruptor build and the Stalwart reads \"Closes: No crowd clear in your hands\".",
       "True Grit does a little for big belts with a long reload, so the Stalwart and the Machine Gun now gain from it.",
       "Siege-Ready reaches the Explosive Crossbow, and explosive resistance counts the Plasma Punisher as a blast you set off close.",
       "An expendable launcher beside another support weapon warns you that one gets dropped for the other. No points lost: bringing launchers for the squad is allowed.",
-      "Reloading the page while editing a saved build opens that build again, not an empty one.",
-      "An opened tier row is shorter: armour reads as full damage, reduced and weak points by name, missing figures are marked, and hovering a label explains it. The reasoning moved to About."
+      "Reloading the page while editing a saved build opens that build again, not an empty one."
     ]
   },
   {

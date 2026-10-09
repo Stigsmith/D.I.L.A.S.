@@ -276,10 +276,10 @@ export function whyFor(reading) {
   if (lifted.length) {
     const p = lifted[0];
     const r = p.reasons.find((x) => x.delta > 0);
-    return { tone: "up", item: p.item.name, text: r.say };
+    return { tone: "up", item: p.item.name, name: r.name, text: r.say };
   }
   const gap = reading.notes.find((n) => n.severity === "red" || n.severity === "amber");
-  if (gap) return { tone: "gap", item: null, text: gap.say };
+  if (gap) return { tone: "gap", item: null, name: gap.name, text: gap.say };
   return null;
 }
 

@@ -5,7 +5,7 @@
   "rules": [
     {
       "id": "penetration-misses-the-front",
-      "name": "Nothing you aim gets through",
+      "name": "Low armour penetration",
       "when": {},
       "match": {
         "number": [
@@ -22,12 +22,12 @@
         "clamp": 20
       },
       "severity": "amber",
-      "say": "Nothing you aim opens most of what is on this front. Sentries and orbitals do not count here: they cannot pick a weak point, and neither can you when the thing is already on top of you.",
+      "say": "The weapons you aim cannot open most enemies on this front. Sentries and orbitals do not count, because they cannot aim for weak points.",
       "measured": "Held penetration across the 39 curated builds is AP 3 in 14 of them, AP 4 in 16 and AP 6 in 9. Against the bot front at difficulty 10 those open 10, 16 and 22 of 22 enemies. The 0.7 gate is what keeps this off the builds that already have an answer: AP 4 on bugs opens 20 of 21 and says nothing worth a point."
     },
     {
       "id": "no-answer-to-armour",
-      "name": "No answer to armour",
+      "name": "No anti-tank",
       "when": {
         "faction": [
           "bots",
@@ -44,12 +44,12 @@
       },
       "delta": -12,
       "severity": "red",
-      "say": "Nothing in this build is for opening armour. Chargers and Hulks are not a thing you out-shoot with volume, and at this level they are not optional either.",
+      "say": "Nothing in this build opens heavy armour, and at this peril you will meet Chargers or Hulks.",
       "measured": "17 of the 39 curated builds carry no anti-armor tag at all, so this splits the set 44 / 56 before the front and peril gates narrow it further. Peril 12 is squad.js's own switch-on point, four players at difficulty 7, so a build read for a quiet drop is not marked down for being built for one."
     },
     {
       "id": "no-answer-to-armour-squids",
-      "name": "No anti-tank against the Illuminate",
+      "name": "No anti-tank · Illuminate",
       "when": {
         "faction": [
           "squids"
@@ -65,7 +65,7 @@
       },
       "delta": 0,
       "severity": "grey",
-      "say": "No dedicated anti-tank, which is usually the right call on squids. The tier data warns off most of it on this front.",
+      "say": "Usually fine against the Illuminate: most anti-tank rates poorly on this front.",
       "measured": "Zero points on purpose. It is the same gap as the rule above and it is not a fault here, so it says so and moves nothing. squad.js makes the same call for the same reason."
     },
     {
@@ -83,12 +83,12 @@
       },
       "delta": -14,
       "severity": "red",
-      "say": "Nothing here holds off a crowd. Everything you have kills one thing at a time, and that was never the problem.",
+      "say": "Nothing here kills groups of small enemies quickly.",
       "measured": "3 of 39 curated builds carry no chaff tag, which is 8%. Asking the question the other way round, whether a build has chaff, fires on 92% and tells you nothing: that is the difference between a check and a description of the pool."
     },
     {
       "id": "all-punch-no-volume",
-      "name": "All punch, no volume",
+      "name": "No crowd clear in your hands",
       "when": {
         "faction": [
           "bugs",
@@ -122,7 +122,7 @@
       },
       "delta": -10,
       "severity": "amber",
-      "say": "Everything you aim is built for armour and none of it is built for numbers. Bringing an Eruptor means bringing a Stalwart, and this build brought the Eruptor twice.",
+      "say": "Every weapon you aim is built for armour. Add one built for crowds, like a Stalwart beside an Eruptor.",
       "measured": "This is the curator's own argument from 1.13.0, and it is the reason armour came out of item scoring and came back here. Per item the trade is invisible: the Eruptor is simply good. Across a build it is the whole point. It requires chaff to exist somewhere in the build, so it never stacks with no-chaff-clear: having none at all is one fault, and having it all in a sentry is a different one."
     },
     {
@@ -140,12 +140,12 @@
       },
       "delta": -12,
       "severity": "red",
-      "say": "Nothing here closes a hole or a fabricator without spending a stratagem. That is the entire mission.",
+      "say": "Nothing here closes bug holes or fabricators without spending a stratagem, and this mission is about destroying them.",
       "measured": "3 of 39 carry no objective tag. Gated on the mission trait rather than fired everywhere, because carrying no hole closer to a defence map is not a gap."
     },
     {
       "id": "quiet-kit-loud-drop",
-      "name": "A quiet kit for one or two of you on a hard bot drop",
+      "name": "Has a silenced weapon · Automatons, 1 or 2 players, peril 22+",
       "when": {
         "faction": [
           "bots"
@@ -177,12 +177,12 @@
         "clamp": 6
       },
       "severity": "grey",
-      "say": "Something you carry is silenced, and with one or two of you this deep that is worth having. A loud gun brings the whole base down on you and there is nobody holding the line while you run.",
+      "say": "With 1 or 2 players at this peril, a loud gun draws patrols and nobody covers you. A silenced weapon avoids that.",
       "measured": "The loadout mirror of peril-bots-wants-quiet, which fires on 5 of 232 items. At the build level it asks whether any of the five suppressed weapons is in a hand, which is a different and rarer question than whether a given weapon is one of them. Retuned on 4 October 2026 with the item rules: one or two of you only, from solo on Suicide Mission or two of you on Impossible, and never more than half a tier. The item rules already lift the weapon itself, so this is the small extra for the build carrying it."
     },
     {
       "id": "expendable-beside-a-support-weapon",
-      "name": "An expendable beside a support weapon",
+      "name": "Expendable beside a support weapon",
       "when": {},
       "match": {
         "count": [
@@ -211,12 +211,12 @@
       },
       "delta": 0,
       "severity": "grey",
-      "say": "You carry one support weapon at a time, so using the expendable means dropping your other one and picking it up again afterwards. That is fine if the launchers are for your squad.",
+      "say": "You carry one support weapon at a time, so firing the expendable means dropping the other one first. Fine if the launchers are for your squad.",
       "measured": "15% of random builds and none of the 39 curated ones, measured 9 October 2026. Zero points on purpose: bringing launchers for the squad is a real reason, and a build that does it deliberately should not be marked down for it. The curator raised it, 9 October 2026. The Solo Silo is left out, since it is set down and fired from a distance rather than carried."
     },
     {
       "id": "half-built",
-      "name": "Half built",
+      "name": "Empty slots",
       "when": {},
       "match": {
         "number": [
@@ -228,12 +228,12 @@
       },
       "delta": 0,
       "severity": "grey",
-      "say": "Not every slot is filled, so this reads as a draft. The score is what the gear you have picked is worth, not a judgement on the empty slots.",
+      "say": "The score counts only the gear you have picked.",
       "measured": "Zero points, deliberately. All 39 curated builds fill all nine, so this only ever fires on something you are still writing, and marking down a build mid-authoring for not being finished is obnoxious. It exists so the number admits what it is missing."
     },
     {
       "id": "answers-everything",
-      "name": "An answer to everything, in hand",
+      "name": "Armour, crowds and holes covered",
       "when": {
         "peril": {
           "gte": 12
@@ -271,7 +271,7 @@
       },
       "delta": 8,
       "severity": null,
-      "say": "Armour, crowds and holes all have an answer, and the first two are in your hands rather than in a call-in. Nothing here forces you to hope somebody else brought the other thing.",
+      "say": "Your weapons handle armour and crowds, and something in the build closes holes. You do not depend on a squadmate for any of it.",
       "measured": "Over 300 random legal builds, carrying all three roles somewhere is 54% and carrying the two you aim in your hands is 22%. The first is a description of the pool and the second is a real property, which is why this reads held rather than carried. Worth about half a tier: a complete kit is what a good build is supposed to be, not an achievement."
     }
   ],

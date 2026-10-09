@@ -106,14 +106,6 @@ const KIND_META = {
 };
 
 /* ================================================================== */
-/* UNRATED ITEMS                                                      */
-/* Shown on a row flagged "new": in the game, no rating cast yet.     */
-/* ================================================================== */
-
-const UNRATED_NOTE =
-  "Released 12 August 2026 in Castellan's Creed. No community rating exists yet. Re-check u.gg around early September 2026.";
-
-/* ================================================================== */
 /* ARMOR PASSIVE TRAITS                                               */
 /* Damage type is meaningless on armor, so the kind chips are replaced */
 /* by what the passive actually does for you. A passive can sit in     */
@@ -962,20 +954,20 @@ const FAV_FILTERS = [
 /* The two role tags, in plain language. The stored values are slugs;   */
 /* nothing in the UI should show a slug to a reader.                    */
 const ROLE_FILTERS = [
-  { id: "anti-armor", label: "Opens armor" },
+  { id: "anti-armor", label: "Opens armour" },
   { id: "objective", label: "Closes objectives" },
 ];
 
+/* The label beside each value already says what the role is, so the    */
+/* value only adds what the label does not.                              */
 const ROLE_LABEL = {
-  "anti-armor": "Opens armor. Kills Chargers, Hulks, Bile Titans and Factory Striders",
-  objective: "Closes bug holes and fabricators from your carried kit, without spending a call-in",
+  "anti-armor": "Kills Chargers, Hulks, Bile Titans and Factory Striders",
+  objective: "Closes bug holes and fabricators without spending a stratagem",
 };
 
-/* Roles are ours, not a sourced vote. Every rating on a row comes from  */
-/* u.gg with a patch stamp. This line does not, and the UI says so       */
-/* rather than letting the two sit together looking equally weighed.     */
-const ROLE_PROVENANCE =
-  "Our call, not a community vote. Every tier on this row is a u.gg aggregate; this line is a judgment we made.";
+/* Roles are ours, and the ratings are not. The Role heading says so on   */
+/* hover, so the two never sit together looking equally weighed.          */
+const ROLE_PROVENANCE = "Our own judgement. The community tier is a vote.";
 
 /* Which filters make sense per category. Damage type is dropped on    */
 /* armor and boosters because kind is a data convenience there, not a  */
@@ -1045,13 +1037,13 @@ function RowDetail({ item, faction, scored, difficulty }) {
   return (
     <div className="flex flex-col gap-3 border-t border-base-800 bg-base-950/60 px-3 py-3">
       {item.flag === "new" ? (
-        <p className="text-[11px] leading-relaxed text-base-400">{UNRATED_NOTE}</p>
+        <p className="text-[11px] leading-relaxed text-base-400">New in {sourceLabelFor(item)}. No community rating yet.</p>
       ) : null}
       {item.flag === "stale" && item.patchNote ? (
         <div className="text-[11px] leading-relaxed text-base-400">
           <span className="font-semibold text-accent-500">Changed after the vote. </span>
           {item.patchNote}
-          <span className="text-base-600"> The tiers above were voted before this change and have not absorbed it.</span>
+          <span className="text-base-600"> The community tier is from before this change.</span>
         </div>
       ) : null}
 
@@ -1171,7 +1163,7 @@ function RowDetail({ item, faction, scored, difficulty }) {
           {/* it by, which is what this row showed from the day it first   */}
           {/* had an armor pen line. Now it has the other half.            */}
           {armour ? (
-            <Section title={armour.title} tip="For reference only. Armour is scored in the build reading.">
+            <Section title={armour.title} tip="For reference only. Armour counts toward the Build badge.">
               {armour.facts.map((f) => (
                 <Fact key={f.key} label={f.label} tip={f.tip}
                   tone={f.tone === "good" ? "text-emerald-400" : f.tone === "bad" ? "text-red-400" : null}>
@@ -1185,32 +1177,31 @@ function RowDetail({ item, faction, scored, difficulty }) {
             </Section>
           ) : null}
 
-          {/* The editorial layer, kept in its own block with its own      */}
-          {/* provenance line rather than mixed into Numbers, so it never  */}
-          {/* reads as something the source tables recorded.               */}
-          {item.roles.length ? (
-            <Section title="Role">
-              {item.roles.map((r) => (
+          {/* The editorial layer, kept in its own block rather than mixed  */}
+          {/* into Numbers, so it never reads as something the source       */}
+          {/* tables recorded. Only the roles with words of their own show. */}
+          {item.roles.some((r) => ROLE_LABEL[r]) ? (
+            <Section title="Role" tip={ROLE_PROVENANCE}>
+              {item.roles.filter((r) => ROLE_LABEL[r]).map((r) => (
                 <Fact key={r} label={(ROLE_FILTERS.find((x) => x.id === r) || {}).label || r}>
                   {ROLE_LABEL[r]}
                 </Fact>
               ))}
-              <p className="text-[10px] leading-relaxed text-base-600">{ROLE_PROVENANCE}</p>
             </Section>
           ) : null}
 
-          {/* Why the second column disagrees with the first, in full. A     */}
-          {/* score that cannot explain itself is a score nobody should       */}
-          {/* trust, so this is the product rather than a detail.             */}
+          {/* Why the second column differs from the first. A score that   */}
+          {/* cannot explain itself is a score nobody should trust: each    */}
+          {/* rule's name shows, and its full reason is one hover away.     */}
           {scored && scored.reasons.length ? (
-            <Section title={scored.delta === 0 ? "Why this scenario does not move it" : "Why this scenario moves it"}>
+            <Section title="What affects this tier">
               {scored.reasons.map((r) => (
                 <div key={r.id} className="flex items-start gap-2 text-[11px] leading-relaxed">
                   <span className={"mt-px shrink-0 rounded px-1 py-px text-[10px] font-bold tabular-nums " +
                     (r.delta > 0 ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400")}>
                     {r.delta > 0 ? "+" : ""}{r.delta}
                   </span>
-                  <span className="text-base-300">{r.say}</span>
+                  <Tip text={r.say} className="text-base-300"><span className={HAS_TIP}>{r.name}</span></Tip>
                 </div>
               ))}
             </Section>
@@ -1507,7 +1498,7 @@ function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, loc
               backgroundColor: sortBy === "ours" ? factionMeta.hex + "14" : "transparent",
               borderColor: factionMeta.hex + "33",
             }}
-            title={scored && scored.reasons.length ? "What changes this tier" : null}
+            title={scored && scored.reasons.length ? "What affects this tier" : null}
             text={scored && scored.reasons.length ? (
               <span className="flex flex-col gap-1">
                 {scored.reasons.map((r) => (
@@ -1515,7 +1506,7 @@ function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, loc
                     <span className={"shrink-0 font-bold tabular-nums " + (r.delta > 0 ? "text-emerald-400" : "text-red-400")}>
                       {r.delta > 0 ? "+" : ""}{r.delta}
                     </span>
-                    <span>{r.say}</span>
+                    <span>{r.name}</span>
                   </span>
                 ))}
               </span>
@@ -2162,11 +2153,11 @@ function ReadingBadge({ label, tier, quiet, delta }) {
 }
 
 /**
- * reading  what readBuild returned, or null when no front is chosen
- * compact  the card wants the badges and the sentences and nothing else.
- *          The builder has room for the arithmetic underneath.
+ * reading  what readBuild returned, or null when no front is chosen.
+ * Each note shows its rule's name with the full sentence on hover, and
+ * how the two badges work is on About (dilas-writing.md, "Layers").
  */
-export function LoadoutReading({ reading, compact }) {
+export function LoadoutReading({ reading }) {
   if (!reading || reading.score === null) return null;
 
   const moved = TIER_RANK[reading.tier] - TIER_RANK[reading.partsTier];
@@ -2176,17 +2167,11 @@ export function LoadoutReading({ reading, compact }) {
       <div className="flex items-start gap-4">
         <ReadingBadge label="Gear" tier={reading.partsTier} quiet={Boolean(moved)} />
         <ReadingBadge label="Build" tier={reading.tier} delta={moved} />
-        <p className="flex-1 pt-3 text-[10px] leading-relaxed text-base-500">
-          {reading.adjust === 0
-            /* Agreeing is a real answer, the same call the second tier
-               column makes. An empty box would read as a rendering fault.
-               It keys on the points rather than on the badge: a build can
-               gain eight without crossing a band, and saying nothing
-               changed directly above a green +8 is the tool contradicting
-               itself in two lines. */
-            ? "Nothing about how this fits together changes what the gear is worth."
-            : explainScore(reading)}
-        </p>
+        {/* Agreeing is a real answer, so it is said rather than left blank.
+            It keys on the points rather than on the badge: a build can gain
+            eight without crossing a band, and "fits together fine" above a
+            green +8 would be the tool contradicting itself. */}
+        <p className="flex-1 pt-3 text-[10px] leading-relaxed text-base-500">{explainScore(reading)}</p>
       </div>
 
       {reading.notes.length ? (
@@ -2199,20 +2184,11 @@ export function LoadoutReading({ reading, compact }) {
                     : NOTE_TONE[n.severity] || NOTE_TONE.grey)}>
                 {n.delta > 0 ? "+" : ""}{Math.round(n.delta)}
               </span>
-              <span className="text-base-300">{n.say}</span>
+              <Tip text={n.say} className="text-base-300"><span className={HAS_TIP}>{n.name}</span></Tip>
             </div>
           ))}
         </div>
       ) : null}
-
-      {compact ? null : (
-        <p className="mt-2 text-[10px] leading-relaxed text-base-600">
-          Ours, and there is no community vote on a loadout to set it against. The left badge is what these nine items
-          are worth where you are dropping, each scored by the same rules the tier list shows. The right one is what
-          they are worth together. Roughly 14 points is one tier, and nothing about the combination can move it by more
-          than two.
-        </p>
-      )}
     </div>
   );
 }

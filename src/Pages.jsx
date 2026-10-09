@@ -109,15 +109,22 @@ function HowItWorks() {
     <Panel title="How the rating works">
       <Part id="columns" title="The two columns">
         <p>
-          Left: the u.gg community vote for that front. Right: our rating for where you are dropping. It starts from
-          the vote and moves by the rules on the Rules page.
+          Left: the community tier, the u.gg vote for that front. Right: the {BRAND.short} tier for where you are
+          dropping. It starts from the community tier and changes by the rules on the Rules page.
         </p>
       </Part>
       <Part id="points" title="Points">
         <p>
-          About 14 points make a tier. A scenario moves a rating two tiers at most. On the hardest drops for one or
-          two players, that limit grows a little.
+          About 14 points make a tier. A scenario changes a rating by 2 tiers at most. On the hardest drops for 1
+          or 2 players, that limit grows a little.
         </p>
+      </Part>
+      <Part id="build" title="Gear and Build">
+        <p>
+          Gear: the average {BRAND.short} tier of a build's items, for where you are dropping. Build: the same, plus
+          or minus how well the items fit together. Fitting together changes a build by 2 tiers at most.
+        </p>
+        <p className="text-base-500">Nobody votes on builds, so a build has no community tier.</p>
       </Part>
       <Part id="peril" title="Peril">
         <p className="text-base-500">Coming soon: how difficulty and squad size combine into one number.</p>
@@ -128,8 +135,14 @@ function HowItWorks() {
           <li>AP above armour: full damage. AP equal to armour: 65%. AP below: no damage.</li>
           <li>Counted: the enemies a front always has at your difficulty. Event-only strains and brigades are left out.</li>
           <li>Some weak points only open up after armour breaks, like a Charger's legs. The count treats them as always open.</li>
-          <li>Armour does not change an item's rating. The build reading checks it across the whole loadout.</li>
+          <li>Armour does not change an item's tier. It counts toward the Build badge, which checks the whole loadout.</li>
         </ul>
+      </Part>
+      <Part id="ground" title="Ground and megacities">
+        <p>
+          Footing, slopes and driving per biome are our own reading. A planet with a megacity may not put your
+          mission inside it, so megacity rules count half.
+        </p>
       </Part>
       <Part id="missing" title="Missing data">
         <p>Fields marked Missing data have no source yet.</p>
@@ -232,8 +245,8 @@ export function About({ section = null }) {
 
       <Panel title="Role tags are ours">
         <p>
-          Anti-armor, chaff clear and objective are our own judgment, not a community vote. Everything else on a row
-          is sourced; those three are us. Expanded rows say so next to the claim.
+          Anti-armour, crowd clear and objective are our own judgement. Everything else on a row comes from a
+          source.
         </p>
       </Panel>
 

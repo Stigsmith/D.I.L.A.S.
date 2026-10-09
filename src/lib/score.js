@@ -461,7 +461,7 @@ export function scoreItem(item, scenario = {}) {
     const direction = rule.scaleBy ? rule.scaleBy.times : rule.delta;
     const inverted = rule.sayInverted && direction && delta * direction < 0;
     const say = inverted ? rule.sayInverted : rule.say;
-    reasons.push({ id: rule.id, say, delta });
+    reasons.push({ id: rule.id, name: rule.name, say, delta });
   }
 
   reasons.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
