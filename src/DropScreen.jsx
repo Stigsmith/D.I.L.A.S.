@@ -105,8 +105,8 @@ function Brief({ scenario, onMap, hostPicks }) {
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-dashed border-base-700 px-4 py-3 text-xs text-base-500">
         <span className="flex-1">
           {hostPicks
-            ? "No mission and no planet yet. The host sets those, and this says what they will ask of you once they do."
-            : "No mission and no planet yet. Choose them and this says what the mission asks for and what the planet does to you."}
+            ? "No mission or planet yet. The host chooses them."
+            : "No mission or planet yet."}
         </span>
         {onMap ? <SlotButton onClick={onMap} Icon={MapPin}>Choose in the war room</SlotButton> : null}
       </div>
@@ -117,10 +117,10 @@ function Brief({ scenario, onMap, hostPicks }) {
     return (
       <p className="rounded-lg border border-base-800 bg-base-900/40 px-4 py-2.5 text-xs text-base-500">
         {mission && place
-          ? "Nothing about this mission or this planet changes what you should bring."
+          ? "Nothing special to bring for this mission or planet."
           : mission
-            ? "Nothing about this mission changes what you should bring, and no planet is chosen."
-            : "Nothing permanent on this planet changes what you should bring, and no mission is chosen."}
+            ? "Nothing special to bring for this mission. No planet chosen."
+            : "Nothing special to bring for this planet. No mission chosen."}
       </p>
     );
   }
@@ -134,11 +134,11 @@ function Brief({ scenario, onMap, hostPicks }) {
     <div className="grid grid-cols-1 gap-x-6 gap-y-1.5 rounded-lg border border-base-800 bg-base-900/60 px-4 py-3 md:grid-cols-2">
       <div className="flex flex-col gap-1.5">
         {lines.length ? lines.map((t) => say(t.name, t.name, t.line))
-          : <p className="text-xs text-base-500">{mission ? "Nothing about this mission changes what you should bring." : "No mission chosen, so nothing here is keyed to one."}</p>}
+          : <p className="text-xs text-base-500">{mission ? "Nothing special to bring for this mission." : "No mission chosen."}</p>}
       </div>
       <div className="flex flex-col gap-1.5">
         {hazards.length ? hazards.map((h) => say(h, hazardName(h), hazardEffect(h)))
-          : <p className="text-xs text-base-500">{place ? "Nothing permanent on this planet changes what you should bring." : "No planet chosen."}</p>}
+          : <p className="text-xs text-base-500">{place ? "Nothing special to bring for this planet." : "No planet chosen."}</p>}
       </div>
     </div>
   );
@@ -152,7 +152,7 @@ function Brief({ scenario, onMap, hostPicks }) {
    about what they own. One empty set, rather than a new one per render. */
 const NO_LOCKS = new Set();
 
-const GEAR_ROWS = [["Primary", "primary"], ["Secondary", "secondary"], ["Grenade", "grenade"], ["Armor", "armor"], ["Booster", "booster"]];
+const GEAR_ROWS = [["Primary", "primary"], ["Secondary", "secondary"], ["Grenade", "grenade"], ["Armour", "armor"], ["Booster", "booster"]];
 
 function Status({ state }) {
   if (state === "confirmed") {
@@ -196,8 +196,8 @@ function EmptySlot({ onChoose, onStart }) {
         <p className="text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>You</p>
         <p className="mx-auto mt-1 max-w-[16rem] text-xs leading-relaxed text-base-500">
           {onStart
-            ? "You have no builds yet. Start one here: pick a primary, and the list is already ranked for this drop."
-            : "Choose what you are dropping with, then confirm it."}
+            ? "No builds yet. Start with a primary."
+            : "Choose a loadout, then press Drop."}
         </p>
       </div>
       <div className="flex flex-wrap justify-center gap-1.5">
@@ -222,7 +222,7 @@ function EmptySlot({ onChoose, onStart }) {
 function usageLine(usage) {
   if (!usage || !usage.count) return null;
   const when = agoText(Date.now() - Date.parse(usage.last));
-  return `Dropped with ${usage.count === 1 ? "once" : `${usage.count} times`}, last ${when}`;
+  return `Dropped ${usage.count === 1 ? "once" : `${usage.count} times`}, last ${when}`;
 }
 
 /* Why nothing was suggested, from what the gates took out. */
@@ -234,7 +234,7 @@ function nothingFits(cut) {
     c.biome ? `${c.biome} built for other terrain` : null,
     c.locked ? `${c.locked} need${c.locked === 1 ? "s" : ""} gear you have not unlocked` : null,
   ].filter(Boolean);
-  return bits.length ? `Ruled out for this drop: ${bits.join(", ")}.` : "Nothing is built for this front yet.";
+  return bits.length ? `Ruled out: ${bits.join(", ")}.` : "Nothing is built for this front yet.";
 }
 
 /* How long since, the way a person says it, for "for a change". */
@@ -295,7 +295,7 @@ function Suggestions({ picks, fromPresets, current, onTake, cut, onStart, change
         <Sparkles className="h-4 w-4 shrink-0 text-base-600" />
         <div className="min-w-[14rem] flex-1">
           <p className="text-xs text-base-300">Nothing to suggest for this drop.</p>
-          <p className="mt-0.5 text-[11px] leading-relaxed text-base-500">{nothingFits(cut)} The picker can still show them.</p>
+          <p className="mt-0.5 text-[11px] leading-relaxed text-base-500">{nothingFits(cut)}</p>
         </div>
         <SlotButton onClick={onStart} Icon={Plus} primary>Start a build for this drop</SlotButton>
       </div>
@@ -308,8 +308,8 @@ function Suggestions({ picks, fromPresets, current, onTake, cut, onStart, change
       </p>
       <p className="mb-3 text-[11px] text-base-500">
         {fromPresets
-          ? "From the curated presets, until you have builds of your own that fit. Ranked by what each is worth here."
-          : "From your builds, ranked by what each is worth here. Everything that fits is in the picker too."}
+          ? "Curated presets, until you have builds of your own that fit."
+          : "Your best builds for this drop."}
       </p>
       <div className={"grid grid-cols-1 gap-2 " + (change ? "md:grid-cols-2 xl:grid-cols-4" : "md:grid-cols-3")}>
         {picks.map(({ build, reading, usage }) => (
@@ -326,7 +326,7 @@ function Suggestions({ picks, fromPresets, current, onTake, cut, onStart, change
           you have never brought against this front. */}
       {untried && untried.length ? (
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-base-800 pt-3">
-          <span className="text-[11px] text-base-400">Never brought against {frontLabel}, and good here:</span>
+          <span className="text-[11px] text-base-400">Good here, and never brought against {frontLabel}:</span>
           {untried.map(({ item, read }) => (
             <span key={item.id} className="flex items-center gap-1.5 rounded border border-base-700 bg-base-900 py-1 pl-1.5 pr-1">
               <TierBadge tier={read.tier} className="h-auto w-5" />
@@ -349,7 +349,7 @@ function Suggestions({ picks, fromPresets, current, onTake, cut, onStart, change
    the loud one, since a hot planet ruling out a heat build is a locked
    decision rather than a nudge. */
 const GATE_NOTE = {
-  heat: { tone: "amber", text: "Vents heat, and this planet is hot. The picker would not offer it for this drop." },
+  heat: { tone: "amber", text: "Vents heat on a hot planet. Not offered for this drop." },
   band: { tone: "grey", text: "Built for a different difficulty than this drop." },
   biome: { tone: "grey", text: "Built for different terrain than this planet." },
 };
@@ -377,8 +377,8 @@ function FilledSlot({ label, build, state, scenario, lockedSet, actions, source 
           <div className="flex items-center gap-2 text-[11px] text-base-500">
             <TierBadge tier={reading.tier} className="h-auto w-7" />
             <span>
-              as a build for this drop
-              {reading.tier !== reading.partsTier ? <>, from gear worth {reading.partsTier}</> : null}
+              for this drop
+              {reading.tier !== reading.partsTier ? <> · gear {reading.partsTier}</> : null}
             </span>
           </div>
         ) : null}
@@ -496,8 +496,8 @@ function PartyLine({ party, sync, onOpen }) {
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-base-700 bg-base-900/70 px-4 py-2.5">
       <Radio className={"h-4 w-4 shrink-0 " + (party.status === "live" ? "text-emerald-400" : "text-accent-400")} />
       <span className="min-w-[12rem] flex-1 text-xs text-base-400">
-        Party <span className="tracking-widest text-base-100" style={MONO}>{party.code}</span>. The slots below are its members
-        {party.isHost ? ", and the scenario is yours to set." : party.host ? `, following ${party.host.name}'s scenario.` : "."}
+        Party <span className="tracking-widest text-base-100" style={MONO}>{party.code}</span>.
+        {party.isHost ? " You set the scenario." : party.host ? ` Following ${party.host.name}'s scenario.` : ""}
       </span>
       {sync.drifted ? (
         <button onClick={sync.follow} className="text-[11px] text-accent-400 underline hover:text-accent-300">Follow the party</button>
@@ -610,10 +610,10 @@ function BuildPicker({ title, everything, scenario, state, current, onPick, onCl
             <p className="text-sm text-base-400">Nothing fits this drop.</p>
             <p className="mt-1 text-xs text-base-600">
               {query
-                ? "Nothing matches that search. Clear it to see everything that fits."
+                ? "Nothing matches that search."
                 : cut.locked > 0 && !showLocked
-                  ? "Everything that fits needs gear you have not unlocked. Show those builds, or open Collection to fix what you own."
-                  : "No build for this front survives the scenario. Start one for it, or loosen the scenario above."}
+                  ? "Everything that fits needs gear you have not unlocked. Show those builds, or update Collection."
+                  : "No build fits this scenario. Start one, or change the scenario."}
             </p>
             {!query ? (
               <button onClick={onNew}
@@ -650,7 +650,7 @@ function BuildPicker({ title, everything, scenario, state, current, onPick, onCl
                   ) : null}
                   {cold && l.heat ? (
                     <span className="flex shrink-0 items-center gap-1 text-[10px] text-sky-400">
-                      <Snowflake className="h-3 w-3" /> runs longer here
+                      <Snowflake className="h-3 w-3" /> fires longer in the cold
                     </span>
                   ) : null}
                 </button>
@@ -687,10 +687,10 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted }) {
     body = (
       <p className="text-xs text-base-500">
         {waitingOnYou
-          ? "Confirm your loadout and this starts reading the squad. It only counts what somebody has committed to, so a half picked kit never sets off a false alarm."
+          ? "Drop your loadout to start the squad check. Only dropped loadouts count."
           : size === 1
-            ? "One loadout is a loadout, not a squad. This starts reading the squad once somebody else confirms."
-            : "Nobody has confirmed anything yet. It fills in as each of you confirms."}
+            ? "The squad check starts once a second player drops."
+            : "Nobody has dropped yet."}
       </p>
     );
   } else if (coverageIsQuiet(context.level, size) ?? isQuietBand(context.difficulty)) {
@@ -698,22 +698,24 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted }) {
        not the same as the squad being fine. */
     body = (
       <p className="text-xs text-base-500">
-        Coverage checks are off for a drop this easy. Everything behind them assumes real pressure, and under it the
-        gaps stop mattering.{warnings.length ? " What is left below is about overlap, which matters at any level." : ""}
+        Coverage checks are off at this peril.{warnings.length ? " The notes below apply at any level." : ""}
       </p>
     );
   } else if (warnings.length === 0) {
-    body = <p className="text-xs text-base-500">Nothing worth flagging. Anti-tank and hole closing are covered for this drop.</p>;
+    body = <p className="text-xs text-base-500">Nothing to flag. Anti-tank and hole closing are covered.</p>;
   }
 
   return (
     <div className="rounded-lg border border-base-700 bg-base-900/95 p-4">
       <p className="mb-3 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-base-400" style={OSWALD}>
-        <Users className="h-3.5 w-3.5" /> {size < 2 ? "The squad" : `Squad of ${size}`}
+        <Users className="h-3.5 w-3.5" />
+        <Tip text="Advice only. It counts dropped loadouts, the same on every screen in the party.">
+          <span className={HAS_TIP}>{size < 2 ? "The squad" : `Squad of ${size}`}</span>
+        </Tip>
       </p>
       {body}
       {size >= 2 && mineUncounted ? (
-        <p className="mt-2 text-xs text-base-500">Yours is not in this yet. It counts once you confirm it.</p>
+        <p className="mt-2 text-xs text-base-500">Yours counts once you press Drop.</p>
       ) : null}
       {size >= 2 && warnings.length ? (
         <div className={"flex flex-col gap-1.5 " + (body ? "mt-2" : "")}>
@@ -728,10 +730,6 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted }) {
           })}
         </div>
       ) : null}
-      <p className="mt-3 text-[10px] leading-relaxed text-base-600">
-        Advisory only. Counts confirmed loadouts only, the same on every screen in the party. Role tags are our own
-        call, not a community vote.
-      </p>
     </div>
   );
 }
@@ -913,8 +911,7 @@ export default function DropScreen({ state, navigate, scenario, drop, update, pa
       {[mine, ...(inParty ? others.map((m) => m.build) : [])].some(offFront) ? (
         <p className="flex items-start gap-1.5 text-[11px] text-base-500">
           <Info className="mt-px h-3.5 w-3.5 shrink-0" />
-          A build here was made for another front. It still counts, because it is what that person is bringing, but its
-          reading is against this one.
+          A build here was made for another front. It still counts, rated against this one.
         </p>
       ) : null}
 

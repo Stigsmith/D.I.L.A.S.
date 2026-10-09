@@ -5,39 +5,39 @@
   "traits": {
     "standard": {
       "name": "Standard operation",
-      "line": "A full length mission with a main objective and whatever else you find on the way. Nothing here pushes your loadout in a particular direction, so bring what the front and the planet ask for."
+      "line": "A full length mission with a main objective. No special loadout needs: bring what the front and planet call for."
     },
     "nest": {
       "name": "Structure demolition",
-      "line": "The objective is a building or a hole and it has to come down. Anything that closes one from your own kit saves you a call-in, and you will need several of them."
+      "line": "Destroy structures: bug holes, fabricators or buildings. Anything in your kit that closes them saves stratagems."
     },
     "blitz": {
       "name": "Blitz",
-      "line": "Destroy every nest or fabricator on the map before the clock runs out. Speed beats staying power: you want things that flatten a structure the moment you arrive, not things that win a long fight."
+      "line": "Destroy every nest or fabricator before the clock runs out. Bring gear that destroys structures fast."
     },
     "wave": {
       "name": "Eradicate",
-      "line": "One small arena, a kill count, and no room to run. Sustained crowd clear and things you can plant and leave earn their slot here more than anywhere else."
+      "line": "Hold one small area until the kill count is met. Bring crowd clear, sentries and emplacements."
     },
     "defend": {
       "name": "Hold the line",
-      "line": "You are standing on ground you cannot give up while it is attacked. Sentries, mines and emplacements finally get to sit still long enough to pay for themselves."
+      "line": "Defend one position against waves. Sentries, mines and emplacements work well here."
     },
     "evacuate": {
       "name": "Escort",
-      "line": "Civilians have to cross open ground and they will walk into anything in the way. Smoke breaks the line of sight along their route, and area denial keeps the pressure off the path rather than off you."
+      "line": "Escort civilians across open ground. Smoke blocks line of sight along their route, and area denial keeps enemies off it."
     },
     "carry": {
       "name": "Carry",
-      "line": "You pick something up and walk it across the map. It occupies a hand, so a one handed weapon lets you shoot while carrying and everything else means putting the objective down first."
+      "line": "Carry an objective across the map. It takes a hand, so only one handed weapons can fire while you carry it."
     },
     "hvt": {
       "name": "High value target",
-      "line": "A set number of named heavies and nothing else counts. Anti-tank is the whole loadout question; chaff clear is only there so you can reach them."
+      "line": "Kill a set number of named heavy enemies. Bring anti-tank, plus enough crowd clear to reach them."
     },
     "commando": {
       "name": "Commando",
-      "line": "Behind enemy lines with almost no Super Destroyer. You get one minute to call stratagems when you land and one return per Helldiver after that, and zero reinforcements until you find the pods: twelve in all, however many of you there are. Bring what lasts, and stay quiet, because every bot that calls for help makes the whole map worse."
+      "line": "Stratagems work for 1 minute after landing and once more per Helldiver. No reinforcements until you find the pods, 12 in all. Stay quiet: each bot that calls for help raises the threat level."
     }
   },
   "missions": [
