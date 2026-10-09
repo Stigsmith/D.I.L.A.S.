@@ -25,7 +25,7 @@ import {
   FACTIONS, FACTION_THEME, BIOMES, MISSION_TYPES, DIFFICULTIES, CAT_META, STRAT_GROUP, FactionBar, LoadoutReading,
 } from "./Tiers.jsx";
 import { CATEGORIES, getItem, itemName, judgedTier, TIER_RANK, averageRank, rank, eatsBackpack } from "./lib/items.js";
-import { readBuild } from "./lib/build.js";
+import { readBuild, gapsIn, closedGaps } from "./lib/build.js";
 import { scoreItem } from "./lib/score.js";
 import {
   presets, SLOTS, STRAT_SLOTS, emptyLoadout, forkPreset,
@@ -57,7 +57,7 @@ function rankedFor(factionMeta, scenario) {
 /* Picker overlay                                                      */
 /* ------------------------------------------------------------------ */
 
-function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario, takenBackpack, taken = [], lockedSet, favoriteItems, onPick, onPickSet, onClear, onClose }) {
+function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario, takenBackpack, taken = [], closes = null, lockedSet, favoriteItems, onPick, onPickSet, onClear, onClose }) {
   const [query, setQuery] = useState("");
   /* Armour only: which weight of set to show. A passive with no set at
      that weight drops out of the list while the filter is on. */
@@ -208,9 +208,11 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
               /* Warn before the pick, not after. Choosing this would be */
               /* the second thing wanting your back.                     */
               const clash = takenBackpack && (it.stratType === "backpack" || it.usesBackpackSlot === true);
+              /* Which of the build's holes this one fills, by rule name. */
+              const fills = closes ? closes.get(it.id) : null;
               return (
                 <div key={it.id} className="relative">
-                  {best || clash ? (
+                  {best || clash || fills ? (
                     <div className="mb-0.5 flex items-center gap-2 pl-1 text-[10px]">
                       {best ? (
                         <span className="font-semibold uppercase tracking-wider" style={{ color: factionMeta.hex }}>
@@ -220,6 +222,11 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
                       {clash ? (
                         <span className="flex items-center gap-1 text-accent-400">
                           <Backpack className="h-3 w-3" /> clashes with {takenBackpack.name}
+                        </span>
+                      ) : null}
+                      {fills ? (
+                        <span className="font-semibold text-emerald-400">
+                          Closes: {fills.join(", ")}
                         </span>
                       ) : null}
                     </div>
@@ -406,6 +413,14 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
     else if (loadoutId) { setDraft(emptyLoadout(faction || undefined)); setDirty(false); }
   }, [loadoutId]);
 
+  /* Saved builds are read from storage just after the first render, so a */
+  /* reload or a direct link to one found nothing above and opened an     */
+  /* empty build. When it arrives, take it, unless you already started    */
+  /* editing whatever was showing.                                        */
+  useEffect(() => {
+    if (stored && draft.id !== stored.id && !dirty) setDraft(stored);
+  }, [stored]);
+
   const patch = useCallback((changes) => {
     setDraft((d) => ({ ...d, ...changes }));
     setDirty(true);
@@ -419,6 +434,33 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
     () => (draft.faction ? readBuild(draft, { ...scenario, faction: draft.faction }) : null),
     [draft, scenario]
   );
+
+  /* The picker tries each candidate in the open slot and reads the build
+     again, so a candidate that answers one of its red or amber notes can
+     say so. Only while the build has a hole to close. */
+  const closing = useMemo(() => {
+    if (!picking || !reading || !gapsIn(reading).length) return null;
+    const category = CATEGORIES.find((c) => c.slot === picking.slot);
+    if (!category) return null;
+    const at = { ...scenario, faction: draft.faction };
+    const out = new Map();
+    for (const it of category.items) {
+      let trial;
+      if (picking.stratSlot != null) {
+        const strats = [...draft.strats];
+        strats[picking.stratSlot] = it.id;
+        trial = { ...draft, strats };
+      } else if (picking.key === "armor") {
+        const worn = getArmorSet(draft.armorSet);
+        trial = { ...draft, armor: it.id, armorSet: worn && worn.passive === it.id ? worn.id : null };
+      } else {
+        trial = { ...draft, [picking.key]: it.id };
+      }
+      const names = closedGaps(reading, readBuild(trial, at));
+      if (names.length) out.set(it.id, names);
+    }
+    return out;
+  }, [picking, reading, draft, scenario]);
 
   const heat = deriveHeat(draft);
   const heatFrom = heatSources(draft);
@@ -531,6 +573,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
           currentSet={picking.key === "armor" ? draft.armorSet : null}
           faction={draft.faction}
           scenario={withBuild(picking.key, picking.stratSlot)}
+          closes={closing}
           takenBackpack={
             picking.stratSlot == null
               ? null

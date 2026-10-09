@@ -113,6 +113,12 @@
       "label": "Suppressed",
       "source": "wiki",
       "note": "Sourced, not judged. The wiki puts Suppressed in each weapon's infobox and gives the audible range as 12 metres against 100 for everything else. It is curated here rather than fetched because fetch-wiki.mjs reads modules and enemy anatomy tables, not weapon article infoboxes. Move it into the fetch when that changes."
+    },
+    {
+      "id": "close-blast",
+      "label": "Close blast",
+      "source": "curator",
+      "note": "Ours, not a sourced field. Weapons whose own explosion reaches you when you fire them at an enemy close to you. The wiki gives blast damage but no blast radius, so nothing published draws this line. Read by the explosive resistance pairings."
     }
   ],
   "loadoutSlots": [

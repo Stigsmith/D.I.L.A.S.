@@ -1175,6 +1175,39 @@
       "judgement": "Ours. This is what puts the Railgun and the Speargun on the list: their reloads are short, and they do one after every shot. Fires only inside a build."
     },
     {
+      "id": "true-grit-big-belt",
+      "name": "True Grit on a big belt with a long reload",
+      "when": {},
+      "match": {
+        "stratType": "support",
+        "notGameTags": [
+          "HEAT"
+        ],
+        "number": [
+          {
+            "path": "wiki.reload.seconds",
+            "gte": 3.5
+          },
+          {
+            "path": "wiki.ammo.magazine",
+            "gt": 120
+          }
+        ],
+        "alongside": {
+          "number": [
+            {
+              "path": "passive.supportReload",
+              "gte": 1
+            }
+          ]
+        }
+      },
+      "delta": 2,
+      "say": "This reloads rarely, but when it does it takes three and a half seconds or more, usually at the worst moment. True Grit takes 30% off that one long reload.",
+      "source": "Reload times and magazine sizes from each weapon's wiki infobox. True Grit: +30% support weapon reload speed",
+      "judgement": "Ours, and the curator's correction of 9 October 2026: a big belt reloads rarely, which is why this is a third of the long reload rule, not nothing. Stacks with the stationary rule, which is what puts the Machine Gun above the Stalwart. Fires only inside a build."
+    },
+    {
       "id": "true-grit-earns-its-keep",
       "name": "True Grit with a support weapon worth reloading faster",
       "when": {},
@@ -1220,6 +1253,22 @@
                 {
                   "path": "wiki.reload.seconds",
                   "gte": 0.5
+                }
+              ]
+            },
+            {
+              "stratType": "support",
+              "notGameTags": [
+                "HEAT"
+              ],
+              "number": [
+                {
+                  "path": "wiki.reload.seconds",
+                  "gte": 3.5
+                },
+                {
+                  "path": "wiki.ammo.magazine",
+                  "gt": 120
                 }
               ]
             }
@@ -1961,13 +2010,8 @@
           }
         ],
         "alongside": {
-          "idIn": [
-            "gl-21-grenade-launcher",
-            "r-36-eruptor",
-            "gp-20-ultimatum",
-            "gp-31-grenade-pistol",
-            "cb-9-explosive-crossbow",
-            "gl-28-belt-fed-grenade-launcher"
+          "tags": [
+            "close-blast"
           ]
         }
       },
@@ -1979,20 +2023,15 @@
       },
       "say": "You are bringing something that goes off close to you. A Helldiver already takes half of explosion damage, and this armour halves what is left.",
       "source": "helldivers.wiki.gg: Helldivers take 50% of explosion damage. The passive's own effect, read as a number",
-      "judgement": "Named by hand: nothing published marks a weapon as one you set off close. The curator agreed the pairing, 4 October 2026. Fires only inside a build."
+      "judgement": "Ours: the close-blast tag is named by hand, since nothing published marks a weapon as one you set off close. The curator agreed the pairing, 4 October 2026. Fires only inside a build."
     },
     {
       "id": "close-blasts-with-explosive-resist",
       "name": "Close blasts with explosion resistant armour",
       "when": {},
       "match": {
-        "idIn": [
-          "gl-21-grenade-launcher",
-          "r-36-eruptor",
-          "gp-20-ultimatum",
-          "gp-31-grenade-pistol",
-          "cb-9-explosive-crossbow",
-          "gl-28-belt-fed-grenade-launcher"
+        "tags": [
+          "close-blast"
         ],
         "alongside": {
           "number": [
@@ -2011,7 +2050,7 @@
       },
       "say": "Your armour takes most of the sting out of your own blast, so you can use this closer than you otherwise would dare.",
       "source": "helldivers.wiki.gg: Helldivers take 50% of explosion damage",
-      "judgement": "Named by hand, as its mirror. Fires only inside a build."
+      "judgement": "Ours, through the close-blast tag, as its mirror. Fires only inside a build."
     },
     {
       "id": "faster-primary-reload-with-hungry-primary",
@@ -2042,6 +2081,18 @@
               "category": [
                 "Shotgun"
               ]
+            },
+            {
+              "number": [
+                {
+                  "path": "wiki.ammo.magazine",
+                  "lte": 6
+                },
+                {
+                  "path": "wiki.reload.seconds",
+                  "gte": 3
+                }
+              ]
             }
           ]
         }
@@ -2049,7 +2100,7 @@
       "delta": 8,
       "say": "Your primary spends a long time reloading, or reloads a shell at a time, and this armour gets it done sooner.",
       "source": "The passive's own effect. Reload times from each weapon's wiki infobox",
-      "judgement": "The curator's pairing, 4 October 2026, with the Eruptor and the shotguns as his examples. Long means 3.6 seconds or more, a round by round reload, or a shotgun. Fires only inside a build."
+      "judgement": "The curator's pairing, 4 October 2026, with the Eruptor and the shotguns as his examples. Long means 3.6 seconds or more, a round by round reload, a shotgun, or since 9 October 2026 a magazine of six or fewer with a reload of three seconds or more, which brings in the Explosive Crossbow. Fires only inside a build."
     },
     {
       "id": "hungry-primary-with-faster-reload",
@@ -2072,6 +2123,18 @@
           {
             "category": [
               "Shotgun"
+            ]
+          },
+          {
+            "number": [
+              {
+                "path": "wiki.ammo.magazine",
+                "lte": 6
+              },
+              {
+                "path": "wiki.reload.seconds",
+                "gte": 3
+              }
             ]
           }
         ],

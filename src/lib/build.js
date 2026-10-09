@@ -332,6 +332,19 @@ export function readBuild(loadout, scenario = {}) {
 /* claim that the kit is complete.                                       */
 export const gapsIn = (reading) => reading.notes.filter((n) => n.severity === "red" || n.severity === "amber");
 
+/* What a change closes: the red and amber notes in one reading that are */
+/* gone from the next, by rule name. The builder's picker tries each     */
+/* candidate in the build and says "Closes: No crowd clear" beside it,   */
+/* the curator's ask of 9 October 2026: a build anchored on an Eruptor   */
+/* should be told which support weapon answers the crowd. It marks, it   */
+/* never reorders: the ranking stays our reading for the drop.           */
+export function closedGaps(before, after) {
+  const still = new Set(after.notes.map((n) => n.id));
+  return gapsIn(before)
+    .filter((n) => !still.has(n.id))
+    .map((n) => (RULES.rules.find((r) => r.id === n.id) || {}).name || n.id);
+}
+
 /* Ranking a grid. The score is the answer where there is one; a build   */
 /* nobody has rated a single slot of sorts last rather than first, the   */
 /* same place an unrated item sorts on a tier list.                      */

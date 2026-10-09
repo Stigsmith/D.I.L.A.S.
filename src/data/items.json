@@ -91,7 +91,9 @@
         "patch": "7.1.1"
       }
     },
-    "tags": [],
+    "tags": [
+      "close-blast"
+    ],
     "roles": [
       "objective"
     ],
@@ -142,7 +144,9 @@
         "patch": "7.1.1"
       }
     },
-    "tags": [],
+    "tags": [
+      "close-blast"
+    ],
     "roles": [],
     "traits": [],
     "flag": null,
@@ -191,7 +195,9 @@
         "patch": "7.1.1"
       }
     },
-    "tags": [],
+    "tags": [
+      "close-blast"
+    ],
     "roles": [],
     "traits": [],
     "flag": null,
@@ -2672,7 +2678,9 @@
         "patch": "7.1.0"
       }
     },
-    "tags": [],
+    "tags": [
+      "close-blast"
+    ],
     "roles": [
       "anti-armor",
       "objective"
@@ -2724,7 +2732,9 @@
         "patch": "7.1.0"
       }
     },
-    "tags": [],
+    "tags": [
+      "close-blast"
+    ],
     "roles": [
       "objective"
     ],
@@ -4170,7 +4180,9 @@
         "patch": "7.0.2"
       }
     },
-    "tags": [],
+    "tags": [
+      "close-blast"
+    ],
     "roles": [
       "chaff",
       "objective"
@@ -4995,7 +5007,9 @@
         "patch": "7.0.2"
       }
     },
-    "tags": [],
+    "tags": [
+      "close-blast"
+    ],
     "roles": [
       "objective"
     ],
