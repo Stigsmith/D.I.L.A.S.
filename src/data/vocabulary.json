@@ -111,8 +111,8 @@
     {
       "id": "suppressed",
       "label": "Suppressed",
-      "source": "wiki",
-      "note": "Sourced, not judged. The wiki puts Suppressed in each weapon's infobox and gives the audible range as 12 metres against 100 for everything else. It is curated here rather than fetched because fetch-wiki.mjs reads modules and enemy anatomy tables, not weapon article infoboxes. Move it into the fetch when that changes."
+      "source": "game",
+      "note": "Sourced, not judged. The game's own weapon data carries an is_suppressed flag, read by npm run game into game-stats.json, and the validator checks this tag against it for every weapon the game file covers. One exception, kept by hand: the P-35 Re-Educator, which the game gives no noise at all rather than flagging as suppressed. The wiki gives the audible range as 12 metres against 100 for everything else."
     },
     {
       "id": "close-blast",

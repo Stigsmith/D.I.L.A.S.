@@ -129,10 +129,10 @@ Data authority lives outside this repo, in the Helldivers 2 project files: `hell
 >
 > `notIdIn` was added alongside, symmetric with `notTags`, so a rule can say "everything except these". It is what lets the loud half of a list fall at the same moment the quiet half rises.
 
-> [!warning] Suppressed is the one trait read from a wiki article rather than a module
-> Five weapons carry it: the R-72 Censor, AR-59 Suppressor, P-35 Re-Educator, M6C-SOCOM and M7S SMG. **It is sourced, not judged**: the wiki puts Suppressed in each weapon's infobox and states the audible range as 12 metres against 100 for everything else.
+> [!success] Suppressed is read from the game's own flag since 1.33.0
+> Five weapons carry the tag: the R-72 Censor, AR-59 Suppressor, P-35 Re-Educator, M6C-SOCOM and M7S SMG. The tag stays on the items because the rules read it, but **its source is the game**: `npm run game` reads each weapon's `is_suppressed`, and `npm run validate` fails if the tag and the game disagree.
 >
-> It lives as a list of ids inside the rule because `fetch-wiki.mjs` reads modules and enemy anatomy tables, not weapon article infoboxes. **Move it into the fetch when that changes**, the same way enemy armour moved out of a guess and into data.
+> **One exception, the curator's call of 10 October 2026: the Re-Educator stays suppressed.** The game gives it no noise template at all rather than the suppressed flag. `SUPPRESSED_BY_HAND` in `validate.mjs` holds it. See Reading The Game's Own Tables.
 
 > [!success] The scenario is a screen, and the bar is the only copy of it. 1.15.0
 > `#/scenario`, reachable from a one line bar in the sticky chrome and **deliberately absent from the sidebar**: it is a sub screen of the surfaces that read it, not a destination. `OFF_MENU` in `App.jsx` is what makes a route reachable without a menu entry.
@@ -390,6 +390,7 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 | `ownership.json` | What you own. Ships empty |
 | `ownership.template.json` | Every warbond listed as not owned, ready to fill in |
 | `wiki-stats.json` | **Generated.** The stats the tables never had, for 195 items, and since 4 October 2026 a reload time for 91 held weapons and the One Handed trait for 35, read from each weapon's own wiki infobox. Never edit by hand |
+| `game-stats.json` | **Generated** by `npm run game` from the game's own tables, for the 105 weapons in `scripts/data/game-ids.json`. Wiki field names, plus `noise` (0 suppressed to 4 huge), `suppressed` and `oneHanded`. Laid over `wiki-stats.json` field by field in `statsFor`. Never edit by hand. See Reading The Game's Own Tables |
 | `planets.json` | **Generated.** 281 planets: biome, hazards, sector, their cities by size, and for 274 of them a place on the galaxy map and the supply lines to their neighbours. Read by the scenario, the map and the drop planner |
 | `enemies.json` | **Generated.** 80 enemies, 594 body parts, each with an armor value, plus the difficulty each enemy starts appearing at. What every penetration figure is measured against. Never edit by hand |
 | `context-rules.json` | The 105 rules that move one item rating, each with a `name` for the Rules page. 42 of them read the build, pairings and armour weight, and fire only inside one. Read by `score.js`, checked by `npm run rules`, and the pairings by `npm run builds` |
@@ -454,6 +455,32 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 > `PATCH` in `src/lib/patch.js` holds the game version, its date, the ratings range and the read date. **The footer, About, Support and every expanded row read it**, so a restamp is one edit. It lived in `Pages.jsx` until 1.23.0 while the expanded row hardcoded its own "the game is on 7.0.0", and the two had already disagreed once. `Pages.jsx` re-exports it.
 
 ---
+
+# **Reading The Game's Own Tables**
+
+> [!success] Weapon numbers from the game itself. 1.33.0, 10 October 2026, the curator's ask
+> He wanted the tool to lean less on the wiki. `npm run game` reads the game's settings tables as **filediver** (github.com/xypwn/filediver, BSD-3) ships them, already decoded, inside its own source, and writes `src/data/game-stats.json` in the wiki's field names. `statsFor` in `src/lib/items.js` lays it over `wiki-stats.json` field by field, so every screen and rule picks it up with no change.
+
+> [!danger] Option B, and why: the tool never opens the game install
+> Three options were weighed with the curator on 9 October 2026. **A**, stay on the wiki. **B**, read filediver's published snapshot. **C**, run filediver over the install for icons and text. He chose B. The game's settings files on disk are encrypted; filediver's maintainers decrypt them from a memory dump of the running game, which is what anti-cheat bans for and what the game's licence forbids. **We never do that step, and never open the install.** Reading the open source output of a project that did is the same footing as reading the wiki, with better data. Images, names and descriptions live only in the install, so **all art still comes from the wiki and the curator's library.**
+
+| Part | Where |
+|---|---|
+| **The dump** | `tools/game-dump/main.go` and `dilas_resolve.go`. Copied into a filediver clone and built with Go. `dilas_resolve.go` applies a weapon's own adjustments and then **its default attachments**: the Liberator's base magazine is 30, its default extended magazine makes it 45 with 8 spares, which is what the armoury shows |
+| **The join** | `scripts/data/game-ids.json`: our id to the game's entity, in filediver's hash list names (`.../assault_rifle/assault_rifle` is the Liberator) or a raw hash. Seeded by matching every number the two sources share; most matches agree on 12 to 18 figures. Vehicles, exosuits and weak matches were left out |
+| **The fetch** | `scripts/fetch-game.mjs`. Report by default, `--write`, `--refresh` to pull filediver and rebuild. Clones into `.game-data/` (gitignored). Needs git and Go. **Refuses to write under 80% agreement with the wiki**, which is what a drifted decode looks like |
+| **Exceptions** | `GAME_EXCEPTIONS` in `items.js`: the Purifier keeps the wiki's damage (the game's default attack is the charged shot, 200), the Trident keeps the wiki's rate of fire (700 is the beam's tick rate) |
+
+> [!info] What the game file gives, and what stays with the wiki
+> **From the game, for 105 weapons:** damage, durable damage, AP, demolition, stagger, push, velocity, drag, calibre, pellets, magazine and spares, rate of fire, ergonomics, recoil climb, loudness, suppressed, one handed. 1,623 of 1,633 shared figures agreed with the wiki when it landed. **The game wins a disagreement**, the curator's call: the Belt-Fed fires 240 rather than 320, missiles have drag 0.3, the Guard Dog takes 6 from a resupply, and the SMG-37 Defender and Grenade Pistol are two handed.
+>
+> **Still the wiki:** reload times (the game drives them from animation data, not in these tables), heat, stratagem data, every grenade, eagle, orbital and mine (filediver's explosion table no longer decodes after a patch), lasers and arc weapons (the beam weapon table, same), melee figures (nothing to match them on), enemy armour (the hit zone table decodes misaligned), armour set stats, names and images. **Re-run `npm run game -- --refresh` after filediver fixes a table**, then add the newly covered items to the join.
+
+> [!info] Loudness is the game's noise template
+> 0 suppressed, 1 small, 2 medium, 3 large, 4 huge. A weapon whose sound is an explosion takes the size of the blast, our reading of the template's name. `NoiseTemplate_None` is unknown, not silent. A new template stops the fetch. **The loud weapon rule is a ladder on it since 1.33.0**, Automatons, 1 or 2 players, peril 28+: small -0.15, medium and unknown -0.25 (the old figure), large and huge -0.4. Measured against 1.32.0 over 31,122 tier rows in 42 scenarios: **52 moved**, all bots at 1 or 2 players. The Autocannon, Recoilless and Leveller go S+ to S solo on Helldive, the EATs, Airburst and Anti-Materiel Rifle a tier down solo on Super Helldive, seven quiet SMGs up a tier in sandstorms. Three or four players see no change. The number swap itself moved 84 rows, two items: the Belt-Fed A to B on bugs, and the Rocket Sentry S to S+ on bugs, because the game gave it damage figures and the durable damage rule now reaches it.
+
+> [!warning] `noNumber` is a matcher key since 1.33.0
+> "This item has no number at this path." The ladder's fallback uses it for weapons with no loudness class. The engine, the Rules page's words and the validator all know it.
 
 # **Refreshing The Ratings**
 
@@ -651,7 +678,7 @@ SQUAD_PRESSURE = [10, 4, 1, 0]
 > | | Fires from | At solo Super Helldive |
 > |---|---|---|
 > | Quiet weapons, stealth armour, storms | **peril 22**: solo on Suicide Mission, two of you on Impossible | about a tier |
-> | Loud weapons marked down | **peril 28**: solo on Impossible, two of you on Helldive | -6, under half a tier |
+> | Loud weapons marked down, by the game's loudness class (1.33.0) | **peril 28**: solo on Impossible, two of you on Helldive | small -3.6, medium and unknown -6, large and huge -9.6 |
 > | Silenced weapon **without** stealth armour, and the reverse | peril 22, pairings | -5 and +5 |
 > | Stealth armour on an easy drop | **peril 0 or less** | down to -8 at four on Trivial |
 >
@@ -1102,7 +1129,7 @@ lists of item ids, and a concept written down six times is a concept that drifts
 |---|---|---|---|
 | `long-range` | `curator` | 6 support weapons | The ones you aim at something far away |
 | `close-blast` | `curator` | 7 weapons | Their own blast reaches you when you fire close. Since 1.31.0, replacing an id list typed twice |
-| `suppressed` | `wiki` | 5 weapons | Audible at 12 metres rather than 100 |
+| `suppressed` | `game` | 5 weapons | Audible at 12 metres rather than 100. Checked against the game's own flag since 1.33.0 |
 
 > [!danger] A tag declares where it came from, and that is the whole point
 > `vocabulary.json` carries an `itemTags` entry per tag with an `id`, a `label`, a `source` and a `note`
@@ -1533,6 +1560,12 @@ npm run wiki
 ```
 
 Re-fetches the weapon stats and the planet table, and **reports what would change without writing anything**. Add `-- --write` to apply it and `-- --refresh` to go back to the network instead of the cache in `.wiki-cache`. It is deliberately not part of the build: a build that needs the internet is a build that breaks on a train.
+
+```bash
+npm run game
+```
+
+Reads weapon numbers from the game's own tables through filediver's published snapshot, the same way: a report by default, `-- --write` to apply, `-- --refresh` to pull a newer filediver and rebuild the dump. Needs git and Go. See Reading The Game's Own Tables.
 
 ```bash
 npm run missions

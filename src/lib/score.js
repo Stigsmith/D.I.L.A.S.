@@ -237,6 +237,14 @@ export function matches(ctx, match) {
       }
       continue;
     }
+    /* A number the item does not have at all: the loud weapon rule for
+       anything the game file gives no loudness class. */
+    if (key === "noNumber") {
+      for (const path of asArray(want)) {
+        if (typeof reach(ctx, path) === "number") return false;
+      }
+      continue;
+    }
     /* Any one of several clauses. Clauses are otherwise ANDed, and some
        questions are genuinely either-or: a support weapon earns True Grit
        by a long reload, by a reload that pins you in place, or by a

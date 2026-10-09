@@ -163,8 +163,10 @@ Art is optional. With `src/assets` empty, every item reads by its name instead o
 ## Where the numbers come from
 
 - **Community ratings**: [u.gg](https://u.gg), read by hand, each list with its patch stamp.
-- **Weapon stats, enemy armour and the difficulty table**: [helldivers.wiki.gg](https://helldivers.wiki.gg),
-  CC BY-NC-SA 4.0.
+- **Weapon stats for 105 weapons**: the game's own files, through the decoded snapshot
+  [filediver](https://github.com/xypwn/filediver) publishes. The tool never opens a game install.
+- **Reload times, stratagems, enemy armour, the difficulty table and the weapons the game files do not cover**:
+  [helldivers.wiki.gg](https://helldivers.wiki.gg), CC BY-NC-SA 4.0.
 - **Planets, biomes and hazards**: [helldivers-2/json](https://github.com/helldivers-2/json), MIT. Map positions,
   supply lines and the live war: [api.helldivers2.dev](https://api.helldivers2.dev).
 - **Fonts**: Oswald and JetBrains Mono, served from the tool itself.

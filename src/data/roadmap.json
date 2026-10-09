@@ -155,6 +155,14 @@
       "say": "Rules for terrain, mission time limits and megacities, and every armour set with its art and weight."
     },
     {
+      "id": "game-tables",
+      "title": "Numbers from the game itself",
+      "status": "shipped",
+      "version": "1.33.0",
+      "track": "solo",
+      "say": "Weapon figures and loudness for 105 weapons come from the game's own files, with the wiki filling the rest."
+    },
+    {
       "id": "effects",
       "title": "Planet effects in the ratings",
       "status": "next",

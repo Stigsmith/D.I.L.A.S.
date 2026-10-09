@@ -590,6 +590,42 @@
       "judgement": "1 or 2 players only: solo from Suicide Mission, or 2 players from Impossible. A full squad on Super Helldive plays loud and does fine. Grows to about a tier for 1 player on Super Helldive."
     },
     {
+      "id": "peril-bots-small-noise",
+      "name": "Quieter weapons draw fewer patrols · Automatons, 1 or 2 players, peril 28+",
+      "when": {
+        "faction": [
+          "bots"
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 28
+        }
+      },
+      "match": {
+        "held": true,
+        "notTags": [
+          "suppressed"
+        ],
+        "number": [
+          {
+            "path": "wiki.noise",
+            "eq": 1
+          }
+        ]
+      },
+      "say": "This weapon is quieter than most and draws fewer patrols. With 1 or 2 players, nobody covers you while you deal with them.",
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": -0.15,
+        "clamp": 5
+      },
+      "source": "The game's own noise template for each weapon, read from its weapon data: small, medium, large or huge.",
+      "judgement": "The size is ours: about a quarter of a tier at solo Super Helldive. 1 or 2 players only."
+    },
+    {
       "id": "peril-bots-punishes-loud",
       "name": "Loud weapons draw patrols · Automatons, 1 or 2 players, peril 28+",
       "when": {
@@ -607,6 +643,21 @@
         "held": true,
         "notTags": [
           "suppressed"
+        ],
+        "anyOf": [
+          {
+            "number": [
+              {
+                "path": "wiki.noise",
+                "eq": 2
+              }
+            ]
+          },
+          {
+            "noNumber": [
+              "wiki.noise"
+            ]
+          }
         ]
       },
       "say": "Every shot from this is heard up to 100 metres away and draws patrols. With 1 or 2 players, nobody covers you while you deal with them.",
@@ -616,7 +667,44 @@
         "times": -0.25,
         "clamp": 8
       },
-      "judgement": "Kept small: it matches nearly half of all held weapons. 1 or 2 players only, from solo on Impossible or 2 players on Helldive, and never half a tier."
+      "judgement": "The size is ours. Medium is the most common class, and weapons with no class in the game file are counted here too. 1 or 2 players only, from solo on Impossible or 2 players on Helldive.",
+      "source": "The game's own noise template for each weapon, read from its weapon data: small, medium, large or huge."
+    },
+    {
+      "id": "peril-bots-very-loud",
+      "name": "Very loud weapons draw patrols · Automatons, 1 or 2 players, peril 28+",
+      "when": {
+        "faction": [
+          "bots"
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 28
+        }
+      },
+      "match": {
+        "held": true,
+        "notTags": [
+          "suppressed"
+        ],
+        "number": [
+          {
+            "path": "wiki.noise",
+            "gte": 3
+          }
+        ]
+      },
+      "say": "This weapon is heard further than most and draws patrols from far away. With 1 or 2 players, nobody covers you while you deal with them.",
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": -0.4,
+        "clamp": 12
+      },
+      "source": "The game's own noise template for each weapon, read from its weapon data: small, medium, large or huge.",
+      "judgement": "The size is ours: under a tier at solo Super Helldive. Large and huge classes: the Autocannon, the Anti-Materiel Rifle, the expendable and recoilless launchers. 1 or 2 players only."
     },
     {
       "id": "peril-storm-favours-stealth",

@@ -542,6 +542,15 @@ The curator's observations from a session outside this repo, judged against what
 - **The curator's calls, defaults applied**: the Autocannon is not `close-blast`; the Stalwart gets +2 beside True Grit; the juggling warning moves no points
 - **Held back for a source**: whether the Shield Generator Pack stops your own blast throwing you; whether a Solo Silo already on the ground keeps firing through an ion storm or a jammer
 
+## The game's own tables: 1.33.0, 10 October 2026
+
+The curator wanted less reliance on the wiki. Weapon numbers for 105 weapons now come from the game's settings tables as filediver publishes them, decoded, in its own source; the tool never opens a game install. CLAUDE.md, "Reading The Game's Own Tables", has how and why.
+
+- **Done.** Damage, AP, demolition, stagger, push, projectile, magazines, rate of fire, ergonomics, recoil, loudness, suppressed and one handed, laid over the wiki per field. The game wins a disagreement, with two exceptions. The loud weapon rule became a ladder on the game's loudness class
+- **Waits on filediver.** The explosion table (grenades, eagles, orbitals, mines, blast radii), the beam weapon table (lasers, arc weapons) and the hit zone table (enemy armour) no longer decode after a patch. When they do: `npm run game -- --refresh`, then extend the join
+- **Still the wiki, by nature.** Reload times live in animation data. Names, descriptions and every image live only in the install, which option B never opens. Getting art from the game would mean option C, running filediver over the install, which the curator turned down for now
+- **Open for the curator.** Whether melee weapons get joined by hand (the melee table decodes but shares no number with the wiki to match on), and whether vehicles and exosuits do (the game splits each into its guns)
+
 ## Smaller items
 
 - **A roll the dice generator in the builder.** A deliberate roll you ask for, that picks something decent without simply taking the top rated item in every slot, plus playstyle options to steer it. Parked until the coverage logic is good enough to make it worth rolling.

@@ -37,7 +37,7 @@ import { agoText } from "./lib/war.js";
 import { useBadgeStyle } from "./lib/badge.js";
 import {
   CATEGORIES, vocabulary, acquisitionLabels,
-  getItem, itemName, warbondById, ventsHeat, statsFor,
+  getItem, itemName, warbondById, ventsHeat, statsFor, statsSourceFor,
   TIER_RANK, TIER_ORDER, judgedTier, averageRank, rank, eatsBackpack,
 } from "./lib/items.js";
 
@@ -90,6 +90,8 @@ const tierStyle = (tier) => {
     boxShadow: "inset 0 1px 0 rgb(255 255 255 / 0.34), inset 0 -1px 0 rgb(0 0 0 / 0.22)",
   };
 };
+/* The game's noise classes, as game-stats.json numbers them. */
+const NOISE_LABEL = ["Suppressed", "Small", "Medium", "Large", "Huge"];
 /* Icon is null for ballistic and utility on purpose. Those two are the    */
 /* "nothing special happens" defaults, so a glyph there is decoration      */
 /* rather than information. The kinds that keep an icon are the ones that  */
@@ -1103,7 +1105,9 @@ function RowDetail({ item, faction, scored, difficulty }) {
           {/* wiki and joined on read. This row apologised for their        */}
           {/* absence for a week after the fetch had already filled them.   */}
           {wiki ? (
-            <Section title="Handling and ammo" tip="From helldivers.wiki.gg.">
+            <Section title="Handling and ammo" tip={statsSourceFor(item.id) === "game"
+              ? "From the game files. Reload time from helldivers.wiki.gg."
+              : "From helldivers.wiki.gg."}>
               <Fact label="Magazine">
                 {wiki.ammo && wiki.ammo.magazine !== undefined
                   ? `${wiki.ammo.magazine}${wiki.ammo.spareMagazines !== undefined ? `, ${wiki.ammo.spareMagazines} spare` : ""}`
@@ -1126,6 +1130,11 @@ function RowDetail({ item, faction, scored, difficulty }) {
               </Fact>
               <Fact label="Rate of fire">
                 {wiki.handling && wiki.handling.rpm !== undefined ? `${wiki.handling.rpm} rpm` : null}
+              </Fact>
+              <Fact label="Loudness" tip="The game's noise class for each shot. Louder weapons draw patrols from further away.">
+                {item.tags.includes("suppressed")
+                  ? "Suppressed"
+                  : wiki.noise !== undefined ? NOISE_LABEL[wiki.noise] : null}
               </Fact>
               <Fact label="Ergonomics" tip="How fast the barrel follows your aim.">
                 {wiki.handling && wiki.handling.ergonomics !== undefined ? `${wiki.handling.ergonomics}` : null}
