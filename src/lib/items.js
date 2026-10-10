@@ -184,7 +184,7 @@ export const statsSourceFor = (id) => (GAME.stats[id] ? "game" : WIKI.stats[id] 
 /* Three states, not two. An item the fetch covers gives a real yes or  */
 /* no. An item it does not cover, which is the call-ins and the melee   */
 /* weapons, falls back to the old guess rather than silently reading as */
-/* no. See dilas-data-spike.md.                                  */
+/* no.                                                                  */
 export function ventsHeat(item) {
   const s = statsFor(item.id);
   if (s) return Boolean(s.heat);

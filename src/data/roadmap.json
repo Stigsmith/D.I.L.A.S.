@@ -1,5 +1,5 @@
 {
-  "note": "The public summary of where this tool is going. The working document is dilas-roadmap.md in the repo root, which carries the reasoning, the dependency chain and the open questions. This file is the short version for the person using the tool, so keep every entry to one sentence and update it when the working document moves.",
+  "note": "The public summary of where this tool is going. The working backlog is dilas-roadmap.md in the repo root: everything still open, and what each item waits on. This file is the short version for the person using the tool, so keep every entry to one sentence and update it when the working document moves.",
   "tracks": {
     "solo": {
       "label": "Needs nothing new",
@@ -54,7 +54,8 @@
     {
       "id": "tags",
       "title": "The last judgement calls",
-      "status": "next",
+      "status": "shipped",
+      "version": "1.19.0",
       "track": "solo",
       "say": "A few traits no source records, like which support weapons are long range, set by hand for now."
     },

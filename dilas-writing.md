@@ -1,6 +1,6 @@
 # **D.I.L.A.S.: Writing Guide**
 
-> How every word on screen is written, and where it sits. **v1, final, 9 October 2026.** Built from the curator's notes on about sixty real lines over two rounds; the second round, with his notes, is `docs/writing/round-1.md`. Every session follows this for UI text.
+> How every word on screen is written, and where it sits. **v1, final, 9 October 2026.** Built from the curator's notes on about sixty real lines over two rounds. Every session follows this for UI text.
 
 ---
 

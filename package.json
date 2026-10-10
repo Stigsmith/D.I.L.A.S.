@@ -22,7 +22,6 @@
     "armor": "node scripts/fetch-armor.mjs",
     "armor-art": "node scripts/fetch-armor.mjs --art",
     "planet-art": "node scripts/fetch-planet-art.mjs",
-    "vehicles": "node scripts/add-vehicles.mjs",
     "rules": "node scripts/check-rules.mjs",
     "builds": "node scripts/check-builds.mjs",
     "fonts": "node scripts/fonts.mjs",

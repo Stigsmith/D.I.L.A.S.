@@ -1,7 +1,7 @@
 {
   // How D.I.L.A.S. is served, at dilas.me. Replaces dragging dist/ onto Netlify.
   //
-  // Stage 1 of dilas-cloudflare-handover.md: the static site, plus a Worker
+  // The static site, plus a Worker
   // script answering /api/* and nothing else, plus a D1 database for
   // accounts. Same origin, which is what lets the Content-Security-Policy in
   // public/_headers keep saying connect-src 'self' unchanged.
@@ -29,8 +29,8 @@
   "compatibility_flags": ["nodejs_compat"],
 
   // dilas.me, bought by stigly on Cloudflare on 2 October 2026. A custom
-  // domain: the next deploy attaches it, and Cloudflare creates the DNS
-  // record and the certificate itself, since the zone is on this account.
+  // domain: the deploy attaches it, and Cloudflare creates the DNS record
+  // and the certificate itself, since the zone is on this account.
   //
   // workers.dev stays on through the move, so anybody who used it can still
   // reach their collection there and export it. Turn it off once nobody does.
@@ -114,7 +114,7 @@
 
   // The live war. Every five minutes the Worker fetches who holds what from
   // api.helldivers2.dev and keeps a trimmed snapshot in D1; GET /api/war hands
-  // it out. See worker/war.ts, and Stage 6 of dilas-cloudflare-handover.md.
+  // it out. See worker/war.ts.
   //
   // **Five Cron Triggers per account on the free plan**, and this is one.
   // Enodia uses none. Verified on 29 September 2026 against
@@ -138,7 +138,7 @@
   // forward one without a mail server.
   //
   // MAIL_FROM, for password reset, needs an address on dilas.me and a mail
-  // sender. That is Stage 2, which the domain unblocks.
+  // sender, which is the password reset step on the roadmap.
   "vars": {
     "SUPER_CLIENT": "dilas.me",
     "SUPER_CONTACT": "https://dilas.me"

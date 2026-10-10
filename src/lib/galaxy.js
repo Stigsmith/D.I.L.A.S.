@@ -10,8 +10,7 @@
 /* planets.json, fetched once by scripts/fetch-wiki.mjs, so the map   */
 /* draws, pans and fills the scenario with no network call at all.    */
 /* Who holds what is live and arrives separately, if it arrives: it  */
-/* decorates the map and never carries it. dilas-roadmap.md, "The live */
-/* starmap".                                                          */
+/* decorates the map and never carries it.                            */
 /*                                                                    */
 /* The layout is the game's, because finding a planet again where you */
 /* clicked it a minute ago is instant and finding it in a list of 281 */
