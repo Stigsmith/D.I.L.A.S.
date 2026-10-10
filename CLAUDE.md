@@ -465,7 +465,7 @@ Every colour goes through a CSS custom property in `src/index.css`, bound to Tai
 - **Single colour art is masked**, painted with `currentColor`, except the difficulty marks.
 - **`assetsInlineLimit` is 0** in `vite.config.js`. Leave it: inlining moved hundreds of KB of icons into the main bundle.
 - **Art is painted at the size it is displayed.** Check a new mark's pixels against the size it is drawn at.
-- **Armour set renders** come from the wiki by `npm run armor-art`, into `Image Library/Armor Sets/`. **The favicon** is our own drawing, `public/favicon.svg`, committed and edited by hand.
+- **Armour set renders** come from the wiki by `npm run armor-art`, into `Image Library/Armor Sets/`. **The favicon** is our own drawing, `public/favicon.svg`, committed and edited by hand. When it changes, raise the `?v=` on its link in `index.html`, or browsers keep showing the old one.
 - **`Image Library/` has no backup off this machine.** That is the curator's to arrange.
 
 ---
