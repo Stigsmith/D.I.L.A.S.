@@ -1,7 +1,7 @@
 /* ================================================================== */
 /* APPLY THE 26 SEPTEMBER 2026 u.gg READ                              */
 /*                                                                    */
-/* A one shot, the same shape as add-vehicles.mjs. Brings the ratings */
+/* A one shot, kept as the template for the next read. Brings ratings */
 /* from patch 6.3.1 to what u.gg shows for 7.0.2 to 7.1.1, and adds   */
 /* the eleven items the game has that D.I.L.A.S. did not.                 */
 /*                                                                    */

@@ -362,9 +362,8 @@ export function Support() {
 /* where four columns beside the sidebar get too narrow to read.      */
 /*                                                                    */
 /* The data is src/data/roadmap.json, which is the short public        */
-/* version. The working document with the reasoning and the           */
-/* dependency chain is dilas-roadmap.md in the repo root, and it is    */
-/* the one that moves first.                                          */
+/* version. The working backlog is dilas-roadmap.md in the repo root, */
+/* and it is the one that moves first.                                */
 /* ================================================================== */
 
 /* One scale, from the light that is on to the light not lit yet.      */

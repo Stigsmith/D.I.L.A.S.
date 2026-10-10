@@ -49,8 +49,8 @@ const scenariosFor = (loadout) =>
 /*                                                                     */
 /* The 39 curated builds are not a fair denominator and the curator     */
 /* said so plainly on 22 August 2026: they are legacy AI generations    */
-/* made before this project had stats or scoring behind it, and         */
-/* dilas-roadmap.md already measured the damage. 35 of 39 use an S or S+  */
+/* made before this project had stats or scoring behind it, and the     */
+/* numbers show it. 35 of 39 use an S or S+                             */
 /* primary, 13 distinct primaries appear across all of them, and three  */
 /* A tier marksman rifles for bots appear zero times.                   */
 /*                                                                     */

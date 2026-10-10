@@ -109,10 +109,8 @@ const CHAFF_INCLUDE = [
   "orbital-napalm-barrage",
   "orbital-gas-strike",
   "md-i4-incendiary-mines",
-  /* Vehicles. Their roles were written by hand in add-vehicles.mjs in
-     1.5.0, and this script was never told, so any --write run stripped
-     them. Found on 26 September 2026 when adding the 7.1.1 items. Listed
-     here so the derivation and the data agree. */
+  /* Vehicles. No category covers them, so they are listed by hand, and
+     a --write run without them here would strip their roles. */
   "m-102-gunner-frv",
   "m-104-incinerator-frv",
   "exo-45-patriot-exosuit",
@@ -153,7 +151,7 @@ const OBJECTIVE_INCLUDE = [
   "las-99-quasar-cannon",
   "gp-20-ultimatum",
   "md-17-anti-tank-mines",           /* note: demo 40 as of 7.0.0, closes holes from outside */
-  "td-220-bastion-mk-xvi",           /* set by add-vehicles.mjs: a main cannon at demo 40 */
+  "td-220-bastion-mk-xvi",           /* a main cannon at demo 40 */
 ];
 
 /* Throwables the demo floor catches that do not actually close a hole. */

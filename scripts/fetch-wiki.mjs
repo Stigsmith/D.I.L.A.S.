@@ -19,7 +19,7 @@
 /*                                                                    */
 /* The wiki is CC BY-NC-SA 4.0: attribution is required wherever this */
 /* data is shown, derived data carries the same licence, and          */
-/* commercial use is forbidden. See dilas-data-spike.md.       */
+/* commercial use is forbidden.                                       */
 /* ================================================================== */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";

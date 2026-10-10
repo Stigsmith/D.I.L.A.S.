@@ -1,7 +1,6 @@
 /**
  * The live war: who holds each planet, where the fighting is, and how it is
- * going. Stage 6 of `dilas-cloudflare-handover.md`, built the way that plan
- * designed it.
+ * going.
  *
  * ## A snapshot, fetched on a schedule
  *
@@ -15,7 +14,7 @@
  *
  * ## The API decorates, it never carries
  *
- * `dilas-roadmap.md`, "The live starmap". The map is drawn from the planet table
+ * The map is drawn from the planet table
  * the browser already ships. This only colours it in, and if it is down, old
  * or wrong, the browser draws the map uncoloured and says why. Nothing here is
  * on the critical path of choosing a planet.

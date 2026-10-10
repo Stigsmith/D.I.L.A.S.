@@ -45,7 +45,6 @@ export const apiRateLimit = sqliteTable('api_rate_limit', {
 /**
  * The live war, as last fetched. **One row**, id `war`, written by the Cron
  * Trigger in `worker/war.ts` every five minutes and read by `GET /api/war`.
- * Stage 6 of `dilas-cloudflare-handover.md`.
  *
  * A snapshot rather than a pass-through, so the community API is called a
  * fixed number of times a day whatever the traffic, and so an outage there
