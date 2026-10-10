@@ -262,19 +262,23 @@ function Sidebar({ destination, navigate, onNavigated }) {
   const go = (id) => { navigate(LANDING[id] || id); onNavigated(); };
   return (
     <nav className="flex h-full flex-col gap-5 overflow-y-auto p-3" data-tour="nav">
-      {NAV.map((g) => (
-        <div key={g.group}>
-          <p className="mb-1.5 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-base-600"
-            style={{ fontFamily: "'Oswald', sans-serif" }}>
-            {g.group}
-          </p>
-          <div className="flex flex-col gap-0.5">
-            {g.items.map((item) => (
-              <SidebarLink key={item.id} item={item} active={(MENU_FOR[destination] || destination) === item.id} onClick={() => go(item.id)} />
-            ))}
+      {/* The destinations alone, for the tour to light when the whole menu */}
+      {/* is taller than a phone screen. */}
+      <div className="flex flex-col gap-5" data-tour="nav-main">
+        {NAV.map((g) => (
+          <div key={g.group}>
+            <p className="mb-1.5 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-base-600"
+              style={{ fontFamily: "'Oswald', sans-serif" }}>
+              {g.group}
+            </p>
+            <div className="flex flex-col gap-0.5">
+              {g.items.map((item) => (
+                <SidebarLink key={item.id} item={item} active={(MENU_FOR[destination] || destination) === item.id} onClick={() => go(item.id)} />
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
       <div className="mt-auto border-t border-base-800 pt-3 flex flex-col gap-0.5">
         {NAV_FOOT.map((item) => (
           <SidebarLink key={item.id} item={item} active={destination === item.id} onClick={() => go(item.id)} />
@@ -929,7 +933,7 @@ export default function App() {
         </div>
       </div>
 
-      {touring ? <Tour navigate={navigate} onClose={endTour} /> : null}
+      {touring ? <Tour navigate={navigate} onClose={endTour} setMenu={setMenuOpen} /> : null}
     </div>
   );
 }

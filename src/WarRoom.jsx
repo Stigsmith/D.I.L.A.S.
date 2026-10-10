@@ -40,6 +40,9 @@ export const FRONTS = Object.fromEntries(FACTIONS.map((f) => [f.id, { hex: f.hex
 /* The planner's width, and the gap it keeps from the edges. */
 export const PANEL_PX = 368;
 export const GAP_PX = 12;
+/* The folded planner's tab on the left edge. The map keeps its own
+   controls clear of it, which on a short phone screen they were not. */
+export const TAB_PX = 52;
 /* Below this the room is too narrow for the planner beside the map, so
    it lays over it instead. */
 export const WIDE_PX = 900;
@@ -104,7 +107,7 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
   };
 
   const bottom = (bar.h || 64) + GAP_PX;
-  const insets = { left: plannerOpen && wide ? PANEL_PX + GAP_PX : 0, bottom };
+  const insets = { left: plannerOpen ? (wide ? PANEL_PX + GAP_PX : 0) : TAB_PX, bottom };
 
   return (
     <div ref={roomRef} className="relative w-full overflow-hidden"
@@ -145,7 +148,7 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
           </div>
         </aside>
       ) : (
-        <button type="button" onClick={() => setPlanner(true)}
+        <button type="button" onClick={() => setPlanner(true)} data-tour="war-planner"
           className="absolute left-0 top-1/2 z-20 flex -translate-y-1/2 items-center gap-1.5 rounded-r-md border border-l-0 border-base-700 bg-base-950/90 px-1.5 py-3 text-base-300 shadow-xl backdrop-blur-md hover:text-base-100"
           title="Where would you like to play?">
           <span className="text-[11px] font-semibold uppercase tracking-wider [writing-mode:vertical-rl] rotate-180" style={OSWALD}>
@@ -212,15 +215,17 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
 export function ScenarioStrip({ scenario, setFaction, setDifficulty, setSquad, party, onWarRoom, skill, setSkill }) {
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-3 rounded-lg border border-base-800 bg-base-900/60 px-4 py-2.5">
-      <div className="flex gap-1.5" role="group" aria-label="Front">
+      {/* The full row on a phone, shared three ways: at 320 wide the three */}
+      {/* names did not fit with the desktop padding and spacing. */}
+      <div className="flex w-full gap-1 sm:w-auto sm:gap-1.5" role="group" aria-label="Front">
         {FACTIONS.map((f) => {
           const on = scenario.faction === f.id;
           return (
             <button key={f.id} type="button" onClick={() => setFaction(f.id)} aria-pressed={on}
-              className={"flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wider transition-colors " +
+              className={"flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded border px-1.5 py-1.5 text-[11px] font-bold uppercase tracking-normal transition-colors sm:flex-none sm:px-2.5 sm:tracking-wider " +
                 (on ? "" : "border-base-700 text-base-500 hover:border-base-500 hover:text-base-200")}
               style={on ? { ...OSWALD, color: f.hex, borderColor: f.hex, backgroundColor: f.hex + "1a" } : OSWALD}>
-              <f.Icon className="h-4 w-4" style={{ color: on ? f.hex : undefined }} />
+              <f.Icon className="h-4 w-4 shrink-0" style={{ color: on ? f.hex : undefined }} />
               {f.label}
             </button>
           );
@@ -511,7 +516,7 @@ export function SquadCount({ value, onChange, party }) {
   );
 }
 
-/* Your level. Not part of the drop: it describes the player, lives with
+/* Your skill level. Not part of the drop: it describes the player, lives with
    the active profile, and moves peril so the stealth and anti-tank rules
    and the squad checks start where they would for you. Beside how many
    of you, because the ratings read the two together. Outlined until it
@@ -520,10 +525,10 @@ export function SkillPick({ value, onChange }) {
   const v = Number(value) || 0;
   return (
     <div className="flex items-center gap-2">
-      <Tip text="The hardest difficulty four players at your level clear easily. Warnings and the stealth and anti-tank rules start from there.">
-        <span className={"text-[10px] font-semibold uppercase tracking-wider text-base-500 " + HAS_TIP} style={OSWALD}>Your level</span>
+      <Tip text="The hardest difficulty four players at your skill level clear easily. Warnings and the stealth and anti-tank rules start from there.">
+        <span className={"text-[10px] font-semibold uppercase tracking-wider text-base-500 " + HAS_TIP} style={OSWALD}>Your skill level</span>
       </Tip>
-      <select value={v} onChange={(e) => onChange(Number(e.target.value))} aria-label="Your level"
+      <select value={v} onChange={(e) => onChange(Number(e.target.value))} aria-label="Your skill level"
         className={"rounded border bg-base-900 px-1.5 py-1 text-[11px] " +
           (v ? "border-base-700 text-base-100" : "border-accent-500 text-accent-300")}>
         <option value={0}>Not set</option>

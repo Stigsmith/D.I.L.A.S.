@@ -17,15 +17,16 @@
 /* Fields:                                                            */
 /*   route     where to go before the step is shown, as navigate()     */
 /*             takes it. None means stay where you are                 */
-/*   at        the data-tour value to light. None means a whole-page   */
-/*             line, said from the middle of the screen                */
+/*   at        the data-tour value to light, or several, best first:   */
+/*             the first that leaves room for the card is lit. None    */
+/*             means a whole-page line, said from the middle            */
 /*   optional  skip the step when its anchor never turns up, rather    */
 /*             than saying it over nothing. Drop Bay has no slot to    */
 /*             point at before a front is chosen, and sends you to the */
 /*             war room instead                                        */
 /*                                                                    */
-/* A step that is not optional and whose anchor is missing (a menu     */
-/* entry on a phone, where the menu is a drawer) is said from the      */
+/* A step about the menu opens the drawer on a narrow screen. A step   */
+/* that is not optional and whose anchor is missing is said from the    */
 /* middle instead. The words still hold without the pointing.          */
 /* ================================================================== */
 
@@ -39,7 +40,7 @@ export const TOUR = [
     plain: "A short tour of the tool. Esc skips it, the arrow keys step through it, and Settings replays it.",
   },
   {
-    at: "nav",
+    at: ["nav", "nav-main"],
     title: "The chain of command",
     speech:
       "This is the menu. Every destination on it has been cleared by the Ministry of Truth. The entries that are greyed out do not exist, and you did not see them.",
@@ -52,7 +53,7 @@ export const TOUR = [
   /* One step per kind of button, because they act on different things. */
   {
     route: "collection/warbonds",
-    at: "collection-guide",
+    at: ["collection-guide", "collection-quickstart"],
     title: "Requisitions first",
     speech:
       "Before you are issued anything, Super Earth must know what you already possess. Undeclared equipment is not a crime. It is merely suspicious.",

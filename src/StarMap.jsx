@@ -27,7 +27,7 @@ import { ChevronLeft, ChevronRight, MapPin, Users } from "lucide-react";
 
 import GalaxyMap, { MajorOrder } from "./GalaxyMap.jsx";
 import { FACTIONS } from "./Tiers.jsx";
-import { FRONTS, PANEL_PX, GAP_PX, WIDE_PX, useSize, PlanetSearch, WarLine, WarTotals, big } from "./WarRoom.jsx";
+import { FRONTS, PANEL_PX, GAP_PX, TAB_PX, WIDE_PX, useSize, PlanetSearch, WarLine, WarTotals, big } from "./WarRoom.jsx";
 import { frontOf, progressAt } from "./lib/galaxy.js";
 import { useWar, useWarHistory, useWarTrend, untilText } from "./lib/war.js";
 import { planetByName, biomeInfo, biomeName, hazardName, hazardEffect, loudHazards } from "./lib/scenario.js";
@@ -95,7 +95,7 @@ export default function StarMap({ selected, onSelect, onDropHere }) {
         height: "calc(100dvh - var(--shell-chrome, 56px) - 0.5rem)",
         background: "radial-gradient(ellipse 80% 70% at 55% 42%, rgb(var(--base-900)) 0%, rgb(var(--base-950)) 72%)",
       }}>
-      <GalaxyMap room openOnChosen insets={{ left: panelOpen && wide ? PANEL_PX + GAP_PX : 0 }}
+      <GalaxyMap room openOnChosen insets={{ left: panelOpen ? (wide ? PANEL_PX + GAP_PX : 0) : TAB_PX }}
         chosen={selected} query={query} onChoose={select} war={war} fronts={FRONTS}
         label="The galaxy map. Click a sector to go in, then a planet to read about it." />
 

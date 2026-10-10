@@ -14,6 +14,9 @@
 /* is the first *visible* element carrying its data-tour value: the    */
 /* party button is in the DOM twice, one copy for each width, and the  */
 /* hidden one measures zero.                                           */
+/*                                                                    */
+/* Below the lg breakpoint the menu is a drawer, so a step about the   */
+/* menu opens it first and every other step closes it again.          */
 /* ================================================================== */
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -25,15 +28,29 @@ const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 const HALO = 8;
 const GAP = 18;
 const PAD = 14;
+/* The card's width on a wide screen, as w-[400px] below. */
+const CARD_W = 400;
 
+/* `at` may name several anchors, best first. The first one that leaves */
+/* room for the card, beside it or above or below, is lit: on a phone  */
+/* the Collection guide is taller than the screen, and lighting all of */
+/* it means standing on it.                                            */
 function find(at) {
   if (!at) return null;
-  for (const el of document.querySelectorAll(`[data-tour="${at}"]`)) {
-    const r = el.getBoundingClientRect();
-    if (r.width > 1 && r.height > 1) return el;
+  let seen = null;
+  for (const name of [].concat(at)) {
+    for (const el of document.querySelectorAll(`[data-tour="${name}"]`)) {
+      const r = el.getBoundingClientRect();
+      if (r.width <= 1 || r.height <= 1) continue;
+      const beside = window.innerWidth - r.width >= CARD_W + GAP + PAD * 2;
+      if (beside || r.height <= window.innerHeight * 0.6) return el;
+      seen = seen || el;
+    }
   }
-  return null;
+  return seen;
 }
+
+const inMenu = (at) => [].concat(at || []).some((a) => a.startsWith("nav"));
 
 function rectOf(el) {
   if (!el) return null;
@@ -41,7 +58,7 @@ function rectOf(el) {
   return { x: r.left, y: r.top, w: r.width, h: r.height };
 }
 
-export default function Tour({ navigate, onClose }) {
+export default function Tour({ navigate, onClose, setMenu }) {
   const [index, setIndex] = useState(0);
   /* Which way you were going, so a skipped step skips the same way. */
   const way = useRef(1);
@@ -49,6 +66,8 @@ export default function Tour({ navigate, onClose }) {
   const [ready, setReady] = useState(false);
   const card = useRef(null);
   const [size, setSize] = useState({ w: 400, h: 240 });
+  const sizeNow = useRef(size);
+  sizeNow.current = size;
   const step = TOUR[index];
   const last = index === TOUR.length - 1;
 
@@ -67,7 +86,11 @@ export default function Tour({ navigate, onClose }) {
     const timers = [];
     const later = (fn, ms) => timers.push(window.setTimeout(() => alive && fn(), ms));
     setReady(false);
+    /* A new page: the light would sit over whatever is there now until */
+    /* the anchor turns up, so it goes dark in between.                */
+    if (step.route && window.location.hash.replace(/^#\/?/, "") !== step.route) setSpot(null);
     if (step.route) navigate(step.route, { replace: true });
+    setMenu(inMenu(step.at) && !window.matchMedia("(min-width: 1024px)").matches);
 
     if (!step.at) {
       setSpot(null);
@@ -80,8 +103,16 @@ export default function Tour({ navigate, onClose }) {
     const look = () => {
       const el = find(step.at);
       if (el) {
-        el.scrollIntoView({ block: "center", inline: "nearest", behavior: still ? "auto" : "smooth" });
-        later(() => { setSpot(rectOf(find(step.at))); setReady(true); }, still ? 30 : 360);
+        /* Centred, unless that leaves no room for the card above or below */
+        /* it, as on a small or sideways phone: then it goes to the top,   */
+        /* clear of the sticky chrome, and the card sits underneath.       */
+        const tight = (window.innerHeight - el.getBoundingClientRect().height) / 2 < sizeNow.current.h + GAP + HALO;
+        if (tight) {
+          const chrome = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--shell-chrome")) || 0;
+          el.style.scrollMarginTop = `${chrome + HALO + PAD}px`;
+        }
+        el.scrollIntoView({ block: tight ? "start" : "center", inline: "nearest", behavior: still ? "auto" : "smooth" });
+        later(() => { el.style.scrollMarginTop = ""; setSpot(rectOf(find(step.at))); setReady(true); }, still ? 30 : 360);
         return;
       }
       if (++tries < 20) return later(look, 80);
@@ -101,6 +132,8 @@ export default function Tour({ navigate, onClose }) {
     later(look, step.route ? 60 : 0);
     return () => { alive = false; timers.forEach(clearTimeout); };
   }, [index]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => () => setMenu(false), [setMenu]);
 
   /* Keep the light on the element when anything moves under it. Capture */
   /* phase, so a scrolling panel is heard as well as the window.         */
@@ -141,9 +174,9 @@ export default function Tour({ navigate, onClose }) {
   }, [index]);
 
   /* Beside the lit thing if there is room: right, left, below, above.  */
-  /* Standing on what it points at is the failure; when the lit thing   */
-  /* is most of the screen the card takes the bottom corner furthest    */
-  /* from its middle.                                                   */
+  /* Standing on what it points at is the failure; when nothing fits,   */
+  /* the card takes the corner furthest from the lit thing's middle,    */
+  /* top or bottom by whichever side has more room.                     */
   const place = () => {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
@@ -156,7 +189,8 @@ export default function Tour({ navigate, onClose }) {
     if (spot.x - GAP >= w + PAD) return { left: spot.x - w - GAP, top: beside };
     if (vh - (spot.y + spot.h) - GAP >= h + PAD) return { left: cx(spot.x), top: spot.y + spot.h + GAP };
     if (spot.y - GAP >= h + PAD) return { left: cx(spot.x), top: spot.y - h - GAP };
-    return { left: spot.x + spot.w / 2 > vw / 2 ? cx(PAD) : cx(vw - w - PAD), top: cy(vh - h - PAD) };
+    const roomy = vh - (spot.y + spot.h) >= spot.y;
+    return { left: spot.x + spot.w / 2 > vw / 2 ? cx(PAD) : cx(vw - w - PAD), top: roomy ? cy(vh - h - PAD) : cy(PAD) };
   };
   const { left, top } = place();
 
@@ -174,8 +208,8 @@ export default function Tour({ navigate, onClose }) {
       )}
 
       <div ref={card}
-        className={"absolute flex w-[400px] max-w-[calc(100vw-28px)] flex-col gap-3 rounded-lg border border-brand/50 bg-base-950/95 p-4 shadow-2xl backdrop-blur-md transition-[left,top,opacity] duration-300 " +
-          (ready ? "opacity-100" : "opacity-0")}
+        className={"absolute flex w-[400px] max-w-[calc(100vw-28px)] flex-col gap-3 rounded-lg border border-brand/50 bg-base-950/95 p-4 shadow-2xl [@media(max-height:640px)]:gap-2 [@media(max-height:640px)]:p-3 backdrop-blur-md transition-[left,top,opacity] duration-300 " +
+          (ready ? "opacity-100" : "pointer-events-none opacity-0")}
         style={{ left, top }}>
         <div className="flex items-center gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-brand/60 bg-brand/10 text-brand">
@@ -189,8 +223,8 @@ export default function Tour({ navigate, onClose }) {
           </div>
         </div>
 
-        <p className="text-[15px] leading-relaxed text-base-100" role="status">"{step.speech}"</p>
-        <p className="border-t border-base-800 pt-2.5 text-[12px] leading-relaxed text-base-400">{step.plain}</p>
+        <p className="text-[15px] leading-relaxed text-base-100 [@media(max-height:640px)]:text-[13px] [@media(max-height:640px)]:leading-snug" role="status">"{step.speech}"</p>
+        <p className="border-t border-base-800 pt-2.5 text-[12px] leading-relaxed text-base-400 [@media(max-height:640px)]:pt-2 [@media(max-height:640px)]:text-[11px] [@media(max-height:640px)]:leading-snug">{step.plain}</p>
 
         <div className="flex items-center gap-2">
           <button type="button" onClick={onClose}

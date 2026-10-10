@@ -1462,7 +1462,8 @@ function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, loc
           </span>
 
           <div className={"flex items-center gap-2 flex-1 min-w-0 sm:gap-2.5 " + (isLocked ? "opacity-40" : "")}>
-            <ItemArt item={item} className="h-8 w-8 sm:h-10 sm:w-10" />
+            {/* Gone under 360 wide, where the name needs the room more. */}
+            <ItemArt item={item} className="h-8 w-8 max-[359px]:hidden sm:h-10 sm:w-10" />
             {stratMeta ? (
               <span className="hidden sm:flex items-center gap-1.5 shrink-0 w-[108px]" title={STRAT_GROUP[stratMeta.group].label}>
                 <stratMeta.Icon className="w-4 h-4 shrink-0" style={{ color: groupHex }} />
@@ -1482,7 +1483,9 @@ function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, loc
                 {KindIcon ? (
                   <KindIcon className="w-3.5 h-3.5 shrink-0 text-base-500" title={meta.label + (meta.note ? ` · ${meta.note}` : "")} />
                 ) : null}
-                <span className={"text-sm truncate " + (isLocked ? "text-base-400 line-through" : "text-base-100")} style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                {/* Wraps on a phone, where one line cut "PLAS-101 Purifier" */}
+                {/* short: the name is the thing you pick by.                */}
+                <span className={"min-w-0 text-sm leading-tight break-words sm:truncate sm:leading-normal " + (isLocked ? "text-base-400 line-through" : "text-base-100")} style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                   {name}
                 </span>
                 {takesBackpack ? (

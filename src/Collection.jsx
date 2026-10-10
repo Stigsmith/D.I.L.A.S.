@@ -103,7 +103,7 @@ export function CollectionNudge({ onSetUp, onAllOwned }) {
           Until you do, the tool assumes you own everything and may suggest gear you do not have. It takes a few minutes.
         </p>
       </div>
-      <div className="flex shrink-0 flex-wrap gap-2">
+      <div className="flex max-w-full flex-wrap gap-2">
         <button type="button" onClick={onSetUp}
           className="rounded border border-accent-500 bg-accent-500 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-accent-950 hover:bg-accent-400"
           style={OSWALD}>
