@@ -269,6 +269,13 @@ export function matches(ctx, match) {
       if (!asArray(want).some((clause) => matches(ctx, clause))) return false;
       continue;
     }
+    /* The opposite of a clause. The storm warning counts weapons that are
+       not marksman rifles and not long range, which no positive list can
+       say without naming everything else. */
+    if (key === "not") {
+      if (matches(ctx, want)) return false;
+      continue;
+    }
     /* Pairings. What else is in the build, matched with this same item
        matcher. They only fire inside a build: a tier row has no build, and
        a rule asking what you brought with it cannot answer there, the same

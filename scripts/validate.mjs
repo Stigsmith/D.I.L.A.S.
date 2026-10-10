@@ -583,7 +583,11 @@ for (const rule of buildRules.rules) {
   if (!rule.delta && !rule.scaleBy && !rule.severity) {
     buildProblems.push(`${rule.id} has no delta, no scaleBy and no severity, so it can never be seen`);
   }
-  const paths = []; collect(rule, paths, ["path"]);
+  /* A count clause is an item clause, read by score.js's own matcher, so its
+     paths are item paths; checkRules has already checked their passive keys.
+     Only the build level paths answer to build.js's roots. */
+  const { count, ...buildLevel } = rule.match || {};
+  const paths = []; collect({ ...rule, match: buildLevel }, paths, ["path"]);
   for (const path of paths) {
     const [root, field] = String(path).split(".");
     if (!PATH_ROOTS.has(root)) { buildProblems.push(`${rule.id} reads "${path}", and ${root} is not a root build.js knows`); continue; }

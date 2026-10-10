@@ -6,7 +6,7 @@
 
 ## The order
 
-1. **The rules.** 1.34.0 is the first pass: depth on every front, the True Grit ladder, and the misfires the audit found. What is left is under Rules still to write.
+1. **The rules.** 1.34.0 is the first pass: difficulty and squad size on every front, the True Grit ladder, and the misfires the audit found. What is left is under Rules still to write.
 2. **Bin the curated builds and build a new set.** All 39 go, none kept: they are AI generations from before 1.0, two names ago. The new set is made once the rules stand, so the rules rate it.
 3. **Accounts**, then the rest of the server track, then everything else.
 
@@ -19,10 +19,9 @@ When those three are done, the tool is ready to show the public.
 From the 1.34.0 audit. Each one needs its source read before it is written, and measuring with `npm run rules` after.
 
 - **Explosion radius from the wiki.** The weapon pages give inner, outer and shockwave radii (the Breacher's does). A fetch of them could replace the `close-blast` judgement with a figure
-- **Fliers by difficulty.** Stingrays from difficulty 4 on the Illuminate, Gunships from 5 on the Automatons, Shriekers and Dragonroaches on the Terminids. The wiki names lock-on (Spear, W.A.S.P.) and the Laser Cannon against Stingrays. Worth a rule only if fliers change enough with difficulty
-- **Explosive resistance at depth against the Automatons**: War Striders from difficulty 6, Barrager Tanks from 7
-- **Surviving a lethal hit at depth** (Democracy Protects, Adreno-Defibrillator). Commando has it; peril does not yet
-- **Watchers.** Arc weapons stun a Watcher and stop its call. A front fact the vote already prices, unless it pairs with stealth
+- **Fliers beyond Stingrays.** Lock-on against Stingrays is in. Gunships are easy without it, the curator says. The Laser Cannon also downs Stingrays in flight, by the wiki
+- **Surviving a lethal hit at high peril** (Democracy Protects, Adreno-Defibrillator). Commando has it; peril does not yet
+- **Watchers.** The wiki says the Blitzer and Arc Thrower stun a Watcher and stop its call. A front fact the vote already prices, unless it pairs with stealth for 1 or 2 players
 - **Illuminate fire multipliers**: Fleshmob 1.8x fire and arc, Harvester 1.5x fire, Voteless 0.75x. Front facts the vote prices, unless a mission or subfaction changes the mix
 
 ---
@@ -52,7 +51,7 @@ From the 1.34.0 audit. Each one needs its source read before it is written, and 
 
 ## Waiting on a source
 
-- **Meteor storms, acid resistance and most boosters** have no rule because no source gives a figure: meteor damage type, whether acid resistance softens an acid storm, how much Localization Confusion or the reinforcement boosters change with depth. See `knownGaps` in `context-rules.json`
+- **Meteor storms, acid resistance and most boosters** have no rule because no source gives a figure: meteor damage type, whether acid resistance softens an acid storm, how much Localization Confusion or the reinforcement boosters change with difficulty. See `knownGaps` in `context-rules.json`
 - **Illuminate subfactions.** Stingrays are absent under the Appropriators, Mindless Masses and Vote Snatchers, and Voteless under the last two. Nothing the tool reads says which one holds a planet
 - **Planet effects in the ratings.** The real prize of the live war. `api.helldivers2.dev`'s tidy endpoints carry none. Only `/raw/api/WarSeason/801/Status` holds `planetActiveEffects`, and it has been unreliable. Definitions are in `effects/planetEffects.json` in `helldivers-2/json`. The variant enemies in `enemies.json` switch on from the same list. Re-ranking lists with it is the curator's call, with measurements in front of him
 - **filediver's explosion, beam and hit-zone tables** no longer decode after a patch. When they do: `npm run game -- --refresh`, then extend `scripts/data/game-ids.json` to grenades, eagles, orbitals, mines, lasers, arc weapons and enemy armour

@@ -148,13 +148,14 @@ for (const rule of RULES) {
   for (const loadout of [...SAMPLE, ...RANDOM]) {
     const isRandom = loadout.id.startsWith("random-");
     for (const scenario of scenariosFor(loadout)) {
-      /* A rule gated on a biome or a mission trait needs one, or it reads
-         as dead when it is only unasked. Same correction check-rules.mjs
-         makes for difficulty and squad. */
+      /* A rule gated on a biome, a hazard or a mission trait needs one, or
+         it reads as dead when it is only unasked. Same correction
+         check-rules.mjs makes for difficulty and squad. */
       const when = rule.when || {};
       const s = {
         ...scenario,
         biome: (when.biome || [])[0] ?? scenario.biome,
+        hazards: when.hazard ? [when.hazard[0]] : scenario.hazards,
         mission: when.mission ? missionWith(when.mission) : scenario.mission,
       };
       if (!isRandom) eligible += 1;
