@@ -165,7 +165,7 @@ Everything lives in `src/data` as JSON. Components read from it and hold no tabl
 - **`roles`** (`anti-armor`, `chaff`, `objective`) and **`tags`** are ours. See Tags And Roles.
 - **`flag`** is `"stale"` (needs a `patchNote`) or `"new"` (in the game, no rating yet).
 - **`effect` versus `note`.** Armour passives and boosters carry an `effect`, what the thing does. Everything else carries a `note`, which is opinion. Never both.
-- **`passive`**, armour only: the effect's percentages as numbers a rule can scale off, `{ "fireResist": 75 }`. Keys are a closed list (`PASSIVE_KEYS` in `validate.mjs`); `stimDuration` is seconds, the rest percent. **Change `effect` and `passive` together.**
+- **`passive`**, armour only: the effect's numbers as a rule can scale off them, `{ "fireResist": 75 }`, and the counts and rating the effect states (`stims`, `throwables`, `ammoCapacity`, `armourRating`). Keys are a closed list (`PASSIVE_KEYS` in `validate.mjs`); `stimDuration` is seconds, the rest percent. **Change `effect` and `passive` together.**
 - **`stats` stay sparse.** Leave a figure absent rather than guess it; fetch it instead.
 - **`statsFor(id)`** in `items.js` is how anything reads stats: the wiki's figures with the game's laid over them.
 
@@ -253,9 +253,9 @@ Each row's second rating is the vote's score plus what the scenario's rules add,
 - **Points, never floors or ceilings.** A floor flattens every item sharing a tag into one tier. If a floor and ceiling ever contradict, neither applies and the points stand (`contradiction: true`); `npm run rules` sweeps for it.
 - **The clamp** is two tiers, growing past peril 22 (`swingFor`: `28 + max(0, peril - 22) * 0.5`). It is permission, not force.
 - **A rule that can invert must carry `sayInverted`**, and the validator checks. Inverted means the delta came out opposite to the sign of `scaleBy.times`, not simply negative.
-- **Match keys.** `tags`/`notTags` read our `item.tags`; `gameTags` reads the wiki's `wiki.tags` (screaming caps). `idIn`/`notIdIn` exist and nothing uses them. `noNumber` means "no number at this path". `held` means a held weapon (`isHeldWeapon` in `loadouts.js`). The engine throws on an unknown key, and the validator catches it first.
+- **Match keys.** `tags`/`notTags` read our `item.tags`; `gameTags` reads the wiki's `wiki.tags` (screaming caps). `idIn` names items by hand, only where no field says it, and the rule's `judgement` says so. `noNumber` means "no number at this path". `notDamageType` leaves a damage type out: the loud weapon rules use it so a melee weapon, which has no loudness class, is not counted as a medium gun. `held` means a held weapon (`isHeldWeapon` in `loadouts.js`). The engine throws on an unknown key, and the validator catches it first.
 - **Weather prices a risk, not a state**: a sandstorm planet has storms sometimes. Extreme cold and intense heat are climate and are not softened. Reduced visibility is partly a gift solo, as its own rule.
-- **A known gap, not agreement**: outside the stealth rules, difficulty and squad size move nothing on bugs or squids. The u.gg vote is a blur over every difficulty and squad size, so a list that matches it at four players has not reached a baseline; it has run out of rules. Do not quote "at a full squad it agrees with u.gg" as a principle.
+- **Depth on every front**: anti-tank helps from peril 22 on Automatons and Terminids, crowd clear from peril 22 on Terminids and Illuminate, anti-tank from difficulty 8 on the Illuminate for the Leviathans, and anti-tank is marked down at peril 0 or less on every front, because no armoured heavy spawns below difficulty 3. The u.gg vote is a blur over every difficulty and squad size, so agreeing with it at four players is not a baseline. Do not quote "at a full squad it agrees with u.gg" as a principle.
 - **`src/lib/place.js`** holds the terrain, city and mission minutes lookups the rules read, pure, so scripts read them too.
 - **The city is a guess** from the planet listing a megacity (the mission may be outside it), so city rules carry half weight and say so. The terrain table in `vocabulary.json` is the curator's draft and his to correct.
 
@@ -264,19 +264,20 @@ Each row's second rating is the vote's score plus what the scenario's rules add,
 Difficulty and squad size as one number:
 
 ```
-peril = 6 * (difficulty - 5) + SQUAD_PRESSURE[squad]
+peril = 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] + FRONT_PRESSURE[front]
 SQUAD_PRESSURE = [10, 4, 1, 0]
+FRONT_PRESSURE = { bots: 2, squids: 2, bugs: 0 }
 ```
 
-Solo on 7 and two of you on 8 both sit at 22; four on 10 is 30. The squad curve comes from the wiki's patrol multipliers (second player 0.8333, third 0.75); the fourth column is an extrapolation and a guess. `peril()` returns null unless both difficulty and squad are set. **To choose a coefficient**: at what peril should this be worth one tier (about 14 points)? `times = 14 / (thatPeril - from)`.
+Against Terminids, solo on 7 and two of you on 8 both sit at 22; four on 10 is 30. **The front term is the curator's**: Automatons and Illuminate play slightly harder, a third of a difficulty step. About's Peril section states all three terms. The squad curve comes from the wiki's patrol multipliers (second player 0.8333, third 0.75); the fourth column is an extrapolation and a guess. `peril()` returns null unless both difficulty and squad are set. **To choose a coefficient**: at what peril should this be worth one tier (about 14 points)? `times = 14 / (thatPeril - from)`.
 
 - **A peril rule never names a squad size in its copy.** Depth reaches peril as readily as being alone. If a rule must talk about how many of you, it gates on `squad` and says so.
-- **Stealth is for one or two of you.** Every stealth rule also gates on `squad: { lte: 2 }`. Quiet weapons, stealth armour and storms from peril 22; loud weapons marked down from peril 28 by the game's loudness class (small -0.15, medium and unknown -0.25, large and huge -0.4 per peril point past 16, bots); bugs and squids at six tenths of the bot figures. Not needing stealth is never a penalty, except stealth armour below peril 0.
+- **Stealth is for one or two of you.** Every stealth rule also gates on `squad: { lte: 2 }`. Quiet weapons, stealth armour and storms from peril 22; loud weapons marked down from peril 28 by the game's loudness class (small -0.15, medium and unknown -0.25, large and huge -0.4 per peril point past 16, bots); bugs and squids at six tenths of the bot figures, and on the Illuminate `stingrays-find-you` takes part of that back (Stingrays detect anyone in the mission area; only Watchers call reinforcements). Rain counts as a storm, like fog. Not needing stealth is never a penalty, except stealth armour below peril 0.
 - **The squad panel reads peril too**: coverage checks from peril 12, the "only anti-tank" warning from 22, falling back to the difficulty band when no level is set.
 
 ### Pairings
 
-What a piece is worth beside the rest of its build: True Grit beside a long reload, Gunslinger beside a pistol, Inflammable beside a Cremator. **A pairing is an ordinary item rule with an `alongside` or `notAlongside` clause**, matched against `scenario.alongside`. `readBuild` and the editor set it for every part, slot and picker candidate; **the tier list never does, so a pairing never fires on a bare row.** A pairing may scale off its partner (`alongside.passive.fireResist`). Weight rules read `scenario.weight`; builds with no armour set have no weight and those rules stay silent. `npm run builds` measures pairings by placing their items into seeded random builds. **Points preserve order, so the vote still decides a lot**: a pairing is a strong argument, not a floor. When one looks too weak, that is why, and the curator should hear it rather than get a floor.
+What a piece is worth beside the rest of its build: True Grit beside a long reload, Gunslinger beside a pistol, Inflammable beside a Cremator. **A pairing is an ordinary item rule with an `alongside` or `notAlongside` clause**, matched against `scenario.alongside`. `readBuild` and the editor set it for every part, slot and picker candidate; **the tier list never does, so a pairing never fires on a bare row.** A pairing may scale off its partner (`alongside.passive.fireResist`). Weight rules read `scenario.weight`; builds with no armour set have no weight and those rules stay silent. `npm run builds` measures pairings by placing their items into seeded random builds. **True Grit is a ladder** on the support weapon's reload: stationary for 4 seconds or more, then any reload of 3 seconds or more, then a short or rare one, with the armour's own reading stepping down beside it. Heat weapons and weapons that never reload get nothing. **Points preserve order, so the vote still decides a lot**: a pairing is a strong argument, not a floor. When one looks too weak, that is why, and the curator should hear it rather than get a floor.
 
 ### The loadout reading: `src/lib/build.js` and `build-rules.json`
 
@@ -292,7 +293,7 @@ A build gets **two badges**: the gear badge, the mean of its nine parts each sco
 
 Both are **our judgement, never a vote**, and the UI keeps them visibly separate from ratings ("our call, not a vote").
 
-- **`tags`** (`long-range`, `close-blast`, `suppressed`) are what a rule needs that no fetched field answers. Each declares `source` in `vocabulary.json` (`curator`, `wiki` or `game`; the validator rejects anything else). `suppressed` is the game's `is_suppressed` flag, checked by the validator, with the Re-Educator kept suppressed by hand (`SUPPRESSED_BY_HAND`).
+- **`tags`** (`long-range`, `close-blast`, `suppressed`) are what a rule needs that no fetched field answers. Each declares `source` in `vocabulary.json` (`curator`, `wiki` or `game`; the validator rejects anything else). `suppressed` is the game's `is_suppressed` flag, checked by the validator, with the Re-Educator kept suppressed by hand (`SUPPRESSED_BY_HAND`). `close-blast` marks a weapon whose own explosion reaches you up close; the expanded row shows it as a "Hurts you up close" marker on the Blast line.
 - **`roles`** (`anti-armor`, `chaff`, `objective`) are written by `scripts/tag-roles.mjs`, never by hand: `npm run roles` reports, `node scripts/tag-roles.mjs --write` applies, and **any role set elsewhere is deleted by the next run**. Anti-armor derives from `apClass` AT or Heavy, gated on lethality (no `utility` or `gas`), with the AP 4 Heavy band decided by `HEAVY_INCLUDE`. Chaff derives from category plus `CHAFF_INCLUDE`, and **means rate, not capability**: the Eruptor and sidearms are not chaff. Objective is hand listed, plus throwables at demolition 30 or more; eagles and orbitals are excluded. An empty role list is normal.
 
 ### The squad panel: `src/lib/squad.js`

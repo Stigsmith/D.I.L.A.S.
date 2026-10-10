@@ -54,6 +54,9 @@ const PASSIVE_KEYS = set([
   "throwRange", "detectionRange", "movementNoise", "crouchRecoil",
   /* Seconds rather than a percentage, still inside the 1 to 100 check. */
   "stimDuration",
+  /* Counts and a rating rather than percentages, from the effect line:
+     +2 stims, +2 throwables, +20% ammo, +50 armour rating. */
+  "stims", "throwables", "ammoCapacity", "armourRating",
 ]);
 const ROLES = set(vocab.roles);
 /* Ours, plus the sourced facts the fetch does not reach yet. Each one     */

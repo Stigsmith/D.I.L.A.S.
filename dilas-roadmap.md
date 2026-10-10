@@ -4,6 +4,29 @@
 
 ---
 
+## The order
+
+1. **The rules.** 1.34.0 is the first pass: depth on every front, the True Grit ladder, and the misfires the audit found. What is left is under Rules still to write.
+2. **Bin the curated builds and build a new set.** All 39 go, none kept: they are AI generations from before 1.0, two names ago. The new set is made once the rules stand, so the rules rate it.
+3. **Accounts**, then the rest of the server track, then everything else.
+
+When those three are done, the tool is ready to show the public.
+
+---
+
+## Rules still to write
+
+From the 1.34.0 audit. Each one needs its source read before it is written, and measuring with `npm run rules` after.
+
+- **Explosion radius from the wiki.** The weapon pages give inner, outer and shockwave radii (the Breacher's does). A fetch of them could replace the `close-blast` judgement with a figure
+- **Fliers by difficulty.** Stingrays from difficulty 4 on the Illuminate, Gunships from 5 on the Automatons, Shriekers and Dragonroaches on the Terminids. The wiki names lock-on (Spear, W.A.S.P.) and the Laser Cannon against Stingrays. Worth a rule only if fliers change enough with difficulty
+- **Explosive resistance at depth against the Automatons**: War Striders from difficulty 6, Barrager Tanks from 7
+- **Surviving a lethal hit at depth** (Democracy Protects, Adreno-Defibrillator). Commando has it; peril does not yet
+- **Watchers.** Arc weapons stun a Watcher and stop its call. A front fact the vote already prices, unless it pairs with stealth
+- **Illuminate fire multipliers**: Fleshmob 1.8x fire and arc, Harvester 1.5x fire, Voteless 0.75x. Front facts the vote prices, unless a mission or subfaction changes the mix
+
+---
+
 ## Waiting on the curator
 
 > [!danger] Accounts stay shut until a forgotten password has a way back
@@ -19,7 +42,7 @@
   - What counts as a run and a clear? Leaderboards cannot exist until this is answered
   - Moderation, before anything discoverable ships. Builds carry free text notes. And if Exchange lets people rate builds, who may vote: open voting is unusable within a week
   - Rating disagreements between sources. The SG-8 Punisher Plasma is S+ on u.gg and B on GamesRadar; the tool shows only u.gg. Averaging would lose the most useful signal, so if it is ever shown, show both
-  - Three defaults applied in 1.31.0 for him to overturn: the Autocannon is not `close-blast`, the Stalwart gets +2 beside True Grit, and the expendable-beside-a-support-weapon warning moves no points
+  - The expendable warning: an EAT or Commando beside another support weapon shows a warning, because you drop one to use the other, and costs no points. Keep it as it is, give it points, or drop it
   - A ceiling for gear the game refuses. A reinforcement booster on a Commando mission reads B, because two tiers is the most a scenario may move anything
   - Whether switched-off rules go into the export
   - Whether melee weapons get joined to the game tables by hand, and whether vehicles and exosuits do (the game splits each one into its guns)
@@ -29,11 +52,12 @@
 
 ## Waiting on a source
 
+- **Meteor storms, acid resistance and most boosters** have no rule because no source gives a figure: meteor damage type, whether acid resistance softens an acid storm, how much Localization Confusion or the reinforcement boosters change with depth. See `knownGaps` in `context-rules.json`
+- **Illuminate subfactions.** Stingrays are absent under the Appropriators, Mindless Masses and Vote Snatchers, and Voteless under the last two. Nothing the tool reads says which one holds a planet
 - **Planet effects in the ratings.** The real prize of the live war. `api.helldivers2.dev`'s tidy endpoints carry none. Only `/raw/api/WarSeason/801/Status` holds `planetActiveEffects`, and it has been unreliable. Definitions are in `effects/planetEffects.json` in `helldivers-2/json`. The variant enemies in `enemies.json` switch on from the same list. Re-ranking lists with it is the curator's call, with measurements in front of him
 - **filediver's explosion, beam and hit-zone tables** no longer decode after a patch. When they do: `npm run game -- --refresh`, then extend `scripts/data/game-ids.json` to grenades, eagles, orbitals, mines, lasers, arc weapons and enemy armour
 - **Ratings:** the P/40-K Bolt Pistol has none yet, and the P-33 Missile Pistol keeps a 6.3.1 rating until u.gg lists it again
 - **Data:** the TD-110 Maelstrom has no wiki data; the G-8 Immolation has no armour penetration or demolition of its own (the wiki's AP 0 looks like the burn, and was not copied)
-- **Inferences from 1.23.0, to correct when a source says otherwise:** the LAS-12 Sai is recorded as Superstore from the icon u.gg shows beside it; the P-34 Breacher's damage type is `fire`, and it has no objective role pending its demolition figure
 - **Art:** the eleven items added in 1.23.0, Electrical Conduit, and the Ironclad Democracy cover. The curator adds art
 - **Rules held back until a source says:** whether Med-Kit lengthens Experimental Infusion; Localization Confusion and squad size; the Hover Pack on steep ground; whether the Shield Generator Pack stops your own blast throwing you; whether a Solo Silo keeps firing through an ion storm or a jammer
 - **Per-planet mission lists.** The drop planner narrows missions by front, because nothing says which planets offer which missions
@@ -56,7 +80,7 @@ Also on this track: saving a squadmate's build straight from their party slot (i
 
 ### On its own
 
-- **Replace the 39 curated builds.** They are legacy AI generations, and are to be binned and rebuilt by a separate tool that reads this project's data and writes `loadouts.json`. `readBuild` is the validator and `check-builds.mjs` already generates and scores legal builds; what is missing is the steering, with variety as a hard constraint (no item in more than N builds, every A or better item on a front used at least once). When the set changes, rewrite the citations of the 39 in `build-rules.json` and rerun `npm run builds`. Two known faults in the current set disappear with it: True Grit is in none of them, though it is S+ on every front, and `bugs-blender` is marked `fire: false` while carrying the most committed fire kit of the lot. **This is not the auto-calibration that was declined**
+- **Replace the 39 curated builds.** Second in the order above. They are legacy AI generations from before 1.0, and all of them are binned and rebuilt by a separate tool that reads this project's data and writes `loadouts.json`. `readBuild` is the validator and `check-builds.mjs` already generates and scores legal builds; what is missing is the steering, with variety as a hard constraint (no item in more than N builds, every A or better item on a front used at least once). When the set changes, rewrite the citations of the 39 in `build-rules.json` and rerun `npm run builds`. Two known faults in the current set disappear with it: True Grit is in none of them, though it is S+ on every front, and `bugs-blender` is marked `fire: false` while carrying the most committed fire kit of the lot. **This is not the auto-calibration that was declined**
 - **The roll-the-dice generator** in the builder: a roll you ask for, that does not just take the top item in every slot, with playstyle options. Parked until the coverage logic is good enough to be worth rolling
 - **A wider warning set**, as a design session first: what else kills a run; whether range band and ammo economy become tagged axes; whether difficulty scales thresholds rather than gating them
 - **Superstore and event armour sets have no lock of their own.** Sets from a warbond lock with it; the others need a per set lock in Collection, which touches the profile shape

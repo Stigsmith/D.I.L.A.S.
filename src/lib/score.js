@@ -75,6 +75,7 @@ const swingFor = (peril) => (peril === null ? MAX_SWING : MAX_SWING + Math.max(0
 /* scenario answers that decide it.                                    */
 /*                                                                     */
 /*   peril = 6 * (difficulty - 5) + SQUAD_PRESSURE[squad]              */
+/*           + FRONT_PRESSURE[front]                                   */
 /*                                                                     */
 /* **It is not points and nothing adds it to a score.** Rules gate on  */
 /* it, and may one day scale off it. Its magnitude changes no rating   */
@@ -85,7 +86,8 @@ const swingFor = (peril) => (peril === null ? MAX_SWING : MAX_SWING + Math.max(0
 /* comfortable through 3. Solo at 2 is daycare and difficulty 1 exists */
 /* to onboard somebody for a mission or two. It runs from -24, four    */
 /* players on Trivial, to +42 alone on Super Helldive, which he rates  */
-/* as suicide and thinks is still generous.                            */
+/* as suicide and thinks is still generous; +44 on the two harder      */
+/* fronts.                                                             */
 /*                                                                     */
 /* **It replaces a cliff.** The three rules that read squad used to    */
 /* gate on difficulty >= 7 and squad <= 1, which made solo at 6 and a  */
@@ -107,8 +109,15 @@ export function peril(scenario = {}) {
   const d = scenario.difficulty;
   const sq = scenario.squad;
   if (!d || !sq) return null;
-  return 6 * (d - 5) + SQUAD_PRESSURE[sq - 1];
+  return 6 * (d - 5) + SQUAD_PRESSURE[sq - 1] + (FRONT_PRESSURE[scenario.faction] || 0);
 }
+
+/* The fronts are not equally hard at the same difficulty. The curator
+   rates Automatons and Illuminate slightly harder than Terminids, and
+   slightly is a third of a difficulty step: 2 against the 6 a level is
+   worth. A judgement from play, not a published figure, and About says
+   so. No front chosen counts as Terminids, which adds nothing. */
+const FRONT_PRESSURE = { bots: 2, squids: 2, bugs: 0 };
 
 /* How much more of the war lands on you per person, by squad size.       */
 /*                                                                        */
@@ -188,6 +197,13 @@ export function matches(ctx, match) {
     }
     if (key === "notIdIn") {
       if (asArray(want).includes(item.id)) return false;
+      continue;
+    }
+    /* Everything but these damage types. The loud weapon rules use it to
+       leave out melee, which has no loudness class in the game file but
+       makes no gunshot either. */
+    if (key === "notDamageType") {
+      if (asArray(want).includes(item.damageType)) return false;
       continue;
     }
     if (key === "hasWiki") {

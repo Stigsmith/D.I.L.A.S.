@@ -200,6 +200,6 @@ For every line:
 
 # **Still Open**
 
-- **Peril on screen.** Rule names show it as a number, so it needs its explanation on About (a placeholder is there) and a hover wherever it appears.
+- **Peril on screen.** About explains it since 1.34.0. Rule names still show it as a bare number, with no hover where it appears.
 - **An AP table**, one reference of enemy armour per front, linked from the armour block.
 - **A contact channel**, so Missing data can say where to send a source. It waits on the feedback form.

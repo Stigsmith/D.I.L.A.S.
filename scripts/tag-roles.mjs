@@ -150,6 +150,7 @@ const OBJECTIVE_INCLUDE = [
   "eat-17-expendable-anti-tank",
   "las-99-quasar-cannon",
   "gp-20-ultimatum",
+  "p-34-breacher",                   /* demo 30 blast on the wiki, like the Grenade Pistol; three rounds */
   "md-17-anti-tank-mines",           /* note: demo 40 as of 7.0.0, closes holes from outside */
   "td-220-bastion-mk-xvi",           /* a main cannon at demo 40 */
 ];
@@ -213,9 +214,11 @@ for (const item of items) {
 
 /* Ordered so the field lands next to the other judgment fields rather */
 /* than at the end of the object, where it reads as an afterthought.   */
+/* An armour passive's numbers sit right after its effect line, since  */
+/* the two are edited together; undefined drops out for everything else. */
 const ordered = items.map((item) => {
-  const { roles, traits, flag, patchNote, effect, note, ...head } = item;
-  return { ...head, roles, traits, flag, patchNote, effect, note };
+  const { roles, traits, flag, patchNote, effect, passive, note, ...head } = item;
+  return { ...head, roles, traits, flag, patchNote, effect, passive, note };
 });
 
 const rated = items.filter(isRated);

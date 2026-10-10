@@ -164,9 +164,23 @@
       "say": "Weapon figures and loudness for 105 weapons come from the game's own files, with the wiki filling the rest."
     },
     {
+      "id": "depth",
+      "title": "Every front responds to depth",
+      "status": "next",
+      "track": "solo",
+      "say": "Difficulty, squad size and front change ratings on all three fronts, and more of the armoury has rules."
+    },
+    {
+      "id": "curated",
+      "title": "New curated builds",
+      "status": "next",
+      "track": "solo",
+      "say": "Every preset build replaced with a new set, made from the tool's own ratings and rules."
+    },
+    {
       "id": "effects",
       "title": "Planet effects in the ratings",
-      "status": "next",
+      "status": "later",
       "track": "solo",
       "say": "Live planet effects, like strains and surges, changing what the tool suggests."
     },

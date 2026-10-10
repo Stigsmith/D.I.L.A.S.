@@ -156,6 +156,11 @@ const PATHS = {
   "passive.primaryReload": ["primary reload bonus", "%"],
   "passive.crouchRecoil": ["recoil cut when crouched", "%"],
   "passive.stimDuration": ["extra stim time", " seconds"],
+  "passive.stims": ["extra stims"],
+  "passive.throwables": ["extra throwables"],
+  "passive.ammoCapacity": ["extra ammo capacity", "%"],
+  "passive.armourRating": ["armour rating bonus"],
+  "wiki.primary.dmg": ["damage"],
 };
 /* A partner's passive is always its armour's, the one thing in a build
    that carries a passive. */
@@ -204,6 +209,7 @@ const MATCH_WORDS = {
   slot: (v) => article(list([].concat(v).map((x) => SLOT_WORDS[x] || x))),
   category: (v) => `${list([].concat(v))} weapons`,
   damageType: (v) => `${list([].concat(v))} damage`,
+  notDamageType: (v) => `except ${list([].concat(v))} weapons`,
   tags: (v) => `our ${list([].concat(v))} tag`,
   notTags: (v) => `without our ${list([].concat(v))} tag`,
   gameTags: (v) => `game tag ${list([].concat(v).map((t) => t.toLowerCase()))}`,
