@@ -242,6 +242,7 @@ function clauseWords(m) {
       out.push(branches.every((b) => !b.includes(",")) ? branches.join(" or ") : `one of: ${branches.join("; or ")}`);
       continue;
     }
+    if (key === "not") { out.push(`not ${clauseWords(v).join(", ")}`); continue; }
     if (key === "alongside") { out.push(`with ${clauseWords(v).join(", ")} in the build`); continue; }
     if (key === "notAlongside") { out.push(`with nothing in the build that is ${clauseWords(v).join(", ")}`); continue; }
     if (MATCH_WORDS[key]) { out.push(MATCH_WORDS[key](v)); continue; }

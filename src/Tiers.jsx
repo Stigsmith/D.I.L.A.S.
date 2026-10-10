@@ -1155,8 +1155,8 @@ function RowDetail({ item, faction, scored, difficulty }) {
                   ? <>
                     {wiki.blast.dmg}
                     {item.tags.includes("close-blast") ? (
-                      <Tip text="The explosion reaches you. Do not fire at enemies right in front of you." className="ml-1.5 cursor-help">
-                        <span className="inline-block rounded border border-base-700 px-1.5 text-[10px] uppercase leading-4 tracking-wider text-base-400">Hurts you up close</span>
+                      <Tip text="Its explosive splash damages you too. Do not fire at enemies right in front of you." className="ml-1.5 cursor-help">
+                        <span className="inline-block rounded border border-base-700 px-1.5 text-[10px] uppercase leading-4 tracking-wider text-base-400">Splash hurts you</span>
                       </Tip>
                     ) : null}
                   </>

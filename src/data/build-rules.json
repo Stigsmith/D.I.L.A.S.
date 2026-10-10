@@ -182,7 +182,7 @@
     },
     {
       "id": "expendable-beside-a-support-weapon",
-      "name": "Expendable beside a support weapon",
+      "name": "Overlapping support weapons",
       "when": {},
       "match": {
         "count": [
@@ -211,8 +211,117 @@
       },
       "delta": 0,
       "severity": "grey",
-      "say": "You carry one support weapon at a time, so firing the expendable means dropping the other one first. Fine if the launchers are for your squad.",
+      "say": "You hold one support weapon at a time.",
       "measured": "No points: bringing launchers for the squad is a good reason. The Solo Silo is left out, because you set it down and fire it from a distance."
+    },
+    {
+      "id": "own-fire-no-resistance",
+      "name": "Fire weapon, no fire resistance",
+      "when": {},
+      "match": {
+        "count": [
+          {
+            "of": {
+              "held": true,
+              "damageType": [
+                "fire"
+              ]
+            },
+            "gte": 1
+          },
+          {
+            "of": {
+              "anyOf": [
+                {
+                  "slot": "armor",
+                  "number": [
+                    {
+                      "path": "passive.fireResist",
+                      "gte": 25
+                    }
+                  ]
+                },
+                {
+                  "idIn": [
+                    "integrated-extinguishers"
+                  ]
+                }
+              ]
+            },
+            "lte": 0
+          }
+        ]
+      },
+      "delta": 0,
+      "severity": "grey",
+      "say": "Your own fire burns you too. Nothing here resists fire or puts it out.",
+      "measured": "No points: plenty of players run fire without it. Counts fire resistance of 25% or more, or Integrated Extinguishers."
+    },
+    {
+      "id": "storm-long-range-only",
+      "name": "No close range weapon · storms, fog",
+      "when": {
+        "hazard": [
+          "sandstorms",
+          "blizzards",
+          "rainstorms",
+          "thick_fog"
+        ]
+      },
+      "match": {
+        "count": [
+          {
+            "of": {
+              "held": true,
+              "anyOf": [
+                {
+                  "slot": "primary"
+                },
+                {
+                  "stratType": "support"
+                }
+              ],
+              "not": {
+                "anyOf": [
+                  {
+                    "category": [
+                      "Marksman"
+                    ]
+                  },
+                  {
+                    "tags": [
+                      "long-range"
+                    ]
+                  }
+                ]
+              }
+            },
+            "lte": 0
+          },
+          {
+            "of": {
+              "held": true,
+              "anyOf": [
+                {
+                  "category": [
+                    "Marksman"
+                  ]
+                },
+                {
+                  "tags": [
+                    "long-range"
+                  ]
+                }
+              ]
+            },
+            "gte": 1
+          }
+        ]
+      },
+      "delta": 0,
+      "severity": "grey",
+      "say": "Storms and fog cut visibility. Your primary and support weapon both work best at range.",
+      "measured": "No points: a storm passes, and you can play around it. Checks the primary and support weapon, since a sidearm rarely carries a fight."
     },
     {
       "id": "half-built",

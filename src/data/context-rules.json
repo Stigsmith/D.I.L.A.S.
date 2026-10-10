@@ -105,7 +105,7 @@
           "Marksman"
         ]
       },
-      "delta": -8,
+      "delta": -3,
       "say": "Sandstorms reduce visibility, so long range weapons are less useful. Each storm lasts about 3 minutes."
     },
     {
@@ -121,7 +121,7 @@
           "long-range"
         ]
       },
-      "delta": -8,
+      "delta": -3,
       "say": "Sandstorms reduce visibility, so long range weapons are less useful. Each storm lasts about 3 minutes.",
       "judgement": "No published stat marks a support weapon as long range, so we tag them by hand. Projectile speed does not separate them: lasers read 1300, assault rifles 820."
     },
@@ -139,15 +139,16 @@
           "SMG"
         ]
       },
-      "delta": 10,
+      "delta": 4,
       "say": "Sandstorms reduce visibility, so most fights happen at close range."
     },
     {
       "id": "blizzard-blinds-marksmen",
-      "name": "Marksman rifles less useful · blizzards",
+      "name": "Marksman rifles less useful · blizzards, rainstorms",
       "when": {
         "hazard": [
-          "blizzards"
+          "blizzards",
+          "rainstorms"
         ]
       },
       "match": {
@@ -155,15 +156,17 @@
           "Marksman"
         ]
       },
-      "delta": -6,
-      "say": "Blizzards reduce visibility while they last, so long range weapons are less useful."
+      "delta": -3,
+      "say": "Blizzards and rainstorms reduce visibility while they last, so long range weapons are less useful.",
+      "judgement": "Rain counts the same as a blizzard: the wiki says rain reduces visibility, but not by how much."
     },
     {
       "id": "blizzard-blinds-long-support",
-      "name": "Long range support weapons less useful · blizzards",
+      "name": "Long range support weapons less useful · blizzards, rainstorms",
       "when": {
         "hazard": [
-          "blizzards"
+          "blizzards",
+          "rainstorms"
         ]
       },
       "match": {
@@ -171,16 +174,17 @@
           "long-range"
         ]
       },
-      "delta": -6,
-      "say": "Blizzards reduce visibility while they last, so long range weapons are less useful.",
-      "judgement": "No published stat marks a support weapon as long range, so we tag them by hand. Projectile speed does not separate them: lasers read 1300, assault rifles 820."
+      "delta": -3,
+      "say": "Blizzards and rainstorms reduce visibility while they last, so long range weapons are less useful.",
+      "judgement": "No published stat marks a support weapon as long range, so we tag them by hand. Projectile speed does not separate them: lasers read 1300, assault rifles 820. Rain counts the same as a blizzard: the wiki says rain reduces visibility, but not by how much."
     },
     {
       "id": "blizzard-favours-close",
-      "name": "Shotguns and SMGs help · blizzards",
+      "name": "Shotguns and SMGs help · blizzards, rainstorms",
       "when": {
         "hazard": [
-          "blizzards"
+          "blizzards",
+          "rainstorms"
         ]
       },
       "match": {
@@ -189,16 +193,16 @@
           "SMG"
         ]
       },
-      "delta": 7,
-      "say": "Blizzards reduce visibility, so fights start at closer range."
+      "delta": 3,
+      "say": "Blizzards and rainstorms reduce visibility while they last, so fights start at closer range.",
+      "judgement": "Rain counts the same as a blizzard: the wiki says rain reduces visibility, but not by how much."
     },
     {
       "id": "fog-blinds-marksmen",
-      "name": "Marksman rifles less useful · thick fog, rainstorms",
+      "name": "Marksman rifles less useful · thick fog",
       "when": {
         "hazard": [
-          "thick_fog",
-          "rainstorms"
+          "thick_fog"
         ]
       },
       "match": {
@@ -207,16 +211,15 @@
         ]
       },
       "delta": -5,
-      "say": "Thick fog and heavy rain reduce visibility, so long range weapons are a little less useful.",
-      "judgement": "Rain counts the same as fog: the wiki says rain reduces visibility, but not by how much."
+      "say": "Thick fog reduces visibility for the whole mission, so long range weapons are a little less useful.",
+      "source": "helldivers.wiki.gg, Stealth: thick fog reduces vision for the entire mission."
     },
     {
       "id": "fog-blinds-long-support",
-      "name": "Long range support weapons less useful · thick fog, rainstorms",
+      "name": "Long range support weapons less useful · thick fog",
       "when": {
         "hazard": [
-          "thick_fog",
-          "rainstorms"
+          "thick_fog"
         ]
       },
       "match": {
@@ -225,8 +228,9 @@
         ]
       },
       "delta": -5,
-      "say": "Thick fog and heavy rain reduce visibility, so long range weapons are a little less useful.",
-      "judgement": "No published stat marks a support weapon as long range, so we tag them by hand. Projectile speed does not separate them: lasers read 1300, assault rifles 820. Rain counts the same as fog: the wiki says rain reduces visibility, but not by how much."
+      "say": "Thick fog reduces visibility for the whole mission, so long range weapons are a little less useful.",
+      "judgement": "No published stat marks a support weapon as long range, so we tag them by hand. Projectile speed does not separate them: lasers read 1300, assault rifles 820.",
+      "source": "helldivers.wiki.gg, Stealth: thick fog reduces vision for the entire mission."
     },
     {
       "id": "tremors-punish-standing-still",
@@ -560,6 +564,25 @@
       },
       "delta": 10,
       "say": "You have 12 minutes to destroy every structure on the map. Demolition force 40 or more closes each one from outside, with no throw to line up."
+    },
+    {
+      "id": "blitz-wants-to-move",
+      "name": "Moving faster helps · Blitz",
+      "when": {
+        "mission": [
+          "blitz"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "stamina-enhancement",
+          "dead-sprint",
+          "oxygenator"
+        ]
+      },
+      "delta": 5,
+      "say": "Blitz is a race to every nest or fabricator before the clock runs out. This lets you run faster or longer.",
+      "judgement": "Named by hand: no published stat marks what makes you faster."
     },
     {
       "id": "carry-wants-sidearm",
@@ -1146,7 +1169,7 @@
       "judgement": "Takes back part of the stealth rules on this front, so stealth counts for less against the Illuminate than against the Terminids."
     },
     {
-      "id": "depth-wants-anti-tank",
+      "id": "more-heavies-want-anti-tank",
       "name": "Anti-tank helps · Automatons, Terminids, peril 22+",
       "when": {
         "faction": [
@@ -1173,7 +1196,7 @@
       "judgement": "The size is ours: under half a tier at peril 30, the most from peril 36."
     },
     {
-      "id": "depth-wants-crowd-clear",
+      "id": "more-enemies-want-crowd-clear",
       "name": "Crowd clear helps · Terminids, Illuminate, peril 22+",
       "when": {
         "faction": [
@@ -1232,7 +1255,57 @@
       "judgement": "The Anti-Tank Emplacement is named by hand, because the wiki names it."
     },
     {
-      "id": "shallow-drop-less-anti-tank",
+      "id": "lock-on-for-stingrays",
+      "name": "Lock-on helps · Illuminate, difficulty 4+",
+      "when": {
+        "faction": [
+          "squids"
+        ],
+        "difficulty": {
+          "gte": 4
+        }
+      },
+      "match": {
+        "idIn": [
+          "faf-14-spear",
+          "sta-x3-wasp-launcher"
+        ]
+      },
+      "delta": 5,
+      "say": "Stingrays strafe from the air. The Spear and W.A.S.P. lock on to them and hit as they slow to attack.",
+      "source": "helldivers.wiki.gg, Stingray.",
+      "judgement": "Named by hand, because the wiki names these two."
+    },
+    {
+      "id": "explosive-resist-vs-striders",
+      "name": "Explosive resistance helps · Automatons, difficulty 6+",
+      "when": {
+        "faction": [
+          "bots"
+        ],
+        "difficulty": {
+          "gte": 6
+        }
+      },
+      "match": {
+        "slot": "armor",
+        "number": [
+          {
+            "path": "passive.explosiveResist",
+            "gte": 1
+          }
+        ]
+      },
+      "scaleBy": {
+        "path": "passive.explosiveResist",
+        "times": 0.1,
+        "clamp": 5
+      },
+      "say": "War Striders fire grenade salvos from difficulty 6, and Barrager Tanks fire rockets from 7. This armour resists explosive damage.",
+      "source": "helldivers.wiki.gg, War Strider and Barrager Tank."
+    },
+    {
+      "id": "few-heavies-less-anti-tank",
       "name": "Anti-tank less needed · peril 0 or less",
       "when": {
         "peril": {
@@ -1393,7 +1466,7 @@
         ]
       },
       "delta": 10,
-      "say": "Resupply is a stratagem, so it comes twice at most here. Supplies you bring make up for the missing resupplies.",
+      "say": "Resupply works for the first minute and once more per Helldiver here. Supplies you bring make up for the rest.",
       "source": "helldivers.wiki.gg, Commando Missions",
       "judgement": "Named by hand: no published stat marks an item as carrying supplies."
     },
@@ -1485,7 +1558,7 @@
         ]
       },
       "delta": 6,
-      "say": "Resupply is a stratagem, so it comes twice at most here. This armour carries more ammo, grenades or stims.",
+      "say": "Resupply works for the first minute and once more per Helldiver here. This armour carries more ammo, grenades or stims.",
       "source": "helldivers.wiki.gg, Commando Missions"
     },
     {
@@ -1502,10 +1575,28 @@
           "adreno-defibrillator"
         ]
       },
-      "delta": 8,
+      "delta": 5,
       "say": "No reinforcements arrive until you find the pods. This armour can keep you alive through a lethal hit.",
       "source": "helldivers.wiki.gg, Commando Missions",
       "judgement": "Named by hand: no published stat marks a passive that survives death."
+    },
+    {
+      "id": "commando-localization-confusion",
+      "name": "Localization Confusion helps · Commando",
+      "when": {
+        "mission": [
+          "commando"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "localization-confusion"
+        ]
+      },
+      "delta": 6,
+      "say": "Each Automaton that calls for help raises the threat level here. This booster spaces enemy reinforcement calls 15% further apart.",
+      "source": "The booster's own text, and helldivers.wiki.gg, Commando Missions.",
+      "judgement": "Our own reading of the two together."
     },
     {
       "id": "quiet-weapon-loud-armour",
@@ -2627,6 +2718,28 @@
       "judgement": "Throwables do not count: a thermite grenade is anti-tank."
     },
     {
+      "id": "extinguishers-with-fire-resist",
+      "name": "Integrated Extinguishers help · fire resistant armour",
+      "when": {},
+      "match": {
+        "idIn": [
+          "integrated-extinguishers"
+        ],
+        "alongside": {
+          "slot": "armor",
+          "number": [
+            {
+              "path": "passive.fireResist",
+              "gte": 25
+            }
+          ]
+        }
+      },
+      "delta": 4,
+      "say": "Fire resistant armour cuts burn damage. This booster also puts you out sooner.",
+      "judgement": "Our own pairing."
+    },
+    {
       "id": "explosive-resist-with-close-blasts",
       "name": "Explosive resistance helps · your own close blasts",
       "when": {},
@@ -3091,15 +3204,15 @@
     "Suppressed is sourced from a wiki article infobox rather than from a module, so it is curated on the items instead of fetched. It is a real published fact, 13 metres of audible range on the wiki's Stealth page, and it carries no `judgement` field for that reason. fetch-wiki.mjs reads weapon infoboxes since 4 October 2026, for reload times, so moving Suppressed into the fetch is now a small change rather than a new one.",
     "The weather rules price a hazard as if it were always happening. A planet listing sandstorms has sandstorms sometimes, roughly three minutes at a time, and nothing in the data says how often. The visibility penalties are set as a risk you carry across a run rather than a state you are in, which is a judgement and not a measurement.",
     "Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] + FRONT_PRESSURE[front], where the squad curve is [10, 4, 1, 0] taken from the wiki patrol interval multipliers. The formula is unchanged on 4 October 2026; what changed is that the stealth rules also gate on squad. The curator: a four stack on Super Helldive knows what it is doing, so stealth is a question for one or two of you, from solo on Suicide Mission or two of you on Impossible. Peril alone puts four of you at difficulty 10 above two of you at 9, which is the wrong way round for stealth, so the squad gate does what the formula cannot. The front term is the curator's: Automatons and Illuminate play slightly harder than Terminids, so they add 2, a third of a difficulty step. It is a judgement from play, and About says so.",
-    "The stealth rules scale off peril from 16, gated at 22, for one or two of you. Bugs and squids have their own, at about six tenths of the bot figure. On the Illuminate front stingrays-find-you takes part of that back: Stingrays detect any Helldiver in the mission area, and only Watchers call reinforcements. Outside stealth, the depth rules give every front a gradient: anti-tank from peril 22 on Automatons and Terminids, crowd clear from peril 22 on Terminids and Illuminate, anti-tank on the Illuminate from difficulty 8 for the Leviathans, and anti-tank marked down at peril 0 or less on every front.",
-    "The negative half is used twice. easy-drop-wastes-stealth-armour takes up to half a tier off stealth passives below zero peril, and shallow-drop-less-anti-tank takes up to half a tier off anti-tank there, because no armoured heavy enemy spawns below difficulty 3. The old inverted halves, silenced weapons marked down and loud ones lifted on an easy drop, were removed: not needing stealth is not a reason to mark it down.",
-    "A rule scaling off peril must not name a squad size in its say. Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] and depth reaches it as readily as being alone does, so four players on Super Helldive sit at 30. All three bot peril rules shipped in 1.19.0 asserting the reader was outnumbered, and their inverted halves asserted the reader was not, both on a figure that says neither. Fixed on 22 August 2026 by describing the pressure instead. Nothing about how a squad size might get its own wording is solved here; the rule simply may not claim one it did not check.",
+    "The stealth rules scale off peril from 16, gated at 22, for one or two of you. Bugs and squids have their own, at about six tenths of the bot figure. On the Illuminate front stingrays-find-you takes part of that back: Stingrays detect any Helldiver in the mission area, and only Watchers call reinforcements. Outside stealth, difficulty and squad size change ratings on every front: anti-tank from peril 22 on Automatons and Terminids, crowd clear from peril 22 on Terminids and Illuminate, anti-tank on the Illuminate from difficulty 8 for the Leviathans, and anti-tank marked down at peril 0 or less on every front.",
+    "The negative half is used twice. easy-drop-wastes-stealth-armour takes up to half a tier off stealth passives below zero peril, and few-heavies-less-anti-tank takes up to half a tier off anti-tank there, because no armoured heavy enemy spawns below difficulty 3. The old inverted halves, silenced weapons marked down and loud ones lifted on an easy drop, were removed: not needing stealth is not a reason to mark it down.",
+    "A rule scaling off peril must not name a squad size in its say. Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] and difficulty reaches it as readily as being alone does, so four players on Super Helldive sit at 30. All three bot peril rules shipped in 1.19.0 asserting the reader was outnumbered, and their inverted halves asserted the reader was not, both on a figure that says neither. Fixed on 22 August 2026 by describing the pressure instead. Nothing about how a squad size might get its own wording is solved here; the rule simply may not claim one it did not check.",
     "Pairing rules, those with an alongside or notAlongside clause, read the rest of the build and so never fire on a tier row. They show in the builder's picker and slots and on every build's parts. Twenty since 4 October 2026: stealth, True Grit, Gunslinger, melee, fire, arc and gas resistance, and C4 with throw range. npm run builds measures them by placing each subject in 60 random builds.",
     "Considered and cut by the curator on 4 October 2026, recorded so nobody rebuilds them. True Grit worth more solo, and team weapons marked down solo: the wiki says assisted reloads skip True Grit and team weapons are built for a loader, but in practice nobody team reloads, so neither changes what is worth bringing. Peak Physique paired with low ergonomics support weapons: the +30 ergonomics is real, but those weapons are better served by other passives. Kinetic Displacement or Blunt Force Mitigation paired with a Jump Pack or a vehicle: nobody should pick a passive to soften their own bad landings.",
     "Held back for want of a source, 4 October 2026: whether Med-Kit's longer stims also lengthen Experimental Infusion, whether Localization Confusion matters more for a small squad, and how the Hover Pack fares on steep ground. Fire against the Automatons is not a gap: the wiki gives no front wide fire resistance, and the vote already prices flame's short range against a front that shoots from far away.",
     "The city rules guess from the planet: a planet with a megacity reads as a city fight wherever the mission actually is. The scenario does not know which part of a planet a mission is on, so those rules carry half weight and say they are a guess.",
     "Armour weight comes from the set a build wears, since 4 October 2026, and every build made before then, and every preset, has no set and so no weight. The weight rules stay silent on those rather than guessing medium, the same contract as an unset difficulty.",
-    "Boosters are mostly silent, and that is correct rather than a gap. 12 of 20 have no rule because they do the same job on every drop: samples, hellpod ammo, radar, extraction. The ones that might vary with depth, Localization Confusion and the two reinforcement boosters, have no published figure to scale off.",
+    "Boosters are mostly silent, and that is correct rather than a gap. 11 of 20 have no rule because they do the same job on every drop: samples, hellpod ammo, radar, extraction. The two reinforcement boosters might vary with difficulty, and have no published figure to scale off.",
     "Meteor storms have no rule. The wiki says meteors cause massive damage and gives no damage type, figure or frequency, so nothing says which armour or gear it should favour.",
     "Acid resistance on Acclimated and Desert Stormer is read by no rule. The wiki does not say whether it softens an acid storm, which reduces armour effectiveness rather than dealing acid damage. Blunt Force Mitigation's armour rating bonus has no number in its effect, so the acid storm rule cannot scale it.",
     "Stingrays are absent when the Appropriators, Mindless Masses or Vote Snatchers lead the Illuminate front. The tool has no subfaction, so stingrays-find-you applies on every Illuminate planet."

@@ -164,11 +164,11 @@
       "say": "Weapon figures and loudness for 105 weapons come from the game's own files, with the wiki filling the rest."
     },
     {
-      "id": "depth",
-      "title": "Every front responds to depth",
+      "id": "difficulty-everywhere",
+      "title": "Difficulty and squad size on every front",
       "status": "next",
       "track": "solo",
-      "say": "Difficulty, squad size and front change ratings on all three fronts, and more of the armoury has rules."
+      "say": "Anti-tank and crowd clear count for more at high difficulty or with fewer players, on all three fronts, and more of the armoury has rules."
     },
     {
       "id": "curated",
