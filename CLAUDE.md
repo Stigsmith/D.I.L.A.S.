@@ -46,8 +46,9 @@ A left sidebar for destinations, a top tab bar scoped to the open one. `src/lib/
 - **Tailwind 3, core utilities only.** Not 4: it drops `placeholder-base-600`, which the code uses, and changes the default border colour.
 - **Deploy only when the curator asks, in that conversation.** He saves deploys for a major upgrade. Develop, check, commit, keep adding to the top changelog entry, and say when work is ready to ship. Production migrations wait with the deploy.
 - **Push only `main`, and only when asked.** Never push `private-history-with-art`, the old local history with the game art in it. Before any push this must print 0: `git rev-list main | while read c; do git ls-tree -r --name-only $c; done | grep -c '^Image Library/'`
-- **Art is never committed.** `Image Library/` and the generated `src/assets/*` folders are gitignored: extracted game art, and the repo is public.
-- **Edit each file one way, in place.** Never `sed -i`, which writes a new file and swaps it in. A file sync (Proton Drive, stopped on 4 October 2026) used to rename files it saw replaced; a `(# Name clash ...)` file means it is back on. **If `git status` shows every file deleted, look for `.git/index (# Name clash ...)` and move it back. Never reset.**
+- **Art is never committed.** `Image Library/` and the generated `src/assets/*` folders are gitignored: extracted game art, and the repo is public. `docs/reddit/` is gitignored too: the curator's drafts, never pushed.
+- **Nothing here can be sold.** The wiki's data is CC BY-NC-SA 4.0 (attribution wherever it is shown, derived data under the same licence, no commercial use), and the art is extracted from shipped games. Paid theme packs died on both counts.
+- **Edit each file one way, in place.** Never `sed -i`, which writes a new file and swaps it in. A file sync (Proton Drive, stopped on 4 October 2026) used to rename files it saw replaced; a `(# Name clash ...)` file means it is back on. **If `git status` shows every file deleted, look for `.git/index (# Name clash ...)` and move it back. Never reset.** For the same reason the image import and the build empty their folders in place rather than deleting them (`scripts/lib/empty-in-place.mjs`, and `emptyOutDir` off in `vite.config.js`). Leave that as it is.
 - **Blurbs and notes stay direct and opinionated.** Short sentences, no hedging. An admitted gap beats a hedged guess. **Empty states say what to do next.**
 - **Measure before shipping anything that re-ranks a list**, and show the curator how many rows moved.
 
@@ -63,6 +64,8 @@ A left sidebar for destinations, a top tab bar scoped to the open one. `src/lib/
 - **Drop Bay is the front door and the Armoury is where builds are made and kept**, the game's own two places. The tier list is the picker inside every build, ranked for the drop, and also in the menu, with quick scenario controls, for watching rules move the list.
 - **Curated loadouts are fixed and named, not generated.** Auto-calibration, pick a primary and have the rest adjust, was declined. Do not build it. A roll you ask for is a different thing, on the roadmap.
 - **Loadout objects stay readable.** Tier rows are arrays, loadouts are objects, because he may edit them by hand.
+- **Every component stands alone and embeds; the scenario is the wire between them.** The tier row is a page and the picker in every build; the map is the Star Map and the war room. The test for anything new: it works on its own, and it can be composed into another surface without forcing you out of the flow.
+- **Patch data is fetched by a script and shipped as JSON; only the live war is fetched at run time.** Weapon stats, planets, missions and tiers never need the network in the browser, and the build never needs it either.
 - **No squad by hand.** Outside a party Drop Bay is you alone. Squadmate slots exist only in a party, each filled by that member's own confirmed build. "How many of you" survives as one setting beside difficulty, and in a party the party's count decides.
 - **An unconfirmed slot says "Still deciding" and nothing else**, and the squad checks ignore it.
 - **A party is joined by a code, no account. The host sets the scenario** for everybody.
@@ -87,6 +90,7 @@ A left sidebar for destinations, a top tab bar scoped to the open one. `src/lib/
 - **Fonts**: Oswald for headers and tier badges, JetBrains Mono for item names, vendored by `npm run fonts`. Never link Google Fonts again: the policy blocks it and it hands every visitor's IP to Google.
 - **Every row expands**, the whole row is the click target, one open at a time. Every expanded row states its rating source and patch stamp, and says so when that is behind the game. The tier picker reuses the row but selects instead of expanding.
 - **`usesBackpackSlot: null` reads "not recorded in the source yet"**, never "leaves your backpack free".
+- **The expanded row admits what is still unknown** (today, projectile count; a weapon with no wiki page says its figures are unknown). Never delete the admission: restate it when a fetch fills a field. A row apologising for data the tool holds is as wrong as one claiming data it lacks.
 - **The amber corner dot means the item eats your own backpack slot**, red on a conflict. Never on a backpack stratagem.
 - **Tesla Tower is an emplacement, not a sentry.**
 - **The difficulty marks are images, not masks**, because they carry the game's colour ramp (grey at 1, bronze at 5, red at 7, near black at 10). Every other single colour mark is masked with `currentColor`.
@@ -102,6 +106,8 @@ A left sidebar for destinations, a top tab bar scoped to the open one. `src/lib/
 | The "Galactic War" half copy map skin | Either exactly the game or clearly the tool's own |
 | Badge rivets, bands, double rims, bevel, scratches, filled/outline split | Geometry inside the plate competes with the letter, and wear implies low tiers are damaged |
 | Squad-size toggle for assisted reload | Declined; the backpack dot keeps its meaning |
+| Role claiming (declare Anti-Armor, get a filtered picker) | Auto-calibration wearing a different hat |
+| `sustain`, `mobility` and `control` role tags | A tag is only useful when its absence is possible, and nobody is ever short of these in a way worth a warning |
 
 ---
 
@@ -249,6 +255,9 @@ Each row's second rating is the vote's score plus what the scenario's rules add,
 - **A rule that can invert must carry `sayInverted`**, and the validator checks. Inverted means the delta came out opposite to the sign of `scaleBy.times`, not simply negative.
 - **Match keys.** `tags`/`notTags` read our `item.tags`; `gameTags` reads the wiki's `wiki.tags` (screaming caps). `idIn`/`notIdIn` exist and nothing uses them. `noNumber` means "no number at this path". `held` means a held weapon (`isHeldWeapon` in `loadouts.js`). The engine throws on an unknown key, and the validator catches it first.
 - **Weather prices a risk, not a state**: a sandstorm planet has storms sometimes. Extreme cold and intense heat are climate and are not softened. Reduced visibility is partly a gift solo, as its own rule.
+- **A known gap, not agreement**: outside the stealth rules, difficulty and squad size move nothing on bugs or squids. The u.gg vote is a blur over every difficulty and squad size, so a list that matches it at four players has not reached a baseline; it has run out of rules. Do not quote "at a full squad it agrees with u.gg" as a principle.
+- **`src/lib/place.js`** holds the terrain, city and mission minutes lookups the rules read, pure, so scripts read them too.
+- **The city is a guess** from the planet listing a megacity (the mission may be outside it), so city rules carry half weight and say so. The terrain table in `vocabulary.json` is the curator's draft and his to correct.
 
 ### Peril
 
@@ -267,7 +276,7 @@ Solo on 7 and two of you on 8 both sit at 22; four on 10 is 30. The squad curve 
 
 ### Pairings
 
-What a piece is worth beside the rest of its build: True Grit beside a long reload, Gunslinger beside a pistol, Inflammable beside a Cremator. **A pairing is an ordinary item rule with an `alongside` or `notAlongside` clause**, matched against `scenario.alongside`. `readBuild` and the editor set it for every part, slot and picker candidate; **the tier list never does, so a pairing never fires on a bare row.** A pairing may scale off its partner (`alongside.passive.fireResist`). Weight rules read `scenario.weight`; builds with no armour set have no weight and those rules stay silent. `npm run builds` measures pairings by placing their items into seeded random builds.
+What a piece is worth beside the rest of its build: True Grit beside a long reload, Gunslinger beside a pistol, Inflammable beside a Cremator. **A pairing is an ordinary item rule with an `alongside` or `notAlongside` clause**, matched against `scenario.alongside`. `readBuild` and the editor set it for every part, slot and picker candidate; **the tier list never does, so a pairing never fires on a bare row.** A pairing may scale off its partner (`alongside.passive.fireResist`). Weight rules read `scenario.weight`; builds with no armour set have no weight and those rules stay silent. `npm run builds` measures pairings by placing their items into seeded random builds. **Points preserve order, so the vote still decides a lot**: a pairing is a strong argument, not a floor. When one looks too weak, that is why, and the curator should hear it rather than get a floor.
 
 ### The loadout reading: `src/lib/build.js` and `build-rules.json`
 
@@ -276,7 +285,7 @@ A build gets **two badges**: the gear badge, the mean of its nine parts each sco
 - **There is no community base for builds and one must never be invented.** Nobody votes on loadouts.
 - **Penetration counts only what you aim** (`facts.heldAp`: primaries, secondaries, support weapons). A Railcannon answers the `anti-armor` role, counted separately. Two questions, both asked.
 - **The layer only deducts**, except `answers-everything`. Silence is the normal state and never a claim of coverage.
-- `count` calls `score.js`'s own matcher, so a build rule can ask anything an item rule can. `closedGaps` tells the picker which holes a candidate closes; **it marks, never reorders**. A note at zero points (grey) is allowed: a warning that moves nothing.
+- **What a build rule may ask**: `covers` and `notCovers` for roles, `has` and `notHas`, `count` of items matching an ordinary item clause, and `number` reading `facts.*`, `reach.*` or `scenario.*`. `count` calls `score.js`'s own matcher (`matches`, `applies`, `numberTest` and `reach` are exported for this), so a build rule can ask anything an item rule can. One matcher, two engines. `closedGaps` tells the picker which holes a candidate closes; **it marks, never reorders**. A note at zero points (grey) is allowed: a warning that moves nothing.
 - **`npm run builds` measures every rule against 300 seeded random legal builds** as well as the 39 curated ones. The random column is the honest denominator; the curated one only describes those 39. The `measured` citations of the 39 in `build-rules.json` expire when the set is replaced.
 
 ### Tags and roles
@@ -330,7 +339,7 @@ Pure checks over two to four builds, conditioned on the scenario through `dropCo
 `src/DropScreen.jsx` draws it, `src/lib/drop.js` holds everything that is not a picture. **A brief** (what the mission asks for and what each planet hazard does, from tables the tool ships, nothing invented), **your slot**, **suggestions**, and in a party **the squad's slots and the squad read**.
 
 - **Choose, then Confirm.** Only a confirmed build counts. Confirming stamps the build's `updatedAt`; **edit the build afterwards and the slot drops back to still deciding**. Presets stamp as the empty string, so `confirmed` is null for not confirmed, never merely falsy.
-- **`gateOf` is the one test for both hard gates.** The picker uses it to refuse a build and a slot uses it to say "the picker would not offer this now". A slot keeps a build the scenario would now refuse, and says why. The picker says how many builds each gate took out.
+- **`gateOf` is the one test for both hard gates.** The picker uses it to refuse a build and a slot uses it to say "the picker would not offer this now". `gateBiome` reads the hazards: hot is `intense_heat`, cold `extreme_cold`, foggy `thick_fog`. Urban and cave have no hazard behind them, so the scenario never says either, and a build declaring only those survives everywhere. A slot keeps a build the scenario would now refuse, and says why. The picker says how many builds each gate took out.
 - **Suggestions**: three of your own builds through the same gates, never needing gear you have not unlocked, ranked by the reading (`suggestBuilds`, `rankByReading`), each saying why (`whyFor`). With nothing of yours, presets stand in and say so; with nothing at all, the panel says what ruled everything out and offers to start a build. Hidden once confirmed.
 - **The editor opens over Drop Bay.** Saving puts the build in your slot, still to confirm; Save as new keeps the original.
 - **The scenario bar is the one place that names the planet and mission.** The brief only says what they do.
@@ -407,7 +416,7 @@ A Cron Trigger fetches `api.helldivers2.dev` every five minutes (planets, campai
 - **The server keeps no planet table.** Planets go out under the upstream's names and the browser joins by name, dropping what it does not know. Only planets with something happening are sent.
 - **Choosing a planet with fighting on it sets the front**: the attacker in a defence, otherwise the owner.
 - **The Major Order's front and reward are inferences** from one real answer (task type 1 values 2, 3, 4 are Terminids, Automatons, Illuminate; reward type 1 is medals). Anything else shows nothing rather than a wrong name.
-- **History**: the Cron keeps the planets and totals once an hour for thirty days (`war_history`, `keepHistory`). `GET /api/war/history?planet=<name>`, 503 until the first hour is kept. A failure keeping it never costs the snapshot.
+- **History**: the Cron keeps the planets and totals once an hour for thirty days (`war_history`, `keepHistory`). **One row an hour, not one per planet**, because D1 on the free plan allows fifty queries a run and a hundred bound values a query. `GET /api/war/history?planet=<name>`, 503 until the first hour is kept. Only a good fetch is kept, and a failure keeping it never costs the snapshot. Nobody publishes the war's past, so nothing before the first deploy can be had.
 - **The upstream requires both `X-Super-Client` and `X-Super-Contact`**, whatever its README says, or it answers 400. `SUPER_CLIENT` is `dilas.me`, `SUPER_CONTACT` is `https://dilas.me`, in `wrangler.jsonc` vars. Never a personal contact.
 - **Budget**: five Cron Triggers per account on the free plan, 10 ms CPU each. The upstream allows 5 requests in 10 seconds; this is 4 in 300. To run one fetch by hand: the `workers` launch config, then `curl "http://localhost:8788/cdn-cgi/handler/scheduled?cron=*/5+*+*+*+*"`, which is a real request.
 
@@ -432,6 +441,7 @@ Every colour goes through a CSS custom property in `src/index.css`, bound to Tai
 - **The tier ramp is shared by every theme.** A skin may override it only all six at once.
 - **The shell must not paint its own background.** `body` carries `base-950`; the ambient layer sits at `z-index: 0` behind content at `z-10`.
 - **A skin is generated, then tuned**: `node scripts/build-themes.mjs` turns a study's `:root` into a pasteable block. Each skin starts as a palette study in `Image Library/Themes/<Warbond>/`; read it first. The Creek is blue, not green. Dark is `#121214`, grey not black.
+- **When a new theme packet lands**: `npm run images`, then `themeArtNames("<theme-id>")` from `src/lib/assets.js` lists what it shipped. The importer pulls every data URI image out of a study, from `<img>` tags and CSS `url()` alike, into `study_*` files. **Draw with those**, already cut and coloured for the skin, not the loose reference art beside the study.
 
 ### The material layer
 
@@ -486,11 +496,11 @@ From `C:\Dev\D.I.L.A.S`. Node is on the PATH.
 | `npm run armor-art`, `planet-art`, `fonts` | Art and font fetches |
 | `npm run deploy` | Builds, checks `dist`, deploys. **Only when the curator asks** |
 
-**Run `npm run rules` and `npm run builds` after adding a rule. A copy-only change must leave both byte identical.** Every check that can fail exits non zero.
+**Run `npm run rules` and `npm run builds` after adding a rule. A copy-only change must leave both byte identical.** Every check that can fail exits non zero. **Scripts load the real `src/lib` modules through `scripts/lib/app.mjs`**, so they measure the code that ships. Never copy a formula into a script: a copied peril formula once sampled every peril rule in situations the engine no longer produced. After editing `wrangler.jsonc`, run `npm run types`, which regenerates `worker-configuration.d.ts`.
 
 ### Local Worker
 
-`npx wrangler dev` (the `workers` launch config) serves the built `dist/` exactly as Cloudflare will, on **port 8788, never 8787**: Enodia's wrangler dev uses 8787 on this machine and the two silently share it. It needs `npm run build` first, and **a `.dev.vars` with `BETTER_AUTH_SECRET`**, or every `/api/*` answers 500. **Restart it after every build**: Vite empties `dist/` and wrangler's asset watcher dies quietly on Windows. Stopping it in the background can orphan `workerd`; check nothing from this folder is still listening before starting another.
+`npx wrangler dev` (the `workers` launch config) serves the built `dist/` exactly as Cloudflare will, on **port 8788, never 8787**: Enodia's wrangler dev uses 8787 on this machine and the two silently share it. It needs `npm run build` first, and **a `.dev.vars` with `BETTER_AUTH_SECRET`**, or every `/api/*` answers 500. **Restart it after every build**: Vite empties `dist/` and wrangler's asset watcher dies quietly on Windows. The tell is every page answering `{"error":"no such route"}`. Stopping it in the background can orphan `workerd`; check nothing from this folder is still listening before starting another.
 
 ### How stigly runs it
 
@@ -535,6 +545,7 @@ File Explorer into `C:\Dev\D.I.L.A.S`, click the address bar, type `cmd`, Enter,
 - **`npm run db:schema` runs the better-auth CLI at the installed version, never `@latest`**: a newer CLI dropped the NOT NULL `issuer` column the installed core writes on every sign up. `scripts/db-schema.mjs` reads the version.
 - **`BETTER_AUTH_SECRET`** signs session cookies: random in `.dev.vars` (gitignored), a different random value in production via `npx wrangler secret put`. Without it the Worker answers 500 rather than signing with `undefined`.
 - **Changing the D1 `database_id` orphans the local database**; re-run `npm run db:migrate`.
+- **Rehearse every migration against real rows** before applying it remote: drizzle-kit once generated a table rebuild that wrote a column name as a string into every row of Enodia's database and reported success. **Never hard delete a row other people's data hangs from**; soft delete with a timestamp.
 - **To drive the account screen locally**, set `ACCOUNTS_LIVE` to true, build, restart wrangler, test, set it back, rebuild, and grep the bundle to prove the test build is gone.
 - **Every protection was seen failing before it was trusted.** Keep it that way.
 
