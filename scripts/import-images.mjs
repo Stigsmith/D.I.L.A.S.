@@ -19,27 +19,12 @@ const SOURCE = join(ROOT, "Image Library");
 const ASSETS = join(ROOT, "src", "assets");
 const DATA = join(ROOT, "src", "data");
 
-/* The favicon when there is no skull art to cut it from: the brand yellow
-   with a D, drawn here rather than taken from the game. A clone without
-   the library still gets an icon, and check-dist, which wants every file
-   the page asks for, still passes. */
-const PLAIN_FAVICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="12" fill="#FFE900"/>
-  <text x="32" y="45" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="700" fill="#121214">D</text>
-</svg>
-`;
-const writePlainFavicon = () => {
-  mkdirSync(join(ROOT, "public"), { recursive: true });
-  writeFileSync(join(ROOT, "public", "favicon.svg"), PLAIN_FAVICON, "utf8");
-};
-
 /* A clone from GitHub has no library: the art is extracted from the game
    and stays on the curator's machine, out of the public repository. The
    tool runs art free without it, every item read by its name, so this
-   says so, writes the plain favicon if there is none, and changes nothing
-   else rather than failing the build. */
+   says so and changes nothing rather than failing the build. The favicon
+   is our own drawing, committed in public/, so it needs nothing from here. */
 if (!existsSync(SOURCE)) {
-  if (!existsSync(join(ROOT, "public", "favicon.svg"))) writePlainFavicon();
   console.log("\n  No Image Library here, so there is no art to copy. The tool runs art free: every item reads by its name.\n");
   process.exit(0);
 }
@@ -246,31 +231,6 @@ writeFileSync(
   JSON.stringify({ generatedFrom: "Image Library", ...manifest }, null, 2) + "\n",
   "utf8"
 );
-
-/* Favicon. The skull art is black on transparent, which disappears on a */
-/* dark tab bar, so it is composited onto the neon yellow taken from     */
-/* ui_logo_helldivers_yellow.svg. An SVG wrapper with the PNG inlined    */
-/* avoids pulling in an image library just to draw a rectangle behind    */
-/* it. A favicon is a static file, so it cannot follow the active theme. */
-const NEON = "#FFE900";
-/* Resolved through the walk rather than a flat path. The library is
-   sorted into folders now, so this file lives under UI. */
-const skull = pathOf.get("ui_icon_booster_skull.png");
-try {
-  if (!skull) throw new Error("skull not found");
-  const b64 = readFileSync(skull).toString("base64");
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="12" fill="${NEON}"/>
-  <image href="data:image/png;base64,${b64}" x="6" y="6" width="52" height="52"/>
-</svg>
-`;
-  mkdirSync(join(ROOT, "public"), { recursive: true });
-  writeFileSync(join(ROOT, "public", "favicon.svg"), svg, "utf8");
-  console.log("favicon written from the skull art");
-} catch (e) {
-  writePlainFavicon();
-  console.log("no skull art, so the plain favicon instead");
-}
 
 console.log(`items with art:    ${Object.keys(manifest.items).length} of ${items.length}`);
 console.log(`warbonds with art: ${Object.keys(manifest.warbonds).length} of ${warbonds.length}`);

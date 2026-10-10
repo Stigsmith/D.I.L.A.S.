@@ -12,7 +12,6 @@ src/assets/items/
 src/assets/warbonds/
 src/assets/ui/
 src/assets/themes/
-public/favicon.svg
 
 # Raw wiki pulls. Cache only, re-fetchable with npm run wiki -- --refresh
 .wiki-cache/

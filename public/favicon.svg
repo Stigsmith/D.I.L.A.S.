@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Our own drawing, traced after the game's booster skull: the left half
+       bone, the right half gunmetal with a red optic. No game art inside, so
+       it is committed and the same in every clone. -->
+  <defs>
+    <path id="skull" d="M61 21.5H67L93.5 32V61L100 70V72L90 84L89 85.5H87L82 81.5L80 82L79 83V88L78 88V94L74 95L69 96.5L64 98.5L59 96.5L54 95L50 94V88L49 88V83L48 82L46 81.5L41 85.5H39L38 84L28 72V70L34.5 61V32Z"/>
+    <clipPath id="right"><rect x="64" y="0" width="64" height="128"/></clipPath>
+    <linearGradient id="metal" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#C9CED6"/>
+      <stop offset=".45" stop-color="#7C828C"/>
+      <stop offset="1" stop-color="#3E434B"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#FF5A4A" stop-opacity=".9"/>
+      <stop offset=".45" stop-color="#EF4444" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#EF4444" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lens">
+      <stop offset="0" stop-color="#FFF1E8"/>
+      <stop offset=".35" stop-color="#FF6B5A"/>
+      <stop offset="1" stop-color="#C81E1E"/>
+    </radialGradient>
+  </defs>
+  <rect width="128" height="128" rx="24" fill="#FFE900"/>
+  <path d="M64 6L13 16V92C13 104 34 116 64 124C94 116 115 104 115 92V16Z" fill="#121214"/>
+  <use href="#skull" fill="#F2F0E8"/>
+  <use href="#skull" fill="url(#metal)" clip-path="url(#right)"/>
+  <path d="M64 46H93.5M64 88H79M64 22V98" stroke="#121214" stroke-width="2.4" fill="none"/>
+  <path d="M66 33.5H92" stroke="#E6E9EE" stroke-width="1.8"/>
+  <circle cx="72" cy="39" r="1.8" fill="#121214"/>
+  <circle cx="86" cy="39" r="1.8" fill="#121214"/>
+  <circle cx="47" cy="65.5" r="8" fill="#121214"/>
+  <path d="M64 73.5L58.5 81L60 83H68L69.5 81Z" fill="#121214"/>
+  <path d="M64 79.5L61.5 83H64Z" fill="#F2F0E8"/>
+  <circle cx="81" cy="65.5" r="22" fill="url(#glow)"/>
+  <circle cx="81" cy="65.5" r="9.5" fill="#121214"/>
+  <circle cx="81" cy="65.5" r="6.2" fill="url(#lens)"/>
+</svg>
