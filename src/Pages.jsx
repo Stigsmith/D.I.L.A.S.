@@ -127,15 +127,17 @@ function HowItWorks() {
         <p className="text-base-500">Nobody votes on builds, so a build has no community tier.</p>
       </Part>
       <Part id="peril" title="Peril">
-        <p>Difficulty, squad size and front as one number. Rules named with a peril, like peril 22+, apply from that number up.</p>
+        <p>Difficulty, squad size, front and your level as one number. Rules named with a peril, like peril 22+, apply from that number up.</p>
         <ul className="flex list-disc flex-col gap-1 pl-5">
           <li>Difficulty: 6 per level, 0 at difficulty 5.</li>
           <li>Players: 1 player +10, 2 players +4, 3 players +1, 4 players +0.</li>
           <li>Front: Automatons and Illuminate +2.</li>
+          <li>Your level: 6 less for each level above Suicide Mission, 6 more for each level below. Not set counts as Suicide Mission.</li>
           <li>1 player on difficulty 7 is peril 22 against the Terminids, 24 against the Automatons.</li>
         </ul>
         <p className="text-base-500">
-          Player figures follow the patrol spawn rates on helldivers.wiki.gg. The front figure is a judgement from play.
+          Set your level beside How many of you, in the war room or on the tier list. Player figures follow the patrol
+          spawn rates on helldivers.wiki.gg. The front figure and the Suicide Mission anchor are judgements from play.
         </p>
       </Part>
       <Part id="armour" title="How armour is counted">

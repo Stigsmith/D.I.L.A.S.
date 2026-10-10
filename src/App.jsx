@@ -515,7 +515,9 @@ export default function App() {
      surface reads so each honours them without being told twice. Never on
      the scenario the party sends: that is the bare one, above. */
   const [rulesOff, toggleRule, clearRules] = useRulesOff();
-  const scored = useMemo(() => ({ ...scenario, rulesOff }), [scenario, rulesOff]);
+  /* Your level rides beside the switched-off rules: it comes from the
+     active profile, never from the drop, and never goes to a party. */
+  const scored = useMemo(() => ({ ...scenario, rulesOff, skill: state.skill }), [scenario, rulesOff, state.skill]);
   /* The drop and the party live here rather than on the drop screen: what
      you confirmed has to reach the party, and the host's scenario has to
      reach you, while you are in the builder or on the tier list too. */
@@ -685,7 +687,7 @@ export default function App() {
       return (
         <WarRoom scenario={scenario} setFaction={setFaction} setPlanet={setPlanet} setMission={setMission}
           setDifficulty={setDifficulty} setSquad={setSquad} clearEnvironment={clearEnvironment}
-          onDone={closeScenario} party={party} />
+          onDone={closeScenario} party={party} skill={state.skill} setSkill={state.setSkill} />
       );
     }
     switch (dest) {
@@ -693,7 +695,7 @@ export default function App() {
         return (
           <div className="flex flex-col gap-4">
           <ScenarioStrip scenario={scenario} setFaction={setFaction} setDifficulty={setDifficulty} setSquad={setSquad}
-            party={party} onWarRoom={openScenario} />
+            party={party} onWarRoom={openScenario} skill={state.skill} setSkill={state.setSkill} />
           <TierBrowser
             catId={catId}
             faction={scenario.faction}

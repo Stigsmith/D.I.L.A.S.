@@ -374,8 +374,8 @@ export function Coverage({ state, navigate, scenario }) {
     [usingPresets, own]
   );
   const cov = useMemo(
-    () => coverage(pool, { lockedSet: state.lockedSet, rulesOff: scenario.rulesOff }),
-    [pool, state.lockedSet, scenario.rulesOff]
+    () => coverage(pool, { lockedSet: state.lockedSet, rulesOff: scenario.rulesOff, skill: scenario.skill }),
+    [pool, state.lockedSet, scenario.rulesOff, scenario.skill]
   );
 
   return (

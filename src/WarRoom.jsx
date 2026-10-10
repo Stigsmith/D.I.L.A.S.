@@ -29,6 +29,8 @@ import { useWar, agoText } from "./lib/war.js";
 import { usePlannerPrefs, planets, biomeName, loudHazards, hazardName } from "./lib/scenario.js";
 import { levelFacts, levelNew, outpostSummary, DIFFICULTY_SOURCE } from "./lib/difficulty.js";
 import { enemiesUpTo, arrivalsAt, arrivalsLine } from "./lib/enemies.js";
+import { vocabulary } from "./lib/items.js";
+import { Tip, HAS_TIP } from "./Tip.jsx";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 
@@ -71,7 +73,7 @@ export function useSize(ref) {
  * and would only send you straight back. `party` is the live party, whose
  * member count says how many of you there are.
  */
-export default function WarRoom({ scenario, setFaction, setPlanet, setMission, setDifficulty, setSquad, clearEnvironment, onDone, party }) {
+export default function WarRoom({ scenario, setFaction, setPlanet, setMission, setDifficulty, setSquad, clearEnvironment, onDone, party, skill, setSkill }) {
   const roomRef = useRef(null);
   const barRef = useRef(null);
   const room = useSize(roomRef);
@@ -179,7 +181,11 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
         style={{ bottom: GAP_PX, right: GAP_PX, left: (plannerOpen && wide ? PANEL_PX + GAP_PX : 0) + GAP_PX }}>
         {wide ? <span /> : null}
         <DifficultyCard level={scenario.difficulty} faction={scenario.faction} onChange={setDifficulty}
-          squad={<SquadCount value={scenario.squad} onChange={setSquad} party={party} />} />
+          squad={<>
+            <SquadCount value={scenario.squad} onChange={setSquad} party={party} />
+            <span className="hidden h-8 w-px bg-base-800 sm:block" aria-hidden="true" />
+            <SkillPick value={skill} onChange={setSkill} />
+          </>} />
         {onDone && scenario.faction ? (
           <button type="button" onClick={onDone}
             className={"pointer-events-auto flex items-center justify-center gap-1.5 rounded-lg border border-brand bg-brand px-5 py-2 text-sm font-bold uppercase tracking-wide text-brand-ink shadow-2xl hover:brightness-110 " +
@@ -203,7 +209,7 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
 /* in the war room, one click away.                                      */
 /* ------------------------------------------------------------------ */
 
-export function ScenarioStrip({ scenario, setFaction, setDifficulty, setSquad, party, onWarRoom }) {
+export function ScenarioStrip({ scenario, setFaction, setDifficulty, setSquad, party, onWarRoom, skill, setSkill }) {
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-3 rounded-lg border border-base-800 bg-base-900/60 px-4 py-2.5">
       <div className="flex gap-1.5" role="group" aria-label="Front">
@@ -222,6 +228,7 @@ export function ScenarioStrip({ scenario, setFaction, setDifficulty, setSquad, p
       </div>
       <DifficultyStepper value={scenario.difficulty} onChange={setDifficulty} />
       <SquadCount value={scenario.squad} onChange={setSquad} party={party} />
+      <SkillPick value={skill} onChange={setSkill} />
       <button type="button" onClick={onWarRoom}
         className="ml-auto flex items-center gap-1.5 rounded border border-base-700 px-2.5 py-1.5 text-[11px] text-base-300 hover:border-base-500 hover:text-base-100">
         <MapIcon className="h-3.5 w-3.5" />
@@ -500,6 +507,30 @@ export function SquadCount({ value, onChange, party }) {
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+/* Your level. Not part of the drop: it describes the player, lives with
+   the active profile, and moves peril so the stealth and anti-tank rules
+   and the squad checks start where they would for you. Beside how many
+   of you, because the ratings read the two together. Outlined until it
+   is answered, the way the collection nudge asks for setup first. */
+export function SkillPick({ value, onChange }) {
+  const v = Number(value) || 0;
+  return (
+    <div className="flex items-center gap-2">
+      <Tip text="The hardest difficulty four players at your level clear easily. Warnings and the stealth and anti-tank rules start from there.">
+        <span className={"text-[10px] font-semibold uppercase tracking-wider text-base-500 " + HAS_TIP} style={OSWALD}>Your level</span>
+      </Tip>
+      <select value={v} onChange={(e) => onChange(Number(e.target.value))} aria-label="Your level"
+        className={"rounded border bg-base-900 px-1.5 py-1 text-[11px] " +
+          (v ? "border-base-700 text-base-100" : "border-accent-500 text-accent-300")}>
+        <option value={0}>Not set</option>
+        {vocabulary.difficulties.map((d) => (
+          <option key={d.level} value={d.level}>{d.level} · {d.name}</option>
+        ))}
+      </select>
     </div>
   );
 }

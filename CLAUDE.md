@@ -66,7 +66,7 @@ A left sidebar for destinations, a top tab bar scoped to the open one. `src/lib/
 - **Loadout objects stay readable.** Tier rows are arrays, loadouts are objects, because he may edit them by hand.
 - **Every component stands alone and embeds; the scenario is the wire between them.** The tier row is a page and the picker in every build; the map is the Star Map and the war room. The test for anything new: it works on its own, and it can be composed into another surface without forcing you out of the flow.
 - **Patch data is fetched by a script and shipped as JSON; only the live war is fetched at run time.** Weapon stats, planets, missions and tiers never need the network in the browser, and the build never needs it either.
-- **No squad by hand.** Outside a party Drop Bay is you alone. Squadmate slots exist only in a party, each filled by that member's own confirmed build. "How many of you" survives as one setting beside difficulty, and in a party the party's count decides.
+- **No squad by hand.** Outside a party Drop Bay is you alone. Squadmate slots exist only in a party, each filled by that member's own confirmed build. "How many of you" survives as one setting beside difficulty, and in a party the party's count decides. Your level sits beside it and is never the party's.
 - **An unconfirmed slot says "Still deciding" and nothing else**, and the squad checks ignore it.
 - **A party is joined by a code, no account. The host sets the scenario** for everybody.
 - **Setting up the collection comes first.** An untouched collection locks nothing and so reads as owning everything. `CollectionNudge` (on the surfaces in `NUDGE_SURFACES`, `App.jsx`), the guide at the top of Collection and the tour all push toward it. `needsSetup` in `src/lib/ownership.js` is the one test: no `setUp` mark and no lock of either kind.
@@ -220,7 +220,7 @@ State lives in `localStorage`, per exact address. **What you own and what you ma
 | Key | Holds | Exported |
 |---|---|---|
 | `hd2-loadout-favorites`, `hd2-favorite-items` | Starred builds and rows | Yes |
-| `hd2-profiles` | Lock state per profile | Yes |
+| `hd2-profiles` | Lock state and your level, per profile | Yes |
 | `hd2-loadouts` | Your builds | Yes |
 | `hd2-drop-history` | Every confirmed drop | Yes; an import adds rather than replaces |
 | `hd2-scenario-*`, `hd2-drop`, `hd2-party`, `hd2-planner` | Tonight's drop and party | No |
@@ -255,7 +255,7 @@ Each row's second rating is the vote's score plus what the scenario's rules add,
 - **A rule that can invert must carry `sayInverted`**, and the validator checks. Inverted means the delta came out opposite to the sign of `scaleBy.times`, not simply negative.
 - **Match keys.** `tags`/`notTags` read our `item.tags`; `gameTags` reads the wiki's `wiki.tags` (screaming caps). `idIn` names items by hand, only where no field says it, and the rule's `judgement` says so. `noNumber` means "no number at this path". `not` inverts a clause. `notDamageType` leaves a damage type out: the loud weapon rules use it so a melee weapon, which has no loudness class, is not counted as a medium gun. `held` means a held weapon (`isHeldWeapon` in `loadouts.js`). The engine throws on an unknown key, and the validator catches it first.
 - **Weather prices a risk, not a state**: a sandstorm planet has storms sometimes, so storms cost long range weapons only 3 points, and a build note says when nothing works up close. Rain counts as a blizzard. Fog lasts the whole mission and costs 5. Extreme cold and intense heat are climate and are not softened. Reduced visibility is partly a gift solo, as its own rule.
-- **Difficulty and squad size on every front**: anti-tank helps from peril 22 on Automatons and Terminids, crowd clear from peril 22 on Terminids and Illuminate, anti-tank from difficulty 8 on the Illuminate for the Leviathans, and anti-tank is marked down at peril 0 or less on every front, because no armoured heavy spawns below difficulty 3. The u.gg vote is a blur over every difficulty and squad size, so agreeing with it at four players is not a baseline. Do not quote "at a full squad it agrees with u.gg" as a principle.
+- **Difficulty and squad size on every front**: anti-tank helps from peril 22 on Automatons and Terminids, crowd clear from peril 22 on Terminids and Illuminate, anti-tank from difficulty 8 on the Illuminate for the Leviathans, and anti-tank is marked down at difficulty 4 or less on every front, because no armoured heavy spawns below difficulty 3. The u.gg vote is a blur over every difficulty and squad size, so agreeing with it at four players is not a baseline. Do not quote "at a full squad it agrees with u.gg" as a principle.
 - **`src/lib/place.js`** holds the terrain, city and mission minutes lookups the rules read, pure, so scripts read them too.
 - **The city is a guess** from the planet listing a megacity (the mission may be outside it), so city rules carry half weight and say so. The terrain table in `vocabulary.json` is the curator's draft and his to correct.
 
@@ -264,12 +264,12 @@ Each row's second rating is the vote's score plus what the scenario's rules add,
 Difficulty and squad size as one number:
 
 ```
-peril = 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] + FRONT_PRESSURE[front]
+peril = 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] + FRONT_PRESSURE[front] - 6 * (level - 7)
 SQUAD_PRESSURE = [10, 4, 1, 0]
 FRONT_PRESSURE = { bots: 2, squids: 2, bugs: 0 }
 ```
 
-Against Terminids, solo on 7 and two of you on 8 both sit at 22; four on 10 is 30. **The front term is the curator's**: Automatons and Illuminate play slightly harder, a third of a difficulty step. About's Peril section states all three terms. The squad curve comes from the wiki's patrol multipliers (second player 0.8333, third 0.75); the fourth column is an extrapolation and a guess. `peril()` returns null unless both difficulty and squad are set. **To choose a coefficient**: at what peril should this be worth one tier (about 14 points)? `times = 14 / (thatPeril - from)`.
+Against Terminids, solo on 7 and two of you on 8 both sit at 22; four on 10 is 30. **The front term is the curator's**: Automatons and Illuminate play slightly harder, a third of a difficulty step. **Your level** is the player's own answer, per profile: the hardest difficulty four players at their level clear easily, 1 to 10, picked beside How many of you in the war room and on the tier list strip. The curator's answer is Suicide Mission, so 7 is the anchor and changes nothing, and unset counts as 7. It rides on the scenario like `rulesOff` (`scored` in `App.jsx`) and never goes to a party: each player's screen uses their own. **Only peril moves with it.** A rule about what spawns reads difficulty instead (Leviathans from 8, anti-tank marked down at difficulty 4 or less), so a strong player still sees them. About's Peril section states all four terms. The squad curve comes from the wiki's patrol multipliers (second player 0.8333, third 0.75); the fourth column is an extrapolation and a guess. `peril()` returns null unless both difficulty and squad are set. **To choose a coefficient**: at what peril should this be worth one tier (about 14 points)? `times = 14 / (thatPeril - from)`.
 
 - **A peril rule never names a squad size in its copy.** Difficulty reaches peril as readily as being alone. If a rule must talk about how many of you, it gates on `squad` and says so.
 - **Stealth is for one or two of you.** Every stealth rule also gates on `squad: { lte: 2 }`. Quiet weapons, stealth armour and storms from peril 22; loud weapons marked down from peril 28 by the game's loudness class (small -0.15, medium and unknown -0.25, large and huge -0.4 per peril point past 16, bots); bugs and squids at six tenths of the bot figures, and on the Illuminate `stingrays-find-you` takes part of that back (Stingrays detect anyone in the mission area; only Watchers call reinforcements). Rain counts as a storm, like fog. Not needing stealth is never a penalty, except stealth armour below peril 0.

@@ -108,6 +108,10 @@ export function cleanProfile(p, taken = []) {
     lockedItems: list(p.lockedItems, (x) => itemById.has(x)),
     lockedWarbonds: list(p.lockedWarbonds, (x) => gateableWarbondIds.has(x)),
     ...(p.setUp === true ? { setUp: true } : {}),
+    /* Your level: the hardest difficulty four players at your level clear
+       easily. It describes the player, so it lives with the profile and
+       travels in the backup. A copied profile does not copy it. */
+    ...(Number.isInteger(p.skill) && p.skill >= 1 && p.skill <= 10 ? { skill: p.skill } : {}),
   };
 }
 

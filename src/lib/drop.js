@@ -73,6 +73,9 @@ export function dropContext(scenario = {}) {
     traits: traitsOf(scenario.mission),
     difficulty: bandFor(scenario.difficulty),
     level: scenario.difficulty || 0,
+    /* Your level, from the active profile, so the squad checks start where
+       the ratings do. */
+    skill: scenario.skill || 0,
   };
 }
 
