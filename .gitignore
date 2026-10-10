@@ -55,3 +55,7 @@ src/assets/armor-sets/
 # The game data fetch: filediver's source, our built dump tool and its
 # JSON output. Re-made by npm run game -- --refresh. Never committed.
 .game-data/
+
+# Reddit promotion drafts and the scripts that make their images. The
+# curator's, kept on this machine and never pushed.
+docs/reddit/
