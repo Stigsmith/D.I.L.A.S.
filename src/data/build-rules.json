@@ -324,6 +324,106 @@
       "measured": "No points: a storm passes, and you can play around it. Checks the primary and support weapon, since a sidearm rarely carries a fight."
     },
     {
+      "id": "harvester-shield-takes-a-shot",
+      "name": "Two shots per Harvester · Illuminate, difficulty 3+",
+      "when": {
+        "faction": [
+          "squids"
+        ],
+        "difficulty": {
+          "gte": 3
+        }
+      },
+      "match": {
+        "count": [
+          {
+            "of": {
+              "held": true,
+              "stratType": "support",
+              "gameTags": [
+                "ANTI-TANK"
+              ],
+              "anyOf": [
+                {
+                  "number": [
+                    {
+                      "path": "wiki.ammo.magazine",
+                      "eq": 1
+                    }
+                  ]
+                },
+                {
+                  "gameTags": [
+                    "EXPENDABLE"
+                  ]
+                },
+                {
+                  "gameTags": [
+                    "HEAT"
+                  ]
+                }
+              ]
+            },
+            "gte": 1
+          },
+          {
+            "of": {
+              "held": true,
+              "roles": [
+                "anti-armor"
+              ],
+              "not": {
+                "stratType": "support",
+                "gameTags": [
+                  "ANTI-TANK"
+                ],
+                "anyOf": [
+                  {
+                    "number": [
+                      {
+                        "path": "wiki.ammo.magazine",
+                        "eq": 1
+                      }
+                    ]
+                  },
+                  {
+                    "gameTags": [
+                      "EXPENDABLE"
+                    ]
+                  },
+                  {
+                    "gameTags": [
+                      "HEAT"
+                    ]
+                  }
+                ]
+              }
+            },
+            "lte": 0
+          },
+          {
+            "of": {
+              "held": true,
+              "damageType": [
+                "explosive"
+              ],
+              "number": [
+                {
+                  "path": "wiki.ammo.magazine",
+                  "gt": 1
+                }
+              ]
+            },
+            "lte": 0
+          }
+        ]
+      },
+      "delta": 0,
+      "severity": "grey",
+      "say": "A Harvester's shield absorbs any single hit, so single shot anti-tank needs a second shot. Explosive shrapnel, like the Eruptor's, strips the shield first.",
+      "measured": "No points: the community tier already prices the shield into each launcher. This says it for the build. Counts the Recoilless, Spear, Quasar and expendables, and stays quiet when you hold a multi shot explosive or other anti-tank."
+    },
+    {
       "id": "half-built",
       "name": "Empty slots",
       "when": {},

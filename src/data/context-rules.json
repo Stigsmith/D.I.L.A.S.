@@ -1277,6 +1277,28 @@
       "judgement": "Named by hand, because the wiki names these two."
     },
     {
+      "id": "arc-stops-watchers",
+      "name": "Stuns Watchers, stops their calls · Illuminate, 1 or 2 players",
+      "when": {
+        "faction": [
+          "squids"
+        ],
+        "squad": {
+          "lte": 2
+        }
+      },
+      "match": {
+        "idIn": [
+          "arc-12-blitzer",
+          "arc-3-arc-thrower"
+        ]
+      },
+      "delta": 5,
+      "say": "Only Watchers call Illuminate reinforcements. This stuns a Watcher and stops its call.",
+      "source": "helldivers.wiki.gg, Watcher.",
+      "judgement": "Named by hand, because the wiki names these two. 1 or 2 players only, where one call costs the most."
+    },
+    {
       "id": "explosive-resist-vs-striders",
       "name": "Explosive resistance helps · Automatons, difficulty 6+",
       "when": {
