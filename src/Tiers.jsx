@@ -1150,6 +1150,18 @@ function RowDetail({ item, faction, scored, difficulty }) {
                   ? `${Math.round(wiki.primary.durableRatio * 100)}%`
                   : null}
               </Fact>
+              <Fact label="Blast" tip="Damage from the explosion, on top of the hit itself.">
+                {wiki.blast && wiki.blast.dmg
+                  ? <>
+                    {wiki.blast.dmg}
+                    {item.tags.includes("close-blast") ? (
+                      <Tip text="The explosion reaches you. Do not fire at enemies right in front of you." className="ml-1.5 cursor-help">
+                        <span className="inline-block rounded border border-base-700 px-1.5 text-[10px] uppercase leading-4 tracking-wider text-base-400">Hurts you up close</span>
+                      </Tip>
+                    ) : null}
+                  </>
+                  : null}
+              </Fact>
               <Fact label="Stagger" tip="How hard a hit staggers them, then how far it pushes them back.">
                 {wiki.primary && wiki.primary.stun !== undefined
                   ? `${wiki.primary.stun}${wiki.primary.push !== undefined ? ` · pushback ${wiki.primary.push}` : ""}`

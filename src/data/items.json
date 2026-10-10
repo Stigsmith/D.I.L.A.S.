@@ -3869,7 +3869,9 @@
         "patch": "7.0.2"
       }
     },
-    "tags": [],
+    "tags": [
+      "close-blast"
+    ],
     "roles": [
       "anti-armor",
       "objective"
@@ -9111,7 +9113,8 @@
     "patchNote": null,
     "effect": "+2 stim capacity, +2.0s stim duration",
     "passive": {
-      "stimDuration": 2
+      "stimDuration": 2,
+      "stims": 2
     },
     "note": null
   },
@@ -9275,7 +9278,8 @@
     "patchNote": null,
     "effect": "+50% explosive resist, +30 armour rating",
     "passive": {
-      "explosiveResist": 50
+      "explosiveResist": 50,
+      "armourRating": 30
     },
     "note": null
   },
@@ -9387,7 +9391,8 @@
     "patchNote": null,
     "effect": "+50% explosive resist, +2 throwables capacity",
     "passive": {
-      "explosiveResist": 50
+      "explosiveResist": 50,
+      "throwables": 2
     },
     "note": null
   },
@@ -9497,7 +9502,8 @@
     "patchNote": null,
     "effect": "+30% primary reload, +20% ammo capacity (excludes backpacks)",
     "passive": {
-      "primaryReload": 30
+      "primaryReload": 30,
+      "ammoCapacity": 20
     },
     "note": null
   },
@@ -9552,7 +9558,8 @@
     "patchNote": null,
     "effect": "-30% recoil crouched or prone, +2 throwables capacity",
     "passive": {
-      "crouchRecoil": 30
+      "crouchRecoil": 30,
+      "throwables": 2
     },
     "note": null
   },
@@ -9881,7 +9888,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "Reduced flinch, +25 armour rating, map marker radar",
-    "passive": {},
+    "passive": {
+      "armourRating": 25
+    },
     "note": null
   },
   {
@@ -10372,7 +10381,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "+50 armour rating",
-    "passive": {},
+    "passive": {
+      "armourRating": 50
+    },
     "note": null
   },
   {
@@ -10425,7 +10436,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "Gain stamina when taking damage, +25 armour rating",
-    "passive": {},
+    "passive": {
+      "armourRating": 25
+    },
     "note": null
   },
   {
@@ -10531,7 +10544,9 @@
     "flag": null,
     "patchNote": null,
     "effect": "Armour explodes 1.5s after death, +2 throwables capacity",
-    "passive": {},
+    "passive": {
+      "throwables": 2
+    },
     "note": null
   },
   {
@@ -12180,7 +12195,8 @@
     },
     "tags": [],
     "roles": [
-      "anti-armor"
+      "anti-armor",
+      "objective"
     ],
     "traits": [],
     "flag": null,

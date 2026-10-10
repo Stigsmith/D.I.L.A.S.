@@ -67,8 +67,8 @@ export const isQuietBand = (difficulty) => QUIET_BANDS.includes(difficulty);
 
 /* What the panel asks so it can say "these are switched off" rather than
    "you are covered". Same rule the warnings use, so the two cannot drift. */
-export const coverageIsQuiet = (level, size) => {
-  const p = peril({ difficulty: level, squad: size });
+export const coverageIsQuiet = (level, size, faction) => {
+  const p = peril({ difficulty: level, squad: size, faction });
   return p === null ? null : p < COVERAGE_PERIL;
 };
 
@@ -117,7 +117,7 @@ export function squadWarnings(builds, context = {}) {
      read straight off the panel without asking for it separately. With no
      level set peril is null and the band is all there is to go on, which
      is the old behaviour and the right fallback. */
-  const p = peril({ difficulty: level, squad: size });
+  const p = peril({ difficulty: level, squad: size, faction });
   const quiet = p === null ? QUIET_BANDS.includes(difficulty) : p < COVERAGE_PERIL;
   const heavyFront = faction === "bugs" || faction === "bots" || faction === "any";
 

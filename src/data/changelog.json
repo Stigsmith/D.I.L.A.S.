@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.34.0",
+    "date": "2026-10-10",
+    "title": "Know your enemy",
+    "say": "The Ministry has surveyed all three fronts at every depth. It regrets to report that the Illuminate always know where you are.",
+    "changes": [
+      "Difficulty and squad size now change ratings on every front: anti-tank and crowd clear count for more on the hardest drops, and anti-tank for less on the easiest.",
+      "Automatons and Illuminate count as slightly harder than Terminids. About now explains peril.",
+      "Against the Illuminate, stealth helps less because Stingrays find you anywhere, and anti-tank helps from difficulty 8, where Leviathans spawn.",
+      "True Grit works on a ladder: most for a long stationary reload like the Recoilless Rifle, less for a long one, a little for the Stalwart.",
+      "Rain reduces visibility like fog, fire resistant armour helps on burning planets, and Commando rewards extra stims, grenades and ammo, and armour that survives a lethal hit.",
+      "Fixed: smoke and gas no longer count as durable damage, melee weapons no longer count as loud, Carry goes by one handed weapons, and close blasts like the Autocannon's are marked on the row."
+    ]
+  },
+  {
     "version": "1.33.0",
     "date": "2026-10-10",
     "title": "Straight from the source",

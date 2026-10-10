@@ -194,10 +194,11 @@
     },
     {
       "id": "fog-blinds-marksmen",
-      "name": "Marksman rifles less useful · thick fog",
+      "name": "Marksman rifles less useful · thick fog, rainstorms",
       "when": {
         "hazard": [
-          "thick_fog"
+          "thick_fog",
+          "rainstorms"
         ]
       },
       "match": {
@@ -206,14 +207,16 @@
         ]
       },
       "delta": -5,
-      "say": "Thick fog slightly reduces visibility, so long range weapons are a little less useful."
+      "say": "Thick fog and heavy rain reduce visibility, so long range weapons are a little less useful.",
+      "judgement": "Rain counts the same as fog: the wiki says rain reduces visibility, but not by how much."
     },
     {
       "id": "fog-blinds-long-support",
-      "name": "Long range support weapons less useful · thick fog",
+      "name": "Long range support weapons less useful · thick fog, rainstorms",
       "when": {
         "hazard": [
-          "thick_fog"
+          "thick_fog",
+          "rainstorms"
         ]
       },
       "match": {
@@ -222,8 +225,8 @@
         ]
       },
       "delta": -5,
-      "say": "Thick fog slightly reduces visibility, so long range weapons are a little less useful.",
-      "judgement": "No published stat marks a support weapon as long range, so we tag them by hand. Projectile speed does not separate them: lasers read 1300, assault rifles 820."
+      "say": "Thick fog and heavy rain reduce visibility, so long range weapons are a little less useful.",
+      "judgement": "No published stat marks a support weapon as long range, so we tag them by hand. Projectile speed does not separate them: lasers read 1300, assault rifles 820. Rain counts the same as fog: the wiki says rain reduces visibility, but not by how much."
     },
     {
       "id": "tremors-punish-standing-still",
@@ -268,6 +271,13 @@
         ]
       },
       "match": {
+        "slot": [
+          "primary",
+          "secondary",
+          "throwable",
+          "stratagem",
+          "booster"
+        ],
         "damageType": "fire"
       },
       "delta": -8,
@@ -275,17 +285,28 @@
     },
     {
       "id": "acid-storms-and-armor",
-      "name": "Armour passives weaker · acid storms",
+      "name": "Armour rating bonus less useful · acid storms",
       "when": {
         "hazard": [
           "acid_storms"
         ]
       },
       "match": {
-        "slot": "armor"
+        "slot": "armor",
+        "number": [
+          {
+            "path": "passive.armourRating",
+            "gte": 1
+          }
+        ]
       },
-      "delta": -6,
-      "say": "Acid storms reduce armour for everyone while they last, so armour passives are worth a little less."
+      "say": "Acid storms reduce armour effectiveness for everyone while they last. This passive's extra armour rating counts for less.",
+      "scaleBy": {
+        "path": "passive.armourRating",
+        "times": -0.12,
+        "clamp": 6
+      },
+      "source": "The hazard text on helldivers.wiki.gg."
     },
     {
       "id": "bugs-want-durable-damage",
@@ -296,6 +317,14 @@
         ]
       },
       "match": {
+        "damageType": [
+          "ballistic",
+          "explosive",
+          "fire",
+          "heat",
+          "arc",
+          "melee"
+        ],
         "number": [
           {
             "path": "wiki.primary.durableRatio",
@@ -364,7 +393,8 @@
         "held": true
       },
       "delta": 6,
-      "say": "Crushers regenerate when the damage pauses. A big magazine keeps the damage going."
+      "say": "Many Illuminate carry shields or plating that cut overkill damage. Steady fire from a big magazine keeps working.",
+      "source": "helldivers.wiki.gg, Illuminate."
     },
     {
       "id": "squids-punish-one-shot",
@@ -384,7 +414,8 @@
         "held": true
       },
       "delta": -6,
-      "say": "Crushers regenerate when the damage pauses, and reloading every few shots gives them that pause."
+      "say": "Many Illuminate carry shields or plating that cut overkill damage. A small magazine means fewer, bigger hits and frequent reloads.",
+      "source": "helldivers.wiki.gg, Illuminate."
     },
     {
       "id": "nest-wants-demolition",
@@ -546,19 +577,19 @@
     },
     {
       "id": "carry-wants-smg",
-      "name": "SMGs help · Carry",
+      "name": "One handed primaries help · Carry",
       "when": {
         "mission": [
           "carry"
         ]
       },
       "match": {
-        "category": [
-          "SMG"
-        ]
+        "slot": "primary",
+        "wiki.oneHanded": true
       },
       "delta": 14,
-      "say": "You carry an objective for most of this mission. A one handed weapon can fire while you carry it."
+      "say": "You carry an objective for most of this mission. A one handed weapon can fire while you carry it.",
+      "source": "The game's own one handed flag, read from its weapon data."
     },
     {
       "id": "peril-bots-wants-quiet",
@@ -656,6 +687,9 @@
           {
             "noNumber": [
               "wiki.noise"
+            ],
+            "notDamageType": [
+              "melee"
             ]
           }
         ]
@@ -667,7 +701,7 @@
         "times": -0.25,
         "clamp": 8
       },
-      "judgement": "The size is ours. Medium is the most common class, and weapons with no class in the game file are counted here too. 1 or 2 players only, from solo on Impossible or 2 players on Helldive.",
+      "judgement": "The size is ours. Medium is the most common class, and weapons with no class in the game file are counted here too, except melee. 1 or 2 players only, from solo on Impossible or 2 players on Helldive.",
       "source": "The game's own noise template for each weapon, read from its weapon data: small, medium, large or huge."
     },
     {
@@ -775,6 +809,9 @@
           {
             "noNumber": [
               "wiki.noise"
+            ],
+            "notDamageType": [
+              "melee"
             ]
           }
         ]
@@ -836,7 +873,8 @@
         "hazard": [
           "sandstorms",
           "blizzards",
-          "thick_fog"
+          "thick_fog",
+          "rainstorms"
         ],
         "squad": {
           "lte": 2
@@ -870,7 +908,8 @@
         "hazard": [
           "sandstorms",
           "blizzards",
-          "thick_fog"
+          "thick_fog",
+          "rainstorms"
         ],
         "squad": {
           "lte": 2
@@ -1051,6 +1090,169 @@
         "clamp": 8
       },
       "judgement": "Only at peril 0 or less, such as 4 players on Challenging or 1 player on Easy. Never more than half a tier."
+    },
+    {
+      "id": "stingrays-find-you",
+      "name": "Stealth helps less · Illuminate, 1 or 2 players, peril 22+",
+      "when": {
+        "faction": [
+          "squids"
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 22
+        }
+      },
+      "match": {
+        "anyOf": [
+          {
+            "tags": [
+              "suppressed"
+            ]
+          },
+          {
+            "slot": "armor",
+            "anyOf": [
+              {
+                "number": [
+                  {
+                    "path": "passive.detectionRange",
+                    "gte": 1
+                  }
+                ]
+              },
+              {
+                "number": [
+                  {
+                    "path": "passive.movementNoise",
+                    "gte": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": -0.15,
+        "clamp": 5
+      },
+      "say": "Stingrays detect any Helldiver in the mission area. Only Watchers call reinforcements, and their call can be interrupted.",
+      "source": "helldivers.wiki.gg, Stealth and Stingray.",
+      "judgement": "Takes back part of the stealth rules on this front, so stealth counts for less against the Illuminate than against the Terminids."
+    },
+    {
+      "id": "depth-wants-anti-tank",
+      "name": "Anti-tank helps · Automatons, Terminids, peril 22+",
+      "when": {
+        "faction": [
+          "bots",
+          "bugs"
+        ],
+        "peril": {
+          "gte": 22
+        }
+      },
+      "match": {
+        "roles": [
+          "anti-armor"
+        ]
+      },
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": 0.4,
+        "clamp": 8
+      },
+      "say": "At this level more heavy enemies spawn per player. Anti-tank kills them.",
+      "source": "Peril, from difficulty and squad size. Enemy arrival levels from helldivers.wiki.gg.",
+      "judgement": "The size is ours: under half a tier at peril 30, the most from peril 36."
+    },
+    {
+      "id": "depth-wants-crowd-clear",
+      "name": "Crowd clear helps · Terminids, Illuminate, peril 22+",
+      "when": {
+        "faction": [
+          "bugs",
+          "squids"
+        ],
+        "peril": {
+          "gte": 22
+        }
+      },
+      "match": {
+        "roles": [
+          "chaff"
+        ]
+      },
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": 0.4,
+        "clamp": 8
+      },
+      "say": "At this level more enemies spawn per player. Crowd clear kills groups of small enemies quickly.",
+      "source": "Peril, from difficulty and squad size.",
+      "judgement": "The size is ours, the same as the anti-tank rule. Not on the Automatons, whose deeper levels add armour more than numbers."
+    },
+    {
+      "id": "leviathans-want-anti-tank",
+      "name": "Anti-tank helps · Illuminate, difficulty 8+",
+      "when": {
+        "faction": [
+          "squids"
+        ],
+        "difficulty": {
+          "gte": 8
+        }
+      },
+      "match": {
+        "anyOf": [
+          {
+            "stratType": "support",
+            "gameTags": [
+              "ANTI-TANK",
+              "HEAVY ARMOR PENETRATING"
+            ]
+          },
+          {
+            "idIn": [
+              "e-at-12-anti-tank-emplacement"
+            ]
+          }
+        ]
+      },
+      "delta": 8,
+      "say": "Leviathans spawn from difficulty 8, up to 5 at once. Their turrets and body need anti-tank.",
+      "source": "helldivers.wiki.gg, Leviathan: heavy penetration support weapons for the turrets, the Recoilless, Spear and Anti-Tank Emplacement for the body.",
+      "judgement": "The Anti-Tank Emplacement is named by hand, because the wiki names it."
+    },
+    {
+      "id": "shallow-drop-less-anti-tank",
+      "name": "Anti-tank less needed · peril 0 or less",
+      "when": {
+        "peril": {
+          "lte": 0
+        }
+      },
+      "match": {
+        "roles": [
+          "anti-armor"
+        ]
+      },
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 0,
+        "times": 0.3,
+        "clamp": 8
+      },
+      "say": "Few armoured heavy enemies spawn at this level, and none below difficulty 3.",
+      "source": "Enemy arrival levels from helldivers.wiki.gg.",
+      "judgement": "The size is ours: up to half a tier, on difficulty 1 and 2."
     },
     {
       "id": "commando-no-reinforcement-boosters",
@@ -1246,6 +1448,66 @@
       "source": "helldivers.wiki.gg, Commando Missions"
     },
     {
+      "id": "commando-carry-more",
+      "name": "Extra ammo, grenades or stims help · Commando",
+      "when": {
+        "mission": [
+          "commando"
+        ]
+      },
+      "match": {
+        "slot": "armor",
+        "anyOf": [
+          {
+            "number": [
+              {
+                "path": "passive.ammoCapacity",
+                "gte": 1
+              }
+            ]
+          },
+          {
+            "number": [
+              {
+                "path": "passive.throwables",
+                "gte": 1
+              }
+            ]
+          },
+          {
+            "number": [
+              {
+                "path": "passive.stims",
+                "gte": 1
+              }
+            ]
+          }
+        ]
+      },
+      "delta": 6,
+      "say": "Resupply is a stratagem, so it comes twice at most here. This armour carries more ammo, grenades or stims.",
+      "source": "helldivers.wiki.gg, Commando Missions"
+    },
+    {
+      "id": "commando-cheat-death",
+      "name": "Surviving a lethal hit helps · Commando",
+      "when": {
+        "mission": [
+          "commando"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "democracy-protects",
+          "adreno-defibrillator"
+        ]
+      },
+      "delta": 8,
+      "say": "No reinforcements arrive until you find the pods. This armour can keep you alive through a lethal hit.",
+      "source": "helldivers.wiki.gg, Commando Missions",
+      "judgement": "Named by hand: no published stat marks a passive that survives death."
+    },
+    {
       "id": "quiet-weapon-loud-armour",
       "name": "Silenced weapon needs stealth armour · 1 or 2 players, peril 22+",
       "when": {
@@ -1330,18 +1592,19 @@
       "judgement": "The other half of the same judgement, in the same range."
     },
     {
-      "id": "true-grit-long-reload",
-      "name": "True Grit shortens a long support reload",
+      "id": "true-grit-stationary-reload",
+      "name": "True Grit shortens a long stationary reload",
       "when": {},
       "match": {
         "stratType": "support",
         "notGameTags": [
           "HEAT"
         ],
+        "wiki.reload.stationary": true,
         "number": [
           {
             "path": "wiki.reload.seconds",
-            "gte": 3.5
+            "gte": 4
           },
           {
             "path": "wiki.ammo.magazine",
@@ -1357,49 +1620,56 @@
           ]
         }
       },
-      "delta": 6,
-      "say": "This takes 3.5 seconds or more to reload. True Grit cuts that by 30% every time.",
-      "source": "Reload times from each weapon's wiki infobox. True Grit: +30% support weapon reload speed.",
-      "judgement": "Magazines over 120 are left out (Stalwart, Machine Gun, Flamethrower): they reload too rarely for it to show. Heat weapons are left out too: the Laser Cannon rarely swaps its heat sink."
+      "delta": 12,
+      "say": "You cannot move for 4 seconds or more while this reloads. True Grit cuts that by 30%.",
+      "source": "Stationary Reload, from the weapon's wiki infobox or the game's own tag.",
+      "judgement": "Our own ladder: a stationary reload of 4 seconds or more, then any reload of 3 seconds or more, then a short or rare one. Weapons that never reload, and heat weapons, get nothing."
     },
     {
-      "id": "true-grit-stationary-reload",
-      "name": "True Grit shortens a stationary reload",
+      "id": "true-grit-long-reload",
+      "name": "True Grit shortens a long reload",
       "when": {},
       "match": {
         "stratType": "support",
         "notGameTags": [
           "HEAT"
         ],
-        "wiki.reload.stationary": true,
-        "alongside": {
-          "number": [
-            {
-              "path": "passive.supportReload",
-              "gte": 1
-            }
-          ]
-        }
-      },
-      "delta": 4,
-      "say": "You cannot move while this reloads. True Grit cuts that time by 30%.",
-      "source": "Stationary Reload, from the weapon's wiki infobox or the game's own tag.",
-      "judgement": "Adds to the long reload rule: a long reload you cannot move during is worse than either alone."
-    },
-    {
-      "id": "true-grit-every-shot",
-      "name": "True Grit shortens a reload after every shot",
-      "when": {},
-      "match": {
-        "stratType": "support",
-        "number": [
+        "anyOf": [
           {
-            "path": "wiki.ammo.magazine",
-            "eq": 1
+            "wiki.reload.stationary": true,
+            "number": [
+              {
+                "path": "wiki.reload.seconds",
+                "gte": 3,
+                "lt": 4
+              }
+            ]
           },
           {
-            "path": "wiki.reload.seconds",
-            "gte": 0.5
+            "wiki.reload.stationary": true,
+            "number": [
+              {
+                "path": "wiki.reload.seconds",
+                "gte": 3
+              },
+              {
+                "path": "wiki.ammo.magazine",
+                "gt": 120
+              }
+            ]
+          },
+          {
+            "wiki.reload.stationary": false,
+            "number": [
+              {
+                "path": "wiki.reload.seconds",
+                "gte": 3
+              },
+              {
+                "path": "wiki.ammo.magazine",
+                "lte": 120
+              }
+            ]
           }
         ],
         "alongside": {
@@ -1411,28 +1681,46 @@
           ]
         }
       },
-      "delta": 4,
-      "say": "This reloads after every shot, so 30% faster reloads means close to 30% more shots.",
-      "source": "Magazine size and reload time from the wiki.",
-      "judgement": "This covers the Railgun and the Speargun: short reloads, but one after every shot."
+      "delta": 7,
+      "say": "Each reload takes 3 seconds or more. True Grit cuts that by 30%.",
+      "source": "Reload times from each weapon's wiki infobox. True Grit: +30% support weapon reload speed.",
+      "judgement": "Our own ladder: a stationary reload of 4 seconds or more, then any reload of 3 seconds or more, then a short or rare one. Weapons that never reload, and heat weapons, get nothing."
     },
     {
       "id": "true-grit-big-belt",
-      "name": "True Grit shortens a rare long reload",
+      "name": "True Grit shortens a short or rare reload",
       "when": {},
       "match": {
         "stratType": "support",
         "notGameTags": [
           "HEAT"
         ],
-        "number": [
+        "anyOf": [
           {
-            "path": "wiki.reload.seconds",
-            "gte": 3.5
+            "wiki.reload.stationary": false,
+            "number": [
+              {
+                "path": "wiki.reload.seconds",
+                "gte": 3
+              },
+              {
+                "path": "wiki.ammo.magazine",
+                "gt": 120
+              }
+            ]
           },
           {
-            "path": "wiki.ammo.magazine",
-            "gt": 120
+            "number": [
+              {
+                "path": "wiki.ammo.magazine",
+                "eq": 1
+              },
+              {
+                "path": "wiki.reload.seconds",
+                "gte": 0.5,
+                "lt": 3
+              }
+            ]
           }
         ],
         "alongside": {
@@ -1444,14 +1732,14 @@
           ]
         }
       },
-      "delta": 2,
-      "say": "This reloads rarely, but each reload takes 3.5 seconds or more. True Grit cuts that by 30%.",
+      "delta": 3,
+      "say": "This reloads quickly, or rarely. True Grit still cuts each reload by 30%.",
       "source": "Reload times and magazine sizes from each weapon's wiki infobox. True Grit: +30% support weapon reload speed.",
-      "judgement": "A third of the long reload rule, because a big belt reloads rarely. Adds to the stationary rule, which puts the Machine Gun above the Stalwart."
+      "judgement": "Our own ladder: a stationary reload of 4 seconds or more, then any reload of 3 seconds or more, then a short or rare one. Weapons that never reload, and heat weapons, get nothing."
     },
     {
       "id": "true-grit-earns-its-keep",
-      "name": "True Grit helps · slow support weapon reload",
+      "name": "True Grit helps · long stationary support reload",
       "when": {},
       "match": {
         "number": [
@@ -1461,32 +1749,118 @@
           }
         ],
         "alongside": {
+          "stratType": "support",
+          "notGameTags": [
+            "HEAT"
+          ],
+          "wiki.reload.stationary": true,
+          "number": [
+            {
+              "path": "wiki.reload.seconds",
+              "gte": 4
+            },
+            {
+              "path": "wiki.ammo.magazine",
+              "lte": 120
+            }
+          ]
+        }
+      },
+      "delta": 8,
+      "say": "Your support weapon pins you in place for 4 seconds or more to reload. True Grit cuts that by 30%.",
+      "judgement": "Our own ladder: a stationary reload of 4 seconds or more, then any reload of 3 seconds or more, then a short or rare one. Weapons that never reload, and heat weapons, get nothing."
+    },
+    {
+      "id": "true-grit-helps-long-reload",
+      "name": "True Grit helps · long support reload",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.supportReload",
+            "gte": 1
+          }
+        ],
+        "alongside": {
+          "stratType": "support",
+          "notGameTags": [
+            "HEAT"
+          ],
           "anyOf": [
             {
-              "stratType": "support",
-              "notGameTags": [
-                "HEAT"
-              ],
+              "wiki.reload.stationary": true,
               "number": [
                 {
                   "path": "wiki.reload.seconds",
-                  "gte": 3.5
+                  "gte": 3,
+                  "lt": 4
+                }
+              ]
+            },
+            {
+              "wiki.reload.stationary": true,
+              "number": [
+                {
+                  "path": "wiki.reload.seconds",
+                  "gte": 3
+                },
+                {
+                  "path": "wiki.ammo.magazine",
+                  "gt": 120
+                }
+              ]
+            },
+            {
+              "wiki.reload.stationary": false,
+              "number": [
+                {
+                  "path": "wiki.reload.seconds",
+                  "gte": 3
                 },
                 {
                   "path": "wiki.ammo.magazine",
                   "lte": 120
                 }
               ]
+            }
+          ]
+        }
+      },
+      "delta": 5,
+      "say": "Your support weapon takes 3 seconds or more to reload. True Grit cuts that by 30%.",
+      "judgement": "Our own ladder: a stationary reload of 4 seconds or more, then any reload of 3 seconds or more, then a short or rare one. Weapons that never reload, and heat weapons, get nothing."
+    },
+    {
+      "id": "true-grit-helps-short-reload",
+      "name": "True Grit helps a little · short or rare support reload",
+      "when": {},
+      "match": {
+        "number": [
+          {
+            "path": "passive.supportReload",
+            "gte": 1
+          }
+        ],
+        "alongside": {
+          "stratType": "support",
+          "notGameTags": [
+            "HEAT"
+          ],
+          "anyOf": [
+            {
+              "wiki.reload.stationary": false,
+              "number": [
+                {
+                  "path": "wiki.reload.seconds",
+                  "gte": 3
+                },
+                {
+                  "path": "wiki.ammo.magazine",
+                  "gt": 120
+                }
+              ]
             },
             {
-              "stratType": "support",
-              "notGameTags": [
-                "HEAT"
-              ],
-              "wiki.reload.stationary": true
-            },
-            {
-              "stratType": "support",
               "number": [
                 {
                   "path": "wiki.ammo.magazine",
@@ -1494,32 +1868,17 @@
                 },
                 {
                   "path": "wiki.reload.seconds",
-                  "gte": 0.5
-                }
-              ]
-            },
-            {
-              "stratType": "support",
-              "notGameTags": [
-                "HEAT"
-              ],
-              "number": [
-                {
-                  "path": "wiki.reload.seconds",
-                  "gte": 3.5
-                },
-                {
-                  "path": "wiki.ammo.magazine",
-                  "gt": 120
+                  "gte": 0.5,
+                  "lt": 3
                 }
               ]
             }
           ]
         }
       },
-      "delta": 8,
-      "say": "Your support weapon has a long, frequent or stationary reload. True Grit cuts each one by 30%.",
-      "judgement": "Our own pairing."
+      "delta": 2,
+      "say": "Your support weapon reloads quickly, or rarely. True Grit still cuts each reload by 30%.",
+      "judgement": "Our own ladder: a stationary reload of 4 seconds or more, then any reload of 3 seconds or more, then a short or rare one. Weapons that never reload, and heat weapons, get nothing."
     },
     {
       "id": "true-grit-nothing-to-reload",
@@ -2198,6 +2557,33 @@
       "judgement": "Our own reading of the hazards."
     },
     {
+      "id": "fire-resist-on-burning-planets",
+      "name": "Fire resistance helps · fire tornadoes, volcanic activity",
+      "when": {
+        "hazard": [
+          "fire_tornadoes",
+          "volcanic_activity"
+        ]
+      },
+      "match": {
+        "slot": "armor",
+        "number": [
+          {
+            "path": "passive.fireResist",
+            "gte": 1
+          }
+        ]
+      },
+      "scaleBy": {
+        "path": "passive.fireResist",
+        "times": 0.12,
+        "clamp": 9
+      },
+      "say": "This planet sets Helldivers on fire. Your armour resists fire damage.",
+      "source": "The hazard text: fire tornadoes, and burning rocks from volcanoes.",
+      "judgement": "Our own reading of the hazards, the same one the Integrated Extinguishers rule uses."
+    },
+    {
       "id": "shield-pack-keeps-out-storms",
       "name": "Shield Generator Pack helps · acid storms, sandstorms, blizzards",
       "when": {
@@ -2704,14 +3090,18 @@
     "Armour penetration moves no rating at the item level and it must not. It moves one at the loadout level as of 1.20.0: build-rules.json reads the best thing a build holds against the front, which splits the 39 curated builds 36 / 41 / 23 where the per item reading split 51 primaries 48 to 3. Enemy armour is still shown on every expanded row as a fact. See whyThereAreNoArmourRules, which is about this file and stays true.",
     "Suppressed is sourced from a wiki article infobox rather than from a module, so it is curated on the items instead of fetched. It is a real published fact, 13 metres of audible range on the wiki's Stealth page, and it carries no `judgement` field for that reason. fetch-wiki.mjs reads weapon infoboxes since 4 October 2026, for reload times, so moving Suppressed into the fetch is now a small change rather than a new one.",
     "The weather rules price a hazard as if it were always happening. A planet listing sandstorms has sandstorms sometimes, roughly three minutes at a time, and nothing in the data says how often. The visibility penalties are set as a risk you carry across a run rather than a state you are in, which is a judgement and not a measurement.",
-    "Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad], where the squad curve is [10, 4, 1, 0] taken from the wiki patrol interval multipliers. The formula is unchanged on 4 October 2026; what changed is that the stealth rules also gate on squad. The curator: a four stack on Super Helldive knows what it is doing, so stealth is a question for one or two of you, from solo on Suicide Mission or two of you on Impossible. Peril alone puts four of you at difficulty 10 above two of you at 9, which is the wrong way round for stealth, so the squad gate does what the formula cannot.",
-    "The stealth rules scale off peril from 16, gated at 22, for one or two of you. Bugs and squids have their own, at about six tenths of the bot figure, since 4 October 2026. Nothing on bugs or squids reads difficulty for anything but stealth, so the gradient there is still thin.",
-    "The negative half is used once. easy-drop-wastes-stealth-armour takes up to half a tier off stealth passives below zero peril. The old inverted halves, silenced weapons marked down and loud ones lifted on an easy drop, were removed on 4 October 2026: not needing stealth is not a reason to mark it down. Nothing yet says that anti tank at difficulty 3 is firepower for an enemy that does not spawn.",
+    "Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] + FRONT_PRESSURE[front], where the squad curve is [10, 4, 1, 0] taken from the wiki patrol interval multipliers. The formula is unchanged on 4 October 2026; what changed is that the stealth rules also gate on squad. The curator: a four stack on Super Helldive knows what it is doing, so stealth is a question for one or two of you, from solo on Suicide Mission or two of you on Impossible. Peril alone puts four of you at difficulty 10 above two of you at 9, which is the wrong way round for stealth, so the squad gate does what the formula cannot. The front term is the curator's: Automatons and Illuminate play slightly harder than Terminids, so they add 2, a third of a difficulty step. It is a judgement from play, and About says so.",
+    "The stealth rules scale off peril from 16, gated at 22, for one or two of you. Bugs and squids have their own, at about six tenths of the bot figure. On the Illuminate front stingrays-find-you takes part of that back: Stingrays detect any Helldiver in the mission area, and only Watchers call reinforcements. Outside stealth, the depth rules give every front a gradient: anti-tank from peril 22 on Automatons and Terminids, crowd clear from peril 22 on Terminids and Illuminate, anti-tank on the Illuminate from difficulty 8 for the Leviathans, and anti-tank marked down at peril 0 or less on every front.",
+    "The negative half is used twice. easy-drop-wastes-stealth-armour takes up to half a tier off stealth passives below zero peril, and shallow-drop-less-anti-tank takes up to half a tier off anti-tank there, because no armoured heavy enemy spawns below difficulty 3. The old inverted halves, silenced weapons marked down and loud ones lifted on an easy drop, were removed: not needing stealth is not a reason to mark it down.",
     "A rule scaling off peril must not name a squad size in its say. Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] and depth reaches it as readily as being alone does, so four players on Super Helldive sit at 30. All three bot peril rules shipped in 1.19.0 asserting the reader was outnumbered, and their inverted halves asserted the reader was not, both on a figure that says neither. Fixed on 22 August 2026 by describing the pressure instead. Nothing about how a squad size might get its own wording is solved here; the rule simply may not claim one it did not check.",
     "Pairing rules, those with an alongside or notAlongside clause, read the rest of the build and so never fire on a tier row. They show in the builder's picker and slots and on every build's parts. Twenty since 4 October 2026: stealth, True Grit, Gunslinger, melee, fire, arc and gas resistance, and C4 with throw range. npm run builds measures them by placing each subject in 60 random builds.",
     "Considered and cut by the curator on 4 October 2026, recorded so nobody rebuilds them. True Grit worth more solo, and team weapons marked down solo: the wiki says assisted reloads skip True Grit and team weapons are built for a loader, but in practice nobody team reloads, so neither changes what is worth bringing. Peak Physique paired with low ergonomics support weapons: the +30 ergonomics is real, but those weapons are better served by other passives. Kinetic Displacement or Blunt Force Mitigation paired with a Jump Pack or a vehicle: nobody should pick a passive to soften their own bad landings.",
     "Held back for want of a source, 4 October 2026: whether Med-Kit's longer stims also lengthen Experimental Infusion, whether Localization Confusion matters more for a small squad, and how the Hover Pack fares on steep ground. Fire against the Automatons is not a gap: the wiki gives no front wide fire resistance, and the vote already prices flame's short range against a front that shoots from far away.",
     "The city rules guess from the planet: a planet with a megacity reads as a city fight wherever the mission actually is. The scenario does not know which part of a planet a mission is on, so those rules carry half weight and say they are a guess.",
-    "Armour weight comes from the set a build wears, since 4 October 2026, and every build made before then, and every preset, has no set and so no weight. The weight rules stay silent on those rather than guessing medium, the same contract as an unset difficulty."
+    "Armour weight comes from the set a build wears, since 4 October 2026, and every build made before then, and every preset, has no set and so no weight. The weight rules stay silent on those rather than guessing medium, the same contract as an unset difficulty.",
+    "Boosters are mostly silent, and that is correct rather than a gap. 12 of 20 have no rule because they do the same job on every drop: samples, hellpod ammo, radar, extraction. The ones that might vary with depth, Localization Confusion and the two reinforcement boosters, have no published figure to scale off.",
+    "Meteor storms have no rule. The wiki says meteors cause massive damage and gives no damage type, figure or frequency, so nothing says which armour or gear it should favour.",
+    "Acid resistance on Acclimated and Desert Stormer is read by no rule. The wiki does not say whether it softens an acid storm, which reduces armour effectiveness rather than dealing acid damage. Blunt Force Mitigation's armour rating bonus has no number in its effect, so the acid storm rule cannot scale it.",
+    "Stingrays are absent when the Appropriators, Mindless Masses or Vote Snatchers lead the Illuminate front. The tool has no subfaction, so stingrays-find-you applies on every Illuminate planet."
   ]
 }
