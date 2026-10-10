@@ -114,9 +114,10 @@ function scenariosFor(rule) {
      scenario carrying those numbers, or it reads null and never fires.
      Solo on Impossible is peril 22, the anchor the coefficients are set
      against, so it is the fair place to measure one. */
+  /* Only what is missing: a rule gated on difficulty 4 or less keeps its 4. */
   if (rule.scaleBy && String(rule.scaleBy.path).startsWith("scenario.") && (!difficulty || !squad)) {
-    difficulty = 7;
-    squad = 1;
+    difficulty = difficulty || 7;
+    squad = squad || 1;
   }
 
   return factions.map((faction) => ({ faction, hazards, biome, planet, mission, difficulty, squad }));

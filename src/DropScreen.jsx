@@ -693,7 +693,7 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted }) {
             : "Nobody has dropped yet."}
       </p>
     );
-  } else if (coverageIsQuiet(context.level, size, context.faction) ?? isQuietBand(context.difficulty)) {
+  } else if (coverageIsQuiet(context.level, size, context.faction, context.skill) ?? isQuietBand(context.difficulty)) {
     /* Never claim coverage here. The checks are switched off, which is
        not the same as the squad being fine. */
     body = (

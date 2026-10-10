@@ -104,6 +104,14 @@ export function useCollectionState() {
   );
   const lockedItems = active.lockedItems;
   const lockedWarbonds = active.lockedWarbonds;
+  /* 0 until the player answers, which peril reads as the curator's level. */
+  const skill = active.skill || 0;
+  const setSkill = useCallback((level) => {
+    updateActive((p) => {
+      const { skill: _old, ...rest } = p;
+      return Number.isInteger(level) && level >= 1 && level <= 10 ? { ...rest, skill: level } : rest;
+    });
+  }, [updateActive]);
 
   const toggleFavorite = useCallback((id) => {
     setFavorites((prev) => {
@@ -171,7 +179,7 @@ export function useCollectionState() {
   /* owned or everything owned, keeping its id and name. Either is a       */
   /* deliberate answer, so the profile counts as set up afterwards.        */
   const resetActiveTo = useCallback((mode) => {
-    updateActive((p) => ({ ...blankProfile(p.id, p.name, mode, p), setUp: true }));
+    updateActive((p) => ({ ...blankProfile(p.id, p.name, mode, p), setUp: true, ...(p.skill ? { skill: p.skill } : {}) }));
   }, [updateActive]);
 
   const setWarbondGroup = useCallback((ids, locked) => {
@@ -429,6 +437,7 @@ export function useCollectionState() {
     toggleFavorite, toggleFavItem, clearFavItems,
     toggleLock, clearItemLocks, setItemGroup, toggleWarbond, setWarbondGroup,
     markSetUp, resetActiveTo, needsSetup: needsSetup(active),
+    skill, setSkill,
     saveLoadout, deleteLoadout, duplicate, logDrop, unlogDrop,
     exportState, importState, resetLocal,
   };

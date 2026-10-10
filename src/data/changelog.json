@@ -5,12 +5,12 @@
     "title": "Know your enemy",
     "say": "The Ministry has surveyed all three fronts at every difficulty. It regrets to report that the Illuminate always know where you are.",
     "changes": [
-      "Difficulty and squad size now change ratings on every front: anti-tank and crowd clear count for more at high difficulty or with fewer players, and anti-tank for less at low difficulty.",
+      "Set your level beside How many of you: the hardest difficulty four players at your level clear easily. Stealth advice, anti-tank and the squad checks start from there.",
+      "Difficulty and squad size now change ratings on every front: anti-tank and crowd clear count for more at high peril, and anti-tank for less at difficulty 4 or below.",
       "Automatons and Illuminate count as slightly harder than Terminids. About now explains peril.",
       "Against the Illuminate, stealth helps less because Stingrays find you anywhere, lock-on helps against Stingrays, arc weapons stop Watcher calls, and anti-tank helps from difficulty 8, where Leviathans spawn.",
       "True Grit works on a ladder: most for a long stationary reload like the Recoilless Rifle, less for a long one, a little for the Stalwart.",
-      "New rules for rain, burning planets, Automaton explosives from difficulty 6, Blitz and Commando, and storms now cost long range weapons less.",
-      "Builds now note fire without fire resistance, no close range weapon in a storm, overlapping support weapons, and single shot anti-tank against Harvester shields. Close blasts like the Autocannon's are marked on the row."
+      "New rules for rain, burning planets, Automaton explosives, Blitz and Commando, new build notes for fire, storms, Harvester shields and overlapping support weapons, and close blasts marked on the row."
     ]
   },
   {

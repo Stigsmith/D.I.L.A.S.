@@ -50,10 +50,10 @@ export function missionFor(faction, trait) {
   return (pure || here[0] || {}).name || null;
 }
 
-export function situationScenario(situation, faction, rulesOff) {
+export function situationScenario(situation, faction, rulesOff, skill) {
   const mission = situation.trait ? missionFor(faction, situation.trait) : null;
   if (situation.trait && !mission) return null;
-  return { ...BASE, ...(situation.scenario || {}), faction, mission, rulesOff };
+  return { ...BASE, ...(situation.scenario || {}), faction, mission, rulesOff, skill };
 }
 
 /* A situation counts as covered once your best build for it reads A or
@@ -68,11 +68,11 @@ export const standingOf = (best) =>
  *           best is { build, reading } or null; fit counts every build the
  *           situation lets through that you can field
  */
-export function coverage(builds, { lockedSet = new Set(), rulesOff, fronts = ["bots", "bugs", "squids"] } = {}) {
+export function coverage(builds, { lockedSet = new Set(), rulesOff, skill, fronts = ["bots", "bugs", "squids"] } = {}) {
   const out = {};
   for (const faction of fronts) {
     out[faction] = SITUATIONS.map((situation) => {
-      const scenario = situationScenario(situation, faction, rulesOff);
+      const scenario = situationScenario(situation, faction, rulesOff, skill);
       if (!scenario) return { situation, scenario: null, best: null, fit: 0, cut: null, standing: "absent" };
       const { shown, cut } = dropPool(builds, scenario, { lockedSet, showLocked: false });
       const ranked = rankByReading(shown, scenario).filter((r) => r.reading.score !== null);

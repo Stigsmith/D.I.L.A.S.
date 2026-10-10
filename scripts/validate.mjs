@@ -451,10 +451,13 @@ for (const rule of rules) {
   /* Unless a peril gate keeps it on one side of its own zero: a rule that
      only fires from peril 16 and counts from 16 never comes out negative,
      and a second sentence for it would be dead copy. */
-  const gate = (rule.when && rule.when.peril) || {};
+  /* The same holds for any scenario number the rule gates on and scales
+     off: anti-tank marked down from difficulty 4 counts from 5. */
+  const scaled = rule.scaleBy && String(rule.scaleBy.path).startsWith("scenario.") ? String(rule.scaleBy.path).slice(9) : null;
+  const gate = (scaled && rule.when && rule.when[scaled]) || {};
   const from = rule.scaleBy ? rule.scaleBy.from ?? 0 : 0;
   const oneSided =
-    rule.scaleBy && String(rule.scaleBy.path) === "scenario.peril" &&
+    scaled !== null &&
     ((gate.gte !== undefined && gate.gte >= from) || (gate.lte !== undefined && gate.lte <= from));
   if (rule.scaleBy && String(rule.scaleBy.path).startsWith("scenario.") && !rule.sayInverted && !oneSided) {
     ruleProblems.push(`${rule.id} scales off the scenario so it can invert, but carries no sayInverted`);

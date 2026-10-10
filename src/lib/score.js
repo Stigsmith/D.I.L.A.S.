@@ -75,7 +75,7 @@ const swingFor = (peril) => (peril === null ? MAX_SWING : MAX_SWING + Math.max(0
 /* scenario answers that decide it.                                    */
 /*                                                                     */
 /*   peril = 6 * (difficulty - 5) + SQUAD_PRESSURE[squad]              */
-/*           + FRONT_PRESSURE[front]                                   */
+/*           + FRONT_PRESSURE[front] - 6 * (your level - 7)            */
 /*                                                                     */
 /* **It is not points and nothing adds it to a score.** Rules gate on  */
 /* it, and may one day scale off it. Its magnitude changes no rating   */
@@ -109,8 +109,20 @@ export function peril(scenario = {}) {
   const d = scenario.difficulty;
   const sq = scenario.squad;
   if (!d || !sq) return null;
-  return 6 * (d - 5) + SQUAD_PRESSURE[sq - 1] + (FRONT_PRESSURE[scenario.faction] || 0);
+  return 6 * (d - 5) + SQUAD_PRESSURE[sq - 1] + (FRONT_PRESSURE[scenario.faction] || 0) - skillOffset(scenario.skill);
 }
+
+/* Your level: the hardest difficulty four players at your level clear
+   easily, 1 to 10, from the active profile. Every peril number was set
+   from the curator's play, and his answer is Suicide Mission, so 7 is the
+   anchor and changes nothing. Each level above it takes a difficulty
+   step, 6, off peril; each level below adds one. Unset counts as the
+   anchor, which is how the tool behaved before anyone could answer.
+   Only peril moves. Rules about what spawns at a difficulty (Leviathans
+   from 8, War Strider grenades from 6) read difficulty and stay put. */
+export const SKILL_ANCHOR = 7;
+const skillOffset = (skill) =>
+  Number.isInteger(skill) && skill >= 1 && skill <= 10 ? 6 * (skill - SKILL_ANCHOR) : 0;
 
 /* The fronts are not equally hard at the same difficulty. The curator
    rates Automatons and Illuminate slightly harder than Terminids, and

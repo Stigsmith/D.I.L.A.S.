@@ -1191,7 +1191,7 @@
         "times": 0.4,
         "clamp": 8
       },
-      "say": "At this level more heavy enemies spawn per player. Anti-tank kills them.",
+      "say": "At this peril more heavy enemies come at you at once. Anti-tank kills them.",
       "source": "Peril, from difficulty and squad size. Enemy arrival levels from helldivers.wiki.gg.",
       "judgement": "The size is ours: under half a tier at peril 30, the most from peril 36."
     },
@@ -1218,7 +1218,7 @@
         "times": 0.4,
         "clamp": 8
       },
-      "say": "At this level more enemies spawn per player. Crowd clear kills groups of small enemies quickly.",
+      "say": "At this peril more enemies come at you at once. Crowd clear kills groups of small enemies quickly.",
       "source": "Peril, from difficulty and squad size.",
       "judgement": "The size is ours, the same as the anti-tank rule. Not on the Automatons, whose deeper levels add armour more than numbers."
     },
@@ -1328,10 +1328,10 @@
     },
     {
       "id": "few-heavies-less-anti-tank",
-      "name": "Anti-tank less needed · peril 0 or less",
+      "name": "Anti-tank less needed · difficulty 4 or less",
       "when": {
-        "peril": {
-          "lte": 0
+        "difficulty": {
+          "lte": 4
         }
       },
       "match": {
@@ -1340,14 +1340,14 @@
         ]
       },
       "scaleBy": {
-        "path": "scenario.peril",
-        "from": 0,
-        "times": 0.3,
+        "path": "scenario.difficulty",
+        "from": 5,
+        "times": 2.5,
         "clamp": 8
       },
-      "say": "Few armoured heavy enemies spawn at this level, and none below difficulty 3.",
+      "say": "Few armoured heavy enemies spawn at this difficulty, and none below difficulty 3.",
       "source": "Enemy arrival levels from helldivers.wiki.gg.",
-      "judgement": "The size is ours: up to half a tier, on difficulty 1 and 2."
+      "judgement": "The size is ours: up to half a tier, on difficulty 1 and 2. It reads difficulty, not peril, because it is about what spawns."
     },
     {
       "id": "commando-no-reinforcement-boosters",
@@ -3226,8 +3226,8 @@
     "Suppressed is sourced from a wiki article infobox rather than from a module, so it is curated on the items instead of fetched. It is a real published fact, 13 metres of audible range on the wiki's Stealth page, and it carries no `judgement` field for that reason. fetch-wiki.mjs reads weapon infoboxes since 4 October 2026, for reload times, so moving Suppressed into the fetch is now a small change rather than a new one.",
     "The weather rules price a hazard as if it were always happening. A planet listing sandstorms has sandstorms sometimes, roughly three minutes at a time, and nothing in the data says how often. The visibility penalties are set as a risk you carry across a run rather than a state you are in, which is a judgement and not a measurement.",
     "Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] + FRONT_PRESSURE[front], where the squad curve is [10, 4, 1, 0] taken from the wiki patrol interval multipliers. The formula is unchanged on 4 October 2026; what changed is that the stealth rules also gate on squad. The curator: a four stack on Super Helldive knows what it is doing, so stealth is a question for one or two of you, from solo on Suicide Mission or two of you on Impossible. Peril alone puts four of you at difficulty 10 above two of you at 9, which is the wrong way round for stealth, so the squad gate does what the formula cannot. The front term is the curator's: Automatons and Illuminate play slightly harder than Terminids, so they add 2, a third of a difficulty step. It is a judgement from play, and About says so.",
-    "The stealth rules scale off peril from 16, gated at 22, for one or two of you. Bugs and squids have their own, at about six tenths of the bot figure. On the Illuminate front stingrays-find-you takes part of that back: Stingrays detect any Helldiver in the mission area, and only Watchers call reinforcements. Outside stealth, difficulty and squad size change ratings on every front: anti-tank from peril 22 on Automatons and Terminids, crowd clear from peril 22 on Terminids and Illuminate, anti-tank on the Illuminate from difficulty 8 for the Leviathans, and anti-tank marked down at peril 0 or less on every front.",
-    "The negative half is used twice. easy-drop-wastes-stealth-armour takes up to half a tier off stealth passives below zero peril, and few-heavies-less-anti-tank takes up to half a tier off anti-tank there, because no armoured heavy enemy spawns below difficulty 3. The old inverted halves, silenced weapons marked down and loud ones lifted on an easy drop, were removed: not needing stealth is not a reason to mark it down.",
+    "The stealth rules scale off peril from 16, gated at 22, for one or two of you. Bugs and squids have their own, at about six tenths of the bot figure. On the Illuminate front stingrays-find-you takes part of that back: Stingrays detect any Helldiver in the mission area, and only Watchers call reinforcements. Outside stealth, difficulty and squad size change ratings on every front: anti-tank from peril 22 on Automatons and Terminids, crowd clear from peril 22 on Terminids and Illuminate, anti-tank on the Illuminate from difficulty 8 for the Leviathans, and anti-tank marked down at difficulty 4 or less on every front.",
+    "The negative half is used twice. easy-drop-wastes-stealth-armour takes up to half a tier off stealth passives below zero peril, and few-heavies-less-anti-tank takes up to half a tier off anti-tank at difficulty 4 or less, because no armoured heavy enemy spawns below difficulty 3. That one reads difficulty rather than peril: it is about what spawns, which your level does not change. The old inverted halves, silenced weapons marked down and loud ones lifted on an easy drop, were removed: not needing stealth is not a reason to mark it down.",
     "A rule scaling off peril must not name a squad size in its say. Peril is 6 * (difficulty - 5) + SQUAD_PRESSURE[squad] and difficulty reaches it as readily as being alone does, so four players on Super Helldive sit at 30. All three bot peril rules shipped in 1.19.0 asserting the reader was outnumbered, and their inverted halves asserted the reader was not, both on a figure that says neither. Fixed on 22 August 2026 by describing the pressure instead. Nothing about how a squad size might get its own wording is solved here; the rule simply may not claim one it did not check.",
     "Pairing rules, those with an alongside or notAlongside clause, read the rest of the build and so never fire on a tier row. They show in the builder's picker and slots and on every build's parts. Twenty since 4 October 2026: stealth, True Grit, Gunslinger, melee, fire, arc and gas resistance, and C4 with throw range. npm run builds measures them by placing each subject in 60 random builds.",
     "Considered and cut by the curator on 4 October 2026, recorded so nobody rebuilds them. True Grit worth more solo, and team weapons marked down solo: the wiki says assisted reloads skip True Grit and team weapons are built for a loader, but in practice nobody team reloads, so neither changes what is worth bringing. Peak Physique paired with low ergonomics support weapons: the +30 ergonomics is real, but those weapons are better served by other passives. Kinetic Displacement or Blunt Force Mitigation paired with a Jump Pack or a vehicle: nobody should pick a passive to soften their own bad landings.",
@@ -3237,6 +3237,7 @@
     "Boosters are mostly silent, and that is correct rather than a gap. 11 of 20 have no rule because they do the same job on every drop: samples, hellpod ammo, radar, extraction. The two reinforcement boosters might vary with difficulty, and have no published figure to scale off.",
     "Meteor storms have no rule. The wiki says meteors cause massive damage and gives no damage type, figure or frequency, so nothing says which armour or gear it should favour.",
     "Acid resistance on Acclimated and Desert Stormer is read by no rule. The wiki does not say whether it softens an acid storm, which reduces armour effectiveness rather than dealing acid damage. Blunt Force Mitigation's armour rating bonus has no number in its effect, so the acid storm rule cannot scale it.",
-    "Stingrays are absent when the Appropriators, Mindless Masses or Vote Snatchers lead the Illuminate front. The tool has no subfaction, so stingrays-find-you applies on every Illuminate planet."
+    "Stingrays are absent when the Appropriators, Mindless Masses or Vote Snatchers lead the Illuminate front. The tool has no subfaction, so stingrays-find-you applies on every Illuminate planet.",
+    "Your level, set per profile, moves peril: each level above Suicide Mission takes 6 off, each below adds 6. It is the player's own answer and nothing checks it. Rules about what spawns read difficulty instead, so a strong player still sees Leviathans from 8."
   ]
 }
