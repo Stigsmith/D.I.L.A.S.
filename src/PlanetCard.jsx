@@ -17,7 +17,7 @@
 /* ================================================================== */
 
 import { planetFacts, pickShots } from "./lib/planet.js";
-import { planetLandscapes, biomeLandscape, planetArt, markArt } from "./lib/assets.js";
+import { planetLandscapes, biomeLandscape, planetArt, markArt, hazardIcon } from "./lib/assets.js";
 import { Tip, MissingData, HAS_TIP } from "./Tip.jsx";
 import { planetEffects } from "./lib/effects.js";
 import { SUBFACTIONS, subfactionsOn } from "./lib/subfaction.js";
@@ -41,7 +41,25 @@ const standInLine = (shot, facts) => {
   return shot.standIn === "biome" ? `${biome}, typical ground` : `${biome}, as seen on ${shot.standIn}`;
 };
 
-function Banner({ shots, facts, compact, scorched = false }) {
+/* The planet's hazards as the game draws them over its picture: the
+   temperature when it is hot or cold, then the weather. */
+function HazardRow({ facts, compact }) {
+  const list = [
+    ...(facts.temperature && facts.temperature.slug !== "normal_temp" ? [facts.temperature] : []),
+    ...facts.weather,
+  ].filter((h) => hazardIcon(h.slug));
+  if (!list.length) return null;
+  return (
+    <div className="pointer-events-auto absolute bottom-1.5 right-1.5 flex gap-1">
+      {list.map((h) => {
+        const icon = <img src={hazardIcon(h.slug)} alt={h.name} className={(compact ? "h-5 w-5" : "h-6 w-6") + " drop-shadow"} />;
+        return compact ? <span key={h.slug}>{icon}</span> : <Tip key={h.slug} title={h.name} text={h.effect}>{icon}</Tip>;
+      })}
+    </div>
+  );
+}
+
+function Banner({ shots, facts, compact, scorched = false, hazards = true }) {
   if (!shots.length) return null;
   return (
     <div className={"relative grid gap-px bg-base-950 " + (shots.length > 1 ? "grid-cols-2 " : "") + (compact ? "h-24" : "h-32")}>
@@ -67,6 +85,7 @@ function Banner({ shots, facts, compact, scorched = false }) {
           ) : null}
         </div>
       ))}
+      {hazards ? <HazardRow facts={facts} compact={compact} /> : null}
     </div>
   );
 }
@@ -115,7 +134,7 @@ export default function PlanetCard({ name, compact = false, war = null, titled =
 
   return (
     <div className="flex flex-col text-left">
-      <Banner shots={shots} facts={facts} compact={compact} scorched={scorched} />
+      <Banner shots={shots} facts={facts} compact={compact} scorched={scorched} hazards={!gone} />
       <div className={"flex flex-col gap-2 " + (compact ? "px-3 py-2" : "p-3")}>
         {titled ? <div className="flex items-center gap-2.5">
           {render ? <img src={render} alt="" className={(compact ? "h-10 w-10" : "h-12 w-12") + " shrink-0"} /> : null}

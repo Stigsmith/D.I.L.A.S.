@@ -50,6 +50,12 @@ const LANDSCAPES = load(
 /* What the game marks on a planet, by the art id war-effects.json names:
    render_<id> for a destroyed planet on the map, banner_<id> for the
    card. Fetched by npm run planet-art -- --marks and gitignored. */
+/* The game's hazard icons, a white disc with the hazard on it, by the
+   hazard's key. Fetched by npm run planet-art -- --hazards, gitignored. */
+const HAZARD_ICONS = load(
+  import.meta.glob("../assets/hazards/*", { eager: true, query: "?url", import: "default" })
+);
+export const hazardIcon = (slug) => (slug ? HAZARD_ICONS.get(`hazard_${slug}`) || null : null);
 const MARKS = load(
   import.meta.glob("../assets/marks/*", { eager: true, query: "?url", import: "default" })
 );

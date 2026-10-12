@@ -221,6 +221,18 @@ if (existsSync(LANDSCAPES_SOURCE)) {
   }
 }
 
+/* The game's hazard icons, fetched by npm run planet-art -- --hazards. */
+const HAZARDS_SOURCE = join(PLANETS_SOURCE, "Hazards");
+emptyInPlace(join(ASSETS, "hazards"));
+let hazardArt = 0;
+if (existsSync(HAZARDS_SOURCE)) {
+  for (const d of readdirSync(HAZARDS_SOURCE, { withFileTypes: true })) {
+    if (!d.isFile() || !/^hazard_[a-z_]+.svg$/i.test(d.name)) continue;
+    copyFileSync(join(HAZARDS_SOURCE, d.name), join(ASSETS, "hazards", d.name));
+    hazardArt += 1;
+  }
+}
+
 /* What the game marks on a planet: a render and a banner per art id in
    war-effects.json, cut by npm run planet-art -- --marks. */
 const MARKS_SOURCE = join(PLANETS_SOURCE, "Marks");
@@ -264,6 +276,7 @@ console.log(`warbonds with art: ${Object.keys(manifest.warbonds).length} of ${wa
 console.log(`ui and other:      ${manifest.ui.length}`);
 console.log(`planets with art:  ${planetArt}${planetArt ? "" : " (npm run planet-art -- --write fetches them)"}`);
 console.log(`landscapes:        ${landscapeArt}${landscapeArt ? "" : " (npm run planet-art -- --landscapes --write fetches them)"}`);
+console.log(`hazard icons:      ${hazardArt}${hazardArt ? "" : " (npm run planet-art -- --hazards --write fetches them)"}`);
 console.log(`planet marks:      ${markArt}${markArt ? "" : " (npm run planet-art -- --marks --write fetches them)"}`);
 console.log(`armour sets:${armorSetArt}${armorSetArt ? "" : " (npm run armor-art fetches them)"}`);
 if (missingItems.length) {

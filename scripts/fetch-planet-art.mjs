@@ -474,6 +474,66 @@ async function marks() {
   console.log("  Run npm run images to bring them into the app.\n");
 }
 
+/* ------------------------------------------------------------------ */
+/* HAZARD ICONS                                                        */
+/*                                                                     */
+/*   npm run planet-art -- --hazards            report                 */
+/*   npm run planet-art -- --hazards --write    fetch                  */
+/*                                                                     */
+/* The game's icon for each hazard, single colour SVGs the wiki keeps  */
+/* as "<Hazard> Environmental Condition Icon.svg". Drawn masked in     */
+/* currentColor over the planet card's picture. Into                   */
+/* Image Library/Planets/Hazards as hazard_<key>.svg.                  */
+/* ------------------------------------------------------------------ */
+
+const HAZARDS_DIR = join(SMALL, "Hazards");
+/* The wiki spells one differently from the hazard's own name. */
+const HAZARD_FILES = { fire_tornadoes: "Fire Tornados" };
+
+async function hazardIcons() {
+  const table = JSON.parse(readFileSync(join(ROOT, "src", "data", "planets.json"), "utf8")).hazards;
+  const keys = Object.keys(table).filter((k) => !["none", "normal_temp"].includes(k));
+  const fileOf = (k) => `${HAZARD_FILES[k] || table[k].name} Environmental Condition Icon.svg`;
+  const doc = await wikiJson({ action: "query", prop: "imageinfo", iiprop: "url|size", titles: keys.map((k) => `File:${fileOf(k)}`).join("|") });
+  const back = new Map((doc.query.normalized || []).map((n) => [n.to, n.from]));
+  const urls = new Map();
+  for (const page of Object.values(doc.query.pages || {})) {
+    const ii = page.imageinfo && page.imageinfo[0];
+    if (ii) urls.set((back.get(page.title) || page.title).replace(/^File:/, ""), ii.url);
+  }
+  for (const k of keys) console.log(`  ${urls.has(fileOf(k)) ? "found  " : "MISSING"} ${k}`);
+  if (!WRITE) {
+    console.log("\n  Nothing downloaded. Add -- --write to fetch them.\n");
+    return;
+  }
+  mkdirSync(HAZARDS_DIR, { recursive: true });
+  let made = 0;
+  for (const k of keys) {
+    const url = urls.get(fileOf(k));
+    if (!url) continue;
+    const res = await fetch(url, { headers: { "user-agent": AGENT } });
+    if (!res.ok) {
+      console.log(`  ${k}: answered ${res.status}`);
+      continue;
+    }
+    const svg = await res.text();
+    /* An SVG is markup: only keep one that is plainly an icon. */
+    if (!/^\s*(<\?xml[^>]*>\s*)?<svg[\s>]/i.test(svg) || /<script|on\w+=|<foreignObject/i.test(svg)) {
+      console.log(`  ${k}: not a plain SVG, skipped`);
+      continue;
+    }
+    writeFileSync(join(HAZARDS_DIR, `hazard_${k}.svg`), svg);
+    made += 1;
+    await sleep(300);
+  }
+  console.log(`  ${made} hazard icons. Run npm run images to bring them into the app.\n`);
+}
+
+if (process.argv.includes("--hazards")) {
+  await hazardIcons();
+  process.exit(0);
+}
+
 if (process.argv.includes("--marks")) {
   await marks();
   process.exit(0);
