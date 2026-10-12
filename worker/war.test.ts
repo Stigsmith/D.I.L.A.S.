@@ -16,7 +16,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import worker from './index.ts'
 import * as schema from './schema.ts'
-import { type Fetcher, HISTORY_EVERY_MS, HISTORY_KEEP_MS, UPSTREAM, WAR_ID, refreshWar, trimMarks, trimOrder, trimStation, trimStats, trimWar } from './war.ts'
+import { type Fetcher, GAME_CONFIG, HISTORY_EVERY_MS, HISTORY_KEEP_MS, UPSTREAM, WAR_ID, refreshWar, trimMarks, trimOrder, trimScars, trimStation, trimStats, trimWar } from './war.ts'
 
 const ORIGIN = 'https://dilas.me'
 const db = drizzle(env.DB, { schema })
@@ -45,9 +45,9 @@ const planet = (index: number, name: string, currentOwner: string, extra: Record
 
 const PLANETS = [
   planet(0, 'SUPER EARTH', 'Humans'),
-  planet(1, 'QUIET HOLD', 'Humans'),
+  planet(1, 'QUIET HOLD', 'Humans', { hash: 1001 }),
   planet(196, 'MALEVELON CREEK', 'Automaton', { health: 250_000, statistics: { playerCount: 4210 } }),
-  planet(2, 'BACKWATER', 'Terminids'),
+  planet(2, 'BACKWATER', 'Terminids', { hash: 1002 }),
   planet(3, 'UNDER SIEGE', 'Humans', {
     statistics: { playerCount: 900 },
     event: {
@@ -122,6 +122,19 @@ const STATIONS = [{
 
 const STATUS_PATH = `/raw/api/WarSeason/${WAR_ID}/Status`
 
+/** The game's client configuration, trimmed to the scarring mix and some that is not. Mars is a hash the war does not list. */
+const SCAR = { parentMixId: 1787495693, dataType: 6, enabled: true }
+const CONFIG = {
+  pollingConfiguration: [{ id32: 1, interval: 60 }],
+  onlineOverrideConfiguration: [
+    { ...SCAR, id32: 1001, data: '50' },
+    { ...SCAR, id32: 1893896155, data: '100' },
+    { ...SCAR, id32: 1002, data: '20', enabled: false },
+    { ...SCAR, id32: 1002, data: '30', parentMixId: 5 },
+    { ...SCAR, id32: 0, data: '0' },
+  ],
+}
+
 type Call = { url: string; headers: Record<string, string> }
 
 /** A stand in for the upstream that answers from the fixtures and records what it was asked. */
@@ -130,6 +143,7 @@ function fake(answers: Partial<Record<string, () => Response>> = {}) {
   const fetcher: Fetcher = async (input, init) => {
     const headers = Object.fromEntries(new Headers(init?.headers).entries())
     calls.push({ url: input, headers })
+    if (input === GAME_CONFIG) return (answers.config || (() => Response.json(CONFIG)))()
     const path = input.slice(UPSTREAM.length)
     const answer = answers[path]
     if (answer) return answer()
@@ -272,12 +286,15 @@ describe('fetching and serving the snapshot', () => {
   it('names the tool and a contact to the upstream on every path', async () => {
     const { fetcher, calls } = fake()
     await refreshWar(db, identity, fetcher)
-    expect(calls.map((c) => c.url).sort()).toEqual([
+    const community = calls.filter((c) => c.url.startsWith(UPSTREAM))
+    expect(community.map((c) => c.url).sort()).toEqual([
       `${UPSTREAM}/api/v1/assignments`, `${UPSTREAM}/api/v1/planets`, `${UPSTREAM}/api/v1/war`,
       `${UPSTREAM}/api/v2/space-stations`, `${UPSTREAM}${STATUS_PATH}`,
     ])
-    expect(calls.every((c) => c.headers['x-super-client'] === 'dilas.test')).toBe(true)
-    expect(calls.every((c) => c.headers['x-super-contact'] === 'contact.test')).toBe(true)
+    expect(community.every((c) => c.headers['x-super-client'] === 'dilas.test')).toBe(true)
+    expect(community.every((c) => c.headers['x-super-contact'] === 'contact.test')).toBe(true)
+    /* The game's own server is a different service: it is not sent the community API's headers. */
+    expect(calls.filter((c) => c.url === GAME_CONFIG)).toHaveLength(1)
   })
 
   /**
@@ -389,17 +406,18 @@ describe('the marks and the space station', () => {
   it('never asks more than five things in one run, and asks the station only once an hour', async () => {
     const first = fake()
     await refreshWar(db, identity, first.fetcher, 1_000_000)
-    expect(first.calls).toHaveLength(5)
+    expect(first.calls.filter((c) => c.url.startsWith(UPSTREAM))).toHaveLength(5)
     const next = fake()
     await refreshWar(db, identity, next.fetcher, 1_300_000)
     expect(next.calls).toHaveLength(4)
+    expect(next.calls.some((c) => c.url === GAME_CONFIG)).toBe(false)
     expect(next.calls.some((c) => c.url.endsWith('/space-stations'))).toBe(false)
   })
 
   it('falls back to the campaign list when the raw status fails, losing only the marks and the station', async () => {
     const down = fake({ [STATUS_PATH]: () => new Response('bad gateway', { status: 502 }) })
     expect(await refreshWar(db, identity, down.fetcher, 1_000_000)).toEqual({ ok: true, planets: 3 })
-    expect(down.calls).toHaveLength(5)
+    expect(down.calls.filter((c) => c.url.startsWith(UPSTREAM))).toHaveLength(5)
     expect(down.calls.some((c) => c.url.endsWith('/space-stations'))).toBe(false)
     const body = await (await war()).json<{ planets: { campaign: boolean }[]; marks: unknown; station: unknown }>()
     expect(body.planets.filter((p) => p.campaign)).toHaveLength(2)
@@ -417,6 +435,37 @@ describe('the marks and the space station', () => {
     await refreshWar(db, identity, stationDown.fetcher, 1_000_000 + 4 * HOUR)
     body = await (await war()).json<{ station: { planet: string; fetchedAt: number } | null }>()
     expect(body.station).toBeNull()
+  })
+})
+
+describe('the scarring', () => {
+  it('reads the scarring mix by planet name, by hash for a planet the war does not list, and nothing else', () => {
+    expect(trimScars(PLANETS, CONFIG)).toEqual({ planets: { 'QUIET HOLD': 50 }, hashes: { '1893896155': 100 } })
+    expect(trimScars(PLANETS, null)).toBeNull()
+    expect(trimScars(null, CONFIG)).toBeNull()
+  })
+
+  it('serves it with the war, keeps the last good one when a read fails, and drops it after three hours', async () => {
+    const HOUR = 60 * 60 * 1000
+    await refreshWar(db, identity, fake().fetcher, 1_000_000)
+    let body = await (await war()).json<{ scars: { planets: Record<string, number>; hashes: Record<string, number>; fetchedAt: number } | null }>()
+    expect(body.scars?.planets).toEqual({ 'QUIET HOLD': 50 })
+    expect(body.scars?.fetchedAt).toBe(1_000_000)
+    const down = fake({ config: () => new Response('busy', { status: 503 }) })
+    await refreshWar(db, identity, down.fetcher, 1_000_000 + HOUR)
+    body = await (await war()).json()
+    expect(body.scars?.fetchedAt).toBe(1_000_000)
+    await refreshWar(db, identity, down.fetcher, 1_000_000 + 4 * HOUR)
+    body = await (await war()).json()
+    expect(body.scars).toBeNull()
+  })
+
+  it('never costs the war: a broken configuration still lands the snapshot', async () => {
+    const broken = fake({ config: () => new Response('not json') })
+    expect(await refreshWar(db, identity, broken.fetcher, 1_000_000)).toEqual({ ok: true, planets: 3 })
+    const body = await (await war()).json<{ ok: boolean; scars: unknown }>()
+    expect(body.ok).toBe(true)
+    expect(body.scars).toBeNull()
   })
 })
 
@@ -498,8 +547,8 @@ describe('the Cron Trigger', () => {
     await worker.scheduled(createScheduledController({ cron: '*/5 * * * *' }), env)
 
     // The fake, and not the network, is what answered.
-    // Four every run, and the space station on the first.
-    expect(spy).toHaveBeenCalledTimes(5)
+    // Four every run, and the space station and the game's scarring on the first.
+    expect(spy).toHaveBeenCalledTimes(6)
     const sent = new Headers(spy.mock.calls[0]?.[1]?.headers)
     expect(sent.get('x-super-client')).toBe(env.SUPER_CLIENT)
     expect(sent.get('x-super-contact')).toBe(env.SUPER_CONTACT)

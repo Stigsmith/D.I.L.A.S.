@@ -21,6 +21,10 @@ import { planetLandscapes, biomeLandscape, planetArt, destroyedArt } from "./lib
 import { Tip, MissingData, HAS_TIP } from "./Tip.jsx";
 import { planetEffects } from "./lib/effects.js";
 import { SUBFACTIONS, subfactionsOn } from "./lib/subfaction.js";
+import { scorchedOf } from "./lib/galaxy.js";
+
+/* A scorched world's ground, the way the game's own card shows it: burnt red. */
+const SCORCHED_TINT = { filter: "sepia(0.75) saturate(2.4) hue-rotate(-22deg) brightness(0.85)" };
 
 /* The fronts' own colours, literal in every theme like everywhere else. */
 const FRONT_HEX = { bots: "#EF4444", bugs: "#F97316", squids: "#A855F7" };
@@ -37,13 +41,14 @@ const standInLine = (shot, facts) => {
   return shot.standIn === "biome" ? `${biome}, typical ground` : `${biome}, as seen on ${shot.standIn}`;
 };
 
-function Banner({ shots, facts, compact }) {
+function Banner({ shots, facts, compact, scorched = false }) {
   if (!shots.length) return null;
   return (
     <div className={"relative grid gap-px bg-base-950 " + (shots.length > 1 ? "grid-cols-2 " : "") + (compact ? "h-24" : "h-32")}>
       {shots.map((s, i) => (
         <div key={s.url} className="relative min-w-0 overflow-hidden">
-          <img src={s.url} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+          <img src={s.url} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover"
+            style={scorched ? SCORCHED_TINT : undefined} />
           {s.caption || s.standIn ? (
             <span className="absolute bottom-1 left-1.5 max-w-[calc(100%-0.75rem)] truncate rounded-sm bg-base-950/75 px-1 text-[9px] leading-4 text-base-200">
               {s.standIn ? standInLine(s, facts) : s.caption}
@@ -101,13 +106,16 @@ export default function PlanetCard({ name, compact = false, war = null, titled =
   const shots = gone ? (wreck.banner ? [{ url: wreck.banner, caption: null }] : []) : pickShots(name, planetLandscapes, biomeLandscape);
   const render = shots.length ? null : gone ? wreck.render : planetArt(name);
   const plain = gone || facts.landmark;
+  /* Razed by the enemy: the game's own scarring figure, from a fresh war. */
+  const scorched = !gone && scorchedOf(war, facts.name);
+  const scar = scorched ? war.scars.get(facts.name) : 0;
   const t = facts.temperature;
   const hot = t && t.slug !== "normal_temp";
   const station = war && war.fresh && war.station && war.station.planet === facts.name ? war.station : null;
 
   return (
     <div className="flex flex-col text-left">
-      <Banner shots={shots} facts={facts} compact={compact} />
+      <Banner shots={shots} facts={facts} compact={compact} scorched={scorched} />
       <div className={"flex flex-col gap-2 " + (compact ? "px-3 py-2" : "p-3")}>
         {titled ? <div className="flex items-center gap-2.5">
           {render ? <img src={render} alt="" className={(compact ? "h-10 w-10" : "h-12 w-12") + " shrink-0"} /> : null}
@@ -149,7 +157,21 @@ export default function PlanetCard({ name, compact = false, war = null, titled =
             Destroyed. No missions here.
             {compact ? null : <span className="block font-normal text-base-400">A Super Destroyer can still travel there.</span>}
           </p>
-        ) : marked.evacuated ? (
+        ) : null}
+
+        {scorched ? (
+          <p className="rounded border px-2 py-1 text-[11px] font-semibold text-base-100"
+            style={{ borderColor: "#B4451FB3", backgroundColor: "#B4451F26" }}>
+            {compact ? "Scorched world" : (
+              <Tip text={`Scarring ${scar} of 100, from the game's own data. 10 or more is a scorched world.`}>
+                <span className={HAS_TIP}>Scorched world</span>
+              </Tip>
+            )}
+            {compact ? null : <span className="block font-normal text-base-300">Razed to the ground by the enemies of Liberty.</span>}
+          </p>
+        ) : null}
+
+        {marked.evacuated ? (
           <p className="rounded border border-base-700 bg-base-900 px-2 py-1 text-[11px] font-semibold text-base-200">
             Evacuated. No missions here.
           </p>

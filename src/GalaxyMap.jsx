@@ -38,13 +38,16 @@ import {
   VIEW, CENTRE, RADIUS, MAX_ZOOM, HOME, placed, lanes, sectors, roomFor, placeOf, matchSet,
   clampView, zoomAt, toMap, placeLabels, labelSide,
   sectorHolders, frontArcs, arcPath, sectorMembers, sectorNear, sectorView, leavesSector, glide, towards, LEAVE_AT,
-  sectorZones, sectorOutlines, zoneAt, stageFit, stageCover, stageTransform, onStage, offStage, stageDepth, liveSpot,
+  sectorZones, sectorOutlines, zoneAt, stageFit, stageCover, stageTransform, onStage, offStage, stageDepth, liveSpot, scorchedOf,
 } from "./lib/galaxy.js";
 import { planetEffects } from "./lib/effects.js";
 import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 import { planetByName } from "./lib/scenario.js";
 import { untilText } from "./lib/war.js";
 import { planetArt, destroyedArt } from "./lib/assets.js";
+
+/* A scorched world's render, burnt red like the game's card. */
+const SCORCHED_TINT = { filter: "sepia(0.8) saturate(2.6) hue-rotate(-22deg) brightness(0.8)" };
 import PlanetCard from "./PlanetCard.jsx";
 
 const OSWALD = "'Oswald', sans-serif";
@@ -594,7 +597,10 @@ export default function GalaxyMap({
       .map(([a, b]) => [spotOf(a), spotOf(b)])
       .filter(([a, b]) => a && b)
       .map(([a, b]) => [{ ...a, hex: hexOf(a.name) }, b]);
-    return { clouds, attacks, shape, wreck, evacuated, station: war.station };
+    /* Razed by the enemy, from the game's own scarring: burnt red, as the
+       game's own card shows them. */
+    const scorched = new Set(placed.filter((p) => scorchedOf(war, p.name)).map((p) => p.name));
+    return { clouds, attacks, shape, wreck, evacuated, scorched, station: war.station };
   }, [war, spotOf, fronts]);
   const station = marks ? marks.station : war && war.fresh ? war.station : null;
 
@@ -1023,7 +1029,8 @@ export default function GalaxyMap({
             </circle>
           ) : null}
           {art ? (
-            <image href={art} x={-size / 2} y={-size / 2} width={size} height={size} opacity={hex || p.home ? 1 : 0.8} />
+            <image href={art} x={-size / 2} y={-size / 2} width={size} height={size} opacity={hex || p.home ? 1 : 0.8}
+              style={marks && marks.scorched.has(p.name) ? SCORCHED_TINT : undefined} />
           ) : (
             <circle r={size * 0.3} fill={hex || undefined} className={hex ? "" : "fill-base-400"} />
           )}

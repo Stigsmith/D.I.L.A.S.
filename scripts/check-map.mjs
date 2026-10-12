@@ -457,6 +457,20 @@ ok(covers, "in full screen the drawing reaches every edge of the screen, so a se
     "an old war draws no effect, no attack line, no station, and moves nothing");
 }
 
+/* Scorched worlds: the game's scarring, by name for a war planet and by
+   hash for Mars, from a fresh war only, never a home world. */
+{
+  const now = 2_000_000_000_000;
+  const scars = { planets: { "PILEN V": 50, CYBERSTAN: 15, "YED PRIOR": 9, NOWHERE: 80 }, hashes: { "1893896155": 100, "42": 70 } };
+  const fresh = galaxy.cleanWar({ fetchedAt: now - 60_000, planets: [], scars }, now);
+  ok(fresh.scars.get("Pilen V") === 50 && fresh.scars.get("Mars") === 100 && !fresh.scars.has("NOWHERE") && fresh.scars.size === 4,
+    "scarring joins war planets by name and Mars by hash, and drops what joins nothing");
+  ok(galaxy.scorchedOf(fresh, "Pilen V") && galaxy.scorchedOf(fresh, "Mars"), "50 and 100 are scorched worlds");
+  ok(!galaxy.scorchedOf(fresh, "Yed Prior") && !galaxy.scorchedOf(fresh, "Cyberstan"), "under 10 is not, and a home world never is");
+  const old = galaxy.cleanWar({ fetchedAt: now - galaxy.WAR_TOO_OLD_MS - 1, planets: [], scars }, now);
+  ok(!galaxy.scorchedOf(old, "Pilen V"), "an old war scorches nothing");
+}
+
 /* Who holds a planet: read from a fresh war only, gated to the scenario's
    own front, and changing the enemy list the way the table says. */
 {

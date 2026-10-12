@@ -281,6 +281,10 @@ export function About({ section = null }) {
             className="text-base-200 underline hover:text-base-100">Helldivers 2 Companion</a>. An effect we have not named yet
           shows as Missing data.
         </p>
+        <p className="text-base-500">
+          Scorched worlds come from the game's own server: how scarred each planet is, 0 to 100, read once an hour.
+          10 or more is a scorched world, the threshold the Helldivers 2 Companion uses.
+        </p>
       </Panel>
 
       <Panel title="Role tags are ours">

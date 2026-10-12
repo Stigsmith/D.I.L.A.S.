@@ -288,6 +288,32 @@ function cleanMarks(raw) {
   return { effects, attacks, moved };
 }
 
+/* How scarred each planet is, 0 to 100, from the game's own configuration:
+   by name for a war planet, by the game's hash for a landmark (Mars). */
+const landmarkByHash = new Map(LANDMARKS.landmarks.filter((l) => Number.isInteger(l.hash)).map((l) => [String(l.hash), l.name]));
+function cleanScars(raw) {
+  const out = new Map();
+  if (!raw || typeof raw !== "object") return out;
+  const keep = (name, v) => {
+    const n = Number(v);
+    if (name && Number.isFinite(n) && n > 0) out.set(name, Math.min(100, Math.round(n)));
+  };
+  for (const [name, v] of Object.entries(raw.planets || {})) {
+    const own = byUpper.get(String(name).toUpperCase());
+    keep(own && own.name, v);
+  }
+  for (const [hash, v] of Object.entries(raw.hashes || {})) keep(landmarkByHash.get(hash), v);
+  return out;
+}
+
+/* Scorched: razed by the enemy, at the game's own threshold of 10, the
+   Helldivers 2 Companion's reading. A home world carries scarring too
+   (Cyberstan, 15) and is not a scorched world. */
+const HOMEWORLDS = new Set(["Super Earth", "Cyberstan"]);
+export const SCORCHED_AT = 10;
+export const scorchedOf = (war, name) =>
+  Boolean(war && war.fresh && war.scars && !HOMEWORLDS.has(name) && (war.scars.get(name) || 0) >= SCORCHED_AT);
+
 /* The space station: its planet, when its vote ends, and its actions. */
 function cleanStation(raw) {
   if (!raw || typeof raw !== "object" || typeof raw.planet !== "string") return null;
@@ -358,6 +384,8 @@ export function cleanWar(raw, now = Date.now()) {
        and moves no planet. */
     marks: fresh ? cleanMarks(raw.marks) : null,
     station: fresh ? cleanStation(raw.station) : null,
+    /* Read once an hour and held to the war's own age, like the station. */
+    scars: fresh ? cleanScars(raw.scars) : null,
   };
 }
 

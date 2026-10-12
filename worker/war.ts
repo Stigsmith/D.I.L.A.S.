@@ -12,7 +12,8 @@
  * raw status (campaigns, effects, attack lines, drifted planets), the Major
  * Order, and the war's running totals. Once an hour a fifth asks for the
  * space station. Its published limit is 5 requests in 10 seconds, and no run
- * asks more than 5.
+ * asks more than 5. Once an hour too, the game's own server is asked for how
+ * scarred each planet is, a request that costs the community API nothing.
  *
  * ## The API decorates, it never carries
  *
@@ -162,6 +163,8 @@ export type Snapshot = {
   marks: WarMarks | null
   /** The space station and when it was read, or null. Kept in its own row, so it has its own age. */
   station: (WarStation & { fetchedAt: number }) | null
+  /** How scarred each planet is and when it was read, or null. Its own row, like the station. */
+  scars: (WarScars & { fetchedAt: number }) | null
 }
 
 type DB = DrizzleD1Database<typeof schema>
@@ -444,6 +447,9 @@ export async function refreshWar(
     if (Array.isArray(fromStatus) && (kept || !(await hasStation(db)))) {
       await refreshStation(db, identity, fetcher, now).catch(() => false)
     }
+    /* The scarring changes when the war razes a planet, which is rare: the
+       hourly run, or when none has been read yet. */
+    if (kept || !(await hasScars(db))) await refreshScars(db, planets, fetcher, now).catch(() => false)
     return { ok: true, planets: trimmed.length }
   } catch (e) {
     const error = (e instanceof Error ? e.message : String(e)).slice(0, 200)
@@ -572,6 +578,101 @@ export async function readWar(db: DB): Promise<Snapshot | null> {
     fetchedAt: row.fetched_at, triedAt: row.tried_at, ok: row.ok === 1,
     planets: doc.planets, order: doc.order ?? null, stats: doc.stats ?? null, marks: doc.marks ?? null,
     station: await readStation(db, row.fetched_at),
+    scars: await readScars(db, row.fetched_at),
+  }
+}
+
+/**
+ * How scarred each planet is, from the game's own client configuration: the
+ * one public answer Arrowhead serves directly that the community API does not
+ * pass on. Planets razed by the enemy carry a figure, 0 to 100: Mars is 100,
+ * the scorched Altus worlds 50. Read once an hour with the station. The
+ * Helldivers 2 Companion found where the game files it, 12 October 2026.
+ */
+export const GAME_CONFIG = 'https://api.live.prod.thehelldiversgame.com/api/Configuration/GameClient'
+const SCAR_MIX = 1787495693
+const MAX_SCARS = 400
+
+/** Scarring by the upstream's planet name, and by the game's hash for a planet the war does not list (Mars). */
+export type WarScars = { planets: Record<string, number>; hashes: Record<string, number> }
+
+export function trimScars(planets: unknown, config: unknown): WarScars | null {
+  const list = record(config)?.onlineOverrideConfiguration
+  if (!Array.isArray(list) || !Array.isArray(planets)) return null
+  const byHash = new Map<number, string>()
+  for (const p of planets) {
+    const r = record(p)
+    if (r && typeof r.hash === 'number' && typeof r.name === 'string') byHash.set(r.hash, r.name)
+  }
+  const out: WarScars = { planets: {}, hashes: {} }
+  let kept = 0
+  for (const entry of list) {
+    const r = record(entry)
+    if (!r || r.enabled !== true || r.parentMixId !== SCAR_MIX || r.dataType !== 6) continue
+    const value = Number(r.data)
+    if (typeof r.id32 !== 'number' || !Number.isFinite(value) || value <= 0) continue
+    if (++kept > MAX_SCARS) break
+    const scar = Math.min(100, Math.round(value))
+    const name = byHash.get(r.id32)
+    if (name) out.planets[name] = scar
+    else out.hashes[String(r.id32)] = scar
+  }
+  return out
+}
+
+async function hasScars(db: DB): Promise<boolean> {
+  const row = await db.get<{ fetched_at: number | null }>(sql`select fetched_at from war_snapshot where id = 'scars'`)
+  return Boolean(row && row.fetched_at !== null)
+}
+
+/**
+ * The scarring, into its own row, the station's way: a failure leaves the
+ * last good one with its own age. The game's server, not the community API,
+ * so none of that API's five requests are spent on it.
+ */
+export async function refreshScars(db: DB, planets: unknown, fetcher: Fetcher, now: number): Promise<boolean> {
+  try {
+    const response = await fetcher(GAME_CONFIG, {
+      headers: { accept: 'application/json', 'accept-language': 'en-US' },
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    })
+    if (!response.ok) throw new Error(`the game's configuration answered ${response.status}`)
+    const text = await response.text()
+    if (text.length > MAX_ANSWER) throw new Error(`the game's configuration answered with ${text.length} characters`)
+    const scars = trimScars(planets, JSON.parse(text))
+    if (!scars) throw new Error("the game's configuration was not the shape expected")
+    const payload = JSON.stringify(scars)
+    await db.run(sql`
+      insert into war_snapshot (id, payload, fetched_at, tried_at, ok, error)
+      values ('scars', ${payload}, ${now}, ${now}, 1, null)
+      on conflict(id) do update set
+        payload = excluded.payload, fetched_at = excluded.fetched_at,
+        tried_at = excluded.tried_at, ok = 1, error = null
+    `)
+    return true
+  } catch (e) {
+    const error = (e instanceof Error ? e.message : String(e)).slice(0, 200)
+    await db.run(sql`
+      insert into war_snapshot (id, payload, fetched_at, tried_at, ok, error)
+      values ('scars', null, null, ${now}, 0, ${error})
+      on conflict(id) do update set tried_at = excluded.tried_at, ok = 0, error = excluded.error
+    `)
+    return false
+  }
+}
+
+/** The kept scarring, when it is at most three hours older than the war it rides on. */
+async function readScars(db: DB, warAt: number): Promise<Snapshot['scars']> {
+  const row = await db.get<{ payload: string | null; fetched_at: number | null }>(
+    sql`select payload, fetched_at from war_snapshot where id = 'scars'`,
+  )
+  if (!row || row.payload === null || row.fetched_at === null) return null
+  if (warAt - row.fetched_at > STATION_TOO_OLD_MS) return null
+  try {
+    const scars = JSON.parse(row.payload) as WarScars
+    return { ...scars, fetchedAt: row.fetched_at }
+  } catch {
+    return null
   }
 }
 
