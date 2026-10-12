@@ -20,10 +20,15 @@
 /*   at        the data-tour value to light, or several, best first:   */
 /*             the first that leaves room for the card is lit. None    */
 /*             means a whole-page line, said from the middle            */
+/*   front     the step needs a front chosen: Drop Bay and the rating  */
+/*             columns show nothing without one. With none chosen the  */
+/*             tour borrows BORROWED_FRONT from the first such step to */
+/*             the end, says so on the card, and puts none back after.  */
+/*             The curator's choice of 12 October 2026: a first visit   */
+/*             has no front, and skipped the front door entirely        */
 /*   optional  skip the step when its anchor never turns up, rather    */
-/*             than saying it over nothing. Drop Bay has no slot to    */
-/*             point at before a front is chosen, and sends you to the */
-/*             war room instead                                        */
+/*             than saying it over nothing. In a party the tour borrows */
+/*             nothing, so Drop Bay may still have no slot to point at  */
 /*                                                                    */
 /* A step about the menu opens the drawer on a narrow screen. A step   */
 /* that is not optional and whose anchor is missing is said from the    */
@@ -31,6 +36,9 @@
 /* ================================================================== */
 
 import { BRAND } from "./brand.js";
+
+/* The front the tour shows when you have not chosen one. */
+export const BORROWED_FRONT = { id: "bots", label: "Automatons" };
 
 export const TOUR = [
   {
@@ -117,6 +125,7 @@ export const TOUR = [
   {
     route: "bay",
     at: "drop-slots",
+    front: true,
     optional: true,
     title: "The Drop Bay",
     speech:
@@ -127,6 +136,7 @@ export const TOUR = [
   {
     route: "bay",
     at: "scenario-bar",
+    front: true,
     optional: true,
     title: "Your orders, at a glance",
     speech:
@@ -146,6 +156,7 @@ export const TOUR = [
   {
     route: "tiers/primary",
     at: "rating-columns",
+    front: true,
     title: "Two opinions, one truth",
     speech:
       "On the left, the vote of the people. On the right, our reading for where you are actually dropping. Where they disagree, a sentence explains why. Disagreement is healthy. Within limits.",

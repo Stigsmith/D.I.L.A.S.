@@ -21,7 +21,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Megaphone } from "lucide-react";
-import { TOUR } from "./lib/tour.js";
+import { BORROWED_FRONT, TOUR } from "./lib/tour.js";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 /* Room round the lit element, so the ring is not on its edge. */
@@ -58,7 +58,11 @@ function rectOf(el) {
   return { x: r.left, y: r.top, w: r.width, h: r.height };
 }
 
-export default function Tour({ navigate, onClose, setMenu }) {
+/**
+ * `front` and `setFront` are the scenario's. `canBorrow` is false in a
+ * party, where the host's front would reach everybody.
+ */
+export default function Tour({ navigate, onClose, setMenu, front, setFront, canBorrow }) {
   const [index, setIndex] = useState(0);
   /* Which way you were going, so a skipped step skips the same way. */
   const way = useRef(1);
@@ -69,6 +73,9 @@ export default function Tour({ navigate, onClose, setMenu }) {
   const sizeNow = useRef(size);
   sizeNow.current = size;
   const step = TOUR[index];
+  /* Whether the tour lent you a front, so it can say so and take it back. */
+  const [borrowed, setBorrowed] = useState(false);
+  const lent = useRef(false);
   const last = index === TOUR.length - 1;
 
   const go = useCallback((to) => {
@@ -89,6 +96,11 @@ export default function Tour({ navigate, onClose, setMenu }) {
     /* A new page: the light would sit over whatever is there now until */
     /* the anchor turns up, so it goes dark in between.                */
     if (step.route && window.location.hash.replace(/^#\/?/, "") !== step.route) setSpot(null);
+    if (step.front && !front && canBorrow && !lent.current) {
+      lent.current = true;
+      setBorrowed(true);
+      setFront(BORROWED_FRONT.id);
+    }
     if (step.route) navigate(step.route, { replace: true });
     setMenu(inMenu(step.at) && !window.matchMedia("(min-width: 1024px)").matches);
 
@@ -133,7 +145,10 @@ export default function Tour({ navigate, onClose, setMenu }) {
     return () => { alive = false; timers.forEach(clearTimeout); };
   }, [index]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => () => setMenu(false), [setMenu]);
+  useEffect(() => () => {
+    setMenu(false);
+    if (lent.current) setFront(null);
+  }, [setMenu, setFront]);
 
   /* Keep the light on the element when anything moves under it. Capture */
   /* phase, so a scrolling panel is heard as well as the window.         */
@@ -225,6 +240,11 @@ export default function Tour({ navigate, onClose, setMenu }) {
 
         <p className="text-[15px] leading-relaxed text-base-100 [@media(max-height:640px)]:text-[13px] [@media(max-height:640px)]:leading-snug" role="status">"{step.speech}"</p>
         <p className="border-t border-base-800 pt-2.5 text-[12px] leading-relaxed text-base-400 [@media(max-height:640px)]:pt-2 [@media(max-height:640px)]:text-[11px] [@media(max-height:640px)]:leading-snug">{step.plain}</p>
+        {borrowed && step.front ? (
+          <p className="text-[11px] leading-snug text-accent-300">
+            Shown against the {BORROWED_FRONT.label} for this tour only. You choose your front in the war room.
+          </p>
+        ) : null}
 
         <div className="flex items-center gap-2">
           <button type="button" onClick={onClose}

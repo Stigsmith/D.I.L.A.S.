@@ -933,7 +933,8 @@ export default function App() {
         </div>
       </div>
 
-      {touring ? <Tour navigate={navigate} onClose={endTour} setMenu={setMenuOpen} /> : null}
+      {touring ? <Tour navigate={navigate} onClose={endTour} setMenu={setMenuOpen}
+        front={scenario.faction} setFront={setFaction} canBorrow={!party.code} /> : null}
     </div>
   );
 }

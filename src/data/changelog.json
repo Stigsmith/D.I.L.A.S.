@@ -1,11 +1,12 @@
 [
   {
     "version": "1.34.1",
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "title": "Pocket edition",
     "say": "The Ministry has inspected the tool on a standard issue phone. Several buttons were found outside their assigned posts and have been returned.",
     "changes": [
       "The tour works on a phone: it opens the menu when it talks about the menu, finds the folded Where to play tab, and keeps its card off the thing it points at.",
+      "On a first visit the tour shows Drop Bay and the two rating columns against the Automatons, then leaves your front unchosen.",
       "Item names wrap onto a second line on a phone instead of being cut short, on the tier list and in the build picker.",
       "On a small phone the front buttons above the tier list fit the screen, and the collection reminder keeps its buttons inside its box.",
       "The map's controls keep clear of the folded side tab.",
