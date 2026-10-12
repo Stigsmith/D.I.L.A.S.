@@ -68,8 +68,8 @@ export async function send(env: Mail, letter: Letter): Promise<boolean> {
 }
 
 /**
- * The reset letter. **A placeholder in plain words, and its voice is the curator's
- * call in Stage 2**, the way Enodia's was.
+ * The reset letter. **A placeholder in plain words, and its voice is the
+ * curator's call in Stage 2**, the way Enodia's was.
  *
  * What carries over from Enodia regardless of voice: the working half first,
  * because the reader is locked out and irritated; one line saying what the

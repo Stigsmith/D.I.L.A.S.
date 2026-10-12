@@ -28,7 +28,7 @@
   // to start rather than failing at a request, so it is not subtle.
   "compatibility_flags": ["nodejs_compat"],
 
-  // dilas.me, bought by the curator on Cloudflare on 2 October 2026. A custom
+  // dilas.me, bought on Cloudflare on 2 October 2026. A custom
   // domain: the deploy attaches it, and Cloudflare creates the DNS record
   // and the certificate itself, since the zone is on this account.
   //
