@@ -47,11 +47,11 @@ const ARMOR_SETS = load(
 const LANDSCAPES = load(
   import.meta.glob("../assets/landscapes/*", { eager: true, query: "?url", import: "default" })
 );
-/* What is left of a destroyed planet, by the art id war-effects.json
-   names: render_<id> for the map, banner_<id> for the card. Fetched by
-   npm run planet-art -- --destroyed and gitignored. */
-const DESTROYED = load(
-  import.meta.glob("../assets/destroyed/*", { eager: true, query: "?url", import: "default" })
+/* What the game marks on a planet, by the art id war-effects.json names:
+   render_<id> for a destroyed planet on the map, banner_<id> for the
+   card. Fetched by npm run planet-art -- --marks and gitignored. */
+const MARKS = load(
+  import.meta.glob("../assets/marks/*", { eager: true, query: "?url", import: "default" })
 );
 const planetSlug = (s) =>
   s.toLowerCase().replace(/['’.]/g, "").replace(/&/g, " and ")
@@ -120,8 +120,8 @@ export const planetLandscapes = (name) => {
   }
   return out;
 };
-export const destroyedArt = (id) =>
-  id ? { render: DESTROYED.get(`render_${id}`) || null, banner: DESTROYED.get(`banner_${id}`) || null } : { render: null, banner: null };
+export const markArt = (id) =>
+  id ? { render: MARKS.get(`render_${id}`) || null, banner: MARKS.get(`banner_${id}`) || null } : { render: null, banner: null };
 export const biomeLandscape = (biome) => (biome ? LANDSCAPES.get(`biome_${biome}`) || null : null);
 export const armorSetArt = (id) => (id ? ARMOR_SETS.get(id) || null : null);
 

@@ -17,7 +17,7 @@
 /* ================================================================== */
 
 import { planetFacts, pickShots } from "./lib/planet.js";
-import { planetLandscapes, biomeLandscape, planetArt, destroyedArt } from "./lib/assets.js";
+import { planetLandscapes, biomeLandscape, planetArt, markArt } from "./lib/assets.js";
 import { Tip, MissingData, HAS_TIP } from "./Tip.jsx";
 import { planetEffects } from "./lib/effects.js";
 import { SUBFACTIONS, subfactionsOn } from "./lib/subfaction.js";
@@ -102,7 +102,7 @@ export default function PlanetCard({ name, compact = false, war = null, titled =
   const forces = gone ? [] : subfactionsOn(war, facts.name);
   const forceEffects = new Set(forces.flatMap((k) => SUBFACTIONS[k].effects));
   const others = marked.named.filter((e) => !forceEffects.has(e.id));
-  const wreck = gone ? destroyedArt(marked.art) : null;
+  const wreck = gone ? markArt(marked.art) : null;
   const shots = gone ? (wreck.banner ? [{ url: wreck.banner, caption: null }] : []) : pickShots(name, planetLandscapes, biomeLandscape);
   const render = shots.length ? null : gone ? wreck.render : planetArt(name);
   const plain = gone || facts.landmark;
@@ -191,12 +191,28 @@ export default function PlanetCard({ name, compact = false, war = null, titled =
 
         {others.length || marked.unnamed || station ? (
           <div className="flex flex-col gap-1 border-t border-base-800 pt-2">
-            {others.map((e) => (
-              <p key={e.id} className="text-[11px] leading-relaxed text-base-400">
-                <span className="font-semibold text-base-100">{e.name}</span>
-                {!compact && e.say ? <> {e.say}</> : null}
-              </p>
-            ))}
+            {others.map((e) => {
+              /* A place with the game's own banner shows it, its name on
+                 the picture, the way the game's card does. */
+              const banner = e.banner ? markArt(e.banner).banner : null;
+              return banner ? (
+                <div key={e.id} className="flex flex-col gap-1">
+                  <div className={"relative overflow-hidden rounded-sm " + (compact ? "h-14" : "h-20")}>
+                    <img src={banner} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                    <span className="absolute left-1.5 top-1 rounded-sm bg-base-950/75 px-1 text-[10px] font-bold uppercase tracking-wider text-base-100"
+                      style={OSWALD}>
+                      {e.name}
+                    </span>
+                  </div>
+                  {!compact && e.say ? <p className="text-[11px] leading-relaxed text-base-400">{e.say}</p> : null}
+                </div>
+              ) : (
+                <p key={e.id} className="text-[11px] leading-relaxed text-base-400">
+                  <span className="font-semibold text-base-100">{e.name}</span>
+                  {!compact && e.say ? <> {e.say}</> : null}
+                </p>
+              );
+            })}
             {station ? (
               <p className="text-[11px] leading-relaxed text-base-400">
                 {compact || !station.actions.length ? (

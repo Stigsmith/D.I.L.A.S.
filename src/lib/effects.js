@@ -39,7 +39,7 @@ export function effectsOn(ids) {
     if (!e.name) continue;
     if (seen.has(e.name)) continue;
     seen.add(e.name);
-    named.push({ id, name: e.name, say: e.say || null });
+    named.push({ id, name: e.name, say: e.say || null, banner: e.banner || null });
   }
   return { named, unnamed, draw, cloud: colour, gone, art, evacuated };
 }

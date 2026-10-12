@@ -51,9 +51,9 @@ src/assets/planets/
 # Planet and biome landscape shots from the wiki, fetched by
 # npm run planet-art -- --landscapes. Game screenshots, not kept.
 src/assets/landscapes/
-# Black hole and fractured planet renders and banners, fetched by
-# npm run planet-art -- --destroyed. Game art, not kept.
-src/assets/destroyed/
+# Black hole and fractured planet renders, and banners for what the game
+# marks on a planet, fetched by npm run planet-art -- --marks. Game art.
+src/assets/marks/
 # Armour set renders from the wiki, fetched by npm run armor-art, copied
 # here from the library. Game art, not kept either.
 src/assets/armor-sets/

@@ -353,16 +353,18 @@ async function landscapes() {
 }
 
 /* ------------------------------------------------------------------ */
-/* WHAT IS LEFT OF A PLANET                                            */
+/* WHAT THE GAME MARKS ON A PLANET                                     */
 /*                                                                     */
-/*   npm run planet-art -- --destroyed            report               */
-/*   npm run planet-art -- --destroyed --write    fetch and cut        */
+/*   npm run planet-art -- --marks            report                   */
+/*   npm run planet-art -- --marks --write    fetch and cut            */
 /*                                                                     */
 /* A black hole or a fractured planet has no render under its planet's */
-/* name, so its art is named in war-effects.json (art) and fetched     */
-/* here from the files the wiki keeps: the game's own header banner,   */
-/* the one its planet card shows, and a render for the map. Into       */
-/* Image Library/Planets/Destroyed:                                    */
+/* name, and a place on a planet (Pandora Base, the Deep Mantle Forge) */
+/* has a banner of its own in the game. Each is named in               */
+/* war-effects.json (art, banner) and fetched here from the files the  */
+/* wiki keeps: the game's own header banner, the one its card shows,   */
+/* and for a destroyed planet a render for the map. Into               */
+/* Image Library/Planets/Marks:                                        */
 /*                                                                     */
 /*   render_<art>.webp   the map's planet, up to 256, cut round        */
 /*   banner_<art>.webp   the card's banner, at its own size            */
@@ -371,14 +373,24 @@ async function landscapes() {
 /* render is a square from the middle of its banner, cut round.        */
 /* ------------------------------------------------------------------ */
 
-const DESTROYED_DIR = join(SMALL, "Destroyed");
-const DESTROYED = {
+const MARKS_DIR = join(SMALL, "Marks");
+const MARKS = {
   "meridian-black-hole": { render: "Meridian Black Hole.png", banner: "MeridianBlackHole Header.png" },
   "conventional-black-hole": { render: "Penta Black Hole Planet Icon.png", banner: "Conventional Black Hole Header.png" },
   "fractured-planet": {
     render: { from: "Fractured Planet Header.png", crop: { left: 330, top: 20, width: 310, height: 310 }, keyAll: true },
     banner: "Fractured Planet Header.png",
   },
+  /* Places on a planet: a banner only. The city and mine images the wiki
+     keeps are crops of the game's map card, not banners, and are left out. */
+  "pandora-base": { banner: "Center for the Confinement of Dissidence POI.png" },
+  "civilian-surveillance": { banner: "CFCSandS POI header.png" },
+  "communications-array": { banner: "Communications Array POI Header.png" },
+  "data-center": { banner: "Data Center POI Header.png" },
+  "deep-mantle-forge": { banner: "Deep Mantle Forge Complex POI Icon.png" },
+  "jet-brigade-factories": { banner: "JetBrigadeFactoryPOI.png" },
+  "xenoentomology-center": { banner: "Xenoentomology Center POI.png" },
+  "training-facility": { banner: "Tutorial Gate New.png" },
 };
 
 /* Debris on the dark of space, cut out whole: every pixel near the
@@ -406,9 +418,9 @@ async function keyOutSpace(sharp, from) {
   return sharp(data, { raw: { width: W, height: H, channels: 4 } });
 }
 
-async function destroyed() {
-  const fileOf = (r) => (typeof r === "string" ? r : r.from);
-  const files = [...new Set(Object.values(DESTROYED).flatMap((d) => [fileOf(d.render), d.banner]))];
+async function marks() {
+  const fileOf = (r) => (!r ? null : typeof r === "string" ? r : r.from);
+  const files = [...new Set(Object.values(MARKS).flatMap((d) => [fileOf(d.render), d.banner]).filter(Boolean))];
   const doc = await wikiJson({ action: "query", prop: "imageinfo", iiprop: "url|size", titles: files.map((f) => `File:${f}`).join("|") });
   const back = new Map((doc.query.normalized || []).map((n) => [n.to, n.from]));
   const urls = new Map();
@@ -425,7 +437,7 @@ async function destroyed() {
     return;
   }
   const sharp = (await import("sharp")).default;
-  mkdirSync(DESTROYED_DIR, { recursive: true });
+  mkdirSync(MARKS_DIR, { recursive: true });
   const got = new Map();
   for (const f of files) {
     if (!urls.has(f)) continue;
@@ -437,10 +449,14 @@ async function destroyed() {
     got.set(f, Buffer.from(await res.arrayBuffer()));
     await sleep(300);
   }
-  for (const [art, d] of Object.entries(DESTROYED)) {
+  for (const [art, d] of Object.entries(MARKS)) {
     const banner = got.get(d.banner);
     if (banner) {
-      writeFileSync(join(DESTROYED_DIR, `banner_${art}.webp`), await sharp(banner).webp({ quality: 80, effort: 5 }).toBuffer());
+      /* At their own size, but never wider than the card's 800: a 1920
+         screenshot is cut down, a 752 banner is kept as it is. */
+      const buf = await sharp(banner).resize({ width: 800, withoutEnlargement: true }).webp({ quality: 80, effort: 5 }).toBuffer();
+      writeFileSync(join(MARKS_DIR, `banner_${art}.webp`), buf);
+      if (!d.render) console.log(`  ${art}: banner`);
     }
     let src = got.get(fileOf(d.render));
     if (!src) continue;
@@ -452,14 +468,14 @@ async function destroyed() {
     const buf = await shaped
       .resize(side, side, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 }, kernel: "lanczos3" })
       .webp({ quality: 82, alphaQuality: 90, effort: 5 }).toBuffer();
-    writeFileSync(join(DESTROYED_DIR, `render_${art}.webp`), buf);
+    writeFileSync(join(MARKS_DIR, `render_${art}.webp`), buf);
     console.log(`  ${art}: render ${side} px${banner ? ", banner" : ""}`);
   }
   console.log("  Run npm run images to bring them into the app.\n");
 }
 
-if (process.argv.includes("--destroyed")) {
-  await destroyed();
+if (process.argv.includes("--marks")) {
+  await marks();
   process.exit(0);
 }
 

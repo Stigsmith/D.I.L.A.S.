@@ -31,7 +31,7 @@ import { FRONTS, PANEL_PX, GAP_PX, TAB_PX, WIDE_PX, useSize, PlanetSearch, WarLi
 import { frontOf, progressAt, landmarkOf } from "./lib/galaxy.js";
 import { useWar, useWarHistory, useWarTrend, untilText } from "./lib/war.js";
 import { planetByName, biomeInfo, biomeName } from "./lib/scenario.js";
-import { planetArt, destroyedArt } from "./lib/assets.js";
+import { planetArt, markArt } from "./lib/assets.js";
 import { planetEffects } from "./lib/effects.js";
 import PlanetCard from "./PlanetCard.jsx";
 
@@ -244,7 +244,7 @@ function Intel({ name, war, onBack, onSelect, onDropHere, onFold }) {
   const fx = planetEffects(war, name);
   const gone = fx.gone;
   const closed = gone || fx.evacuated || Boolean(lm);
-  const art = gone ? destroyedArt(fx.art).render : planetArt(name);
+  const art = gone ? markArt(fx.art).render : planetArt(name);
   const history = useWarHistory(name);
   if (!p) return null;
   const biome = p.biome ? biomeInfo[p.biome] : null;

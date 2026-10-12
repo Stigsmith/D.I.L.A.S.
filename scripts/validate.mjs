@@ -690,6 +690,7 @@ for (const f of FACTIONS) {
        shows nothing for it. Never both, never neither. */
     if ((e.name === null) !== (e.hidden === true)) bad.push(`${id}: an effect is named or hidden, one of the two`);
     if (e.name !== null && !table.froms.includes(e.from)) bad.push(`${id}: from must be one of ${table.froms.join(", ")}`);
+    if (e.banner !== undefined && !(e.name && !e.gone && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(e.banner))) bad.push(`${id}: banner is a slug, on a named place that still stands`);
     if (e.art !== undefined && !(e.gone && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(e.art))) bad.push(`${id}: art is a slug, and only on a destroyed planet`);
     if (e.evacuated !== undefined && !(e.evacuated === true && e.draw === "none" && !e.gone)) bad.push(`${id}: evacuated is true, on a planet that still stands`);
   }

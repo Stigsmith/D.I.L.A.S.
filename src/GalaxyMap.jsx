@@ -44,7 +44,7 @@ import { planetEffects } from "./lib/effects.js";
 import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 import { planetByName } from "./lib/scenario.js";
 import { untilText } from "./lib/war.js";
-import { planetArt, destroyedArt } from "./lib/assets.js";
+import { planetArt, markArt } from "./lib/assets.js";
 
 /* A scorched world's render, burnt red like the game's card. */
 const SCORCHED_TINT = { filter: "sepia(0.8) saturate(2.6) hue-rotate(-22deg) brightness(0.8)" };
@@ -586,7 +586,7 @@ export default function GalaxyMap({
       const e = planetEffects(war, name);
       if (e.cloud) clouds.push({ name, x: p.x, y: p.y, colour: e.cloud });
       if (e.draw) shape.set(name, e.draw);
-      if (e.art) wreck.set(name, destroyedArt(e.art).render);
+      if (e.art) wreck.set(name, markArt(e.art).render);
       if (e.evacuated) evacuated.add(name);
     }
     const hexOf = (name) => {
@@ -955,7 +955,7 @@ export default function GalaxyMap({
     if (shape) {
       const size = (row.world ? WORLD_PX : tactical ? 9 : DOT * 2.4) * uu;
       /* The game's own art for what is left, once npm run planet-art --
-         --destroyed has fetched it. Drawn a little larger than a planet,
+         --marks has fetched it. Drawn a little larger than a planet,
          because a black hole's glow is wider than the world it was. */
       const wreck = marks.wreck.get(p.name);
       return (
