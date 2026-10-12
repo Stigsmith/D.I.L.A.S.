@@ -422,7 +422,9 @@ function TierChips({ label, value, onChange }) {
    the planner covered both, and the search reaches the planets with no
    place on the map. A scenario saved with a biome set by hand still reads
    here and still clears. */
-function PlanetBar({ scenario, setMission, clearEnvironment, kind = null, onClearKind, stack = false }) {
+/* `hideHazards` leaves the planet's hazards to the war room's planet
+   card when that is open beside it, so they are not said twice. */
+function PlanetBar({ scenario, setMission, clearEnvironment, kind = null, onClearKind, stack = false, hideHazards = false }) {
   /* null or "mission". */
   const [open, setOpen] = useState(null);
   const [query, setQuery] = useState("");
@@ -479,7 +481,7 @@ function PlanetBar({ scenario, setMission, clearEnvironment, kind = null, onClea
               {(missionTraits[t] || {}).line}
             </p>
           )) : null}
-          {loudHazards(scenario.hazards).map((h) => (
+          {(hideHazards ? [] : loudHazards(scenario.hazards)).map((h) => (
             <p key={h} className="text-[11px] leading-relaxed text-base-400">
               <span className="text-accent-300">{hazardName(h)}</span> {hazardEffect(h)}
             </p>
@@ -1295,7 +1297,7 @@ function RowDetail({ item, faction, scored, difficulty }) {
 /* a sticky element inside a long scrolling page made Chromium drop the */
 /* paint for the whole document: layout stayed correct and the screen   */
 /* went blank on scroll. It docks below the shell chrome, which is what */
-/* --shell-chrome carries.                                              */
+/* --shell-chrome carries, under the 0.5rem stripe.                     */
 const RATING_COLUMNS = [
   { id: "ugg", label: "u.gg", title: "Community tier: the u.gg vote" },
   { id: "ours", label: BRAND.short, title: `${BRAND.short} tier: changed for your scenario` },
@@ -1305,7 +1307,7 @@ function RatingHeader({ faction, left, sortBy, setSortBy }) {
   const f = FACTIONS.find((x) => x.id === faction) || FACTIONS[0];
   return (
     <div className="sticky z-10 flex items-stretch border border-transparent bg-base-950"
-      style={{ top: "var(--shell-chrome, 0px)" }}>
+      style={{ top: "calc(var(--shell-chrome, 0px) + 0.5rem)" }}>
       <div className="flex-1 min-w-0 flex items-end px-3 pb-1">
         <span className="text-[10px] uppercase tracking-wider text-base-600 font-semibold" style={{ fontFamily: "'Oswald', sans-serif" }}>
           {left}

@@ -121,7 +121,7 @@ export default function Tour({ navigate, onClose, setMenu, front, setFront, canB
         const tight = (window.innerHeight - el.getBoundingClientRect().height) / 2 < sizeNow.current.h + GAP + HALO;
         if (tight) {
           const chrome = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--shell-chrome")) || 0;
-          el.style.scrollMarginTop = `${chrome + HALO + PAD}px`;
+          el.style.scrollMarginTop = `${chrome + 8 + HALO + PAD}px`;
         }
         el.scrollIntoView({ block: tight ? "start" : "center", inline: "nearest", behavior: still ? "auto" : "smooth" });
         later(() => { el.style.scrollMarginTop = ""; setSpot(rectOf(find(step.at))); setReady(true); }, still ? 30 : 360);

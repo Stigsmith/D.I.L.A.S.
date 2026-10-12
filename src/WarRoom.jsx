@@ -19,7 +19,7 @@
 /* the map and starts folded, and choosing a planet folds it again.   */
 /* ================================================================== */
 
-import { useState, useMemo, useRef, useLayoutEffect } from "react";
+import { useState, useMemo, useRef, useLayoutEffect, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, ChevronDown, Check, Map as MapIcon } from "lucide-react";
 
 import GalaxyMap, { MajorOrder } from "./GalaxyMap.jsx";
@@ -31,6 +31,8 @@ import { levelFacts, levelNew, outpostSummary, DIFFICULTY_SOURCE } from "./lib/d
 import { enemiesUpTo, arrivalsAt, arrivalsLine } from "./lib/enemies.js";
 import { vocabulary } from "./lib/items.js";
 import { Tip, HAS_TIP } from "./Tip.jsx";
+import PlanetCard from "./PlanetCard.jsx";
+import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 
@@ -88,6 +90,7 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
   const plannerOpen = planner === null ? wide : planner;
   const [orderOpen, setOrderOpen] = useState(null);
   const [totalsOpen, setTotalsOpen] = useState(false);
+  const [cardOpen, setCardOpen] = usePlanetCardOpen();
 
   const [query, setQuery] = useState("");
   const war = useWar(true);
@@ -138,11 +141,13 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
           </div>
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 py-3">
             <PlanetSearch query={query} setQuery={setQuery} war={war} chosen={scenario.planet} onChoose={choose} />
+            {scenario.planet ? <ChosenPlanet name={scenario.planet} open={cardOpen} onToggle={() => setCardOpen(!cardOpen)} /> : null}
             <Planner bare scenario={scenario} setFaction={setFaction} prefs={prefs} setPrefs={setPrefs}
               war={war} plan={plan} onChoose={choose} />
             {scenario.faction ? (
               <PlanetBar stack scenario={scenario} setMission={setMission} clearEnvironment={clearEnvironment}
-                kind={prefs.kind} onClearKind={() => setPrefs({ kind: null })} />
+                kind={prefs.kind} onClearKind={() => setPrefs({ kind: null })}
+                hideHazards={Boolean(scenario.planet && cardOpen)} />
             ) : null}
             <WarLine war={war} />
           </div>
@@ -279,6 +284,39 @@ export function PlanetSearch({ query, setQuery, war, chosen, onChoose }) {
                 tags={loudHazards(p.hazards).map((h) => ({ key: h, label: hazardName(h), warn: true }))} />
             );
           })}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/* Whether the chosen planet's card is open. Kept per browser. */
+function usePlanetCardOpen() {
+  const [open, setOpen] = useState(true);
+  useEffect(() => {
+    setOpen(readSetting(SETTINGS.planetCard, ["open", "folded"], "open") === "open");
+  }, []);
+  const choose = useCallback((next) => {
+    setOpen(next);
+    writeSetting(SETTINGS.planetCard, next ? "open" : "folded");
+  }, []);
+  return [open, choose];
+}
+
+/* The planet you chose: its card, which folds down to its name. */
+function ChosenPlanet({ name, open, onToggle }) {
+  return (
+    <div className="shrink-0 overflow-hidden rounded-lg border border-base-800 bg-base-900/60" data-tour="war-planet-card">
+      <button type="button" onClick={onToggle} aria-expanded={open}
+        className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-base-400" style={OSWALD}>
+          {open ? "The planet" : name}
+        </span>
+        <ChevronDown className={"h-3.5 w-3.5 text-base-500 transition-transform " + (open ? "rotate-180" : "")} />
+      </button>
+      {open ? (
+        <div className="border-t border-base-800">
+          <PlanetCard name={name} />
         </div>
       ) : null}
     </div>

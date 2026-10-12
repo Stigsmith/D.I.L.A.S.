@@ -11,7 +11,7 @@
 /* fail.                                                              */
 /* ================================================================== */
 
-import { galaxy, difficulty, readJson } from "./lib/app.mjs";
+import { galaxy, difficulty, planet, readJson } from "./lib/app.mjs";
 
 const { VIEW, CENTRE, RADIUS, MAX_ZOOM, HOME } = galaxy;
 const table = readJson("src/data/planets.json").planets;
@@ -400,4 +400,28 @@ ok(covers, "in full screen the drawing reaches every edge of the screen, so a se
   const t = galaxy.cleanWarTrend({ from: 5, points: [{ at: 9, players: 30, fronts: 2 }, { at: 7, players: "lots", fronts: -1 }, null] });
   ok(t && t.points.length === 2 && t.points[0].at === 7 && t.points[0].players === 0 && t.points[1].fronts === 2,
     "the war's own hours come back oldest first, with a strange count read as none");
+}
+
+/* The planet card's facts, for every planet, and which shots it picks. */
+{
+  const facts = table.map((p) => planet.planetFacts(p.name));
+  ok(facts.every((f) => f && f.name), "every planet has a card");
+  const noTemp = table.filter((p) => !planet.planetFacts(p.name).temperature);
+  ok(noTemp.every((p) => !p.hazards.some((h) => planet.TEMPERATURE[h])),
+    `a temperature shows wherever the planet lists one (${table.length - noTemp.length} do, ${noTemp.length} list none)`);
+  ok(facts.every((f) => f.weather.every((w) => !planet.TEMPERATURE[w.slug] && w.slug !== "none")),
+    "the weather never repeats the temperature or lists none");
+  ok(facts.every((f) => !f.biome || !f.biome.text || !/UNOFFICIAL|pending/i.test(f.biome.text)),
+    "no biome line says it is unofficial or pending");
+  const acamar = table.find((p) => p.name === "Acamar IV");
+  const sameBiome = table.find((p) => p.biome === acamar.biome && p.name !== "Acamar IV");
+  const shotsOf = (n) => (n === "Acamar IV" ? [{ url: "a.webp", caption: null }, { url: "b.webp", caption: "Hill" }] : []);
+  const own = planet.pickShots("Acamar IV", shotsOf, () => "biome.webp");
+  ok(own.length === 2 && own[0].standIn === null && own[1].caption === "Hill", "a planet with shots of its own shows them, up to two");
+  const borrowed = planet.pickShots(sameBiome.name, shotsOf, () => "biome.webp");
+  ok(borrowed.length === 1 && borrowed[0].standIn === "Acamar IV", "a planet with none borrows one from a planet of its biome, and names it");
+  const typical = planet.pickShots(sameBiome.name, () => [], () => "biome.webp");
+  ok(typical.length === 1 && typical[0].standIn === "biome", "with no planet of its biome shot, the biome's own shot stands in");
+  ok(planet.pickShots(sameBiome.name, () => [], () => null).length === 0 && planet.pickShots("Nowhere", shotsOf, () => "x").length === 0,
+    "no shot anywhere, or no such planet, shows none");
 }

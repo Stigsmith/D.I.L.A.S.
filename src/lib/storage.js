@@ -112,6 +112,9 @@ export const SETTINGS = {
   /* Whether the full screen map is tilted back like a table, "on" or
      "off". A display preference, out of the export. */
   mapTilt: "hd2-map-tilt",
+  /* Whether the war room shows the card for the planet you chose, "open"
+     or "folded". A display preference, out of the export. */
+  planetCard: "hd2-planet-card",
   /* The rules switched off on the Rules page, as a list of rule ids.
      This browser's view of the rules, not a fact about a drop: out of the
      export, never sent to a party. */

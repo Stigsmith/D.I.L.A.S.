@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.35.0",
+    "date": "2026-10-12",
+    "title": "Know the ground",
+    "say": "The Ministry has photographed the front. Helldivers are reminded that the scenery is not the objective.",
+    "changes": [
+      "Choosing a planet in the war room shows its card: a picture of the ground, the temperature, the ground underfoot, the cities and what the weather does.",
+      "Hovering a planet on the map shows the same card, smaller.",
+      "A planet with no picture of its own shows another planet of the same biome, and says which.",
+      "Dark, Light and Neon show the D.I.L.A.S. shield beside the name, in the theme's colours.",
+      "The striped bar at the top of the screen stays in place when you scroll."
+    ]
+  },
+  {
     "version": "1.34.1",
     "date": "2026-10-12",
     "title": "Pocket edition",

@@ -279,7 +279,7 @@ export function About({ section = null }) {
         </p>
         <p className="text-base-500">
           Art is used for identification and reference: {artCounts.items} item illustrations, {artCounts.warbonds} warbond
-          covers{artCounts.planets ? ` and ${artCounts.planets} planet renders from helldivers.wiki.gg` : ""}. The tool works
+          covers{artCounts.planets ? `, ${artCounts.planets} planet renders` : ""}{artCounts.landscapes ? ` and ${artCounts.landscapes} landscape shots` : ""}{artCounts.planets || artCounts.landscapes ? " from helldivers.wiki.gg" : ""}. A planet with no shot of its own shows another planet of its biome, named on the picture. The tool works
           without any of it.
         </p>
       </Panel>

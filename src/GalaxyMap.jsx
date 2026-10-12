@@ -41,9 +41,10 @@ import {
   sectorZones, sectorOutlines, zoneAt, stageFit, stageCover, stageTransform, onStage, offStage, stageDepth,
 } from "./lib/galaxy.js";
 import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
-import { planetByName, biomeName, hazardName, loudHazards } from "./lib/scenario.js";
+import { planetByName } from "./lib/scenario.js";
 import { untilText } from "./lib/war.js";
 import { planetArt } from "./lib/assets.js";
+import PlanetCard from "./PlanetCard.jsx";
 
 const OSWALD = "'Oswald', sans-serif";
 
@@ -1070,16 +1071,20 @@ export default function GalaxyMap({
   const done = hoverWar && hoverWar.campaign
     ? (hoverWar.defence ? hoverWar.defence.progress : hoverWar.liberation)
     : null;
-  const art = detail ? planetArt(detail.name) : null;
-
   /* A card sits beside the point it is about, through the tilt, kept clear
-     of the sides, and below the point when that is near the top. */
-  const edge = Math.min(150, box.w * 0.25);
-  const cardAt = (fx, fy) => {
+     of the sides, and below the point when there is no room for it above.
+     The planet card is the tall one, about 340 pixels with its picture. */
+  const cardAt = (fx, fy, { half = 150, tall = 0 } = {}) => {
+    const edge = Math.min(half, box.w * 0.25);
+    /* In the war room, clear of the planner laid over the map's left. */
+    const from = expanded ? ins.left + edge : edge;
     const p = onStage(fit, fx, fy);
-    return { left: Math.min(Math.max(p.x, edge), Math.max(edge, box.w - edge)), top: p.y, below: p.y < box.h * 0.3 };
+    const below = tall ? p.y < tall && p.y < box.h / 2 : p.y < box.h * 0.3;
+    return { left: Math.min(Math.max(p.x, from), Math.max(from, box.w - edge)), top: p.y, below };
   };
-  const at = hovered ? cardAt(hovered.x * view.k + view.x, hovered.y * view.k + view.y) : null;
+  const at = hovered
+    ? cardAt(hovered.x * view.k + view.x, hovered.y * view.k + view.y, { half: expanded ? 172 : 148, tall: 370 })
+    : null;
 
   const sectorCard = !focus && hoverSector && hoverAt ? (() => {
     const h = holders.get(hoverSector);
@@ -1155,41 +1160,32 @@ export default function GalaxyMap({
       {/* A planet, before you commit to it. Mouse only: on a touch screen
           there is no hover, and the tap is the choice. */}
       {detail && at ? (
-        <div className={"pointer-events-none absolute z-10 flex w-max gap-2.5 overflow-hidden rounded-md border border-base-700 bg-base-950/90 py-2 pl-3 pr-3 text-left shadow-xl backdrop-blur-sm " +
-          (expanded ? "max-w-[20rem]" : "max-w-[17rem]")}
+        <div className={"pointer-events-none absolute z-10 overflow-hidden rounded-md border border-base-700 bg-base-950/90 shadow-xl backdrop-blur-sm " +
+          (expanded ? "w-[20rem]" : "w-[17rem]")}
           style={{
             left: at.left,
             top: at.top,
             transform: at.below ? "translate(-50%, 26px)" : "translate(-50%, calc(-100% - 26px))",
             boxShadow: fight && fight.hex ? `inset 3px 0 0 ${fight.hex}, 0 10px 30px rgb(0 0 0 / 0.35)` : undefined,
           }}>
-          {art ? <img src={art} alt="" className={(expanded ? "h-20 w-20" : "h-12 w-12") + " shrink-0 self-center"} /> : null}
-          <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-wider text-base-100" style={{ fontFamily: OSWALD }}>{detail.name}</p>
-            <p className="text-[10px] text-base-500">
-              {[detail.sector ? detail.sector + " sector" : null, detail.biome ? biomeName(detail.biome) : null]
-                .filter(Boolean).join(" · ")}
-            </p>
-            {loudHazards(detail.hazards).length ? (
-              <p className="mt-0.5 text-[10px] text-accent-300">{loudHazards(detail.hazards).map(hazardName).join(" · ")}</p>
-            ) : (
-              <p className="mt-0.5 text-[10px] text-base-500">Nothing special to bring here</p>
-            )}
-            {done !== null ? (
-              <div className="mt-1.5">
-                <div className="h-1 w-36 overflow-hidden rounded-full"
-                  style={{ backgroundColor: ((fight && fight.hex) || "#94a3b8") + "59" }}>
-                  <div className="h-full rounded-full bg-[#60a5fa]" style={{ width: `${Math.round(done * 100)}%` }} />
-                </div>
+          <PlanetCard compact name={detail.name}>
+            {done !== null || fight ? (
+              <div className="border-t border-base-800 pt-2">
+                {done !== null ? (
+                  <div className="h-1 w-full overflow-hidden rounded-full"
+                    style={{ backgroundColor: ((fight && fight.hex) || "#94a3b8") + "59" }}>
+                    <div className="h-full rounded-full bg-[#60a5fa]" style={{ width: `${Math.round(done * 100)}%` }} />
+                  </div>
+                ) : null}
+                {fight ? (
+                  <p className={"mt-1 text-[10px] leading-snug " + (fight.hex ? "" : "text-base-400")}
+                    style={fight.hex ? { color: fight.hex } : undefined}>
+                    {fight.text}
+                  </p>
+                ) : null}
               </div>
             ) : null}
-            {fight ? (
-              <p className={"mt-1 text-[10px] leading-snug " + (fight.hex ? "" : "text-base-400")}
-                style={fight.hex ? { color: fight.hex } : undefined}>
-                {fight.text}
-              </p>
-            ) : null}
-          </div>
+          </PlanetCard>
         </div>
       ) : null}
 

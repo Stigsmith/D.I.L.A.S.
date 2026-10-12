@@ -153,6 +153,208 @@ async function cut() {
   console.log("  Run npm run images to bring them into the app.\n");
 }
 
+/* ------------------------------------------------------------------ */
+/* LANDSCAPES                                                          */
+/*                                                                     */
+/*   npm run planet-art -- --landscapes            report              */
+/*   npm run planet-art -- --landscapes --write    fetch and cut       */
+/*                                                                     */
+/* What the ground looks like, for the planet card in the war room.    */
+/* Each planet page's infobox names a landscape shot, 3840 by 2160     */
+/* and about 11 MB. Those are never fetched: the wiki's own 1280 pixel */
+/* thumbnail is, and cut here to 800 by 450 WebP, about 50 KB. Into    */
+/* Image Library/Planets/Landscapes:                                   */
+/*                                                                     */
+/*   landscape_<slug>.webp            the shot the planet page shows   */
+/*   landscape_<slug>__<label>.webp   one more of the same planet,     */
+/*                                    the label its caption            */
+/*   biome_<biome>.webp               the biome's typical surface, for */
+/*                                    a planet with no shot of its own */
+/*                                                                     */
+/* An infobox that names a biome's shot rather than the planet's own   */
+/* gives the planet nothing of its own, so it reads as its biome.      */
+/* ------------------------------------------------------------------ */
+
+const LANDSCAPE_DIR = join(SMALL, "Landscapes");
+const LANDSCAPE_W = 800;
+const LANDSCAPE_H = 450;
+const THUMB = 1280;
+
+/* Biome shots the wiki names in a way the biome id does not spell. The
+   rest match by their file name: "Swamp base Landscape.png" is
+   swamp_base. */
+const BIOME_FILES = {
+  oasis_base: "Desert Oasis Landscape Day.png",
+  deciduous_base: "Deciduous Forest Landscape Sunset.png",
+  arctic_glacier_tien_kwan: "Tien Kwan landscape.png",
+};
+
+async function wikiJson(params) {
+  const res = await fetch(`${API}?${new URLSearchParams({ format: "json", ...params })}`, { headers: { "user-agent": AGENT } });
+  if (!res.ok) throw new Error(`the wiki answered ${res.status}`);
+  return res.json();
+}
+
+/* Every file with Landscape in its title, in one list. */
+async function landscapeFiles() {
+  const out = [];
+  let offset = 0;
+  for (;;) {
+    const doc = await wikiJson({ action: "query", list: "search", srsearch: "intitle:Landscape", srnamespace: "6", srlimit: "500", sroffset: String(offset), srprop: "" });
+    out.push(...doc.query.search.map((s) => s.title.replace(/^File:/, "")));
+    if (!doc.continue) break;
+    offset = doc.continue.sroffset;
+    await sleep(300);
+  }
+  return out;
+}
+
+/* The infobox's landscape for each planet page, following redirects. */
+async function infoboxShots(names) {
+  const out = new Map();
+  for (let i = 0; i < names.length; i += 50) {
+    const batch = names.slice(i, i + 50);
+    const doc = await wikiJson({ action: "query", prop: "revisions", rvprop: "content", rvslots: "main", redirects: "1", titles: batch.join("|") });
+    const back = new Map();
+    for (const n of doc.query.normalized || []) back.set(n.to, n.from);
+    for (const r of doc.query.redirects || []) back.set(r.to, back.get(r.from) || r.from);
+    for (const page of Object.values(doc.query.pages || {})) {
+      const text = page.revisions ? page.revisions[0].slots.main["*"] : "";
+      const m = /\|\s*landscape\s*=\s*([^\n|}]*)/.exec(text);
+      const file = m ? m[1].trim().replace(/^File:/i, "").replace(/_/g, " ") : "";
+      if (file) out.set(back.get(page.title) || page.title, file);
+    }
+    await sleep(300);
+  }
+  return out;
+}
+
+/* The thumbnail url of each file, batched. */
+async function thumbs(files) {
+  const out = new Map();
+  for (let i = 0; i < files.length; i += 50) {
+    const batch = files.slice(i, i + 50);
+    const doc = await wikiJson({ action: "query", prop: "imageinfo", iiprop: "url|size", iiurlwidth: String(THUMB), titles: batch.map((f) => `File:${f}`).join("|") });
+    const back = new Map((doc.query.normalized || []).map((n) => [n.to, n.from]));
+    for (const page of Object.values(doc.query.pages || {})) {
+      const ii = page.imageinfo && page.imageinfo[0];
+      const asked = (back.get(page.title) || page.title).replace(/^File:/, "");
+      if (ii) out.set(asked, { url: ii.thumburl || ii.url, width: ii.width });
+    }
+    await sleep(300);
+  }
+  return out;
+}
+
+/* A second shot's caption, from what its title says after Landscape:
+   "Exostorm Night C3" reads "Exostorm night". */
+const captionOf = (file) => {
+  const words = file.replace(/\.[a-z]+$/i, "").split(/\s+Landscape\s+/i)[1] || "";
+  const kept = words.split(/\s+/).filter((w) => w && !/^(Header|Ground|Shot|View|C\d|\d)$/i.test(w));
+  if (!kept.length) return null;
+  const s = kept.join(" ").toLowerCase();
+  return s[0].toUpperCase() + s.slice(1);
+};
+
+async function landscapes() {
+  const shown = wanted.map((w) => w.name);
+  console.log("\n  Reading the wiki's landscape files and every planet's infobox...");
+  const files = await landscapeFiles();
+  const infobox = await infoboxShots(shown);
+
+  /* What to fetch: the planet's own shot, a second of the same planet,
+     and each biome's typical surface. */
+  const plan = [];
+  let own = 0;
+  let two = 0;
+  const none = [];
+  for (const name of shown) {
+    const s = slug(name);
+    const head = infobox.get(name);
+    const mine = head && head.toLowerCase().startsWith(name.toLowerCase() + " ") ? head : null;
+    if (!mine) {
+      none.push(name);
+      continue;
+    }
+    own += 1;
+    plan.push({ file: mine, to: `landscape_${s}.webp` });
+    /* One more: another shot of this planet's ground, never a sky, space
+       or icon view, preferring a header variant. */
+    const more = files
+      .filter((f) => f !== mine && f.toLowerCase().startsWith(name.toLowerCase() + " ") && !/\b(Space|Sky|Icon)\b/i.test(f))
+      .sort((a, b) => Number(/Header/.test(b)) - Number(/Header/.test(a)));
+    const second = more.find((f) => captionOf(f));
+    if (second) {
+      two += 1;
+      plan.push({ file: second, to: `landscape_${s}__${slug(captionOf(second))}.webp` });
+    }
+  }
+  const biomes = new Set(planets.map((p) => p.biome).filter(Boolean));
+  const biomeHas = [];
+  for (const b of biomes) {
+    const file = BIOME_FILES[b] || files.find((f) => f.toLowerCase().replace(/ /g, "_") === `${b}_landscape.png`);
+    if (file) {
+      biomeHas.push(b);
+      plan.push({ file, to: `biome_${b}.webp` });
+    }
+  }
+
+  console.log(`  ${own} of ${shown.length} planets have a shot of their own, ${two} of them a second`);
+  console.log(`  ${biomeHas.length} of ${biomes.size} biomes have a typical surface shot`);
+  const bare = [...biomes].filter((b) => !biomeHas.includes(b));
+  if (bare.length) console.log(`  biomes with no shot of their own: ${bare.join(", ")}`);
+
+  if (!WRITE) {
+    console.log(`\n  ${plan.length} shots to fetch. Add -- --write to fetch and cut them.\n`);
+    return;
+  }
+
+  let sharp;
+  try {
+    sharp = (await import("sharp")).default;
+  } catch {
+    console.log("  sharp is not installed, so nothing was fetched. It arrives with wrangler: run npm install.\n");
+    return;
+  }
+  mkdirSync(LANDSCAPE_DIR, { recursive: true });
+  const todo = plan.filter((p) => !existsSync(join(LANDSCAPE_DIR, p.to)));
+  const urls = await thumbs([...new Set(todo.map((p) => p.file))]);
+  let made = 0;
+  let bytes = 0;
+  for (const p of todo) {
+    const got = urls.get(p.file);
+    if (!got) {
+      console.log(`  ${p.file}: not on the wiki`);
+      continue;
+    }
+    /* Never enlarged: most biome shots are 460 pixels wide, and blown up
+       to 800 they are blur. They keep their own width. */
+    const w = Math.min(LANDSCAPE_W, got.width || LANDSCAPE_W);
+    const h = Math.round((w * LANDSCAPE_H) / LANDSCAPE_W);
+    try {
+      const res = await fetch(got.url, { headers: { "user-agent": AGENT } });
+      if (!res.ok) throw new Error(`answered ${res.status}`);
+      const buf = await sharp(Buffer.from(await res.arrayBuffer()))
+        .resize(w, h, { fit: "cover", position: "attention" })
+        .webp({ quality: 78, effort: 5 }).toBuffer();
+      writeFileSync(join(LANDSCAPE_DIR, p.to), buf);
+      made += 1;
+      bytes += buf.length;
+      if (made % 25 === 0) console.log(`  ${made} cut`);
+    } catch (e) {
+      console.log(`  ${p.file}: ${e.message}`);
+    }
+    await sleep(150);
+  }
+  console.log(`\n  ${made} cut, ${(bytes / 1024 / 1024).toFixed(1)} MB, ${plan.length - todo.length} already here`);
+  console.log("  Run npm run images to bring them into the app.\n");
+}
+
+if (process.argv.includes("--landscapes")) {
+  await landscapes();
+  process.exit(0);
+}
+
 /* Cutting needs nothing from the wiki, so it asks it nothing. */
 if (CUT_ONLY && !WRITE) {
   await cut();

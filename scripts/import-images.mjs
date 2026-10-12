@@ -207,6 +207,20 @@ if (existsSync(PLANETS_SOURCE)) {
   }
 }
 
+/* Landscapes: what the ground looks like, cut by npm run planet-art --
+   --landscapes. Copied under their own names, which carry the planet's
+   slug or the biome's id and a second shot's caption. */
+const LANDSCAPES_SOURCE = join(PLANETS_SOURCE, "Landscapes");
+emptyInPlace(join(ASSETS, "landscapes"));
+let landscapeArt = 0;
+if (existsSync(LANDSCAPES_SOURCE)) {
+  for (const d of readdirSync(LANDSCAPES_SOURCE, { withFileTypes: true })) {
+    if (!d.isFile() || !/^(landscape|biome)_.+\.webp$/i.test(d.name)) continue;
+    copyFileSync(join(LANDSCAPES_SOURCE, d.name), join(ASSETS, "landscapes", d.name));
+    landscapeArt += 1;
+  }
+}
+
 /* Armour set renders: the cuts npm run armor-art made, by set id. Never
    the Originals folder beside them. */
 const ARMOR_SETS_SOURCE = join(SOURCE, "Armor Sets");
@@ -236,7 +250,8 @@ console.log(`items with art:    ${Object.keys(manifest.items).length} of ${items
 console.log(`warbonds with art: ${Object.keys(manifest.warbonds).length} of ${warbonds.length}`);
 console.log(`ui and other:      ${manifest.ui.length}`);
 console.log(`planets with art:  ${planetArt}${planetArt ? "" : " (npm run planet-art -- --write fetches them)"}`);
-console.log(`armour sets:       ${armorSetArt}${armorSetArt ? "" : " (npm run armor-art fetches them)"}`);
+console.log(`landscapes:        ${landscapeArt}${landscapeArt ? "" : " (npm run planet-art -- --landscapes --write fetches them)"}`);
+console.log(`armour sets:${armorSetArt}${armorSetArt ? "" : " (npm run armor-art fetches them)"}`);
 if (missingItems.length) {
   console.log(`\nitems with no art (these fall back to text): ${missingItems.length}`);
   for (const m of missingItems) console.log(`  ${m.slot.padEnd(10)} ${m.id.padEnd(34)} ${m.name}`);

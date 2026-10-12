@@ -102,6 +102,8 @@ const galaxyUrl = asModule(inlineJson(read("src/lib/galaxy.js"), "planets"));
 
 const difficultyUrl = asModule(inlineJson(read("src/lib/difficulty.js"), "difficulty"));
 
+const planetUrl = asModule(swap(inlineJson(read("src/lib/planet.js"), "planets"), "place", placeUrl));
+
 export const items = await import(itemsUrl);
 export const place = await import(placeUrl);
 export const armor = await import(armorUrl);
@@ -116,5 +118,6 @@ export const share = await import(shareModuleUrl);
 export const coverage = await import(coverageUrl);
 export const galaxy = await import(galaxyUrl);
 export const difficulty = await import(difficultyUrl);
+export const planet = await import(planetUrl);
 
 export const FACTIONS = ["bots", "bugs", "squids"];

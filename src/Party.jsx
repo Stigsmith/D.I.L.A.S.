@@ -136,7 +136,7 @@ export function PartyPanel({ party, sync, onClose, onDropBay }) {
   return (
     <div ref={box} role="dialog" aria-label="Party"
       className="fixed right-2 z-40 w-[min(22rem,calc(100vw-1rem))] rounded-lg border border-base-700 bg-base-950/95 p-4 shadow-2xl backdrop-blur sm:right-4"
-      style={{ top: "calc(var(--shell-chrome, 56px) + 0.5rem)" }}>
+      style={{ top: "calc(var(--shell-chrome, 56px) + 1rem)" }}>
       <div className="mb-3 flex items-center gap-2">
         <Users className="h-4 w-4 text-base-400" />
         <p className="flex-1 text-sm font-bold uppercase tracking-wide text-base-100" style={OSWALD}>Party</p>

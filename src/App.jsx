@@ -20,7 +20,8 @@ import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser, ScenarioBar } from "./Tiers.jsx";
 import WarRoom, { ScenarioStrip } from "./WarRoom.jsx";
 import StarMap from "./StarMap.jsx";
-import { SKULL, themeArt } from "./lib/assets.js";
+import { themeArt } from "./lib/assets.js";
+import DilasMark from "./DilasMark.jsx";
 import Builder from "./Builder.jsx";
 import ArmouryBuilds, { Coverage, History, ARMOURY_TABS } from "./Armoury.jsx";
 import DropScreen, { useDrop } from "./DropScreen.jsx";
@@ -114,50 +115,21 @@ const MENU_FOR = { builder: "armoury", shared: "armoury" };
 const labelFor = (id) =>
   (ALL_NAV.find((d) => d.id === id) || {}).label || OFF_MENU_LABEL[id] || BRAND.short;
 
-/* The Helldivers skull, painted with the current text colour so it     */
-/* takes the brand token and shifts with the theme.                     */
-/*                                                                      */
-/* Masked by luminance, not by alpha. In the source art the shield and  */
-/* the skull are both fully opaque and only the outside is transparent, */
-/* so an alpha mask paints the whole shield as one flat blob and the    */
-/* skull disappears. Luminance keeps the white skull and drops the      */
-/* black shield, which is the mark we actually want.                    */
-function Skull({ className = "h-7 w-7", style }) {
-  if (!SKULL) return null;
-  return (
-    <span aria-hidden="true" className={className}
-      style={{
-        display: "inline-block",
-        backgroundColor: "currentColor",
-        WebkitMaskImage: `url(${SKULL})`,
-        maskImage: `url(${SKULL})`,
-        maskMode: "luminance",
-        WebkitMaskRepeat: "no-repeat",
-        maskRepeat: "no-repeat",
-        WebkitMaskPosition: "center",
-        maskPosition: "center",
-        WebkitMaskSize: "contain",
-        maskSize: "contain",
-        ...style,
-      }} />
-  );
-}
-
 /* A skin may carry its own mark, taken from its palette study rather   */
 /* than from the loose reference art beside it: the study's copy is     */
 /* already cut to transparency, so it masks cleanly and takes the brand */
-/* token the same way the skull does. Sizes follow the source aspect,   */
+/* token. Sizes follow the source aspect,                               */
 /* wide for the aquila and square for the rest.                         */
 const THEME_MARK = {
   "castellans-creed": { file: "study_aq", label: "Imperial Aquila", lg: "h-[18px] w-[44px]", sm: "h-5 w-[52px]" },
   /* The Creek is where the Automatons are remembered, so the wordmark
-     carries their eye rather than the Super Earth skull. The study ships
-     its own cut of it, already on transparency, so it masks and takes the
-     brand token like every other mark here. */
+     carries their eye. The study ships its own cut of it, already on
+     transparency, so it masks and takes the brand token like every other
+     mark here. */
   "malevelon-creek": { file: "study_auto-mark", label: "Automaton mark", lg: "h-8 w-8", sm: "h-6 w-6" },
   "automaton": { file: "study_glyph", label: "Automaton mark", lg: "h-8 w-8", sm: "h-6 w-6" },
   /* The cutout provided in August 2026 is a clean silhouette on full     */
-  /* transparency, so it masks the way the skull does and takes the acid  */
+  /* transparency, so it masks cleanly and takes the acid                 */
   /* green brand token on its own. It replaced art drawn on an opaque     */
   /* ground, which had to be inverted and screened to be usable at all.   */
   "bile-titan": { file: "emblem", label: "Terminid symbol", lg: "h-8 w-10", sm: "h-6 w-[30px]" },
@@ -197,7 +169,7 @@ function BrandName({ className = "" }) {
 function BrandMark({ theme, size = "lg" }) {
   const mark = THEME_MARK[theme];
   const art = mark ? themeArt(theme, mark.file) : null;
-  if (!art) return <Skull className={(size === "lg" ? "h-9 w-9" : "h-6 w-6") + " shrink-0 text-brand"} />;
+  if (!art) return <DilasMark className={(size === "lg" ? "h-9 w-9" : "h-6 w-6") + " shrink-0"} />;
 
   if (mark.paint === "image") {
     return (
@@ -774,7 +746,8 @@ export default function App() {
       {/* a property of the lens rather than of any one surface.           */}
       <Grain theme={theme} />
 
-      <div className="relative z-10 h-2 w-full fx-stripe" style={{
+      {/* Sticky like the header under it, so the stripe stays at the top.   */}
+      <div className="sticky top-0 z-40 h-2 w-full fx-stripe" style={{
         backgroundImage:
           "repeating-linear-gradient(135deg, rgb(var(--brand)) 0px, rgb(var(--brand)) 10px, rgb(var(--base-950)) 10px, rgb(var(--base-950)) 20px)",
       }} />
@@ -782,7 +755,7 @@ export default function App() {
       <div className="relative z-10 flex">
         {/* Sidebar. Fixed on large screens, a drawer below that. */}
         <aside className="hidden w-56 shrink-0 border-r border-base-800 bg-base-900/40 lg:block"
-          style={{ height: "calc(100vh - 0.5rem)", position: "sticky", top: 0 }}>
+          style={{ height: "calc(100vh - 0.5rem)", position: "sticky", top: "0.5rem" }}>
           {/* Fixed rather than sized by its contents, because the page header */}
           {/* next to it reads the same token and the two rules have to meet.  */}
           <div className="flex items-center gap-3 border-b border-base-800 px-4"
@@ -822,7 +795,7 @@ export default function App() {
         ) : null}
 
         <div className="min-w-0 flex-1">
-          <div ref={chromeRef} className="sticky top-0 z-30 bg-base-950">
+          <div ref={chromeRef} className="sticky top-2 z-30 bg-base-950">
           {/* Wide enough for a header of its own. The height comes from the  */}
           {/* same token the sidebar brand box uses, because on a large       */}
           {/* screen the two sit side by side and their bottom rules have to  */}

@@ -41,6 +41,12 @@ const PLANETS = load(
 const ARMOR_SETS = load(
   import.meta.glob("../assets/armor-sets/*", { eager: true, query: "?url", import: "default" })
 );
+/* What the ground looks like: planet and biome shots from the wiki, cut
+   by npm run planet-art -- --landscapes and gitignored. Named
+   landscape_<planet slug>, landscape_<slug>__<caption>, biome_<biome>. */
+const LANDSCAPES = load(
+  import.meta.glob("../assets/landscapes/*", { eager: true, query: "?url", import: "default" })
+);
 const planetSlug = (s) =>
   s.toLowerCase().replace(/['’.]/g, "").replace(/&/g, " and ")
     .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
@@ -54,7 +60,7 @@ const planetSlug = (s) =>
 /*   study_*    art the palette study embedded, already cut and coloured  */
 /*   masthead*  the header image for that skin, with an optional          */
 /*              masthead-sm.* cut for the phone row                       */
-/*   emblem*    the mark that replaces the skull                          */
+/*   emblem*    the skin's own mark beside the name                      */
 /*                                                                        */
 /* A theme folder also holds the study itself, a preview render, and      */
 /* whatever loose reference the skin was drawn from. None of that         */
@@ -93,12 +99,27 @@ export const itemArt = (id) => ITEMS.get(id) || null;
 export const warbondArt = (id) => WARBONDS.get(id) || null;
 export const uiArt = (name) => UI.get(name) || null;
 export const planetArt = (name) => (name ? PLANETS.get(planetSlug(name)) || null : null);
+/* A planet's own shots, the one its wiki page shows first, then at most
+   one more with its caption. Empty when it has none. */
+export const planetLandscapes = (name) => {
+  if (!name) return [];
+  const s = planetSlug(name);
+  const out = [];
+  if (LANDSCAPES.has(`landscape_${s}`)) out.push({ url: LANDSCAPES.get(`landscape_${s}`), caption: null });
+  for (const [key, url] of LANDSCAPES) {
+    if (!key.startsWith(`landscape_${s}__`)) continue;
+    const words = key.slice(`landscape_${s}__`.length).replace(/-/g, " ");
+    out.push({ url, caption: words[0].toUpperCase() + words.slice(1) });
+    break;
+  }
+  return out;
+};
+export const biomeLandscape = (biome) => (biome ? LANDSCAPES.get(`biome_${biome}`) || null : null);
 export const armorSetArt = (id) => (id ? ARMOR_SETS.get(id) || null : null);
 
-export const artCounts = { items: ITEMS.size, warbonds: WARBONDS.size, ui: UI.size, planets: PLANETS.size, armorSets: ARMOR_SETS.size };
+export const artCounts = { items: ITEMS.size, warbonds: WARBONDS.size, ui: UI.size, planets: PLANETS.size, landscapes: LANDSCAPES.size, armorSets: ARMOR_SETS.size };
 
 /* Named so a component does not have to know the file naming scheme. */
-export const SKULL = uiArt("ui_icon_booster_skull");
 export const FACTION_GLYPH = {
   bots: uiArt("faction_automaton"),
   bugs: uiArt("faction_terminid"),
