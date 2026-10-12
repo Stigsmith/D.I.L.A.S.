@@ -32,6 +32,7 @@ import { enemiesUpTo, arrivalsAt, arrivalsLine } from "./lib/enemies.js";
 import { vocabulary } from "./lib/items.js";
 import { Tip, HAS_TIP } from "./Tip.jsx";
 import PlanetCard from "./PlanetCard.jsx";
+import { planetEffects } from "./lib/effects.js";
 import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
@@ -141,7 +142,7 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
           </div>
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 py-3">
             <PlanetSearch query={query} setQuery={setQuery} war={war} chosen={scenario.planet} onChoose={choose} />
-            {scenario.planet ? <ChosenPlanet name={scenario.planet} open={cardOpen} onToggle={() => setCardOpen(!cardOpen)} /> : null}
+            {scenario.planet ? <ChosenPlanet name={scenario.planet} war={war} open={cardOpen} onToggle={() => setCardOpen(!cardOpen)} /> : null}
             <Planner bare scenario={scenario} setFaction={setFaction} prefs={prefs} setPrefs={setPrefs}
               war={war} plan={plan} onChoose={choose} />
             {scenario.faction ? (
@@ -280,7 +281,7 @@ export function PlanetSearch({ query, setQuery, war, chosen, onChoose }) {
               <PickRow key={p.name} on={p.name === chosen} onClick={() => { onChoose(p.name); setQuery(""); }}
                 title={p.name}
                 sub={(p.sector ? p.sector + " sector · " : "") + biomeName(p.biome) + fighting +
-                  (unplaced.includes(p.name) ? " · not on the map" : "")}
+                  (unplaced.includes(p.name) ? " · not on the map" : "") + (planetEffects(war, p.name).gone ? " · destroyed" : "")}
                 tags={loudHazards(p.hazards).map((h) => ({ key: h, label: hazardName(h), warn: true }))} />
             );
           })}
@@ -304,7 +305,7 @@ function usePlanetCardOpen() {
 }
 
 /* The planet you chose: its card, which folds down to its name. */
-function ChosenPlanet({ name, open, onToggle }) {
+function ChosenPlanet({ name, war, open, onToggle }) {
   return (
     <div className="shrink-0 overflow-hidden rounded-lg border border-base-800 bg-base-900/60" data-tour="war-planet-card">
       <button type="button" onClick={onToggle} aria-expanded={open}
@@ -316,7 +317,7 @@ function ChosenPlanet({ name, open, onToggle }) {
       </button>
       {open ? (
         <div className="border-t border-base-800">
-          <PlanetCard name={name} />
+          <PlanetCard name={name} war={war} />
         </div>
       ) : null}
     </div>

@@ -38,8 +38,9 @@ import {
   VIEW, CENTRE, RADIUS, MAX_ZOOM, HOME, placed, lanes, sectors, roomFor, placeOf, matchSet,
   clampView, zoomAt, toMap, placeLabels, labelSide,
   sectorHolders, frontArcs, arcPath, sectorMembers, sectorNear, sectorView, leavesSector, glide, towards, LEAVE_AT,
-  sectorZones, sectorOutlines, zoneAt, stageFit, stageCover, stageTransform, onStage, offStage, stageDepth,
+  sectorZones, sectorOutlines, zoneAt, stageFit, stageCover, stageTransform, onStage, offStage, stageDepth, liveSpot,
 } from "./lib/galaxy.js";
+import { planetEffects } from "./lib/effects.js";
 import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 import { planetByName } from "./lib/scenario.js";
 import { untilText } from "./lib/war.js";
@@ -564,7 +565,34 @@ export default function GalaxyMap({
      drawn faded or with a warning on top: it is not drawn, and the line
      under the map says why. */
   const live = war && war.fresh ? war.planets : null;
+  /* Where each planet is drawn: the shipped position, or where a fresh
+     war says it drifted to (the black hole does). */
+  const spots = useMemo(() => placed.map((p) => liveSpot(war, p)), [war]);
+  const spotOf = useMemo(() => { const m = new Map(spots.map((p) => [p.name, p])); return (n) => m.get(n) || null; }, [spots]);
   const holders = useMemo(() => sectorHolders(war), [war]);
+  /* The marks the map draws, resolved to where each planet is drawn. */
+  const marks = useMemo(() => {
+    if (!war || !war.fresh || !war.marks) return null;
+    const clouds = [];
+    const shape = new Map();
+    for (const [name, ids] of war.marks.effects) {
+      const p = spotOf(name);
+      if (!p) continue;
+      const e = planetEffects(war, name);
+      if (e.cloud) clouds.push({ name, x: p.x, y: p.y, colour: e.cloud });
+      if (e.draw) shape.set(name, e.draw);
+    }
+    const hexOf = (name) => {
+      const w = war.planets.get(name);
+      return w && w.owner && fronts[w.owner] ? fronts[w.owner].hex : null;
+    };
+    const attacks = war.marks.attacks
+      .map(([a, b]) => [spotOf(a), spotOf(b)])
+      .filter(([a, b]) => a && b)
+      .map(([a, b]) => [{ ...a, hex: hexOf(a.name) }, b]);
+    return { clouds, attacks, shape, station: war.station };
+  }, [war, spotOf, fronts]);
+  const station = marks ? marks.station : war && war.fresh ? war.station : null;
 
   /* Inside a sector only the planets in view, and a margin round it, are
      drawn as renders; the rest stay points of light. Loading all 271 at
@@ -605,7 +633,7 @@ export default function GalaxyMap({
        the Tactical galaxy only the first two: the sector card names the
        rest when you hover, which is how the game does it. */
     const wanted = [];
-    for (const p of placed) {
+    for (const p of spots) {
       const on = p.name === chosen;
       const lit = matches ? matches.has(p.name) : pickAt.has(p.name);
       const w = !matches && live ? live.get(p.name) : null;
@@ -630,7 +658,7 @@ export default function GalaxyMap({
     }
     const named = placeLabels(wanted, scale);
 
-    const rows = placed.map((p) => {
+    const rows = spots.map((p) => {
       const on = p.name === chosen;
       const found = matches ? matches.has(p.name) : false;
       const unfit = !matches && fits && !fits.has(p.name) && !on && !p.home;
@@ -648,7 +676,7 @@ export default function GalaxyMap({
       };
     });
     return { inSector, worlds, showSectors, named, pickAt, rows, hexOf };
-  }, [view.k, reach, ppu, chosen, matches, namesMatches, live, fronts, picks, fits, tactical, focus, pad, still]);
+  }, [view.k, reach, ppu, chosen, matches, namesMatches, live, fronts, picks, fits, tactical, focus, pad, still, spots]);
 
   const layer = useMemo(() => {
     const { inSector, showSectors, named } = plan;
@@ -672,6 +700,38 @@ export default function GalaxyMap({
         })
       : [];
     const lit = inSector ? focus : hoverSector;
+
+    /* The game's own marks, from a fresh war only. A cloud effect (the
+       Gloom) lays a soft field of its colour over every planet carrying
+       it, so neighbours run together the way the game's cloud does. An
+       attack line runs from the attacker, dashed, in the colour of
+       whoever holds it. */
+    const marked = marks ? (
+      <g className="pointer-events-none">
+        <defs>
+          {[...new Set(marks.clouds.map((c) => c.colour))].map((colour) => (
+            <radialGradient key={colour} id={`${gid}-cloud-${colour.slice(1)}`}>
+              <stop offset="0%" stopColor={colour} stopOpacity="0.34" />
+              <stop offset="60%" stopColor={colour} stopOpacity="0.16" />
+              <stop offset="100%" stopColor={colour} stopOpacity="0" />
+            </radialGradient>
+          ))}
+        </defs>
+        {marks.clouds.map((c) => (
+          <circle key={c.name} cx={c.x} cy={c.y} r={34} fill={`url(#${gid}-cloud-${c.colour.slice(1)})`}
+            opacity={matches ? 0.35 : 1} />
+        ))}
+        {marks.attacks.map(([a, b]) => {
+          const hex = a.hex || null;
+          return (
+            <line key={a.name + ">" + b.name} x1={a.x} y1={a.y} x2={b.x} y2={b.y}
+              className={hex ? "" : "stroke-base-400"} {...(hex ? { stroke: hex } : {})}
+              strokeOpacity={matches ? 0.2 : 0.55} strokeWidth={1.1 * u} strokeDasharray={`${4 * u} ${3 * u}`} />
+          );
+        })}
+      </g>
+    ) : null;
+
     const region = (
       <g className="pointer-events-none">
         {blocks.map(({ sector, front, campaign, hex }) => {
@@ -726,9 +786,9 @@ export default function GalaxyMap({
               </radialGradient>
             ))}
             {Object.entries(fronts).map(([id, f]) => (
-              <pattern key={id} id={`${gid}-stripes-${id}`} width="12" height="12" patternUnits="userSpaceOnUse"
+              <pattern key={id} id={`${gid}-stripes-${id}`} width="6" height="6" patternUnits="userSpaceOnUse"
                 patternTransform="rotate(45)">
-                <rect width="3" height="12" fill={f.hex} opacity="0.1" />
+                <rect width="2.2" height="6" fill={f.hex} opacity="0.13" />
               </pattern>
             ))}
             <radialGradient id={`${gid}-home`}>
@@ -784,7 +844,7 @@ export default function GalaxyMap({
               so the timing is exact rather than guessed. */}
           {live ? (
             <g className="pointer-events-none" opacity={matches ? 0.35 : 1}>
-              {placed.map((p) => {
+              {spots.map((p) => {
                 const w = live.get(p.name);
                 if (!w || !w.front) return null;
                 let angle = Math.atan2(p.y - CENTRE, p.x - CENTRE);
@@ -804,6 +864,7 @@ export default function GalaxyMap({
           ) : null}
 
           {region}
+          {marked}
 
           {/* Each front's name round the rim, where its territory is. */}
           {inSector ? null : frontArcs(holders).map(({ front, angle }) => {
@@ -836,6 +897,7 @@ export default function GalaxyMap({
           strokeWidth={u} strokeDasharray={`${3 * u} ${5 * u}`} />
         <path d={LANE_PATH} className="fill-none stroke-base-700" strokeWidth={u} opacity={matches ? 0.35 : 0.8} />
         {region}
+        {marked}
 
         {showSectors
           ? sectors.filter((s) => named.has("sector:" + s.name)).map((s) => (
@@ -850,7 +912,7 @@ export default function GalaxyMap({
 
       </>
     );
-  }, [plan, u, live, fronts, tactical, gid, focus, hoverSector, holders, still, matches]);
+  }, [plan, u, live, fronts, tactical, gid, focus, hoverSector, holders, still, matches, marks]);
 
   /* ---------------------------------------------------------------- */
   /* The planets, drawn round their own centre                         */
@@ -875,6 +937,31 @@ export default function GalaxyMap({
     const hoverRing = hovering ? (
       <circle r={(tactical ? FRONT_WORLD_PX * 0.6 : DOT + 4) * uu} className="pointer-events-none fill-none stroke-base-100" strokeWidth={1.2 * uu} />
     ) : null;
+
+    /* A planet the war destroyed is drawn as what is left of it: a black
+       hole as a dark disc in a bright ring, a fractured planet as its
+       pieces. Only from a fresh war, and only once its effect is named. */
+    const shape = marks ? marks.shape.get(p.name) : null;
+    if (shape) {
+      const size = (row.world ? WORLD_PX : tactical ? 9 : DOT * 2.4) * uu;
+      return (
+        <g opacity={matches && dim ? 0.3 : 1}>
+          {shape === "blackhole" ? (
+            <>
+              <circle r={size * 0.62} fill="none" stroke="#C4B5FD" strokeOpacity={0.35} strokeWidth={size * 0.16} />
+              <circle r={size * 0.42} fill="#05050A" stroke="#E9D5FF" strokeWidth={1.4 * uu} />
+            </>
+          ) : (
+            [[-0.32, -0.18, 0.2], [0.05, -0.3, 0.13], [0.3, -0.12, 0.17], [-0.05, 0.22, 0.1]].map(([x, y, r], i) => (
+              <circle key={i} cx={x * size} cy={y * size} r={r * size} className="fill-base-400 stroke-base-950" strokeWidth={0.8 * uu} />
+            ))
+          )}
+          {on ? <circle r={size * 0.88} className="fill-none stroke-brand" strokeWidth={1.8 * uu} /> : null}
+          {hoverRing}
+          {hit(p.name, Math.max(HIT * uu, size * 0.55))}
+        </g>
+      );
+    }
 
     if (!tactical) {
       /* The chart: a planet somebody holds takes their colour, a front you
@@ -1041,6 +1128,23 @@ export default function GalaxyMap({
       if (pi !== undefined) pickEls.push(<g key={"pick-" + row.p.name} transform={t}>{drawPick(pi, uu)}</g>);
       if (plan.named.has(row.p.name)) names.push(<g key={"name-" + row.p.name} transform={t}>{drawName(row, uu)}</g>);
     }
+    /* The space station, beside the planet it orbits. */
+    const dss = station ? plan.rows.find((r) => r.p.name === station.planet) : null;
+    const dssAt = dss ? place(dss.p) : null;
+    if (dssAt) {
+      const off = (plan.worlds ? FRONT_WORLD_PX * 0.62 : 9) * uu;
+      names.push(
+        <g key="dss" transform={dssAt} className="pointer-events-none">
+          <g transform={`translate(${off} ${-off})`}>
+            <path d={`M0 ${-4 * uu}L${4 * uu} 0L0 ${4 * uu}L${-4 * uu} 0Z`} className="fill-base-100 stroke-base-950" strokeWidth={uu} />
+            <text x={6 * uu} dominantBaseline="middle" className="fill-base-100 stroke-base-950" strokeWidth={3 * uu}
+              style={{ paintOrder: "stroke", fontFamily: OSWALD, fontSize: 9 * uu, letterSpacing: 1.5 * uu, fontWeight: 600 }}>
+              DSS
+            </text>
+          </g>
+        </g>
+      );
+    }
     return <>{marks}{pickEls}{names}</>;
   };
 
@@ -1064,7 +1168,7 @@ export default function GalaxyMap({
 
   /* The cards. In the galaxy the sector under the cursor, the way the game
      names a sector on hover; in a sector the planet under it. */
-  const hovered = hover && (focus || (placeOf(hover) || {}).home) ? placeOf(hover) : null;
+  const hovered = hover && (focus || (spotOf(hover) || {}).home) ? spotOf(hover) : null;
   const detail = hovered ? planetByName.get(hover) : null;
   const fight = detail && live ? warLine(live.get(detail.name), fronts) : null;
   const hoverWar = detail && live ? live.get(detail.name) : null;
@@ -1168,7 +1272,7 @@ export default function GalaxyMap({
             transform: at.below ? "translate(-50%, 26px)" : "translate(-50%, calc(-100% - 26px))",
             boxShadow: fight && fight.hex ? `inset 3px 0 0 ${fight.hex}, 0 10px 30px rgb(0 0 0 / 0.35)` : undefined,
           }}>
-          <PlanetCard compact name={detail.name}>
+          <PlanetCard compact name={detail.name} war={war}>
             {done !== null || fight ? (
               <div className="border-t border-base-800 pt-2">
                 {done !== null ? (

@@ -19,9 +19,13 @@
 import { planetFacts, pickShots } from "./lib/planet.js";
 import { planetLandscapes, biomeLandscape, planetArt } from "./lib/assets.js";
 import { Tip, MissingData, HAS_TIP } from "./Tip.jsx";
+import { planetEffects } from "./lib/effects.js";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 const WIKI = "https://helldivers.wiki.gg/wiki/";
+
+/* "EAGLE STORM" as "Eagle storm". */
+const titleCase = (s) => s.charAt(0) + s.slice(1).toLowerCase();
 
 /* Whose ground a stand-in shows. */
 const standInLine = (shot, facts) => {
@@ -73,20 +77,27 @@ function Tile({ label, tip, children }) {
   );
 }
 
-/* `children` goes under the facts: the map puts the live war there. */
-export default function PlanetCard({ name, compact = false, children = null }) {
+/* `children` goes under the facts: the map puts the live war there.
+   `war` is the live war, for what the game has marked on the planet.
+   `titled` false leaves the name to a page that already shows it.
+   A planet the war destroyed shows what destroyed it and nothing of the
+   world it was: no picture, no temperature, no ground. */
+export default function PlanetCard({ name, compact = false, war = null, titled = true, children = null }) {
   const facts = planetFacts(name);
   if (!facts) return null;
-  const shots = pickShots(name, planetLandscapes, biomeLandscape);
-  const render = shots.length ? null : planetArt(name);
+  const marked = planetEffects(war, facts.name);
+  const gone = marked.gone;
+  const shots = gone ? [] : pickShots(name, planetLandscapes, biomeLandscape);
+  const render = shots.length || gone ? null : planetArt(name);
   const t = facts.temperature;
   const hot = t && t.slug !== "normal_temp";
+  const station = war && war.fresh && war.station && war.station.planet === facts.name ? war.station : null;
 
   return (
     <div className="flex flex-col text-left">
       <Banner shots={shots} facts={facts} compact={compact} />
       <div className={"flex flex-col gap-2 " + (compact ? "px-3 py-2" : "p-3")}>
-        <div className="flex items-center gap-2.5">
+        {titled ? <div className="flex items-center gap-2.5">
           {render ? <img src={render} alt="" className={(compact ? "h-10 w-10" : "h-12 w-12") + " shrink-0"} /> : null}
           <div className="min-w-0">
             <p className="text-sm font-bold uppercase tracking-wider text-base-100" style={OSWALD}>{facts.name}</p>
@@ -94,9 +105,9 @@ export default function PlanetCard({ name, compact = false, children = null }) {
               {[facts.sector ? facts.sector + " sector" : null, facts.biome ? facts.biome.name : null].filter(Boolean).join(" · ")}
             </p>
           </div>
-        </div>
+        </div> : null}
 
-        <div className="grid grid-cols-3 gap-2 border-t border-base-800 pt-2">
+        {gone ? null : <div className="grid grid-cols-3 gap-2 border-t border-base-800 pt-2">
           <Tile label="Temperature" tip={compact || !t ? null : t.effect}>
             {t ? <span className={hot ? "text-accent-300" : ""}>{t.label}</span> : compact ? "Missing data" : <MissingData why="The planet table lists no temperature for this planet." />}
           </Tile>
@@ -115,9 +126,48 @@ export default function PlanetCard({ name, compact = false, children = null }) {
               <span className="text-base-400">None</span>
             )}
           </Tile>
-        </div>
+        </div>}
 
-        {facts.weather.length ? (
+        {marked.gone ? (
+          <p className="rounded border border-base-700 bg-base-900 px-2 py-1 text-[11px] font-semibold text-base-200">
+            Destroyed. No missions here.
+          </p>
+        ) : null}
+
+        {marked.named.length || marked.unnamed || station ? (
+          <div className="flex flex-col gap-1 border-t border-base-800 pt-2">
+            {marked.named.map((e) => (
+              <p key={e.id} className="text-[11px] leading-relaxed text-base-400">
+                <span className="font-semibold text-base-100">{e.name}</span>
+                {!compact && e.say ? <> {e.say}</> : null}
+              </p>
+            ))}
+            {station ? (
+              <p className="text-[11px] leading-relaxed text-base-400">
+                {compact || !station.actions.length ? (
+                  <span className="font-semibold text-base-100">DSS in orbit</span>
+                ) : (
+                  <Tip title="Tactical actions" text={station.actions.map((a) => `${titleCase(a.name)}: ${a.description}`).join(" ")}>
+                    <span className={"font-semibold text-base-100 " + HAS_TIP}>DSS in orbit</span>
+                  </Tip>
+                )}
+                {station.actions.length ? <> · {station.actions.map((a) => titleCase(a.name)).join(", ")}</> : null}
+              </p>
+            ) : null}
+            {marked.unnamed ? (
+              compact ? (
+                <p className="text-[10px] text-base-500">{marked.unnamed} more {marked.unnamed === 1 ? "effect" : "effects"} with no name yet</p>
+              ) : (
+                <span className="flex items-center gap-1.5 text-[10px] text-base-500">
+                  <MissingData why="The game marks this planet with effects that have no name here yet." />
+                  {marked.unnamed} {marked.unnamed === 1 ? "effect" : "effects"}
+                </span>
+              )
+            ) : null}
+          </div>
+        ) : null}
+
+        {gone ? null : facts.weather.length ? (
           <div className="flex flex-col gap-1 border-t border-base-800 pt-2">
             {compact ? (
               <p className="text-[11px] text-accent-300">{facts.weather.map((w) => w.name).join(" · ")}</p>
@@ -131,7 +181,7 @@ export default function PlanetCard({ name, compact = false, children = null }) {
           <p className="border-t border-base-800 pt-2 text-[11px] text-base-500">No weather hazards.</p>
         )}
 
-        {!compact && facts.biome && facts.biome.text ? (
+        {!gone && !compact && facts.biome && facts.biome.text ? (
           <p className="text-[11px] italic leading-relaxed text-base-500">{facts.biome.text}</p>
         ) : null}
 

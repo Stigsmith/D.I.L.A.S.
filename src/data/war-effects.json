@@ -1,0 +1,23 @@
+{
+  "source": "curator",
+  "note": "Names for the game's planet effects. The game sends each effect as a bare number and its name lives only in the install, so these are read off the game's own map: the curator's screenshots of 12 October 2026, matched to the live status of the same day, where a planet carried exactly one effect of the kind the planet card shows (type 71) or every planet carrying a number showed the same line. A number not listed here is shown as unnamed. npm run effects lists every live number, its planets, and whether it is named. draw is how the map shows it: blackhole and fractured replace the planet, cloud lays a soft zone over every planet carrying it, and none is a name on the card only. gone means nobody drops there any more. A name or say written here is the game's own words.",
+  "draws": ["none", "cloud", "blackhole", "fractured"],
+  "effects": {
+    "1229": { "name": "Meridian black hole", "draw": "blackhole", "gone": true, "say": "Meridia, destroyed with Dark Fluid after it became a Terminid Supercolony." },
+    "1352": { "name": "Conventional black hole", "draw": "blackhole", "gone": true, "say": "A former planet, now a stable black hole." },
+    "1252": { "name": "Fractured planet", "draw": "fractured", "gone": true, "say": "Torn apart by the Meridian singularity." },
+    "1241": { "name": "Fractured planet", "draw": "fractured", "gone": true, "say": "Torn apart by the Meridian singularity." },
+    "1190": { "name": "Gloom", "draw": "cloud", "colour": "#D4B526" },
+    "1188": { "name": null, "draw": "cloud", "colour": "#D4B526" },
+    "1193": { "name": null, "draw": "cloud", "colour": "#D4B526" },
+    "1395": { "name": "Terminid Control System+", "draw": "none", "say": "Termicide towers repel Terminids emerging from the Gloom." },
+    "1400": { "name": "Heavy SEAF presence", "draw": "none", "say": "SEAF forces are heavily deployed across this planet." },
+    "1387": { "name": "Communications Array", "draw": "none", "say": "Relay towers important to Automaton communications." },
+    "1287": { "name": "New Hope City", "draw": "none", "say": "The flagship Maximum Security City." },
+    "1292": { "name": "New Yearning City", "draw": "none", "say": "One of 3 Maximum Security Cities." },
+    "1236": { "name": "Center for Civilian Surveillance", "draw": "none", "say": "The Ministry of Truth analyses citizens here." },
+    "1234": { "name": "Center of Science", "draw": "none", "say": "The Ministry of Science's research centre." },
+    "1197": { "name": "Xenoentomology Center", "draw": "none", "say": "Terminid research and E-710." },
+    "1324": { "name": "Ultramafic Mine", "draw": "none", "say": "Extracts platinum from deep igneous rock." }
+  }
+}

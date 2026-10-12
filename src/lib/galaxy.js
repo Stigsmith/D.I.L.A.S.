@@ -254,6 +254,45 @@ function cleanStats(raw) {
   return Object.keys(out).length ? out : null;
 }
 
+/* The game's own marks on the map, joined to the shipped planet table by
+   name: which planets carry which effect numbers, which planet attacks
+   which, and where a planet that drifts (a black hole) is now. Anything
+   that does not resolve is dropped. A position must lie on the disc. */
+function cleanMarks(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const name = (n) => (typeof n === "string" ? (byUpper.get(n.toUpperCase()) || {}).name || null : null);
+  const effects = new Map();
+  for (const [n, ids] of Object.entries(raw.effects && typeof raw.effects === "object" ? raw.effects : {})) {
+    const own = name(n);
+    const list = Array.isArray(ids) ? ids.filter((id) => Number.isInteger(id) && id >= 0).slice(0, 16) : [];
+    if (own && list.length) effects.set(own, list);
+  }
+  const attacks = (Array.isArray(raw.attacks) ? raw.attacks : [])
+    .map((a) => (Array.isArray(a) ? [name(a[0]), name(a[1])] : [null, null]))
+    .filter(([a, b]) => a && b && a !== b)
+    .slice(0, 400);
+  const moved = new Map();
+  for (const [n, at] of Object.entries(raw.moved && typeof raw.moved === "object" ? raw.moved : {})) {
+    const own = name(n);
+    if (!own || !at || !Number.isFinite(at.x) || !Number.isFinite(at.y) || Math.hypot(at.x, at.y) > 1) continue;
+    moved.set(own, { x: at.x, y: at.y });
+  }
+  return { effects, attacks, moved };
+}
+
+/* The space station: its planet, when its vote ends, and its actions. */
+function cleanStation(raw) {
+  if (!raw || typeof raw !== "object" || typeof raw.planet !== "string") return null;
+  const own = byUpper.get(raw.planet.toUpperCase());
+  if (!own) return null;
+  const ends = typeof raw.electionEnd === "string" ? Date.parse(raw.electionEnd) : NaN;
+  const actions = (Array.isArray(raw.actions) ? raw.actions : [])
+    .filter((a) => a && typeof a.name === "string" && a.name.trim())
+    .slice(0, 8)
+    .map((a) => ({ name: a.name.trim().slice(0, 60), description: typeof a.description === "string" ? a.description.slice(0, 400) : "" }));
+  return { planet: own.name, voteEndsAt: Number.isFinite(ends) ? ends : null, actions };
+}
+
 export function cleanWar(raw, now = Date.now()) {
   if (!raw || typeof raw !== "object" || !Array.isArray(raw.planets)) return null;
   const fetchedAt = Number.isFinite(raw.fetchedAt) ? raw.fetchedAt : null;
@@ -307,7 +346,19 @@ export function cleanWar(raw, now = Date.now()) {
        from yesterday reads exactly like today's. */
     order: fresh ? cleanOrder(raw.order, now) : null,
     stats: fresh ? cleanStats(raw.stats) : null,
+    /* The same half hour: an old answer draws no effect, no attack line,
+       and moves no planet. */
+    marks: fresh ? cleanMarks(raw.marks) : null,
+    station: fresh ? cleanStation(raw.station) : null,
   };
+}
+
+/* Where to draw a planet: where a fresh war says it drifted to, or the
+   fixed position from the shipped table. The fixed one is always the
+   fallback, so no answer, or an old one, moves nothing. */
+export function liveSpot(war, p) {
+  const at = war && war.fresh && war.marks ? war.marks.moved.get(p.name) : null;
+  return at ? { ...p, ...project(at) } : p;
 }
 
 /* ------------------------------------------------------------------ */

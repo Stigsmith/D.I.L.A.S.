@@ -664,6 +664,26 @@ for (const f of FACTIONS) {
   if (n < 5) fail(`enemies.json carries only ${n} baseline enemies for ${f}. The armour rules read this and would go quiet on that front.`);
 }
 
+/* The war's effect names, the curator's table. A number is a key, a draw
+   is one the map knows, a colour is hex, and a black hole or a fractured
+   planet is gone, because the map and the card treat it as one. */
+{
+  const table = load("war-effects.json");
+  const bad = [];
+  if (table.source !== "curator") bad.push("source must be curator");
+  for (const [id, e] of Object.entries(table.effects || {})) {
+    if (!/^\d+$/.test(id)) bad.push(`${id}: the key must be the effect number`);
+    if (!e || typeof e !== "object") { bad.push(`${id}: not an object`); continue; }
+    if (e.name !== null && (typeof e.name !== "string" || !e.name.trim() || e.name.length > 40)) bad.push(`${id}: a name is null or 1 to 40 characters`);
+    if (!table.draws.includes(e.draw)) bad.push(`${id}: draw "${e.draw}" is not one of ${table.draws.join(", ")}`);
+    if (e.colour !== undefined && !/^#[0-9A-Fa-f]{6}$/.test(e.colour)) bad.push(`${id}: colour must be #RRGGBB`);
+    if (e.say !== undefined && (typeof e.say !== "string" || e.say.length > 120)) bad.push(`${id}: say is at most 120 characters`);
+    if ((e.draw === "blackhole" || e.draw === "fractured") !== Boolean(e.gone)) bad.push(`${id}: a black hole or fractured planet is gone, and only those`);
+    if (e.draw === "cloud" && !e.colour) bad.push(`${id}: a cloud needs a colour`);
+  }
+  if (bad.length) fail(`${bad.length} problem(s) in war-effects.json:`, bad);
+}
+
 /* ------------------------------------------------------------------ */
 
 if (problems.length) {

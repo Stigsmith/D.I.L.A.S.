@@ -258,9 +258,13 @@ export function About({ section = null }) {
           tool.
         </p>
         <p className="text-base-500">
-          Live data comes from the same API: who holds each planet, the fronts and the Major Order. The tool's server
-          reads it every 5 minutes. Your browser only talks to the tool's server and sends nothing about you. Data
-          older than 30 minutes is not shown.
+          Live data comes from the same API: who holds each planet, the fronts, the Major Order, attack lines, the
+          space station and where a black hole has drifted. The tool's server reads it every 5 minutes. Your browser
+          only talks to the tool's server and sends nothing about you. Data older than 30 minutes is not shown.
+        </p>
+        <p className="text-base-500">
+          The game marks planets with effects as numbers only. The names on the map, such as Gloom, Meridian black hole
+          or New Hope City, are ours, read off the game's own map. An effect we have not named yet shows as Missing data.
         </p>
       </Panel>
 

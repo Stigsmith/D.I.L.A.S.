@@ -425,3 +425,31 @@ ok(covers, "in full screen the drawing reaches every edge of the screen, so a se
   ok(planet.pickShots(sameBiome.name, () => [], () => null).length === 0 && planet.pickShots("Nowhere", shotsOf, () => "x").length === 0,
     "no shot anywhere, or no such planet, shows none");
 }
+
+/* The game's marks: cleaned against the shipped table, and gone with an
+   old war. */
+{
+  const now = 2_000_000_000_000;
+  const raw = {
+    fetchedAt: now - 60_000,
+    planets: [],
+    marks: {
+      effects: { MERIDIA: [1229, -1, "x"], NOWHERE: [1], IVIS: [] },
+      attacks: [["MERIDIA", "IVIS"], ["MERIDIA", "MERIDIA"], ["NOWHERE", "IVIS"], "junk"],
+      moved: { MERIDIA: { x: 0.26588857, y: 0.11910832 }, IVIS: { x: 5, y: 5 }, NOWHERE: { x: 0, y: 0 } },
+    },
+    station: { planet: "SENGE 23", electionEnd: "2026-10-12T12:23:44Z", actions: [{ name: "EAGLE STORM", description: "d" }, { name: " " }] },
+  };
+  const w = galaxy.cleanWar(raw, now);
+  ok(w.marks.effects.size === 1 && w.marks.effects.get("Meridia").join() === "1229",
+    "effects keep whole numbers on planets the table knows, and drop empty lists");
+  ok(w.marks.attacks.length === 1 && w.marks.attacks[0].join() === "Meridia,Ivis", "an attack line needs two different known planets");
+  ok(w.marks.moved.size === 1 && w.marks.moved.has("Meridia"), "a drifted planet must be known and on the disc");
+  ok(w.station && w.station.planet === "Senge 23" && w.station.actions.length === 1, "the station names a known planet and its named actions");
+  const spot = galaxy.liveSpot(w, galaxy.placeOf("Meridia"));
+  const fixed = galaxy.placeOf("Meridia");
+  ok(spot.x !== fixed.x && near(spot.x, galaxy.project(raw.marks.moved.MERIDIA).x), "a fresh war draws a drifted planet where it is now");
+  const old = galaxy.cleanWar({ ...raw, fetchedAt: now - galaxy.WAR_TOO_OLD_MS - 1 }, now);
+  ok(old.marks === null && old.station === null && galaxy.liveSpot(old, fixed) === fixed,
+    "an old war draws no effect, no attack line, no station, and moves nothing");
+}

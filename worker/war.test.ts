@@ -16,7 +16,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import worker from './index.ts'
 import * as schema from './schema.ts'
-import { type Fetcher, HISTORY_EVERY_MS, HISTORY_KEEP_MS, UPSTREAM, refreshWar, trimOrder, trimStats, trimWar } from './war.ts'
+import { type Fetcher, HISTORY_EVERY_MS, HISTORY_KEEP_MS, UPSTREAM, WAR_ID, refreshWar, trimMarks, trimOrder, trimStation, trimStats, trimWar } from './war.ts'
 
 const ORIGIN = 'https://dilas.me'
 const db = drizzle(env.DB, { schema })
@@ -90,6 +90,38 @@ const WAR = {
   },
 }
 
+/**
+ * The game's raw status, shaped like the real one read on 12 October 2026:
+ * planets by index, the campaigns, effects as bare numbers, attack lines,
+ * and a position for every planet, one of which has drifted.
+ */
+const STATUS = {
+  warId: 801,
+  planetStatus: [
+    { index: 0, owner: 1, health: 1_000_000, players: 0, position: { x: 0.1, y: 0.2 } },
+    { index: 196, owner: 3, health: 250_000, players: 4210, position: { x: 0.1, y: 0.2 } },
+    { index: 2, owner: 2, health: 1_000_000, players: 0, position: { x: 0.35, y: 0.25 } },
+  ],
+  planetAttacks: [{ source: 196, target: 1 }, { source: 2, target: 2 }, { source: 999, target: 1 }],
+  campaigns: [{ id: 8, planetIndex: 196, type: 0, count: 1, race: 3 }, { id: 9, planetIndex: 3, type: 0, count: 1, race: 4 }],
+  planetActiveEffects: [
+    { index: 2, galacticEffectId: 1229 }, { index: 2, galacticEffectId: 1229 }, { index: 3, galacticEffectId: 1190 },
+    { index: 999, galacticEffectId: 5 }, { index: 1, galacticEffectId: 'gloom' },
+  ],
+  spaceStations: [{ id32: 749875195, planetIndex: 3 }],
+}
+
+/** The space station as the community API sent it on 12 October 2026, trimmed. */
+const STATIONS = [{
+  id32: 749875195,
+  planet: { index: 3, name: 'UNDER SIEGE', sector: 'Omega' },
+  electionEnd: '2026-10-12T08:23:44Z',
+  flags: 1,
+  tacticalActions: [{ id32: 1, name: 'EAGLE STORM', description: 'DSS crews maintain a rotating fleet of Eagle Fighters.', status: 2 }],
+}]
+
+const STATUS_PATH = `/raw/api/WarSeason/${WAR_ID}/Status`
+
 type Call = { url: string; headers: Record<string, string> }
 
 /** A stand in for the upstream that answers from the fixtures and records what it was asked. */
@@ -105,6 +137,8 @@ function fake(answers: Partial<Record<string, () => Response>> = {}) {
     if (path === '/api/v1/campaigns') return Response.json(CAMPAIGNS)
     if (path === '/api/v1/assignments') return Response.json(ORDER)
     if (path === '/api/v1/war') return Response.json(WAR)
+    if (path === STATUS_PATH) return Response.json(STATUS)
+    if (path === '/api/v2/space-stations') return Response.json(STATIONS)
     return new Response('not found', { status: 404 })
   }
   return { fetcher, calls }
@@ -239,7 +273,8 @@ describe('fetching and serving the snapshot', () => {
     const { fetcher, calls } = fake()
     await refreshWar(db, identity, fetcher)
     expect(calls.map((c) => c.url).sort()).toEqual([
-      `${UPSTREAM}/api/v1/assignments`, `${UPSTREAM}/api/v1/campaigns`, `${UPSTREAM}/api/v1/planets`, `${UPSTREAM}/api/v1/war`,
+      `${UPSTREAM}/api/v1/assignments`, `${UPSTREAM}/api/v1/planets`, `${UPSTREAM}/api/v1/war`,
+      `${UPSTREAM}/api/v2/space-stations`, `${UPSTREAM}${STATUS_PATH}`,
     ])
     expect(calls.every((c) => c.headers['x-super-client'] === 'dilas.test')).toBe(true)
     expect(calls.every((c) => c.headers['x-super-contact'] === 'contact.test')).toBe(true)
@@ -263,7 +298,7 @@ describe('fetching and serving the snapshot', () => {
   })
 
   it('records an answer that is not JSON, or not lists, as a failure rather than throwing', async () => {
-    const notJson = fake({ '/api/v1/campaigns': () => new Response('<html>busy</html>', { status: 200 }) })
+    const notJson = fake({ [STATUS_PATH]: () => new Response('<html>busy</html>', { status: 200 }), '/api/v1/campaigns': () => new Response('<html>busy</html>', { status: 200 }) })
     expect(await refreshWar(db, identity, notJson.fetcher)).toMatchObject({ ok: false })
     const wrongShape = fake({ '/api/v1/planets': () => Response.json({ planets: [] }) })
     expect(await refreshWar(db, identity, wrongShape.fetcher)).toMatchObject({ ok: false })
@@ -308,6 +343,80 @@ describe('fetching and serving the snapshot', () => {
     expect((await SELF.fetch(`${ORIGIN}/api/war`, { method: 'POST', headers: { origin: ORIGIN } })).status).toBe(405)
     expect((await war()).status).toBe(200)
     expect((await war({ origin: ORIGIN })).status).toBe(200)
+  })
+})
+
+describe('the marks and the space station', () => {
+  it('reads effects, attack lines and drifted planets by name, dropping what does not resolve', () => {
+    const marks = trimMarks(PLANETS, STATUS)
+    expect(marks?.effects).toEqual({ BACKWATER: [1229], 'UNDER SIEGE': [1190] })
+    expect(marks?.attacks).toEqual([['MALEVELON CREEK', 'QUIET HOLD']])
+    expect(marks?.moved).toEqual({ BACKWATER: { x: 0.35, y: 0.25 } })
+  })
+
+  it('is nothing when the status or the planets are not the shape expected, and bounds a strange one', () => {
+    expect(trimMarks(PLANETS, null)).toBeNull()
+    expect(trimMarks(null, STATUS)).toBeNull()
+    const flood = {
+      planetActiveEffects: Array.from({ length: 50 }, (_, i) => ({ index: 1, galacticEffectId: i })),
+      planetAttacks: Array.from({ length: 2000 }, () => ({ source: 1, target: 2 })),
+    }
+    const marks = trimMarks(PLANETS, flood)
+    expect(marks?.effects['QUIET HOLD']).toHaveLength(16)
+    expect(marks?.attacks).toHaveLength(400)
+  })
+
+  it('reads the station planet, its vote and its actions by name, and nothing when there is none', () => {
+    expect(trimStation(STATIONS)).toEqual({
+      planet: 'UNDER SIEGE', electionEnd: '2026-10-12T08:23:44Z',
+      actions: [{ name: 'EAGLE STORM', description: 'DSS crews maintain a rotating fleet of Eagle Fighters.' }],
+    })
+    expect(trimStation([])).toBeNull()
+    expect(trimStation({ planet: 'x' })).toBeNull()
+  })
+
+  it('serves the marks and the station with the war, campaigns read from the raw status', async () => {
+    const { fetcher, calls } = fake()
+    expect(await refreshWar(db, identity, fetcher, 1_000_000)).toEqual({ ok: true, planets: 3 })
+    expect(calls.some((c) => c.url.endsWith('/api/v1/campaigns'))).toBe(false)
+    const body = await (await war()).json<{ planets: { name: string; campaign: boolean }[]; marks: { effects: Record<string, number[]> }; station: { planet: string; fetchedAt: number } }>()
+    expect(body.planets.filter((p) => p.campaign).map((p) => p.name)).toEqual(['MALEVELON CREEK', 'UNDER SIEGE'])
+    expect(body.marks.effects.BACKWATER).toEqual([1229])
+    expect(body.station.planet).toBe('UNDER SIEGE')
+    expect(body.station.fetchedAt).toBe(1_000_000)
+  })
+
+  it('never asks more than five things in one run, and asks the station only once an hour', async () => {
+    const first = fake()
+    await refreshWar(db, identity, first.fetcher, 1_000_000)
+    expect(first.calls).toHaveLength(5)
+    const next = fake()
+    await refreshWar(db, identity, next.fetcher, 1_300_000)
+    expect(next.calls).toHaveLength(4)
+    expect(next.calls.some((c) => c.url.endsWith('/space-stations'))).toBe(false)
+  })
+
+  it('falls back to the campaign list when the raw status fails, losing only the marks and the station', async () => {
+    const down = fake({ [STATUS_PATH]: () => new Response('bad gateway', { status: 502 }) })
+    expect(await refreshWar(db, identity, down.fetcher, 1_000_000)).toEqual({ ok: true, planets: 3 })
+    expect(down.calls).toHaveLength(5)
+    expect(down.calls.some((c) => c.url.endsWith('/space-stations'))).toBe(false)
+    const body = await (await war()).json<{ planets: { campaign: boolean }[]; marks: unknown; station: unknown }>()
+    expect(body.planets.filter((p) => p.campaign)).toHaveLength(2)
+    expect(body.marks).toBeNull()
+    expect(body.station).toBeNull()
+  })
+
+  it('keeps the last good station when a later read fails, and stops serving it after three hours', async () => {
+    const HOUR = 60 * 60 * 1000
+    await refreshWar(db, identity, fake().fetcher, 1_000_000)
+    const stationDown = fake({ '/api/v2/space-stations': () => new Response('busy', { status: 503 }) })
+    await refreshWar(db, identity, stationDown.fetcher, 1_000_000 + HOUR)
+    let body = await (await war()).json<{ station: { planet: string; fetchedAt: number } | null }>()
+    expect(body.station?.fetchedAt).toBe(1_000_000)
+    await refreshWar(db, identity, stationDown.fetcher, 1_000_000 + 4 * HOUR)
+    body = await (await war()).json<{ station: { planet: string; fetchedAt: number } | null }>()
+    expect(body.station).toBeNull()
   })
 })
 
@@ -389,7 +498,8 @@ describe('the Cron Trigger', () => {
     await worker.scheduled(createScheduledController({ cron: '*/5 * * * *' }), env)
 
     // The fake, and not the network, is what answered.
-    expect(spy).toHaveBeenCalledTimes(4)
+    // Four every run, and the space station on the first.
+    expect(spy).toHaveBeenCalledTimes(5)
     const sent = new Headers(spy.mock.calls[0]?.[1]?.headers)
     expect(sent.get('x-super-client')).toBe(env.SUPER_CLIENT)
     expect(sent.get('x-super-contact')).toBe(env.SUPER_CONTACT)

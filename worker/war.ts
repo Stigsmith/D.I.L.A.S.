@@ -6,11 +6,13 @@
  *
  * A Cron Trigger calls `refreshWar` every five minutes (`wrangler.jsonc`), and
  * it keeps one trimmed row in D1. `GET /api/war` hands that row out with its
- * age. So the community API behind this is called 1,152 times a day, four
- * paths every five minutes, whether one person has the map open or a thousand,
- * which is the polite way to use a service somebody runs for free. Its
- * published limit is 5 requests in 10 seconds; this is 4 in 300: the planets,
- * the campaigns, the Major Order, and the war's running totals.
+ * age. So the community API behind this is called four times every five
+ * minutes, whether one person has the map open or a thousand, which is the
+ * polite way to use a service somebody runs for free: the planets, the game's
+ * raw status (campaigns, effects, attack lines, drifted planets), the Major
+ * Order, and the war's running totals. Once an hour a fifth asks for the
+ * space station. Its published limit is 5 requests in 10 seconds, and no run
+ * asks more than 5.
  *
  * ## The API decorates, it never carries
  *
@@ -120,6 +122,32 @@ export const STAT_FIELDS = [
 
 export type WarStats = Record<(typeof STAT_FIELDS)[number], number>
 
+/**
+ * What the game's own status adds to the map, by planet name, read from
+ * `/raw/api/WarSeason/<WAR_ID>/Status`. All of it is the game's fact and
+ * none of it is named: an effect is a bare number, and what it is called is
+ * the browser's curated table, never the server's.
+ */
+export type WarMarks = {
+  /** Every planet carrying an effect, and its effect numbers. */
+  effects: Record<string, number[]>
+  /** Which planet attacks which, as the game draws its attack lines. */
+  attacks: [string, string][]
+  /**
+   * A planet the live status places away from the fixed position the
+   * planet list gives: the black hole drifts. Map units, as the upstream
+   * sends them.
+   */
+  moved: Record<string, { x: number; y: number }>
+}
+
+/** The Democracy Space Station, from `/api/v2/space-stations`, refreshed once an hour. */
+export type WarStation = {
+  planet: string
+  electionEnd: string
+  actions: { name: string; description: string }[]
+}
+
 export type Snapshot = {
   fetchedAt: number
   triedAt: number
@@ -130,6 +158,10 @@ export type Snapshot = {
   order: WarOrder | null
   /** The war's running totals as of the same fetch, or null when they could not be read. */
   stats: WarStats | null
+  /** Effects, attack lines and moved planets as of the same fetch, or null when the status could not be read. */
+  marks: WarMarks | null
+  /** The space station and when it was read, or null. Kept in its own row, so it has its own age. */
+  station: (WarStation & { fetchedAt: number }) | null
 }
 
 type DB = DrizzleD1Database<typeof schema>
@@ -152,9 +184,11 @@ const owner = (v: unknown) => (OWNERS as readonly unknown[]).includes(v) ? (v as
 export function trimWar(planets: unknown, campaigns: unknown): WarPlanet[] | null {
   if (!Array.isArray(planets) || !Array.isArray(campaigns)) return null
 
+  /* Either shape: the community API's `planet.index`, or the game's raw
+     status, which names the planet by `planetIndex`. */
   const active = new Set<number>()
   for (const c of campaigns) {
-    const index = record(record(c)?.planet)?.index
+    const index = record(record(c)?.planet)?.index ?? record(c)?.planetIndex
     if (typeof index === 'number' && Number.isInteger(index)) active.add(index)
   }
 
@@ -239,6 +273,100 @@ export function trimStats(war: unknown): WarStats | null {
 }
 
 /**
+ * The war season the raw status is read from. It has been 801 since the war
+ * began in January 2024 and changes only with a new season; a wrong one
+ * answers 404, which loses the marks and nothing else.
+ */
+export const WAR_ID = 801
+
+/** Caps on what the marks keep from a strange answer. Today: 131 effects, 68 attacks, 1 moved planet. */
+const MAX_EFFECT_PLANETS = 400
+const MAX_EFFECTS_EACH = 16
+const MAX_ATTACKS = 400
+const MAX_MOVED = 50
+
+const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
+
+/**
+ * The game's raw status, joined to names through the planet list from the
+ * same run. Pure. Null when either is not the shape expected, which leaves
+ * the marks absent and the war standing.
+ */
+export function trimMarks(planets: unknown, status: unknown): WarMarks | null {
+  const s = record(status)
+  if (!Array.isArray(planets) || !s) return null
+  const nameOf = new Map<number, string>()
+  const fixedAt = new Map<number, { x: number; y: number }>()
+  for (const raw of planets) {
+    const p = record(raw)
+    if (!p || typeof p.name !== 'string' || !finite(p.index)) continue
+    nameOf.set(p.index, p.name.slice(0, 80))
+    const at = record(p.position)
+    if (at && finite(at.x) && finite(at.y)) fixedAt.set(p.index, { x: at.x, y: at.y })
+  }
+
+  const effects: Record<string, number[]> = {}
+  let effectPlanets = 0
+  for (const raw of Array.isArray(s.planetActiveEffects) ? s.planetActiveEffects : []) {
+    const e = record(raw)
+    const name = e && finite(e.index) ? nameOf.get(e.index) : undefined
+    const id = e?.galacticEffectId
+    if (!name || !finite(id) || !Number.isInteger(id) || id < 0) continue
+    if (!effects[name]) {
+      if (effectPlanets >= MAX_EFFECT_PLANETS) continue
+      effects[name] = []
+      effectPlanets += 1
+    }
+    if (effects[name].length < MAX_EFFECTS_EACH && !effects[name].includes(id)) effects[name].push(id)
+  }
+
+  const attacks: [string, string][] = []
+  for (const raw of Array.isArray(s.planetAttacks) ? s.planetAttacks : []) {
+    const a = record(raw)
+    const from = a && finite(a.source) ? nameOf.get(a.source) : undefined
+    const to = a && finite(a.target) ? nameOf.get(a.target) : undefined
+    if (from && to && from !== to && attacks.length < MAX_ATTACKS) attacks.push([from, to])
+  }
+
+  /* A position that differs from the fixed one by more than rounding. */
+  const moved: Record<string, { x: number; y: number }> = {}
+  let movedCount = 0
+  for (const raw of Array.isArray(s.planetStatus) ? s.planetStatus : []) {
+    const p = record(raw)
+    const at = record(p?.position)
+    if (!p || !finite(p.index) || !at || !finite(at.x) || !finite(at.y)) continue
+    const fixed = fixedAt.get(p.index)
+    const name = nameOf.get(p.index)
+    if (!fixed || !name || movedCount >= MAX_MOVED) continue
+    if (Math.abs(fixed.x - at.x) < 1e-4 && Math.abs(fixed.y - at.y) < 1e-4) continue
+    if (Math.abs(at.x) > 1.5 || Math.abs(at.y) > 1.5) continue
+    moved[name] = { x: at.x, y: at.y }
+    movedCount += 1
+  }
+  return { effects, attacks, moved }
+}
+
+/**
+ * The first space station, down to its planet, when its vote ends, and its
+ * tactical actions by name. Pure. Null when there is none.
+ */
+export function trimStation(stations: unknown): WarStation | null {
+  if (!Array.isArray(stations)) return null
+  const s = record(stations[0])
+  const planet = record(s?.planet)
+  if (!s || !planet || typeof planet.name !== 'string') return null
+  const text = (v: unknown, cap: number) => (typeof v === 'string' ? v.slice(0, cap) : '')
+  const actions = (Array.isArray(s.tacticalActions) ? s.tacticalActions : [])
+    .slice(0, 8)
+    .map((raw) => {
+      const a = record(raw)
+      return { name: text(a?.name, 60), description: text(a?.description, 400) }
+    })
+    .filter((a) => a.name)
+  return { planet: planet.name.slice(0, 80), electionEnd: text(s.electionEnd, 40), actions }
+}
+
+/**
  * The upstream refuses any request that does not name its client and a
  * contact, both, with a 400. Its README still calls the contact optional; the
  * service does not. `SUPER_CLIENT` and `SUPER_CONTACT` in `wrangler.jsonc`,
@@ -269,6 +397,13 @@ async function ask(fetcher: Fetcher, path: string, client: string, contact: stri
  * `fetcher` is the global fetch, looked up when called rather than when this
  * module loads, so the tests can stand in for the upstream.
  */
+/**
+ * Every run asks four things at once: the planets, the game's raw status
+ * (which carries the campaigns as well as the marks), the Major Order and
+ * the totals. A fifth is asked only when needed: the community campaign
+ * list when the raw status failed, or else, once an hour, the space
+ * station. So a run never passes the upstream's 5 requests in 10 seconds.
+ */
 export async function refreshWar(
   db: DB,
   identity: { client: string; contact: string },
@@ -279,16 +414,21 @@ export async function refreshWar(
     /* The Major Order and the totals are context. If either alone fails,
        the war still lands and that part is simply absent, rather than the
        map losing its colour over a paragraph of briefing or a kill count. */
-    const [planets, campaigns, assignments, totals] = await Promise.all([
+    const [planets, status, assignments, totals] = await Promise.all([
       ask(fetcher, '/api/v1/planets', identity.client, identity.contact),
-      ask(fetcher, '/api/v1/campaigns', identity.client, identity.contact),
+      ask(fetcher, `/raw/api/WarSeason/${WAR_ID}/Status`, identity.client, identity.contact).catch(() => null),
       ask(fetcher, '/api/v1/assignments', identity.client, identity.contact).catch(() => null),
       ask(fetcher, '/api/v1/war', identity.client, identity.contact).catch(() => null),
     ])
+    const fromStatus = record(status)?.campaigns
+    const campaigns = Array.isArray(fromStatus)
+      ? fromStatus
+      : await ask(fetcher, '/api/v1/campaigns', identity.client, identity.contact)
     const trimmed = trimWar(planets, campaigns)
     if (!trimmed) throw new Error('the answer was not a list of planets and a list of campaigns')
     const stats = trimStats(totals)
-    const payload = JSON.stringify({ planets: trimmed, order: trimOrder(assignments), stats })
+    const marks = trimMarks(planets, status)
+    const payload = JSON.stringify({ planets: trimmed, order: trimOrder(assignments), stats, marks })
     await db.run(sql`
       insert into war_snapshot (id, payload, fetched_at, tried_at, ok, error)
       values ('war', ${payload}, ${now}, ${now}, 1, null)
@@ -298,7 +438,12 @@ export async function refreshWar(
     `)
     /* The history is context too: if keeping it fails, the snapshot above
        has already landed and stays. */
-    await keepHistory(db, now, trimmed, stats).catch(() => false)
+    const kept = await keepHistory(db, now, trimmed, stats).catch(() => false)
+    /* The space station moves rarely: read on the hourly run, or when none
+       has been read yet, and only when the campaign list was not the fifth. */
+    if (Array.isArray(fromStatus) && (kept || !(await hasStation(db)))) {
+      await refreshStation(db, identity, fetcher, now).catch(() => false)
+    }
     return { ok: true, planets: trimmed.length }
   } catch (e) {
     const error = (e instanceof Error ? e.message : String(e)).slice(0, 200)
@@ -308,6 +453,42 @@ export async function refreshWar(
       on conflict(id) do update set tried_at = excluded.tried_at, ok = 0, error = excluded.error
     `)
     return { ok: false, error }
+  }
+}
+
+/** How old a station may be before it is not served: two missed hours. */
+export const STATION_TOO_OLD_MS = 3 * 60 * 60 * 1000
+
+async function hasStation(db: DB): Promise<boolean> {
+  const row = await db.get<{ fetched_at: number | null }>(sql`select fetched_at from war_snapshot where id = 'station'`)
+  return Boolean(row && row.fetched_at !== null)
+}
+
+/**
+ * The space station, into its own row of the snapshot table, so it keeps its
+ * own age. A failure leaves the last good one, as the war's row does; no
+ * station at all (between stations) is stored as an empty payload.
+ */
+export async function refreshStation(db: DB, identity: { client: string; contact: string }, fetcher: Fetcher, now: number): Promise<boolean> {
+  try {
+    const station = trimStation(await ask(fetcher, '/api/v2/space-stations', identity.client, identity.contact))
+    const payload = JSON.stringify(station)
+    await db.run(sql`
+      insert into war_snapshot (id, payload, fetched_at, tried_at, ok, error)
+      values ('station', ${payload}, ${now}, ${now}, 1, null)
+      on conflict(id) do update set
+        payload = excluded.payload, fetched_at = excluded.fetched_at,
+        tried_at = excluded.tried_at, ok = 1, error = null
+    `)
+    return true
+  } catch (e) {
+    const error = (e instanceof Error ? e.message : String(e)).slice(0, 200)
+    await db.run(sql`
+      insert into war_snapshot (id, payload, fetched_at, tried_at, ok, error)
+      values ('station', null, null, ${now}, 0, ${error})
+      on conflict(id) do update set tried_at = excluded.tried_at, ok = 0, error = excluded.error
+    `)
+    return false
   }
 }
 
@@ -380,7 +561,7 @@ export async function readWar(db: DB): Promise<Snapshot | null> {
     sql`select payload, fetched_at, tried_at, ok from war_snapshot where id = 'war'`,
   )
   if (!row || row.payload === null || row.fetched_at === null) return null
-  let doc: { planets?: WarPlanet[]; order?: WarOrder | null; stats?: WarStats | null }
+  let doc: { planets?: WarPlanet[]; order?: WarOrder | null; stats?: WarStats | null; marks?: WarMarks | null }
   try {
     doc = JSON.parse(row.payload) as typeof doc
   } catch {
@@ -389,6 +570,22 @@ export async function readWar(db: DB): Promise<Snapshot | null> {
   if (!Array.isArray(doc.planets)) return null
   return {
     fetchedAt: row.fetched_at, triedAt: row.tried_at, ok: row.ok === 1,
-    planets: doc.planets, order: doc.order ?? null, stats: doc.stats ?? null,
+    planets: doc.planets, order: doc.order ?? null, stats: doc.stats ?? null, marks: doc.marks ?? null,
+    station: await readStation(db, row.fetched_at),
+  }
+}
+
+/** The kept station, when it is at most three hours older than the war it rides on. */
+async function readStation(db: DB, warAt: number): Promise<Snapshot['station']> {
+  const row = await db.get<{ payload: string | null; fetched_at: number | null }>(
+    sql`select payload, fetched_at from war_snapshot where id = 'station'`,
+  )
+  if (!row || row.payload === null || row.fetched_at === null) return null
+  if (warAt - row.fetched_at > STATION_TOO_OLD_MS) return null
+  try {
+    const station = JSON.parse(row.payload) as WarStation | null
+    return station ? { ...station, fetchedAt: row.fetched_at } : null
+  } catch {
+    return null
   }
 }

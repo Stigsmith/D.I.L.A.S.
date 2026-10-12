@@ -30,8 +30,10 @@ import { FACTIONS } from "./Tiers.jsx";
 import { FRONTS, PANEL_PX, GAP_PX, TAB_PX, WIDE_PX, useSize, PlanetSearch, WarLine, WarTotals, big } from "./WarRoom.jsx";
 import { frontOf, progressAt } from "./lib/galaxy.js";
 import { useWar, useWarHistory, useWarTrend, untilText } from "./lib/war.js";
-import { planetByName, biomeInfo, biomeName, hazardName, hazardEffect, loudHazards } from "./lib/scenario.js";
+import { planetByName, biomeInfo, biomeName } from "./lib/scenario.js";
 import { planetArt } from "./lib/assets.js";
+import { planetEffects } from "./lib/effects.js";
+import PlanetCard from "./PlanetCard.jsx";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 
@@ -231,18 +233,16 @@ function Bar({ share, hex }) {
 /* One planet                                                          */
 /* ------------------------------------------------------------------ */
 
-const CITY_WORDS = [["megacity", "megacity", "megacities"], ["city", "city", "cities"], ["town", "town", "towns"], ["settlement", "settlement", "settlements"]];
-
 function Intel({ name, war, onBack, onSelect, onDropHere, onFold }) {
   const p = planetByName.get(name);
   const w = war ? war.planets.get(name) : null;
   const st = stateOf(w);
-  const art = planetArt(name);
+  /* A destroyed planet is not shown as the world it was. */
+  const gone = planetEffects(war, name).gone;
+  const art = gone ? null : planetArt(name);
   const history = useWarHistory(name);
   if (!p) return null;
   const biome = p.biome ? biomeInfo[p.biome] : null;
-  const hazards = loudHazards(p.hazards);
-  const cities = p.cities ? CITY_WORDS.filter(([k]) => p.cities[k]).map(([k, one, many]) => `${p.cities[k]} ${p.cities[k] === 1 ? one : many}`) : [];
 
   return (
     <>
@@ -277,14 +277,18 @@ function Intel({ name, war, onBack, onSelect, onDropHere, onFold }) {
           ) : null}
         </div>
 
-        <button type="button" onClick={onDropHere}
-          className="flex items-center justify-center gap-2 rounded border border-brand bg-brand px-3 py-2 text-sm font-bold uppercase tracking-wide text-brand-ink hover:brightness-110"
-          style={OSWALD}>
-          <MapPin className="h-4 w-4" /> Drop here
-        </button>
-        <p className="-mt-2.5 text-[10px] text-base-600">
-          Sets where you are dropping to {p.name}{w && w.front ? `, against the ${FRONTS[w.front].label}` : ""}, and opens Drop Bay.
-        </p>
+        {gone ? null : (
+          <>
+            <button type="button" onClick={onDropHere}
+              className="flex items-center justify-center gap-2 rounded border border-brand bg-brand px-3 py-2 text-sm font-bold uppercase tracking-wide text-brand-ink hover:brightness-110"
+              style={OSWALD}>
+              <MapPin className="h-4 w-4" /> Drop here
+            </button>
+            <p className="-mt-2.5 text-[10px] text-base-600">
+              Sets where you are dropping to {p.name}{w && w.front ? `, against the ${FRONTS[w.front].label}` : ""}, and opens Drop Bay.
+            </p>
+          </>
+        )}
 
         {/* Over time */}
         <Section title="Over time">
@@ -293,13 +297,9 @@ function Intel({ name, war, onBack, onSelect, onDropHere, onFold }) {
 
         {/* The planet itself */}
         <Section title="The planet">
-          {biome && biome.description ? <p className="text-xs leading-relaxed text-base-400">{biome.description}</p> : null}
-          {hazards.length ? hazards.map((h) => (
-            <p key={h} className="text-xs leading-relaxed text-base-300">
-              <span className="text-accent-300">{hazardName(h)}.</span> {hazardEffect(h)}
-            </p>
-          )) : <p className="text-xs text-base-500">Nothing special to bring here.</p>}
-          {cities.length ? <p className="text-[11px] text-base-500">Cities: {cities.join(", ")}.</p> : null}
+          <div className="-mx-3 overflow-hidden border-y border-base-800">
+            <PlanetCard name={p.name} war={war} titled={false} />
+          </div>
         </Section>
 
         {p.links && p.links.length ? (
