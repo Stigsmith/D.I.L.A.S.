@@ -95,11 +95,12 @@ export function bannerLayers(facts, cloud = null) {
   if (!facts) return [];
   const out = [];
   const tint = facts.type ? TYPE_TINT[facts.type] : null;
-  if (tint) out.push({ key: "type", background: tint, mix: "color", opacity: 0.35 });
+  /* Kept light on purpose: the picture is the game's, the planet a hint over it. */
+  if (tint) out.push({ key: "type", background: tint, mix: "color", opacity: 0.15 });
   const hazards = [facts.temperature && facts.temperature.slug, ...facts.weather.map((w) => w.slug)].filter(Boolean);
-  for (const h of hazards) if (WEATHER_LAYER[h]) out.push({ key: h, ...WEATHER_LAYER[h], opacity: 1 });
+  for (const h of hazards) if (WEATHER_LAYER[h]) out.push({ key: h, ...WEATHER_LAYER[h], opacity: 0.5 });
   /* The Gloom lies over everything under it. */
-  if (cloud) out.push({ key: "cloud", background: `linear-gradient(to top, ${cloud}88, ${cloud}22)`, mix: "soft-light", opacity: 1 });
+  if (cloud) out.push({ key: "cloud", background: `linear-gradient(to top, ${cloud}88, ${cloud}22)`, mix: "soft-light", opacity: 0.5 });
   return out;
 }
 
