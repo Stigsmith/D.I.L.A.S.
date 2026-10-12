@@ -101,11 +101,11 @@ const coverageUrl = asModule(swap(src, "scenario", scenarioUrl));
 src = inlineJson(read("src/lib/share.js"), "vocabulary");
 const shareModuleUrl = asModule(swap(src, "drop", dropUrl));
 
-const galaxyUrl = asModule(inlineJson(read("src/lib/galaxy.js"), "planets"));
+const galaxyUrl = asModule(inlineJson(read("src/lib/galaxy.js"), "planets", "landmarks"));
 
 const difficultyUrl = asModule(inlineJson(read("src/lib/difficulty.js"), "difficulty"));
 
-const planetUrl = asModule(swap(inlineJson(read("src/lib/planet.js"), "planets"), "place", placeUrl));
+const planetUrl = asModule(swap(inlineJson(read("src/lib/planet.js"), "planets", "landmarks"), "place", placeUrl));
 
 export const items = await import(itemsUrl);
 export const place = await import(placeUrl);

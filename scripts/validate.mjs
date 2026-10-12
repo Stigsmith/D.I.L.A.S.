@@ -690,8 +690,25 @@ for (const f of FACTIONS) {
        shows nothing for it. Never both, never neither. */
     if ((e.name === null) !== (e.hidden === true)) bad.push(`${id}: an effect is named or hidden, one of the two`);
     if (e.name !== null && !table.froms.includes(e.from)) bad.push(`${id}: from must be one of ${table.froms.join(", ")}`);
+    if (e.art !== undefined && !(e.gone && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(e.art))) bad.push(`${id}: art is a slug, and only on a destroyed planet`);
+    if (e.evacuated !== undefined && !(e.evacuated === true && e.draw === "none" && !e.gone)) bad.push(`${id}: evacuated is true, on a planet that still stands`);
   }
   if (bad.length) fail(`${bad.length} problem(s) in war-effects.json:`, bad);
+}
+
+/* Landmarks: places the map draws that the war does not list. A name
+   that is also a war planet would be drawn twice. */
+{
+  const table = load("landmarks.json");
+  const bad = [];
+  const names = new Set(load("planets.json").planets.map((p) => p.name));
+  for (const l of table.landmarks || []) {
+    if (!l.name || names.has(l.name)) bad.push(`${l.name}: a landmark needs a name no war planet carries`);
+    if (!l.position || !Number.isFinite(l.position.x) || !Number.isFinite(l.position.y) || Math.hypot(l.position.x, l.position.y) > 1) bad.push(`${l.name}: a position on the disc`);
+    if (typeof l.say !== "string" || !l.say || l.say.length > 160) bad.push(`${l.name}: say is 1 to 160 characters`);
+    if (typeof l.source !== "string" || !l.source.startsWith("https://")) bad.push(`${l.name}: source must be a link`);
+  }
+  if (bad.length) fail(`${bad.length} problem(s) in landmarks.json:`, bad);
 }
 
 /* The subfactions, the curator's table. Every effect number is a named

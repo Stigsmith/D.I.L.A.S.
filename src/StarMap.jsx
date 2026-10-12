@@ -28,10 +28,10 @@ import { ChevronLeft, ChevronRight, MapPin, Users } from "lucide-react";
 import GalaxyMap, { MajorOrder } from "./GalaxyMap.jsx";
 import { FACTIONS } from "./Tiers.jsx";
 import { FRONTS, PANEL_PX, GAP_PX, TAB_PX, WIDE_PX, useSize, PlanetSearch, WarLine, WarTotals, big } from "./WarRoom.jsx";
-import { frontOf, progressAt } from "./lib/galaxy.js";
+import { frontOf, progressAt, landmarkOf } from "./lib/galaxy.js";
 import { useWar, useWarHistory, useWarTrend, untilText } from "./lib/war.js";
 import { planetByName, biomeInfo, biomeName } from "./lib/scenario.js";
-import { planetArt } from "./lib/assets.js";
+import { planetArt, destroyedArt } from "./lib/assets.js";
 import { planetEffects } from "./lib/effects.js";
 import PlanetCard from "./PlanetCard.jsx";
 
@@ -234,12 +234,17 @@ function Bar({ share, hex }) {
 /* ------------------------------------------------------------------ */
 
 function Intel({ name, war, onBack, onSelect, onDropHere, onFold }) {
-  const p = planetByName.get(name);
+  /* Mars is drawn and read like a planet, though the war does not list it. */
+  const lm = landmarkOf(name);
+  const p = planetByName.get(name) || (lm ? { name: lm.name, sector: lm.sector, biome: null, links: [] } : null);
   const w = war ? war.planets.get(name) : null;
   const st = stateOf(w);
-  /* A destroyed planet is not shown as the world it was. */
-  const gone = planetEffects(war, name).gone;
-  const art = gone ? null : planetArt(name);
+  /* A destroyed planet is shown as what is left of it. Nobody drops on a
+     destroyed planet, an evacuated one or a landmark. */
+  const fx = planetEffects(war, name);
+  const gone = fx.gone;
+  const closed = gone || fx.evacuated || Boolean(lm);
+  const art = gone ? destroyedArt(fx.art).render : planetArt(name);
   const history = useWarHistory(name);
   if (!p) return null;
   const biome = p.biome ? biomeInfo[p.biome] : null;
@@ -267,7 +272,7 @@ function Intel({ name, war, onBack, onSelect, onDropHere, onFold }) {
         <div className="flex flex-col gap-1.5 rounded border border-base-800 bg-base-900/60 px-3 py-2"
           style={st.hex ? { boxShadow: `inset 3px 0 0 ${st.hex}` } : undefined}>
           <p className="text-xs leading-relaxed" style={st.hex ? { color: st.hex } : undefined}>
-            {war ? st.text : "No live war data here, so this shows the planet only."}
+            {lm ? "Not part of the Galactic War." : war ? st.text : "No live war data here, so this shows the planet only."}
           </p>
           {war && st.share !== null ? <Bar share={st.share} hex={st.hex} /> : null}
           {w && w.players ? (
@@ -277,7 +282,7 @@ function Intel({ name, war, onBack, onSelect, onDropHere, onFold }) {
           ) : null}
         </div>
 
-        {gone ? null : (
+        {closed ? null : (
           <>
             <button type="button" onClick={onDropHere}
               className="flex items-center justify-center gap-2 rounded border border-brand bg-brand px-3 py-2 text-sm font-bold uppercase tracking-wide text-brand-ink hover:brightness-110"
@@ -291,9 +296,11 @@ function Intel({ name, war, onBack, onSelect, onDropHere, onFold }) {
         )}
 
         {/* Over time */}
-        <Section title="Over time">
-          <PlanetHistory history={history} hex={st.hex} />
-        </Section>
+        {lm ? null : (
+          <Section title="Over time">
+            <PlanetHistory history={history} hex={st.hex} />
+          </Section>
+        )}
 
         {/* The planet itself */}
         <Section title="The planet">

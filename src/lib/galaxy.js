@@ -19,6 +19,7 @@
 /* ================================================================== */
 
 import PLANETS from "../data/planets.json";
+import LANDMARKS from "../data/landmarks.json";
 
 /* The view box is VIEW units square. Positions arrive roughly in -1 to 1
    with Super Earth at the origin; RADIUS maps that onto the box with a
@@ -47,9 +48,16 @@ export const isPlaced = (p) =>
 const all = PLANETS.planets;
 const byUpper = new Map(all.map((p) => [p.name.toUpperCase(), p]));
 
+/* Places the map draws that the war does not list: Mars. Drawn and
+   read like a planet, never chosen, never searched. */
+export const landmarks = LANDMARKS.landmarks;
+const landmarkByName = new Map(landmarks.map((l) => [l.name, l]));
+export const landmarkOf = (name) => landmarkByName.get(name) || null;
+
 export const placed = all
   .filter(isPlaced)
-  .map((p) => ({ name: p.name, sector: p.sector, home: p.type === "super_earth", ...project(p.position) }));
+  .map((p) => ({ name: p.name, sector: p.sector, home: p.type === "super_earth", ...project(p.position) }))
+  .concat(landmarks.map((l) => ({ name: l.name, sector: l.sector, home: false, landmark: true, ...project(l.position) })));
 
 export const unplaced = all.filter((p) => !isPlaced(p)).map((p) => p.name);
 
@@ -85,7 +93,7 @@ export const lanes = (() => {
 export const sectors = (() => {
   const groups = new Map();
   for (const p of placed) {
-    if (!p.sector || p.sector === "TBD" || p.home) continue;
+    if (!p.sector || p.sector === "TBD" || p.home || p.landmark) continue;
     if (!groups.has(p.sector)) groups.set(p.sector, []);
     groups.get(p.sector).push(p);
   }
@@ -565,7 +573,7 @@ export const TABLE = (() => {
   const OUTER = RADIUS + 22;
   const RINGS = 12;
   const depth = (OUTER - SOL) / RINGS;
-  const seeds = placed.filter((p) => !p.home && p.sector && p.sector !== "TBD");
+  const seeds = placed.filter((p) => !p.home && !p.landmark && p.sector && p.sector !== "TBD");
   const nearest = (x, y) => {
     let best = null;
     let bestD = Infinity;
@@ -729,7 +737,7 @@ export function sectorHolders(war) {
   if (!war || !war.fresh) return out;
   const tally = new Map();
   for (const p of placed) {
-    if (p.home || !p.sector || p.sector === "TBD") continue;
+    if (p.home || p.landmark || !p.sector || p.sector === "TBD") continue;
     const t = tally.get(p.sector) || { total: 0, by: {}, campaign: false, fighting: {} };
     t.total += 1;
     const w = war.planets.get(p.name);
@@ -797,7 +805,7 @@ export function arcPath(angle, radius, span = 0.55) {
 export const sectorMembers = (() => {
   const m = new Map();
   for (const p of placed) {
-    if (p.home || !p.sector || p.sector === "TBD") continue;
+    if (p.home || p.landmark || !p.sector || p.sector === "TBD") continue;
     if (!m.has(p.sector)) m.set(p.sector, []);
     m.get(p.sector).push(p);
   }

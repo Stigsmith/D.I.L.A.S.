@@ -221,6 +221,19 @@ if (existsSync(LANDSCAPES_SOURCE)) {
   }
 }
 
+/* What is left of a destroyed planet: a render and a banner per art id
+   in war-effects.json, cut by npm run planet-art -- --destroyed. */
+const DESTROYED_SOURCE = join(PLANETS_SOURCE, "Destroyed");
+emptyInPlace(join(ASSETS, "destroyed"));
+let destroyedArt = 0;
+if (existsSync(DESTROYED_SOURCE)) {
+  for (const d of readdirSync(DESTROYED_SOURCE, { withFileTypes: true })) {
+    if (!d.isFile() || !/^(render|banner)_.+\.webp$/i.test(d.name)) continue;
+    copyFileSync(join(DESTROYED_SOURCE, d.name), join(ASSETS, "destroyed", d.name));
+    destroyedArt += 1;
+  }
+}
+
 /* Armour set renders: the cuts npm run armor-art made, by set id. Never
    the Originals folder beside them. */
 const ARMOR_SETS_SOURCE = join(SOURCE, "Armor Sets");
@@ -251,6 +264,7 @@ console.log(`warbonds with art: ${Object.keys(manifest.warbonds).length} of ${wa
 console.log(`ui and other:      ${manifest.ui.length}`);
 console.log(`planets with art:  ${planetArt}${planetArt ? "" : " (npm run planet-art -- --write fetches them)"}`);
 console.log(`landscapes:        ${landscapeArt}${landscapeArt ? "" : " (npm run planet-art -- --landscapes --write fetches them)"}`);
+console.log(`destroyed planets: ${destroyedArt}${destroyedArt ? "" : " (npm run planet-art -- --destroyed --write fetches them)"}`);
 console.log(`armour sets:${armorSetArt}${armorSetArt ? "" : " (npm run armor-art fetches them)"}`);
 if (missingItems.length) {
   console.log(`\nitems with no art (these fall back to text): ${missingItems.length}`);

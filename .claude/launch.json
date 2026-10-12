@@ -20,6 +20,18 @@
         "--test-scheduled"
       ],
       "port": 8788
+    },
+    {
+      "name": "workers-2",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "wrangler",
+        "dev",
+        "--test-scheduled",
+        "--port",
+        "8790"
+      ],
+      "port": 8790
     }
   ]
 }

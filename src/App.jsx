@@ -31,6 +31,7 @@ import { PartyButton, PartyPanel } from "./Party.jsx";
 import { useRulesOff } from "./lib/rules.js";
 import { useWar } from "./lib/war.js";
 import { subfactionsOn } from "./lib/subfaction.js";
+import { landmarkOf } from "./lib/galaxy.js";
 import { useParty, usePartySync } from "./lib/party.js";
 import Collection, { COLLECTION_TABS, CollectionNudge } from "./Collection.jsx";
 import Ambient, { Grain, Masthead } from "./Ambient.jsx";
@@ -655,7 +656,7 @@ export default function App() {
     if (dest !== "map" || !param) return null;
     try {
       const name = decodeURIComponent(param);
-      return planetByName.has(name) ? name : null;
+      return planetByName.has(name) || landmarkOf(name) ? name : null;
     } catch {
       return null;
     }

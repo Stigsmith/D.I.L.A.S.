@@ -14,7 +14,8 @@ export const DRAWS = TABLE.draws;
 
 /* What a planet's effect numbers mean: the named ones, deduplicated by
    name (two numbers can carry the same line), how many are unnamed, how
-   the map draws it, and whether anyone still drops there. */
+   the map draws it, whether it was destroyed (and which render and
+   banner show what is left), and whether it was evacuated. */
 export function effectsOn(ids) {
   const named = [];
   const seen = new Set();
@@ -22,6 +23,8 @@ export function effectsOn(ids) {
   let draw = null;
   let colour = null;
   let gone = false;
+  let art = null;
+  let evacuated = false;
   for (const id of ids || []) {
     const e = EFFECTS[String(id)];
     if (!e) {
@@ -31,12 +34,14 @@ export function effectsOn(ids) {
     if (e.draw === "blackhole" || e.draw === "fractured") draw = e.draw;
     if (e.draw === "cloud" && !colour) colour = e.colour || null;
     if (e.gone) gone = true;
+    if (e.art && !art) art = e.art;
+    if (e.evacuated) evacuated = true;
     if (!e.name) continue;
     if (seen.has(e.name)) continue;
     seen.add(e.name);
     named.push({ id, name: e.name, say: e.say || null });
   }
-  return { named, unnamed, draw, cloud: colour, gone };
+  return { named, unnamed, draw, cloud: colour, gone, art, evacuated };
 }
 
 /* A planet's effects from a fresh war, or nothing. */

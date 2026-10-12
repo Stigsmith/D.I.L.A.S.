@@ -64,10 +64,12 @@ export const slug = (s) =>
     .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
 const planets = JSON.parse(readFileSync(join(ROOT, "src", "data", "planets.json"), "utf8")).planets;
+/* Mars and anything else the map draws that the war does not list. */
+const landmarks = JSON.parse(readFileSync(join(ROOT, "src", "data", "landmarks.json"), "utf8")).landmarks;
 
 /* The wiki names the file after the planet as the game writes it. The
    placeholders and Void entries have no render and are not asked for. */
-const wanted = planets
+const wanted = [...planets, ...landmarks]
   .filter((p) => !/\((Void|Unused)\)/.test(p.name) && p.sector !== "TBD")
   .map((p) => ({ name: p.name, file: `File:${p.name} Planet Icon.png`, slug: slug(p.name) }));
 
@@ -348,6 +350,117 @@ async function landscapes() {
   }
   console.log(`\n  ${made} cut, ${(bytes / 1024 / 1024).toFixed(1)} MB, ${plan.length - todo.length} already here`);
   console.log("  Run npm run images to bring them into the app.\n");
+}
+
+/* ------------------------------------------------------------------ */
+/* WHAT IS LEFT OF A PLANET                                            */
+/*                                                                     */
+/*   npm run planet-art -- --destroyed            report               */
+/*   npm run planet-art -- --destroyed --write    fetch and cut        */
+/*                                                                     */
+/* A black hole or a fractured planet has no render under its planet's */
+/* name, so its art is named in war-effects.json (art) and fetched     */
+/* here from the files the wiki keeps: the game's own header banner,   */
+/* the one its planet card shows, and a render for the map. Into       */
+/* Image Library/Planets/Destroyed:                                    */
+/*                                                                     */
+/*   render_<art>.webp   the map's planet, up to 256, cut round        */
+/*   banner_<art>.webp   the card's banner, at its own size            */
+/*                                                                     */
+/* The fractured planet has no render on the wiki at all, so its       */
+/* render is a square from the middle of its banner, cut round.        */
+/* ------------------------------------------------------------------ */
+
+const DESTROYED_DIR = join(SMALL, "Destroyed");
+const DESTROYED = {
+  "meridian-black-hole": { render: "Meridian Black Hole.png", banner: "MeridianBlackHole Header.png" },
+  "conventional-black-hole": { render: "Penta Black Hole Planet Icon.png", banner: "Conventional Black Hole Header.png" },
+  "fractured-planet": {
+    render: { from: "Fractured Planet Header.png", crop: { left: 330, top: 20, width: 310, height: 310 }, keyAll: true },
+    banner: "Fractured Planet Header.png",
+  },
+};
+
+/* Debris on the dark of space, cut out whole: every pixel near the
+   ground's colour goes clear, wherever it is, so the rocks float on the
+   map's own space rather than a disc of the banner's. A soft round edge
+   keeps a crop's corners from showing. */
+async function keyOutSpace(sharp, from) {
+  const { data, info } = await sharp(from).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const W = info.width;
+  const H = info.height;
+  const at = (x, y) => (y * W + x) * 4;
+  const ground = [0, 0, 0];
+  const corners = [[2, 2], [W - 3, 2], [2, H - 3], [W - 3, H - 3]];
+  for (const [x, y] of corners) for (let c = 0; c < 3; c += 1) ground[c] += data[at(x, y) + c] / corners.length;
+  const R = Math.min(W, H) / 2;
+  for (let y = 0; y < H; y += 1) {
+    for (let x = 0; x < W; x += 1) {
+      const i = at(x, y);
+      const d = Math.hypot(x - (W - 1) / 2, y - (H - 1) / 2) / R;
+      const edge = Math.max(0, Math.min(1, (1 - d) / 0.12));
+      const off = Math.max(Math.abs(data[i] - ground[0]), Math.abs(data[i + 1] - ground[1]), Math.abs(data[i + 2] - ground[2]));
+      data[i + 3] = Math.round(255 * edge * Math.max(0, Math.min(1, (off - 14) / 40)));
+    }
+  }
+  return sharp(data, { raw: { width: W, height: H, channels: 4 } });
+}
+
+async function destroyed() {
+  const fileOf = (r) => (typeof r === "string" ? r : r.from);
+  const files = [...new Set(Object.values(DESTROYED).flatMap((d) => [fileOf(d.render), d.banner]))];
+  const doc = await wikiJson({ action: "query", prop: "imageinfo", iiprop: "url|size", titles: files.map((f) => `File:${f}`).join("|") });
+  const back = new Map((doc.query.normalized || []).map((n) => [n.to, n.from]));
+  const urls = new Map();
+  for (const page of Object.values(doc.query.pages || {})) {
+    const ii = page.imageinfo && page.imageinfo[0];
+    if (ii) urls.set((back.get(page.title) || page.title).replace(/^File:/, ""), ii);
+  }
+  for (const f of files) {
+    const ii = urls.get(f);
+    console.log(`  ${ii ? "found  " : "MISSING"} ${f}${ii ? `  ${ii.width} x ${ii.height}` : ""}`);
+  }
+  if (!WRITE) {
+    console.log("\n  Nothing downloaded. Add -- --write to fetch and cut them.\n");
+    return;
+  }
+  const sharp = (await import("sharp")).default;
+  mkdirSync(DESTROYED_DIR, { recursive: true });
+  const got = new Map();
+  for (const f of files) {
+    if (!urls.has(f)) continue;
+    const res = await fetch(urls.get(f).url, { headers: { "user-agent": AGENT } });
+    if (!res.ok) {
+      console.log(`  ${f}: answered ${res.status}`);
+      continue;
+    }
+    got.set(f, Buffer.from(await res.arrayBuffer()));
+    await sleep(300);
+  }
+  for (const [art, d] of Object.entries(DESTROYED)) {
+    const banner = got.get(d.banner);
+    if (banner) {
+      writeFileSync(join(DESTROYED_DIR, `banner_${art}.webp`), await sharp(banner).webp({ quality: 80, effort: 5 }).toBuffer());
+    }
+    let src = got.get(fileOf(d.render));
+    if (!src) continue;
+    if (typeof d.render !== "string") src = await sharp(src).extract(d.render.crop).png().toBuffer();
+    const meta = await sharp(src).metadata();
+    const shaped = d.render.keyAll ? await keyOutSpace(sharp, src) : meta.hasAlpha ? sharp(src) : await opaqueToRound(sharp, src);
+    /* Never enlarged: a 128 pixel icon stays 128. */
+    const side = Math.min(CUT, Math.max(meta.width, meta.height));
+    const buf = await shaped
+      .resize(side, side, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 }, kernel: "lanczos3" })
+      .webp({ quality: 82, alphaQuality: 90, effort: 5 }).toBuffer();
+    writeFileSync(join(DESTROYED_DIR, `render_${art}.webp`), buf);
+    console.log(`  ${art}: render ${side} px${banner ? ", banner" : ""}`);
+  }
+  console.log("  Run npm run images to bring them into the app.\n");
+}
+
+if (process.argv.includes("--destroyed")) {
+  await destroyed();
+  process.exit(0);
 }
 
 if (process.argv.includes("--landscapes")) {

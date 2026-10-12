@@ -17,7 +17,7 @@
 /* ================================================================== */
 
 import { planetFacts, pickShots } from "./lib/planet.js";
-import { planetLandscapes, biomeLandscape, planetArt } from "./lib/assets.js";
+import { planetLandscapes, biomeLandscape, planetArt, destroyedArt } from "./lib/assets.js";
 import { Tip, MissingData, HAS_TIP } from "./Tip.jsx";
 import { planetEffects } from "./lib/effects.js";
 import { SUBFACTIONS, subfactionsOn } from "./lib/subfaction.js";
@@ -85,7 +85,8 @@ function Tile({ label, tip, children }) {
    `war` is the live war, for what the game has marked on the planet.
    `titled` false leaves the name to a page that already shows it.
    A planet the war destroyed shows what destroyed it and nothing of the
-   world it was: no picture, no temperature, no ground. */
+   world it was: the game's own banner for what is left, no temperature,
+   no ground. A landmark (Mars) is not in the war: it says what it is. */
 export default function PlanetCard({ name, compact = false, war = null, titled = true, children = null }) {
   const facts = planetFacts(name);
   if (!facts) return null;
@@ -96,8 +97,10 @@ export default function PlanetCard({ name, compact = false, war = null, titled =
   const forces = gone ? [] : subfactionsOn(war, facts.name);
   const forceEffects = new Set(forces.flatMap((k) => SUBFACTIONS[k].effects));
   const others = marked.named.filter((e) => !forceEffects.has(e.id));
-  const shots = gone ? [] : pickShots(name, planetLandscapes, biomeLandscape);
-  const render = shots.length || gone ? null : planetArt(name);
+  const wreck = gone ? destroyedArt(marked.art) : null;
+  const shots = gone ? (wreck.banner ? [{ url: wreck.banner, caption: null }] : []) : pickShots(name, planetLandscapes, biomeLandscape);
+  const render = shots.length ? null : gone ? wreck.render : planetArt(name);
+  const plain = gone || facts.landmark;
   const t = facts.temperature;
   const hot = t && t.slug !== "normal_temp";
   const station = war && war.fresh && war.station && war.station.planet === facts.name ? war.station : null;
@@ -116,7 +119,11 @@ export default function PlanetCard({ name, compact = false, war = null, titled =
           </div>
         </div> : null}
 
-        {gone ? null : <div className="grid grid-cols-3 gap-2 border-t border-base-800 pt-2">
+        {facts.landmark ? (
+          <p className="border-t border-base-800 pt-2 text-[11px] leading-relaxed text-base-300">{facts.landmark}</p>
+        ) : null}
+
+        {plain ? null : <div className="grid grid-cols-3 gap-2 border-t border-base-800 pt-2">
           <Tile label="Temperature" tip={compact || !t ? null : t.effect}>
             {t ? <span className={hot ? "text-accent-300" : ""}>{t.label}</span> : compact ? "Missing data" : <MissingData why="The planet table lists no temperature for this planet." />}
           </Tile>
@@ -140,6 +147,11 @@ export default function PlanetCard({ name, compact = false, war = null, titled =
         {marked.gone ? (
           <p className="rounded border border-base-700 bg-base-900 px-2 py-1 text-[11px] font-semibold text-base-200">
             Destroyed. No missions here.
+            {compact ? null : <span className="block font-normal text-base-400">A Super Destroyer can still travel there.</span>}
+          </p>
+        ) : marked.evacuated ? (
+          <p className="rounded border border-base-700 bg-base-900 px-2 py-1 text-[11px] font-semibold text-base-200">
+            Evacuated. No missions here.
           </p>
         ) : null}
 
@@ -188,7 +200,7 @@ export default function PlanetCard({ name, compact = false, war = null, titled =
           </div>
         ) : null}
 
-        {gone ? null : facts.weather.length ? (
+        {plain ? null : facts.weather.length ? (
           <div className="flex flex-col gap-1 border-t border-base-800 pt-2">
             {compact ? (
               <p className="text-[11px] text-accent-300">{facts.weather.map((w) => w.name).join(" · ")}</p>

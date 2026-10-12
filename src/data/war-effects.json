@@ -1,13 +1,13 @@
 {
   "source": "curator",
-  "note": "Names for the game's planet effects. The game sends each effect as a bare number and its words live only in the install. Each effect also carries a gameplay hash, and the Helldivers 2 Companion app (helldiverscompanion.com) labels those hashes in its own code; that settled which number is which on 12 October 2026, checked against the curator's screenshots of the game's planet cards the same day. Effect type 71 is a line on the game's planet card; type 40 is the same thing's hidden tag behind a flag on the map; every other type is a hidden gameplay modifier. from is screenshot when the curator saw the card, companion when the name is the Companion's label and the card's own words are not yet seen. hidden means the game shows nothing for it, so the tool does not either. draw is how the map shows it: blackhole and fractured replace the planet, cloud lays a soft zone over every planet carrying it, none is a name on the card only. gone means nobody drops there any more. npm run effects lists every live number and whether it is named.",
+  "note": "Names for the game's planet effects. The game sends each effect as a bare number and its words live only in the install. Each effect also carries a gameplay hash, and the Helldivers 2 Companion app (helldiverscompanion.com) labels those hashes in its own code; that settled which number is which on 12 October 2026, checked against the curator's screenshots of the game's planet cards the same day. Effect type 71 is a line on the game's planet card; type 40 is the same thing's hidden tag behind a flag on the map; every other type is a hidden gameplay modifier. from is screenshot when the curator saw the card, companion when the name is the Companion's label and the card's own words are not yet seen. hidden means the game shows nothing for it, so the tool does not either. draw is how the map shows it: blackhole and fractured replace the planet, cloud lays a soft zone over every planet carrying it, none is a name on the card only. gone means the planet was destroyed: no missions, though a Super Destroyer can still travel there, and art names its render and banner. evacuated means the planet still stands with nobody fighting on it: the map greys it out and offers no drop. npm run effects lists every live number and whether it is named.",
   "draws": ["none", "cloud", "blackhole", "fractured"],
   "froms": ["screenshot", "companion"],
   "effects": {
-    "1229": { "name": "Meridian black hole", "draw": "blackhole", "gone": true, "from": "screenshot", "say": "Meridia, destroyed with Dark Fluid after it became a Terminid Supercolony." },
-    "1352": { "name": "Conventional black hole", "draw": "blackhole", "gone": true, "from": "screenshot", "say": "A former planet, now a stable black hole." },
-    "1252": { "name": "Fractured planet", "draw": "fractured", "gone": true, "from": "screenshot", "say": "Torn apart by the Meridian singularity." },
-    "1241": { "name": "Fractured planet", "draw": "fractured", "gone": true, "from": "screenshot", "say": "Torn apart by the Meridian singularity." },
+    "1229": { "name": "Meridian black hole", "draw": "blackhole", "gone": true, "art": "meridian-black-hole", "from": "screenshot", "say": "Meridia, destroyed with Dark Fluid after it became a Terminid Supercolony." },
+    "1352": { "name": "Conventional black hole", "draw": "blackhole", "gone": true, "art": "conventional-black-hole", "from": "screenshot", "say": "A former planet, now a stable black hole." },
+    "1252": { "name": "Fractured planet", "draw": "fractured", "gone": true, "art": "fractured-planet", "from": "screenshot", "say": "Torn apart by the Meridian singularity." },
+    "1241": { "name": "Fractured planet", "draw": "fractured", "gone": true, "art": "fractured-planet", "from": "screenshot", "say": "Torn apart by the Meridian singularity." },
     "1190": { "name": "Gloom", "draw": "cloud", "colour": "#D4B526", "from": "screenshot" },
     "1188": { "name": null, "draw": "cloud", "colour": "#D4B526", "hidden": true },
     "1193": { "name": null, "draw": "cloud", "colour": "#D4B526", "hidden": true },
@@ -56,7 +56,7 @@
     "1333": { "name": "E-711 Facility", "draw": "none", "from": "companion" },
     "1344": { "name": "Pandora Base", "draw": "none", "from": "companion" },
     "1353": { "name": "Automaton Data Center", "draw": "none", "from": "companion" },
-    "1418": { "name": "Forced evacuation", "draw": "none", "from": "companion" },
+    "1418": { "name": "Forced evacuation", "draw": "none", "evacuated": true, "from": "companion", "say": "Super Earth has evacuated this planet. The game no longer offers missions here." },
 
     "1202": { "name": null, "draw": "none", "hidden": true },
     "1243": { "name": null, "draw": "none", "hidden": true },

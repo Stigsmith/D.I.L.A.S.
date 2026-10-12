@@ -24,7 +24,7 @@ import { ChevronLeft, ChevronRight, ChevronDown, Check, Map as MapIcon } from "l
 
 import GalaxyMap, { MajorOrder } from "./GalaxyMap.jsx";
 import { FACTIONS, Planner, PlanetBar, SearchField, PickRow, Empty, DifficultyIcon, difficultyAt } from "./Tiers.jsx";
-import { searchPlanets, unplaced, frontOf, suggestFronts } from "./lib/galaxy.js";
+import { searchPlanets, unplaced, frontOf, suggestFronts, landmarkOf } from "./lib/galaxy.js";
 import { useWar, agoText } from "./lib/war.js";
 import { usePlannerPrefs, planets, biomeName, loudHazards, hazardName } from "./lib/scenario.js";
 import { levelFacts, levelNew, outpostSummary, DIFFICULTY_SOURCE } from "./lib/difficulty.js";
@@ -106,6 +106,9 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
      scenario fills itself" half. The planner's picks name their front;
      the map and the search ask the live war. */
   const choose = (name, front = frontOf(war, name)) => {
+    /* Nobody drops on Mars, a destroyed planet or an evacuated one. */
+    const fx = planetEffects(war, name);
+    if (landmarkOf(name) || fx.gone || fx.evacuated) return;
     setPlanet(name);
     if (front && front !== scenario.faction) setFaction(front);
     if (!wide) setPlanner(false);
@@ -283,7 +286,7 @@ export function PlanetSearch({ query, setQuery, war, chosen, onChoose }) {
               <PickRow key={p.name} on={p.name === chosen} onClick={() => { onChoose(p.name); setQuery(""); }}
                 title={p.name}
                 sub={(p.sector ? p.sector + " sector · " : "") + biomeName(p.biome) + fighting +
-                  (unplaced.includes(p.name) ? " · not on the map" : "") + (planetEffects(war, p.name).gone ? " · destroyed" : "")}
+                  (unplaced.includes(p.name) ? " · not on the map" : "") + (planetEffects(war, p.name).gone ? " · destroyed" : planetEffects(war, p.name).evacuated ? " · evacuated" : "")}
                 tags={loudHazards(p.hazards).map((h) => ({ key: h, label: hazardName(h), warn: true }))} />
             );
           })}

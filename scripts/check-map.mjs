@@ -21,8 +21,11 @@ const near = (a, b, eps = 1e-6) => Math.abs(a - b) < eps;
 /* What is on the map */
 const noPosition = table.filter((p) => !p.position).map((p) => p.name);
 const placeholders = table.filter((p) => p.position && p.type !== "super_earth" && p.position.x === 0 && p.position.y === 0);
-ok(galaxy.placed.length + galaxy.unplaced.length === table.length,
-  `every planet is either drawn or listed as unplaced (${galaxy.placed.length} + ${galaxy.unplaced.length} = ${table.length})`);
+const warPlaced = galaxy.placed.filter((p) => !p.landmark).length;
+ok(warPlaced + galaxy.unplaced.length === table.length,
+  `every planet is either drawn or listed as unplaced (${warPlaced} + ${galaxy.unplaced.length} = ${table.length})`);
+ok(galaxy.landmarks.every((l) => galaxy.placeOf(l.name) && galaxy.placeOf(l.name).landmark && !galaxy.sectors.some((s) => s.name === l.sector)),
+  "landmarks are drawn, marked as landmarks, and make no sector of their own");
 ok(noPosition.every((n) => galaxy.unplaced.includes(n)), `the ${noPosition.length} with no position are not drawn`);
 ok(placeholders.length > 0 && placeholders.every((p) => galaxy.unplaced.includes(p.name)),
   `the ${placeholders.length} placeholders parked on Super Earth are not drawn on top of it`);

@@ -1,0 +1,13 @@
+{
+  "source": "curator",
+  "note": "Places the map draws that the game's war data does not list, so nobody can drop on them. Mars has no planet index and is not in the war's API, though the game keeps an entry for it. Its position is the one the Helldivers 2 Companion draws it at, beside Super Earth, in the war's own coordinates (y points up). The words are from helldivers.wiki.gg, Mars, read 12 October 2026.",
+  "landmarks": [
+    {
+      "name": "Mars",
+      "sector": "Sol",
+      "position": { "x": 0.04, "y": 0.04 },
+      "say": "Razed by the Illuminate Great Host in May 2185. Not part of the Galactic War. Helldiver training moved to Zegema Paradise.",
+      "source": "https://helldivers.wiki.gg/wiki/Mars"
+    }
+  ]
+}

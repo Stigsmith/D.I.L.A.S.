@@ -44,7 +44,7 @@ import { planetEffects } from "./lib/effects.js";
 import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 import { planetByName } from "./lib/scenario.js";
 import { untilText } from "./lib/war.js";
-import { planetArt } from "./lib/assets.js";
+import { planetArt, destroyedArt } from "./lib/assets.js";
 import PlanetCard from "./PlanetCard.jsx";
 
 const OSWALD = "'Oswald', sans-serif";
@@ -575,12 +575,16 @@ export default function GalaxyMap({
     if (!war || !war.fresh || !war.marks) return null;
     const clouds = [];
     const shape = new Map();
+    const wreck = new Map();
+    const evacuated = new Set();
     for (const [name, ids] of war.marks.effects) {
       const p = spotOf(name);
       if (!p) continue;
       const e = planetEffects(war, name);
       if (e.cloud) clouds.push({ name, x: p.x, y: p.y, colour: e.cloud });
       if (e.draw) shape.set(name, e.draw);
+      if (e.art) wreck.set(name, destroyedArt(e.art).render);
+      if (e.evacuated) evacuated.add(name);
     }
     const hexOf = (name) => {
       const w = war.planets.get(name);
@@ -590,7 +594,7 @@ export default function GalaxyMap({
       .map(([a, b]) => [spotOf(a), spotOf(b)])
       .filter(([a, b]) => a && b)
       .map(([a, b]) => [{ ...a, hex: hexOf(a.name) }, b]);
-    return { clouds, attacks, shape, station: war.station };
+    return { clouds, attacks, shape, wreck, evacuated, station: war.station };
   }, [war, spotOf, fronts]);
   const station = marks ? marks.station : war && war.fresh ? war.station : null;
 
@@ -711,14 +715,14 @@ export default function GalaxyMap({
         <defs>
           {[...new Set(marks.clouds.map((c) => c.colour))].map((colour) => (
             <radialGradient key={colour} id={`${gid}-cloud-${colour.slice(1)}`}>
-              <stop offset="0%" stopColor={colour} stopOpacity="0.34" />
-              <stop offset="60%" stopColor={colour} stopOpacity="0.16" />
+              <stop offset="0%" stopColor={colour} stopOpacity="0.62" />
+              <stop offset="55%" stopColor={colour} stopOpacity="0.42" />
               <stop offset="100%" stopColor={colour} stopOpacity="0" />
             </radialGradient>
           ))}
         </defs>
         {marks.clouds.map((c) => (
-          <circle key={c.name} cx={c.x} cy={c.y} r={34} fill={`url(#${gid}-cloud-${c.colour.slice(1)})`}
+          <circle key={c.name} cx={c.x} cy={c.y} r={44} fill={`url(#${gid}-cloud-${c.colour.slice(1)})`}
             opacity={matches ? 0.35 : 1} />
         ))}
         {marks.attacks.map(([a, b]) => {
@@ -944,9 +948,15 @@ export default function GalaxyMap({
     const shape = marks ? marks.shape.get(p.name) : null;
     if (shape) {
       const size = (row.world ? WORLD_PX : tactical ? 9 : DOT * 2.4) * uu;
+      /* The game's own art for what is left, once npm run planet-art --
+         --destroyed has fetched it. Drawn a little larger than a planet,
+         because a black hole's glow is wider than the world it was. */
+      const wreck = marks.wreck.get(p.name);
       return (
         <g opacity={matches && dim ? 0.3 : 1}>
-          {shape === "blackhole" ? (
+          {wreck && (row.world || tactical) ? (
+            <image href={wreck} x={-size * 0.7} y={-size * 0.7} width={size * 1.4} height={size * 1.4} />
+          ) : shape === "blackhole" ? (
             <>
               <circle r={size * 0.62} fill="none" stroke="#C4B5FD" strokeOpacity={0.35} strokeWidth={size * 0.16} />
               <circle r={size * 0.42} fill="#05050A" stroke="#E9D5FF" strokeWidth={1.4 * uu} />
@@ -1116,6 +1126,8 @@ export default function GalaxyMap({
 
   /* Marks, then picks over them, then names over everything. `place`
      says where a planet goes, as an SVG transform, or null to skip it. */
+  /* An evacuated planet still stands and nobody fights there: greyed. */
+  const evacuatedNow = marks ? marks.evacuated : null;
   const drawPlanets = (place, uu) => {
     const marks = [];
     const pickEls = [];
@@ -1123,7 +1135,11 @@ export default function GalaxyMap({
     for (const row of plan.rows) {
       const t = place(row.p);
       if (!t) continue;
-      marks.push(<g key={row.p.name} transform={t}>{drawMark(row, uu)}</g>);
+      marks.push(
+        <g key={row.p.name} transform={t} opacity={evacuatedNow && evacuatedNow.has(row.p.name) ? 0.35 : undefined}>
+          {drawMark(row, uu)}
+        </g>
+      );
       const pi = plan.pickAt.get(row.p.name);
       if (pi !== undefined) pickEls.push(<g key={"pick-" + row.p.name} transform={t}>{drawPick(pi, uu)}</g>);
       if (plan.named.has(row.p.name)) names.push(<g key={"name-" + row.p.name} transform={t}>{drawName(row, uu)}</g>);

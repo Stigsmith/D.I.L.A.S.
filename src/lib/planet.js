@@ -9,6 +9,7 @@
 /* ================================================================== */
 
 import PLANETS from "../data/planets.json";
+import LANDMARKS from "../data/landmarks.json";
 import { terrainOf } from "./place.js";
 
 const byName = new Map(PLANETS.planets.map((p) => [p.name, p]));
@@ -44,7 +45,11 @@ const CITY_KINDS = [["megacity", "megacity", "megacities"], ["city", "city", "ci
 
 export function planetFacts(name) {
   const p = name ? byName.get(name) : null;
-  if (!p) return null;
+  if (!p) {
+    /* A landmark the war does not list: Mars. Its words and nothing else. */
+    const l = name ? LANDMARKS.landmarks.find((x) => x.name === name) : null;
+    return l ? { name: l.name, sector: l.sector, biome: null, temperature: null, weather: [], ground: null, cities: [], landmark: l.say } : null;
+  }
   const hazards = p.hazards || [];
   const temp = hazards.find((h) => TEMPERATURE[h]);
   const terrain = terrainOf(p.biome);
@@ -71,7 +76,8 @@ export function planetFacts(name) {
    { url, caption }, `biomeShotOf(biome)` a url or null. */
 export function pickShots(name, shotsOf, biomeShotOf) {
   const p = name ? byName.get(name) : null;
-  if (!p) return [];
+  /* A landmark has only its own shots. */
+  if (!p) return name && LANDMARKS.landmarks.some((l) => l.name === name) ? shotsOf(name).map((s) => ({ ...s, standIn: null })) : [];
   const own = shotsOf(p.name);
   if (own.length) return own.map((s) => ({ ...s, standIn: null }));
   if (!p.biome) return [];
