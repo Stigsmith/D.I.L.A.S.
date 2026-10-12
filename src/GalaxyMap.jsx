@@ -579,14 +579,20 @@ export default function GalaxyMap({
     const clouds = [];
     const shape = new Map();
     const wreck = new Map();
+    const wreckArt = new Map();
     const evacuated = new Set();
     for (const [name, ids] of war.marks.effects) {
       const p = spotOf(name);
       if (!p) continue;
       const e = planetEffects(war, name);
-      if (e.cloud) clouds.push({ name, x: p.x, y: p.y, colour: e.cloud });
+      /* An evacuated planet keeps its Gloom tag in the war, but the game no
+         longer draws the planet, so its cloud is not drawn either. */
+      if (e.cloud && !e.evacuated) clouds.push({ name, x: p.x, y: p.y, colour: e.cloud });
       if (e.draw) shape.set(name, e.draw);
-      if (e.art) wreck.set(name, markArt(e.art).render);
+      if (e.art) {
+        wreck.set(name, markArt(e.art).render);
+        wreckArt.set(name, e.art);
+      }
       if (e.evacuated) evacuated.add(name);
     }
     const hexOf = (name) => {
@@ -600,7 +606,7 @@ export default function GalaxyMap({
     /* Razed by the enemy, from the game's own scarring: burnt red, as the
        game's own card shows them. */
     const scorched = new Set(placed.filter((p) => scorchedOf(war, p.name)).map((p) => p.name));
-    return { clouds, attacks, shape, wreck, evacuated, scorched, station: war.station };
+    return { clouds, attacks, shape, wreck, wreckArt, evacuated, scorched, station: war.station };
   }, [war, spotOf, fronts]);
   const station = marks ? marks.station : war && war.fresh ? war.station : null;
 
@@ -718,18 +724,27 @@ export default function GalaxyMap({
        whoever holds it. */
     const marked = marks ? (
       <g className="pointer-events-none">
+        {/* One fog bank per colour, not a soft disc per planet: the discs are
+            solid and merged first, so where two meet it does not darken,
+            then blurred into one mass, pushed about by fractal noise so its
+            edge drifts, and thinned by the same noise into wisps. In map
+            units, so the cloud keeps its shape as you zoom. */}
         <defs>
-          {[...new Set(marks.clouds.map((c) => c.colour))].map((colour) => (
-            <radialGradient key={colour} id={`${gid}-cloud-${colour.slice(1)}`}>
-              <stop offset="0%" stopColor={colour} stopOpacity="0.62" />
-              <stop offset="55%" stopColor={colour} stopOpacity="0.42" />
-              <stop offset="100%" stopColor={colour} stopOpacity="0" />
-            </radialGradient>
-          ))}
+          <filter id={`${gid}-fog`} x="-25%" y="-25%" width="150%" height="150%" colorInterpolationFilters="sRGB">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="13" result="mass" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="4" seed="11" result="noise" />
+            <feDisplacementMap in="mass" in2="noise" scale="30" xChannelSelector="R" yChannelSelector="G" result="drift" />
+            <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.7 -0.3" result="wisps" />
+            <feComposite in="drift" in2="wisps" operator="in" result="fog" />
+            <feGaussianBlur in="fog" stdDeviation="2.5" />
+          </filter>
         </defs>
-        {marks.clouds.map((c) => (
-          <circle key={c.name} cx={c.x} cy={c.y} r={44} fill={`url(#${gid}-cloud-${c.colour.slice(1)})`}
-            opacity={matches ? 0.35 : 1} />
+        {[...new Set(marks.clouds.map((c) => c.colour))].map((colour) => (
+          <g key={colour} filter={`url(#${gid}-fog)`} opacity={matches ? 0.25 : 0.7}>
+            {marks.clouds.filter((c) => c.colour === colour).map((c) => (
+              <circle key={c.name} cx={c.x} cy={c.y} r={34} fill={colour} />
+            ))}
+          </g>
         ))}
         {marks.attacks.map(([a, b]) => {
           const hex = a.hex || null;
@@ -948,9 +963,12 @@ export default function GalaxyMap({
       <circle r={(tactical ? FRONT_WORLD_PX * 0.6 : DOT + 4) * uu} className="pointer-events-none fill-none stroke-base-100" strokeWidth={1.2 * uu} />
     ) : null;
 
-    /* A planet the war destroyed is drawn as what is left of it: a black
-       hole as a dark disc in a bright ring, a fractured planet as its
-       pieces. Only from a fresh war, and only once its effect is named. */
+    /* A planet the war destroyed is drawn as what is left of it. Inside a
+       sector, the game's own art. Out in the galaxy, a plain marker like
+       every other planet there, but one of its own: a black hole as a dark
+       disc in a ring of its colour (violet for the Meridian one, gold for a
+       conventional one, as their art is), a fractured planet as its pieces
+       round a dull ember. Only from a fresh war, and only once named. */
     const shape = marks ? marks.shape.get(p.name) : null;
     if (shape) {
       const size = (row.world ? WORLD_PX : tactical ? 9 : DOT * 2.4) * uu;
@@ -958,19 +976,25 @@ export default function GalaxyMap({
          --marks has fetched it. Drawn a little larger than a planet,
          because a black hole's glow is wider than the world it was. */
       const wreck = marks.wreck.get(p.name);
+      const ring = marks.wreckArt.get(p.name) === "conventional-black-hole"
+        ? { glow: "#FBBF24", edge: "#FDE68A" }
+        : { glow: "#A78BFA", edge: "#E9D5FF" };
       return (
         <g opacity={matches && dim ? 0.3 : 1}>
-          {wreck && (row.world || tactical) ? (
+          {wreck && row.world ? (
             <image href={wreck} x={-size * 0.7} y={-size * 0.7} width={size * 1.4} height={size * 1.4} />
           ) : shape === "blackhole" ? (
             <>
-              <circle r={size * 0.62} fill="none" stroke="#C4B5FD" strokeOpacity={0.35} strokeWidth={size * 0.16} />
-              <circle r={size * 0.42} fill="#05050A" stroke="#E9D5FF" strokeWidth={1.4 * uu} />
+              <circle r={size * 0.62} fill="none" stroke={ring.glow} strokeOpacity={0.45} strokeWidth={size * 0.16} />
+              <circle r={size * 0.42} fill="#05050A" stroke={ring.edge} strokeWidth={1.4 * uu} />
             </>
           ) : (
-            [[-0.32, -0.18, 0.2], [0.05, -0.3, 0.13], [0.3, -0.12, 0.17], [-0.05, 0.22, 0.1]].map(([x, y, r], i) => (
-              <circle key={i} cx={x * size} cy={y * size} r={r * size} className="fill-base-400 stroke-base-950" strokeWidth={0.8 * uu} />
-            ))
+            <>
+              <circle r={size * 0.42} fill="#DC2626" fillOpacity={0.28} />
+              {[[-0.32, -0.18, 0.2], [0.05, -0.3, 0.13], [0.3, -0.12, 0.17], [-0.05, 0.22, 0.1]].map(([x, y, r], i) => (
+                <circle key={i} cx={x * size} cy={y * size} r={r * size} className="fill-base-400 stroke-base-950" strokeWidth={0.8 * uu} />
+              ))}
+            </>
           )}
           {on ? <circle r={size * 0.88} className="fill-none stroke-brand" strokeWidth={1.8 * uu} /> : null}
           {hoverRing}
