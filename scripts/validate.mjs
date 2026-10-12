@@ -680,6 +680,10 @@ for (const f of FACTIONS) {
     if (e.say !== undefined && (typeof e.say !== "string" || e.say.length > 120)) bad.push(`${id}: say is at most 120 characters`);
     if ((e.draw === "blackhole" || e.draw === "fractured") !== Boolean(e.gone)) bad.push(`${id}: a black hole or fractured planet is gone, and only those`);
     if (e.draw === "cloud" && !e.colour) bad.push(`${id}: a cloud needs a colour`);
+    /* Named, with where the name came from, or hidden because the game
+       shows nothing for it. Never both, never neither. */
+    if ((e.name === null) !== (e.hidden === true)) bad.push(`${id}: an effect is named or hidden, one of the two`);
+    if (e.name !== null && !table.froms.includes(e.from)) bad.push(`${id}: from must be one of ${table.froms.join(", ")}`);
   }
   if (bad.length) fail(`${bad.length} problem(s) in war-effects.json:`, bad);
 }

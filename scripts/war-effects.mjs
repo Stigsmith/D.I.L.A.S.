@@ -44,11 +44,11 @@ console.log(`\n  ${rows.length} effect numbers on ${new Set([...by.values()].fla
 for (const [id, list] of rows) {
   const e = table[String(id)];
   if (e) named += 1;
-  const label = e ? (e.name || `(no name, drawn as ${e.draw})`) : "UNNAMED";
+  const label = e ? (e.name ? e.name + (e.from === "companion" ? " *" : "") : e.draw === "cloud" ? "(hidden, drawn as cloud)" : "(hidden)") : "UNNAMED";
   const names = [...list].sort();
   console.log(`  ${String(id).padEnd(6)} ${label.padEnd(34)} ${names.length} · ${names.slice(0, 6).join(", ")}${names.length > 6 ? ` and ${names.length - 6} more` : ""}`);
 }
 const stale = Object.keys(table).filter((id) => !by.has(Number(id)));
-console.log(`\n  ${named} of ${rows.length} named in war-effects.json.`);
+console.log(`\n  ${named} of ${rows.length} named or marked hidden in war-effects.json. * is the Companion's label; the game card's own words are not seen yet.`);
 if (stale.length) console.log(`  Named but on no planet right now: ${stale.join(", ")}. Keep them: an effect can come back.`);
 console.log("  To name one, add it to src/data/war-effects.json with the words on the game's planet card.\n");

@@ -264,7 +264,10 @@ export function About({ section = null }) {
         </p>
         <p className="text-base-500">
           The game marks planets with effects as numbers only. The names on the map, such as Gloom, Meridian black hole
-          or New Hope City, are ours, read off the game's own map. An effect we have not named yet shows as Missing data.
+          or New Hope City, are ours, read off the game's own map and checked against the labels in the{" "}
+          <a href="https://helldiverscompanion.com" target="_blank" rel="noreferrer noopener"
+            className="text-base-200 underline hover:text-base-100">Helldivers 2 Companion</a>. An effect we have not named yet
+          shows as Missing data.
         </p>
       </Panel>
 
