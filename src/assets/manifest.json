@@ -235,7 +235,13 @@
     "exo-49-emancipator-exosuit": "stratagem_exo_49_emancipator_exosuit.png",
     "exo-51-lumberer-exosuit": "stratagem_exo_51_lumberer_exosuit.png",
     "exo-55-breakthrough-exosuit": "stratagem_exo_55_breakthrough_exosuit.png",
-    "td-220-bastion-mk-xvi": "stratagem_td_220_bastion_mk_xvi.png"
+    "td-220-bastion-mk-xvi": "stratagem_td_220_bastion_mk_xvi.png",
+    "ar-11-arbitrator": "weapon_ar_11_arbitrator.png",
+    "gl-15-evictor": "weapon_gl_15_evictor.png",
+    "las-12-sai": "weapon_las_12_sai.png",
+    "p-34-breacher": "weapon_p_34_breacher.png",
+    "g-8-immolation": "throwable_g_8_immolation.png",
+    "g-60-anti-tank-seeker": "throwable_g_60_anti_tank_seeker.png"
   },
   "warbonds": {
     "mobilize-free": "warbond_helldivers_mobilize.jpg",

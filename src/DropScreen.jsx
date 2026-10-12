@@ -59,6 +59,7 @@ import { SQUAD_CAP } from "./lib/party.js";
 import { entryFor, TAKE_BACK_MS, daysSince } from "./lib/history.js";
 import { agoText } from "./lib/war.js";
 import { Tip, HAS_TIP } from "./Tip.jsx";
+import { SUBFACTIONS, subfactionsIn } from "./lib/subfaction.js";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 const MONO = { fontFamily: "'JetBrains Mono', monospace" };
@@ -98,6 +99,9 @@ function Brief({ scenario, onMap, hostPicks }) {
   const mission = scenario.mission ? missionByName.get(scenario.mission) : null;
   const lines = mission ? mission.traits.map((t) => missionTraits[t]).filter(Boolean) : [];
   const hazards = loudHazards(scenario.hazards);
+  /* Who holds the planet, from the live war. Said here because it changes
+     what to bring as much as a hazard does: a Hive Lord is a mission. */
+  const forces = subfactionsIn(scenario);
   const place = scenario.planet || (scenario.biome ? biomeName(scenario.biome) : null);
 
   if (!mission && !place) {
@@ -113,7 +117,7 @@ function Brief({ scenario, onMap, hostPicks }) {
     );
   }
 
-  if (!lines.length && !hazards.length) {
+  if (!lines.length && !hazards.length && !forces.length) {
     return (
       <p className="rounded-lg border border-base-800 bg-base-900/40 px-4 py-2.5 text-xs text-base-500">
         {mission && place
@@ -137,8 +141,9 @@ function Brief({ scenario, onMap, hostPicks }) {
           : <p className="text-xs text-base-500">{mission ? "Nothing special to bring for this mission." : "No mission chosen."}</p>}
       </div>
       <div className="flex flex-col gap-1.5">
+        {forces.map((k) => say(k, SUBFACTIONS[k].name, SUBFACTIONS[k].say))}
         {hazards.length ? hazards.map((h) => say(h, hazardName(h), hazardEffect(h)))
-          : <p className="text-xs text-base-500">{place ? "Nothing special to bring for this planet." : "No planet chosen."}</p>}
+          : forces.length ? null : <p className="text-xs text-base-500">{place ? "Nothing special to bring for this planet." : "No planet chosen."}</p>}
       </div>
     </div>
   );

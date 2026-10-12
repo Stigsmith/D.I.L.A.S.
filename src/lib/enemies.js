@@ -11,6 +11,7 @@
 /* ================================================================== */
 
 import ENEMIES from "../data/enemies.json";
+import { SUBFACTIONS } from "./subfaction.js";
 
 /* ------------------------------------------------------------------ */
 /* The rule                                                            */
@@ -43,11 +44,43 @@ export const enemySource = {
 /* comment nobody reads. Stated on the row too.                         */
 export const EXPOSURE_GAP = ENEMIES.gap;
 
-/* The variants only exist while a galactic effect is running on the    */
-/* planet, and the tool has no way to know whether one is. So the       */
-/* baseline is what is always there, and the rest waits for live war    */
-/* state. They are in the file, flagged, not thrown away.               */
-export const baselineEnemies = enemies.filter((e) => !e.variant);
+/* The variants only exist while a subfaction holds the planet. The      */
+/* baseline is what is always there: no variant, and not one of the      */
+/* enemies a subfaction brings by name (the Hive Lord, the Dragonroach). */
+const CLAIMED = new Set(Object.values(SUBFACTIONS).flatMap((s) => s.adds));
+export const baselineEnemies = enemies.filter((e) => !e.variant && !CLAIMED.has(e.name));
+
+/* A front's enemies with these subfactions on the planet: the baseline,
+   less what they replace, plus what they bring. A removal from a
+   difficulty only applies once the level is known and reaches it.
+   Invasion Fleet lays the full force back over any other subfaction, so
+   with it present nothing is removed. Keys from another front are
+   ignored. */
+export function enemiesFor(faction, keys, level) {
+  const here = (keys || []).map((k) => SUBFACTIONS[k]).filter((s) => s && s.front === faction);
+  if (!here.length) return baselineEnemies.filter((e) => e.faction === faction);
+  const restores = here.some((s) => s.restores);
+  const removed = new Set();
+  if (!restores) {
+    for (const s of here) {
+      for (const r of s.removes) {
+        if (typeof r === "string") removed.add(r);
+        else if (level && level >= r.from) removed.add(r.name);
+      }
+    }
+  }
+  const variants = new Set(here.map((s) => s.variant).filter(Boolean));
+  const added = new Set(here.flatMap((s) => s.adds));
+  return enemies.filter(
+    (e) =>
+      e.faction === faction &&
+      (variants.has(e.variant) || added.has(e.name) || (!e.variant && !CLAIMED.has(e.name) && !removed.has(e.name)))
+  );
+}
+
+/* The subfactions that change this front's list, sorted, for a cache key. */
+const keyOf = (faction, keys) =>
+  (keys || []).filter((k) => SUBFACTIONS[k] && SUBFACTIONS[k].front === faction).sort().join("+");
 
 /* Biggest first, because when a list has to be cut short the Factory   */
 /* Strider is the name worth keeping and the Trooper is not.            */
@@ -98,23 +131,24 @@ const round = (n) => Math.round(n * 100) / 100;
  * on the item, or no front chosen. Both are real states and neither is
  * a zero.
  */
-export function frontReading(ap, faction, difficulty) {
+export function frontReading(ap, faction, difficulty, subfactions) {
   if (typeof ap !== "number" || !faction) return null;
 
   /* A level of 0 is how the slider spells "not set", which means judge   */
   /* the whole front rather than none of it.                             */
   const level = typeof difficulty === "number" && difficulty > 0 ? difficulty : null;
 
-  const key = `${faction}:${ap}:${level || "any"}`;
+  const key = `${faction}:${ap}:${level || "any"}:${keyOf(faction, subfactions)}`;
   const hit = cache.get(key);
   if (hit) return hit;
 
-  /* Two enemies leave the field blank on the wiki and both are variants, */
-  /* so nothing in a baseline is currently affected. Treating an unknown  */
-  /* as level 1 is the safe direction anyway: it keeps an enemy in the    */
-  /* reckoning rather than quietly hiding one you might actually meet.    */
-  const list = baselineEnemies.filter(
-    (e) => e.faction === faction && (!level || (e.minDifficulty || 1) <= level)
+  /* Two enemies leave the field blank on the wiki, both variants (the    */
+  /* Rupture Charger and the Jet Brigade Devastator), so they count once  */
+  /* their subfaction is on the planet. Treating an unknown as level 1 is */
+  /* the safe direction: it keeps an enemy in the reckoning rather than   */
+  /* quietly hiding one you might actually meet.                         */
+  const list = enemiesFor(faction, subfactions, level).filter(
+    (e) => !level || (e.minDifficulty || 1) <= level
   );
   if (!list.length) return null;
 
@@ -163,9 +197,9 @@ export function frontReading(ap, faction, difficulty) {
 /* How many of a front's enemies you can actually meet at a given level. */
 /* Its own export because the scenario panel wants the count before any  */
 /* particular weapon is in hand.                                         */
-export const enemiesUpTo = (faction, difficulty) =>
-  baselineEnemies.filter(
-    (e) => e.faction === faction && (!difficulty || (e.minDifficulty || 1) <= difficulty)
+export const enemiesUpTo = (faction, difficulty, subfactions) =>
+  enemiesFor(faction, subfactions, difficulty).filter(
+    (e) => !difficulty || (e.minDifficulty || 1) <= difficulty
   ).length;
 
 /* How frightening a thing is, which is not the same as how large the
@@ -206,9 +240,9 @@ const byThreat = (a, b) =>
  * difficulty 5 is technically true and useless, because it is a ship in
  * the sky rather than something walking at you.
  */
-export function arrivalsAt(faction, difficulty) {
+export function arrivalsAt(faction, difficulty, subfactions) {
   if (!difficulty) return null;
-  const pool = baselineEnemies.filter((e) => e.faction === faction);
+  const pool = enemiesFor(faction, subfactions, difficulty);
   const atLevel = (l) => pool.filter((e) => (e.minDifficulty || 1) === l).sort(byThreat);
 
   const fresh = atLevel(difficulty);
@@ -226,8 +260,8 @@ export function arrivalsAt(faction, difficulty) {
 }
 
 /** The arrivals line, written once so the wording and the data agree. */
-export function arrivalsLine(faction, difficulty) {
-  const a = arrivalsAt(faction, difficulty);
+export function arrivalsLine(faction, difficulty, subfactions) {
+  const a = arrivalsAt(faction, difficulty, subfactions);
   if (!a) return "";
   if (a.kind === "next") return ` Nothing new at this level. Next new enemy: ${a.names[0]}, at difficulty ${a.level}.`;
   if (a.kind === "complete") return ` Nothing new at this level. Every enemy on this front appears by difficulty ${a.level}.`;
@@ -266,11 +300,16 @@ function nameList(names, limit = 3) {
  * leaves out the ones you only tie: those are Reduced. The four lines
  * add up to the front's total.
  */
-export function describeArmour(ap, faction, difficulty) {
-  const r = frontReading(ap, faction, difficulty);
+export function describeArmour(ap, faction, difficulty, subfactions) {
+  const r = frontReading(ap, faction, difficulty, subfactions);
   if (!r) return null;
 
   const front = FRONT_PLURAL[faction] || faction;
+  /* The subfactions that changed the list, named in the heading. */
+  const forces = (subfactions || [])
+    .filter((k) => SUBFACTIONS[k] && SUBFACTIONS[k].front === faction)
+    .map((k) => SUBFACTIONS[k].name)
+    .join(", ");
   const full = r.anywhere - r.grazing;
   const facts = [];
 
@@ -298,7 +337,7 @@ export function describeArmour(ap, faction, difficulty) {
      differently at 3 and at 10. */
   return {
     reading: r,
-    title: `Armour · ${front}${r.difficulty ? ` · difficulty ${r.difficulty}` : ""}`,
+    title: `Armour · ${front}${forces ? ` · ${forces}` : ""}${r.difficulty ? ` · difficulty ${r.difficulty}` : ""}`,
     facts,
   };
 }

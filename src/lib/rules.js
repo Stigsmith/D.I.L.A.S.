@@ -23,6 +23,7 @@ import BUILD from "../data/build-rules.json";
 import { SETTINGS, readList, writeList } from "./storage.js";
 import { hazardName, missionTraits } from "./scenario.js";
 import { getItem } from "./items.js";
+import { subfactionName } from "./subfaction.js";
 
 export const ITEM_RULES = CONTEXT.rules.map((r) => ({ ...r, kind: "item" }));
 export const BUILD_RULES = BUILD.rules.map((r) => ({ ...r, kind: "build" }));
@@ -39,6 +40,7 @@ const CLIMATE = new Set(["intense_heat", "extreme_cold"]);
 
 export const GROUPS = [
   { id: "front", label: "The front", line: "Rules for each enemy faction." },
+  { id: "subfaction", label: "Enemy forces", line: "Rules for the subfaction holding the planet, from the live war. They apply while the war data is fresh." },
   { id: "peril", label: "Difficulty and squad size", line: "These apply once you set both." },
   { id: "climate", label: "Climate", line: "Intense heat and extreme cold. They last the whole mission." },
   { id: "weather", label: "Weather", line: "Storms, fog and tremors come and go, so their effects are smaller." },
@@ -55,6 +57,7 @@ export function ruleGroup(rule) {
   if (rule.kind === "build") return "build";
   if (isPairing(rule) || (rule.when && rule.when.weight)) return "pairing";
   const w = rule.when || {};
+  if (w.subfaction) return "subfaction";
   if (w.mission || w.minutes) return "mission";
   if (w.terrain || w.city !== undefined) return "terrain";
   const scalesOffPeril = rule.scaleBy && String(rule.scaleBy.path).startsWith("scenario.");
@@ -105,6 +108,8 @@ export function describeWhen(rule) {
   const w = rule.when || {};
   const out = [];
   if (w.faction) out.push(list(w.faction.map((f) => FRONT[f] || f)));
+  if (w.subfaction) out.push(list(w.subfaction.map(subfactionName)));
+  if (w.notSubfaction) out.push(`not ${list(w.notSubfaction.map(subfactionName))}`);
   if (w.hazard) out.push(list(w.hazard.map((h) => hazardName(h).toLowerCase())));
   if (w.notHazard) out.push(`no ${list(w.notHazard.map((h) => hazardName(h).toLowerCase()))}`);
   if (w.terrain) {

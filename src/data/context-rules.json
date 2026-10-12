@@ -1126,7 +1126,12 @@
         },
         "peril": {
           "gte": 22
-        }
+        },
+        "notSubfaction": [
+          "mindless-masses",
+          "appropriators",
+          "vote-snatchers"
+        ]
       },
       "match": {
         "anyOf": [
@@ -1205,7 +1210,10 @@
         ],
         "peril": {
           "gte": 22
-        }
+        },
+        "notSubfaction": [
+          "appropriators"
+        ]
       },
       "match": {
         "roles": [
@@ -1263,7 +1271,12 @@
         ],
         "difficulty": {
           "gte": 4
-        }
+        },
+        "notSubfaction": [
+          "mindless-masses",
+          "appropriators",
+          "vote-snatchers"
+        ]
       },
       "match": {
         "idIn": [
@@ -1285,7 +1298,10 @@
         ],
         "squad": {
           "lte": 2
-        }
+        },
+        "notSubfaction": [
+          "vote-snatchers"
+        ]
       },
       "match": {
         "idIn": [
@@ -3217,6 +3233,490 @@
       "delta": 3,
       "say": "Heavy armour suits holding one position, which is where sentries and emplacements work best.",
       "judgement": "From a survey of 304 missions: three quarters of heavy armour players brought 3 turrets. A small effect. Needs a chosen armour set, for its weight."
+    },
+    {
+      "id": "predator-strain-crowd-clear",
+      "name": "Crowd clear helps · Predator Strain",
+      "when": {
+        "subfaction": [
+          "predator-strain"
+        ]
+      },
+      "match": {
+        "roles": [
+          "chaff"
+        ]
+      },
+      "delta": 5,
+      "say": "Predator Strain Terminids are much faster and flank in numbers. Crowd clear kills groups of small enemies quickly.",
+      "source": "helldivers.wiki.gg, Predator Strain.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "predator-strain-fire-and-gas",
+      "name": "Fire and gas help · Predator Strain",
+      "when": {
+        "subfaction": [
+          "predator-strain"
+        ]
+      },
+      "match": {
+        "damageType": [
+          "fire",
+          "gas"
+        ]
+      },
+      "delta": 4,
+      "say": "Predator Hunters cloak. Fire and gas break the cloak and scatter them.",
+      "source": "helldivers.wiki.gg, Predator Strain.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "rupture-strain-explosives",
+      "name": "Explosives help · Rupture Strain",
+      "when": {
+        "subfaction": [
+          "rupture-strain"
+        ]
+      },
+      "match": {
+        "damageType": [
+          "explosive"
+        ],
+        "anyOf": [
+          {
+            "held": true
+          },
+          {
+            "slot": "throwable"
+          }
+        ]
+      },
+      "delta": 4,
+      "say": "Rupture Strain Warriors, Spewers and Chargers burrow. An explosion forces them to the surface.",
+      "source": "helldivers.wiki.gg, Rupture Strain.",
+      "judgement": "Held weapons and throwables only, the ones you aim at a burrowing bug. The size is ours."
+    },
+    {
+      "id": "rupture-strain-explosive-resist",
+      "name": "Explosive resistance helps · Rupture Strain, difficulty 6+",
+      "when": {
+        "subfaction": [
+          "rupture-strain"
+        ],
+        "difficulty": {
+          "gte": 6
+        }
+      },
+      "match": {
+        "slot": "armor",
+        "number": [
+          {
+            "path": "passive.explosiveResist",
+            "gte": 1
+          }
+        ]
+      },
+      "scaleBy": {
+        "path": "passive.explosiveResist",
+        "times": 0.1,
+        "clamp": 5
+      },
+      "say": "A Rupture Spewer bursts on death for 300 blast damage out to 10 m. Your armour resists explosive damage.",
+      "source": "helldivers.wiki.gg, Rupture Spewer: from difficulty 6, 300 blast damage, 4 m inner and 10 m outer radius.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "spore-burst-fire-and-gas",
+      "name": "Fire and gas help · Spore Burst Strain",
+      "when": {
+        "subfaction": [
+          "spore-burst-strain"
+        ]
+      },
+      "match": {
+        "damageType": [
+          "fire",
+          "gas"
+        ]
+      },
+      "delta": 6,
+      "say": "Fire and gas slow Spore Burst Terminids. A bug killed while burning releases no spores.",
+      "source": "helldivers.wiki.gg, Spore Burst Strain.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "spore-burst-crowd-clear",
+      "name": "Crowd clear helps · Spore Burst Strain",
+      "when": {
+        "subfaction": [
+          "spore-burst-strain"
+        ]
+      },
+      "match": {
+        "roles": [
+          "chaff"
+        ]
+      },
+      "delta": 5,
+      "say": "Spore Burst patrols are bigger and come about twice as often. Crowd clear kills groups of small enemies quickly.",
+      "source": "helldivers.wiki.gg, Spore Burst Strain.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "spore-burst-melee",
+      "name": "Melee risky · Spore Burst Strain",
+      "when": {
+        "subfaction": [
+          "spore-burst-strain"
+        ]
+      },
+      "match": {
+        "damageType": [
+          "melee"
+        ],
+        "held": true
+      },
+      "delta": -5,
+      "say": "A Spore Burst bug releases a cloud on death that damages and disorients you. Melee kills put you inside it.",
+      "source": "helldivers.wiki.gg, Spore Burst Strain: avoid melee.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "spore-burst-stamina",
+      "name": "Stamina helps · Spore Burst Strain",
+      "when": {
+        "subfaction": [
+          "spore-burst-strain"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "stamina-enhancement",
+          "dead-sprint"
+        ]
+      },
+      "delta": 5,
+      "say": "Spore clouds make nearby bugs much faster. More stamina keeps you ahead of them.",
+      "source": "helldivers.wiki.gg, Spore Burst Strain: spores give a significant increase in speed since patch 1.006.202.",
+      "judgement": "Named by hand, from the curator's own runs against the strain. The size is ours."
+    },
+    {
+      "id": "spore-burst-light-armour",
+      "name": "Light armour helps · Spore Burst Strain",
+      "when": {
+        "subfaction": [
+          "spore-burst-strain"
+        ],
+        "weight": [
+          "light"
+        ]
+      },
+      "match": {
+        "slot": "armor"
+      },
+      "delta": 4,
+      "say": "Spore clouds make nearby bugs much faster. Light armour is the fastest weight.",
+      "source": "helldivers.wiki.gg, Spore Burst Strain.",
+      "judgement": "From the curator's own runs against the strain. Needs a chosen armour set, for its weight."
+    },
+    {
+      "id": "jet-brigade-fire-resist",
+      "name": "Fire resistance helps · The Jet Brigade",
+      "when": {
+        "subfaction": [
+          "jet-brigade"
+        ]
+      },
+      "match": {
+        "slot": "armor",
+        "number": [
+          {
+            "path": "passive.fireResist",
+            "gte": 1
+          }
+        ]
+      },
+      "scaleBy": {
+        "path": "passive.fireResist",
+        "times": 0.06,
+        "clamp": 5
+      },
+      "say": "A destroyed jump pack explodes and sets fire to everything near it. Your armour resists fire damage.",
+      "source": "helldivers.wiki.gg, Jet Brigade.",
+      "judgement": "Half the size of the Incineration Corps rule: the fire only comes when a pack goes up."
+    },
+    {
+      "id": "incineration-corps-fire-resist",
+      "name": "Fire resistance helps · The Incineration Corps",
+      "when": {
+        "subfaction": [
+          "incineration-corps"
+        ]
+      },
+      "match": {
+        "slot": "armor",
+        "number": [
+          {
+            "path": "passive.fireResist",
+            "gte": 1
+          }
+        ]
+      },
+      "scaleBy": {
+        "path": "passive.fireResist",
+        "times": 0.12,
+        "clamp": 9
+      },
+      "say": "The Incineration Corps fire flamethrowers and incendiary rounds. Your armour resists the fire damage, not the round's own hit.",
+      "source": "helldivers.wiki.gg, Incineration Corps: Inflammable and Acclimated cut the fire damage, not the projectile's ballistic hit.",
+      "judgement": "The same size as the burning planet rule."
+    },
+    {
+      "id": "incineration-corps-shield-pack",
+      "name": "Shield Generator Pack helps · The Incineration Corps",
+      "when": {
+        "subfaction": [
+          "incineration-corps"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "sh-32-shield-generator-pack"
+        ]
+      },
+      "delta": 6,
+      "say": "The Incineration Corps fire incendiary rounds. The Shield Generator Pack stops them.",
+      "source": "helldivers.wiki.gg, Incineration Corps.",
+      "judgement": "Named by hand, because the wiki names it. The size is ours."
+    },
+    {
+      "id": "incineration-corps-extinguishers",
+      "name": "Integrated Extinguishers help · The Incineration Corps",
+      "when": {
+        "subfaction": [
+          "incineration-corps"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "integrated-extinguishers"
+        ]
+      },
+      "delta": 6,
+      "say": "The Incineration Corps set Helldivers on fire. This booster puts you out sooner.",
+      "source": "The booster's own text, and helldivers.wiki.gg, Incineration Corps.",
+      "judgement": "The same size as the burning planet rule."
+    },
+    {
+      "id": "hulk-surge-anti-tank",
+      "name": "Anti-tank helps · Hulk Surge",
+      "when": {
+        "subfaction": [
+          "hulk-surge"
+        ]
+      },
+      "match": {
+        "roles": [
+          "anti-armor"
+        ]
+      },
+      "delta": 5,
+      "say": "More Hulks on this planet. Anti-tank opens them.",
+      "source": "helldivers.wiki.gg, Effects, Combatant Forces.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "heavy-armor-surge-anti-tank",
+      "name": "Anti-tank helps · Heavy Armor Surge",
+      "when": {
+        "subfaction": [
+          "heavy-armor-surge"
+        ]
+      },
+      "match": {
+        "roles": [
+          "anti-armor"
+        ]
+      },
+      "delta": 6,
+      "say": "More Tanks and Striders on this planet. Anti-tank opens them.",
+      "source": "helldivers.wiki.gg, Effects, Combatant Forces.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "devastator-surge-ap-4",
+      "name": "AP 4 helps · Devastator Surge",
+      "when": {
+        "subfaction": [
+          "devastator-surge"
+        ]
+      },
+      "match": {
+        "held": true,
+        "number": [
+          {
+            "path": "stats.ap",
+            "gte": 4
+          }
+        ]
+      },
+      "delta": 4,
+      "say": "More Devastators on this planet. AP 4 opens a Devastator's body.",
+      "source": "helldivers.wiki.gg, Effects, Combatant Forces, and Devastator: armour 3.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "mindless-masses-crowd-clear",
+      "name": "Crowd clear helps · Mindless Masses",
+      "when": {
+        "subfaction": [
+          "mindless-masses"
+        ]
+      },
+      "match": {
+        "anyOf": [
+          {
+            "roles": [
+              "chaff"
+            ]
+          },
+          {
+            "idIn": [
+              "rl-77-airburst-rocket-launcher"
+            ]
+          }
+        ]
+      },
+      "delta": 6,
+      "say": "Huge numbers of Voteless and more Fleshmobs. Crowd clear and area damage kill them in groups.",
+      "source": "helldivers.wiki.gg, Mindless Masses: the Stalwart, GL-21 and RL-77.",
+      "judgement": "The Airburst Rocket Launcher is named by hand, because the wiki names it. The size is ours."
+    },
+    {
+      "id": "appropriators-explosive-resist",
+      "name": "Explosive resistance helps · Appropriators",
+      "when": {
+        "subfaction": [
+          "appropriators"
+        ]
+      },
+      "match": {
+        "slot": "armor",
+        "number": [
+          {
+            "path": "passive.explosiveResist",
+            "gte": 1
+          }
+        ]
+      },
+      "scaleBy": {
+        "path": "passive.explosiveResist",
+        "times": 0.1,
+        "clamp": 5
+      },
+      "say": "Obtruders explode on death. Your armour resists explosive damage.",
+      "source": "helldivers.wiki.gg, Appropriators: explosive resistant armour such as Fortified.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "appropriators-flame-and-laser",
+      "name": "Flamethrower and Laser Cannon help · Appropriators",
+      "when": {
+        "subfaction": [
+          "appropriators"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "flam-40-flamethrower",
+          "las-98-laser-cannon"
+        ]
+      },
+      "delta": 5,
+      "say": "Appropriators bring only Illuminate and their machines. The Flamethrower and the Laser Cannon kill them well.",
+      "source": "helldivers.wiki.gg, Appropriators.",
+      "judgement": "Named by hand, because the wiki names these two. The size is ours."
+    },
+    {
+      "id": "appropriators-melee",
+      "name": "Melee risky · Appropriators",
+      "when": {
+        "subfaction": [
+          "appropriators"
+        ]
+      },
+      "match": {
+        "damageType": [
+          "melee"
+        ],
+        "held": true
+      },
+      "delta": -4,
+      "say": "Obtruders fly out of melee range and explode on death.",
+      "source": "helldivers.wiki.gg, Appropriators: avoid melee.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "vote-snatchers-fire-and-gas",
+      "name": "Fire and gas help · Vote Snatchers",
+      "when": {
+        "subfaction": [
+          "vote-snatchers"
+        ]
+      },
+      "match": {
+        "damageType": [
+          "fire",
+          "gas"
+        ]
+      },
+      "delta": 4,
+      "say": "Wretches pounce from range and come in large patrols. Fire and gas kill them.",
+      "source": "helldivers.wiki.gg, Vote Snatchers.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "vote-snatchers-crusher-helmet",
+      "name": "AP 5 helps · Vote Snatchers",
+      "when": {
+        "subfaction": [
+          "vote-snatchers"
+        ]
+      },
+      "match": {
+        "held": true,
+        "number": [
+          {
+            "path": "stats.ap",
+            "gte": 5
+          }
+        ]
+      },
+      "delta": 4,
+      "say": "A Crusher's helmet is armour 4. AP 5 breaks it at full damage.",
+      "source": "helldivers.wiki.gg, Vote Snatchers, and the Crusher's armour in the enemy table.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "exostorm-3-light-and-medium-armour",
+      "name": "Light and medium armour risky · Exostorm class 3",
+      "when": {
+        "subfaction": [
+          "exostorm-3"
+        ],
+        "weight": [
+          "light",
+          "medium"
+        ]
+      },
+      "match": {
+        "slot": "armor"
+      },
+      "delta": -6,
+      "say": "Constant lightning kills Helldivers in medium or light armour. Destroying the Exospire core ends most of it.",
+      "source": "helldivers.wiki.gg, Exostorm.",
+      "judgement": "The size is ours. Needs a chosen armour set, for its weight."
     }
   ],
   "knownGaps": [
@@ -3237,7 +3737,8 @@
     "Boosters are mostly silent, and that is correct rather than a gap. 11 of 20 have no rule because they do the same job on every drop: samples, hellpod ammo, radar, extraction. The two reinforcement boosters might vary with difficulty, and have no published figure to scale off.",
     "Meteor storms have no rule. The wiki says meteors cause massive damage and gives no damage type, figure or frequency, so nothing says which armour or gear it should favour.",
     "Acid resistance on Acclimated and Desert Stormer is read by no rule. The wiki does not say whether it softens an acid storm, which reduces armour effectiveness rather than dealing acid damage. Blunt Force Mitigation's armour rating bonus has no number in its effect, so the acid storm rule cannot scale it.",
-    "Stingrays are absent when the Appropriators, Mindless Masses or Vote Snatchers lead the Illuminate front. The tool has no subfaction, so stingrays-find-you applies on every Illuminate planet.",
-    "Your skill level, set per profile, moves peril: each level above Suicide Mission takes 6 off, each below adds 6. It is the player's own answer and nothing checks it. Rules about what spawns read difficulty instead, so a strong player still sees Leviathans from 8."
+    "Stingrays are absent when the Appropriators, Mindless Masses or Vote Snatchers hold an Illuminate planet, and Watchers when the Vote Snatchers do. The rules that need them carry notSubfaction, read from a fresh war. With no fresh war the tool cannot tell, so they still apply on every Illuminate planet.",
+    "Your skill level, set per profile, moves peril: each level above Suicide Mission takes 6 off, each below adds 6. It is the player's own answer and nothing checks it. Rules about what spawns read difficulty instead, so a strong player still sees Leviathans from 8.",
+    "The subfaction rules (subfactions.json) apply only while the war is fresh, within 30 minutes. Their sizes are ours; each cites the wiki page it reads. Hive Lords, Dragonroaches and Hive World carry no points at the curator's call: they change the enemy list and are named on the brief, the planet card and the scenario bar. The Cyborgs change the enemy list only, because the wiki names nothing to bring against them that the Automaton front does not already ask for."
   ]
 }

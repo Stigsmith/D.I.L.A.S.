@@ -29,6 +29,8 @@ import Rules from "./Rules.jsx";
 import Shared from "./Shared.jsx";
 import { PartyButton, PartyPanel } from "./Party.jsx";
 import { useRulesOff } from "./lib/rules.js";
+import { useWar } from "./lib/war.js";
+import { subfactionsOn } from "./lib/subfaction.js";
 import { useParty, usePartySync } from "./lib/party.js";
 import Collection, { COLLECTION_TABS, CollectionNudge } from "./Collection.jsx";
 import Ambient, { Grain, Masthead } from "./Ambient.jsx";
@@ -493,7 +495,19 @@ export default function App() {
   const [rulesOff, toggleRule, clearRules] = useRulesOff();
   /* Your level rides beside the switched-off rules: it comes from the
      active profile, never from the drop, and never goes to a party. */
-  const scored = useMemo(() => ({ ...scenario, rulesOff, skill: state.skill }), [scenario, rulesOff, state.skill]);
+  /* Who holds the planet, from this browser's own war, and only while it
+     is fresh. Live like the two above, so never stored and never sent to
+     a party. Keyed on the joined names, because the war object is new on
+     every poll and the ratings should not recompute once a minute for
+     nothing. warStale says a planet is chosen and the war is too old to
+     read, so the bar can say why no subfaction shows. */
+  const war = useWar(Boolean(scenario.planet));
+  const subKey = subfactionsOn(war, scenario.planet).join("+");
+  const warStale = Boolean(scenario.planet && war && !war.fresh);
+  const scored = useMemo(
+    () => ({ ...scenario, rulesOff, skill: state.skill, subfactions: subKey ? subKey.split("+") : [] }),
+    [scenario, rulesOff, state.skill, subKey]
+  );
   /* The drop and the party live here rather than on the drop screen: what
      you confirmed has to reach the party, and the host's scenario has to
      reach you, while you are in the builder or on the tier list too. */
@@ -882,7 +896,7 @@ export default function App() {
           {/* have forgotten making is never on screen without the choice    */}
           {/* next to it.                                                    */}
           {SCENARIO_SURFACES.has(dest) && scenario.faction ? (
-            <ScenarioBar scenario={scenario} onAdjust={openScenario}
+            <ScenarioBar scenario={scored} warStale={warStale} onAdjust={openScenario}
               rulesOff={rulesOff.size} onRules={() => navigate("rules")} />
           ) : null}
           </div>

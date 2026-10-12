@@ -29,6 +29,7 @@ import { useWar, agoText } from "./lib/war.js";
 import { usePlannerPrefs, planets, biomeName, loudHazards, hazardName } from "./lib/scenario.js";
 import { levelFacts, levelNew, outpostSummary, DIFFICULTY_SOURCE } from "./lib/difficulty.js";
 import { enemiesUpTo, arrivalsAt, arrivalsLine } from "./lib/enemies.js";
+import { subfactionsOn } from "./lib/subfaction.js";
 import { vocabulary } from "./lib/items.js";
 import { Tip, HAS_TIP } from "./Tip.jsx";
 import PlanetCard from "./PlanetCard.jsx";
@@ -190,6 +191,7 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
         style={{ bottom: GAP_PX, right: GAP_PX, left: (plannerOpen && wide ? PANEL_PX + GAP_PX : 0) + GAP_PX }}>
         {wide ? <span /> : null}
         <DifficultyCard level={scenario.difficulty} faction={scenario.faction} onChange={setDifficulty}
+          subfactions={subfactionsOn(war, scenario.planet)}
           squad={<>
             <SquadCount value={scenario.squad} onChange={setSquad} party={party} />
             <span className="hidden h-8 w-px bg-base-800 sm:block" aria-hidden="true" />
@@ -445,7 +447,7 @@ export function DifficultyStepper({ value, onChange }) {
    The sentences the tiles stand for are their tooltips. */
 /* How many of you sits beside the stepper: difficulty and squad size are
    the two halves of how hard this is, and the ratings read them together. */
-function DifficultyCard({ level, faction, onChange, squad }) {
+function DifficultyCard({ level, faction, onChange, squad, subfactions }) {
   const f = levelFacts(level);
   const fresh = levelNew(level);
   return (
@@ -457,7 +459,7 @@ function DifficultyCard({ level, faction, onChange, squad }) {
         {squad}
       </div>
       {f ? (
-        <LevelTiles facts={f} level={level} faction={faction} fresh={fresh} />
+        <LevelTiles facts={f} level={level} faction={faction} fresh={fresh} subfactions={subfactions} />
       ) : (
         <p className="max-w-sm text-center text-[11px] leading-relaxed text-base-500">
           Set a difficulty to see what the level brings.
@@ -479,11 +481,11 @@ function Tile({ label, title, children }) {
   );
 }
 
-function LevelTiles({ facts: f, level, faction, fresh }) {
+function LevelTiles({ facts: f, level, faction, fresh, subfactions }) {
   const out = outpostSummary(f.outposts);
-  const arrival = faction ? arrivalsAt(faction, level) : null;
+  const arrival = faction ? arrivalsAt(faction, level, subfactions) : null;
   const enemyNote = faction
-    ? `Ratings count the ${enemiesUpTo(faction, level)} enemies this front has at this level.` + arrivalsLine(faction, level)
+    ? `Ratings count the ${enemiesUpTo(faction, level, subfactions)} enemies this front has at this level.` + arrivalsLine(faction, level, subfactions)
     : "Choose a front to see its enemies at this level.";
   return (
     <div className="flex max-w-full flex-wrap items-start justify-center divide-x divide-base-800 border-t border-base-800 pt-2"
@@ -507,7 +509,7 @@ function LevelTiles({ facts: f, level, faction, fresh }) {
       <Tile label="Modifiers" title="Operation modifiers: one from difficulty 5, a second from 8">{f.modifiers || "none"}</Tile>
       <Tile label="Rewards" title="Extra requisition and experience at this level">{f.multiplier ? `+${f.multiplier}%` : "none"}</Tile>
       <Tile label="Enemies" title={enemyNote}>
-        {faction ? enemiesUpTo(faction, level) : "?"}
+        {faction ? enemiesUpTo(faction, level, subfactions) : "?"}
         {arrival && arrival.kind === "new" ? (
           <span className="block text-[10px] font-normal text-accent-300">new: {arrival.names[0]}</span>
         ) : null}

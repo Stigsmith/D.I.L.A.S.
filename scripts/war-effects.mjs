@@ -17,6 +17,9 @@ import { dirname, join } from "node:path";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const table = JSON.parse(readFileSync(join(ROOT, "src", "data", "war-effects.json"), "utf8")).effects;
+const subfactions = JSON.parse(readFileSync(join(ROOT, "src", "data", "subfactions.json"), "utf8")).subfactions;
+/* Which subfaction each number means, from subfactions.json. */
+const forceOf = new Map(Object.entries(subfactions).flatMap(([key, s]) => s.effects.map((n) => [n, key])));
 const UPSTREAM = "https://api.helldivers2.dev";
 const WAR_ID = 801;
 const headers = { accept: "application/json", "x-super-client": "dilas.me", "x-super-contact": "https://dilas.me" };
@@ -46,9 +49,13 @@ for (const [id, list] of rows) {
   if (e) named += 1;
   const label = e ? (e.name ? e.name + (e.from === "companion" ? " *" : "") : e.draw === "cloud" ? "(hidden, drawn as cloud)" : "(hidden)") : "UNNAMED";
   const names = [...list].sort();
-  console.log(`  ${String(id).padEnd(6)} ${label.padEnd(34)} ${names.length} · ${names.slice(0, 6).join(", ")}${names.length > 6 ? ` and ${names.length - 6} more` : ""}`);
+  const force = forceOf.get(id);
+  console.log(`  ${String(id).padEnd(6)} ${label.padEnd(34)} ${(force ? "subfaction " + force : "").padEnd(30)} ${names.length} · ${names.slice(0, 6).join(", ")}${names.length > 6 ? ` and ${names.length - 6} more` : ""}`);
 }
 const stale = Object.keys(table).filter((id) => !by.has(Number(id)));
 console.log(`\n  ${named} of ${rows.length} named or marked hidden in war-effects.json. * is the Companion's label; the game card's own words are not seen yet.`);
 if (stale.length) console.log(`  Named but on no planet right now: ${stale.join(", ")}. Keep them: an effect can come back.`);
-console.log("  To name one, add it to src/data/war-effects.json with the words on the game's planet card.\n");
+console.log("  To name one, add it to src/data/war-effects.json with the words on the game's planet card.");
+const waiting = Object.entries(subfactions).filter(([, s]) => !s.effects.length).map(([key]) => key);
+if (waiting.length) console.log(`  Subfactions with no number yet: ${waiting.join(", ")}. When one appears, name it in war-effects.json and add its number in subfactions.json.`);
+console.log("");

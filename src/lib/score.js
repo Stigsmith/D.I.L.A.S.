@@ -25,6 +25,7 @@ import { isHeldWeapon } from "./loadouts.js";
 import { traitsOf } from "./scenario.js";
 import { terrainOf, hasMegacity, minutesOf } from "./place.js";
 import { frontReading } from "./enemies.js";
+import { SUBFACTIONS, subfactionsIn } from "./subfaction.js";
 
 /* ------------------------------------------------------------------ */
 /* The scale                                                           */
@@ -405,6 +406,25 @@ export function applies(scenario, when) {
       if (!asArray(want).some((t) => have.includes(t))) return false;
       continue;
     }
+    /* Who holds the planet, from the live war: any of these keys from
+       subfactions.json. Only the scenario's own front counts. No fresh
+       war, or no planet, and a rule asking for one does not fire, the
+       same as an unset difficulty. notSubfaction is the opposite, and
+       with nothing known it holds: a rule about Stingrays still applies
+       until the war says Vote Snatchers took them away. It is only for
+       what a subfaction takes away, and Invasion Fleet puts all of that
+       back, so with Invasion Fleet on the planet it always holds. */
+    if (key === "subfaction" || key === "notSubfaction") {
+      const have = subfactionsIn(scenario);
+      if (key === "notSubfaction" && have.some((k) => SUBFACTIONS[k].restores)) continue;
+      const hit = asArray(want).some((s) => have.includes(s));
+      if (key === "subfaction" ? !hit : hit) return false;
+      continue;
+    }
+    /* A key nothing above reads would be skipped, and the rule would
+       apply wider than written. The validator catches it first; this
+       stops it at run time too. */
+    throw new Error(`a rule's when asks about "${key}", which applies() does not read`);
   }
   return true;
 }
@@ -456,7 +476,7 @@ export function scoreItem(item, scenario = {}) {
   /* priced in. The plumbing stays because it is correct and because     */
   /* loadout scoring will want it. Read whyThereAreNoArmourRules in      */
   /* context-rules.json before adding one back.                          */
-  const armour = frontReading(item.stats.ap, faction, scenario.difficulty);
+  const armour = frontReading(item.stats.ap, faction, scenario.difficulty, scenario.subfactions);
   const ctx = { item, wiki, armour, scenario: { ...scenario, peril: peril(scenario) } };
 
   const reasons = [];

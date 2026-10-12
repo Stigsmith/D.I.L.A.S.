@@ -31,6 +31,7 @@ import {
 import { scoreItem, scenarioIsSet } from "./lib/score.js";
 import { readBuild, explainScore } from "./lib/build.js";
 import { describeArmour } from "./lib/enemies.js";
+import { SUBFACTIONS, subfactionsIn } from "./lib/subfaction.js";
 import { Tip, MissingData, HAS_TIP } from "./Tip.jsx";
 import TierBadgePlate from "./TierBadgePlate.jsx";
 import { agoText } from "./lib/war.js";
@@ -1012,7 +1013,7 @@ function Section({ title, tip = null, children }) {
   );
 }
 
-function RowDetail({ item, faction, scored, difficulty }) {
+function RowDetail({ item, faction, scored, difficulty, subfactions }) {
   const sets = item.slot === "armor" ? ARMOR_SETS[item.id] : null;
   const art = itemArt(item.id);
   const s = item.stats;
@@ -1027,7 +1028,7 @@ function RowDetail({ item, faction, scored, difficulty }) {
   /* Null for anything with no penetration recorded, which is every armor */
   /* passive and every booster, so the section simply does not appear     */
   /* rather than rendering an empty one.                                  */
-  const armour = describeArmour(s.ap, faction, difficulty);
+  const armour = describeArmour(s.ap, faction, difficulty, subfactions);
 
   /* Provenance, which the build spec calls the product rather than an   */
   /* implementation detail. Every rating says where it came from and     */
@@ -1564,7 +1565,7 @@ function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, loc
         </div>
       </div>
       {open && !onSelect ? <RowDetail item={item} faction={factionMeta.id} scored={scored}
-          difficulty={scenario ? scenario.difficulty : 0} /> : null}
+          difficulty={scenario ? scenario.difficulty : 0} subfactions={scenario ? scenario.subfactions : null} /> : null}
     </div>
   );
 }
@@ -1704,7 +1705,7 @@ function FactionPick({ faction: f, on, hero, dimmed, onChoose, compact = false }
  * being read, because a rating computed from a choice you have
  * forgotten making is worse than no rating at all.
  */
-export function ScenarioBar({ scenario, onAdjust, rulesOff = 0, onRules }) {
+export function ScenarioBar({ scenario, onAdjust, rulesOff = 0, onRules, warStale = false }) {
   const f = FACTIONS.find((x) => x.id === scenario.faction);
   if (!f) return null;
   const d = difficultyAt(scenario.difficulty);
@@ -1720,6 +1721,21 @@ export function ScenarioBar({ scenario, onAdjust, rulesOff = 0, onRules }) {
       </span>
 
       <Chip>{scenario.planet || (scenario.biome ? biomeName(scenario.biome) : "any planet")}</Chip>
+      {/* Who holds the planet, from the live war. It changes ratings the
+          way a hazard does, so it is named where the planet is. */}
+      {subfactionsIn(scenario).map((k) => (
+        <Tip key={k} title={SUBFACTIONS[k].name} text={SUBFACTIONS[k].say} className="cursor-help">
+          <span className={"rounded border px-1.5 py-0.5 text-[11px] font-semibold " + HAS_TIP}
+            style={{ borderColor: f.hex + "66", color: f.hex, fontFamily: "'JetBrains Mono', monospace" }}>
+            {SUBFACTIONS[k].name}
+          </span>
+        </Tip>
+      ))}
+      {warStale ? (
+        <Tip text="The war data is more than 30 minutes old. Subfaction rules do not apply until it updates." className="cursor-help">
+          <span className={"text-[11px] text-base-500 " + HAS_TIP} style={{ fontFamily: "'JetBrains Mono', monospace" }}>subfaction unknown</span>
+        </Tip>
+      ) : null}
       <Chip>{scenario.mission || "any mission"}</Chip>
       <Chip icon={d ? <DifficultyIcon level={d.level} className="h-3.5 w-6" /> : null}>
         {d ? d.name : "any difficulty"}

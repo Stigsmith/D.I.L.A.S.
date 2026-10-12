@@ -172,6 +172,14 @@
       "say": "A card for every planet with a picture of the ground, and the map shows the Gloom, black holes, attack lines, the space station and what is on each planet."
     },
     {
+      "id": "effects",
+      "title": "Enemy subfactions in the ratings",
+      "status": "shipped",
+      "version": "1.37.0",
+      "track": "solo",
+      "say": "Predator Strain, the Jet Brigade, Vote Snatchers and the rest, read from the live war, change the enemies counted and the ratings for that planet."
+    },
+    {
       "id": "difficulty-everywhere",
       "title": "Difficulty and squad size on every front",
       "status": "next",
@@ -184,13 +192,6 @@
       "status": "next",
       "track": "solo",
       "say": "Every preset build replaced with a new set, made from the tool's own ratings and rules."
-    },
-    {
-      "id": "effects",
-      "title": "Enemy subfactions in the ratings",
-      "status": "next",
-      "track": "solo",
-      "say": "Predator Strain, the Jet Brigade, Vote Snatchers and the rest, read from the live war, changing what the tool suggests for that planet."
     },
     {
       "id": "accounts",

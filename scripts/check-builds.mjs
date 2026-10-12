@@ -157,6 +157,7 @@ for (const rule of RULES) {
         biome: (when.biome || [])[0] ?? scenario.biome,
         hazards: when.hazard ? [when.hazard[0]] : scenario.hazards,
         mission: when.mission ? missionWith(when.mission) : scenario.mission,
+        subfactions: when.subfaction ? [when.subfaction[0]] : [],
       };
       if (!isRandom) eligible += 1;
       const r = build.readBuild(loadout, s);
@@ -271,7 +272,8 @@ const SLOT_KEY = { primary: "primary", secondary: "secondary", throwable: "grena
 /* The gentlest scenario the rule's own gate allows. */
 function pairingScenario(rule, faction) {
   const when = rule.when || {};
-  const s = { faction, hazards: when.hazard || [], biome: null, mission: when.mission ? missionWith(when.mission) : null, difficulty: 0, squad: 0 };
+  const s = { faction, hazards: when.hazard || [], biome: null, mission: when.mission ? missionWith(when.mission) : null, difficulty: 0, squad: 0,
+    subfactions: when.subfaction ? [when.subfaction[0]] : [] };
   if (when.peril || when.squad || when.difficulty) {
     for (let sq = 4; sq >= 1; sq -= 1) {
       if (when.squad && !score.numberTest(sq, when.squad)) continue;

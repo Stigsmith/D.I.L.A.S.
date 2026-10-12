@@ -97,7 +97,7 @@ export function buildFacts(loadout, scenario = {}) {
        level. Null with no front chosen or nothing held, both of which
        are real absences rather than zeroes, and a rule reaching through
        a null finds undefined and does not fire. */
-    reach: frontReading(heldAp, scenario.faction, scenario.difficulty),
+    reach: frontReading(heldAp, scenario.faction, scenario.difficulty, scenario.subfactions),
     roles: {
       antiArmor: roleCount("anti-armor"),
       chaff: roleCount("chaff"),
@@ -200,7 +200,7 @@ function itemCtx(ctx, item) {
   return {
     item,
     wiki: ctx.wikiFor(item),
-    armour: frontReading(item.stats.ap, ctx.scenario.faction, ctx.scenario.difficulty),
+    armour: frontReading(item.stats.ap, ctx.scenario.faction, ctx.scenario.difficulty, ctx.scenario.subfactions),
     scenario: ctx.scenario,
   };
 }

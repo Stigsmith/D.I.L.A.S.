@@ -11,7 +11,7 @@
 /* fail.                                                              */
 /* ================================================================== */
 
-import { galaxy, difficulty, planet, readJson } from "./lib/app.mjs";
+import { galaxy, difficulty, planet, subfaction, enemies, score, readJson } from "./lib/app.mjs";
 
 const { VIEW, CENTRE, RADIUS, MAX_ZOOM, HOME } = galaxy;
 const table = readJson("src/data/planets.json").planets;
@@ -452,4 +452,38 @@ ok(covers, "in full screen the drawing reaches every edge of the screen, so a se
   const old = galaxy.cleanWar({ ...raw, fetchedAt: now - galaxy.WAR_TOO_OLD_MS - 1 }, now);
   ok(old.marks === null && old.station === null && galaxy.liveSpot(old, fixed) === fixed,
     "an old war draws no effect, no attack line, no station, and moves nothing");
+}
+
+/* Who holds a planet: read from a fresh war only, gated to the scenario's
+   own front, and changing the enemy list the way the table says. */
+{
+  const now = 2_000_000_000_000;
+  const war = (fetchedAt, effects) => galaxy.cleanWar({ fetchedAt, planets: [], marks: { effects, attacks: [], moved: {} } }, now);
+  const fresh = war(now - 60_000, { GACRUX: [1245, 1308, 9999], IVIS: [1403, 1414] });
+  ok(subfaction.subfactionsOn(fresh, "Gacrux").join() === "predator-strain,hive-lords", "a fresh war names the subfactions on a planet, in table order");
+  ok(subfaction.subfactionsOn(war(now - galaxy.WAR_TOO_OLD_MS - 1, { GACRUX: [1245] }), "Gacrux").length === 0, "an old war names none");
+  ok(subfaction.subfactionsOn(null, "Gacrux").length === 0 && subfaction.subfactionsOn(fresh, null).length === 0, "no war, or no planet, names none");
+  ok(subfaction.subfactionsIn({ faction: "bots", subfactions: ["predator-strain"] }).length === 0,
+    "a bot build does not inherit a bug planet's subfaction");
+
+  const names = (list) => new Set(list.map((e) => e.name));
+  const plain = names(enemies.enemiesFor("bugs", [], 10));
+  ok(!plain.has("Hive Lord") && !plain.has("Dragonroach") && !plain.has("Predator Hunter"), "the everyday Terminid list has no Hive Lord, Dragonroach or variant");
+  ok(names(enemies.enemiesFor("bugs", ["hive-lords"], 10)).has("Hive Lord"), "Hive Lords add the Hive Lord");
+  const roaches = names(enemies.enemiesFor("bugs", ["dragonroaches"], 10));
+  ok(roaches.has("Dragonroach") && !roaches.has("Bile Titan"), "Dragonroaches replace Bile Titans");
+  const snatch = names(enemies.enemiesFor("squids", ["vote-snatchers"], 10));
+  ok(snatch.has("Crusher") && !snatch.has("Watcher") && !snatch.has("Stingray"), "Vote Snatchers bring Crushers and take Watchers and Stingrays");
+  ok(names(enemies.enemiesFor("squids", ["vote-snatchers", "invasion-fleet"], 10)).has("Stingray"), "Invasion Fleet puts back what another subfaction removed");
+  ok(names(enemies.enemiesFor("bots", ["cyborgs"], 6)).has("Factory Strider") && !names(enemies.enemiesFor("bots", ["cyborgs"], 7)).has("Factory Strider"),
+    "a removal from a difficulty waits for that difficulty");
+
+  const stingray = { faction: "squids", squad: 1, difficulty: 9 };
+  ok(score.applies(stingray, { notSubfaction: ["vote-snatchers"] }), "with no subfaction known, a not-subfaction rule holds");
+  ok(!score.applies({ ...stingray, subfactions: ["vote-snatchers"] }, { notSubfaction: ["vote-snatchers"] }), "on a Vote Snatchers planet it does not");
+  ok(score.applies({ ...stingray, subfactions: ["vote-snatchers", "invasion-fleet"] }, { notSubfaction: ["vote-snatchers"] }), "with Invasion Fleet there too, it holds again");
+  ok(!score.applies(stingray, { subfaction: ["vote-snatchers"] }), "a subfaction rule needs its subfaction");
+  let threw = false;
+  try { score.applies(stingray, { nonsense: true }); } catch { threw = true; }
+  ok(threw, "a when key the engine does not read stops it");
 }

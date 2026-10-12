@@ -32,6 +32,9 @@ const enemies = load("enemies.json");
 const contextRules = load("context-rules.json");
 const buildRules = load("build-rules.json");
 const missions = load("missions.json");
+const subfactionTable = load("subfactions.json");
+const warEffects = load("war-effects.json");
+const SUBFACTION_KEYS = new Set(Object.keys(subfactionTable.subfactions || {}));
 
 const problems = [];
 const fail = (msg, list) => {
@@ -384,7 +387,7 @@ const collect = (node, out, keys) => {
 /* Every scenario key applies() knows how to test. */
 const WHEN_KEYS = set([
   "faction", "hazard", "notHazard", "biome", "mission", "difficulty", "squad", "peril",
-  "terrain", "city", "minutes", "weight",
+  "terrain", "city", "minutes", "weight", "subfaction", "notSubfaction",
 ]);
 
 /* The hazards and biomes a rule may name, from the planet table. A typo
@@ -524,6 +527,9 @@ for (const rule of rules) {
   }
   for (const v of [].concat(w.weight || [])) {
     if (!["light", "medium", "heavy"].includes(v)) ruleProblems.push(`${rule.id} asks for armour weight "${v}", not light, medium or heavy`);
+  }
+  for (const k of [].concat(w.subfaction || [], w.notSubfaction || [])) {
+    if (!SUBFACTION_KEYS.has(k)) ruleProblems.push(`${rule.id} names subfaction "${k}", which subfactions.json does not carry`);
   }
   if (w.city !== undefined && typeof w.city !== "boolean") ruleProblems.push(`${rule.id} gates on city ${JSON.stringify(w.city)}, not true or false`);
 
@@ -686,6 +692,46 @@ for (const f of FACTIONS) {
     if (e.name !== null && !table.froms.includes(e.from)) bad.push(`${id}: from must be one of ${table.froms.join(", ")}`);
   }
   if (bad.length) fail(`${bad.length} problem(s) in war-effects.json:`, bad);
+}
+
+/* The subfactions, the curator's table. Every effect number is a named
+   one in war-effects.json and belongs to one subfaction only, every enemy
+   it adds, removes or labels is in enemies.json on its own front, and
+   each has a sentence and a source. A name that matches nothing would
+   change no enemy list and say so nowhere. */
+{
+  const bad = [];
+  const FRONTS = new Set(["bots", "bugs", "squids"]);
+  const enemyFront = new Map(enemies.enemies.map((e) => [e.name, e.faction]));
+  const variants = new Set(enemies.enemies.map((e) => e.variant).filter(Boolean));
+  const owner = new Map();
+  if (subfactionTable.source !== "curator") bad.push("source must be curator");
+  for (const [key, s] of Object.entries(subfactionTable.subfactions || {})) {
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(key)) bad.push(`${key}: the key must be a lowercase slug`);
+    if (typeof s.name !== "string" || !s.name.trim() || s.name.length > 40) bad.push(`${key}: a name is 1 to 40 characters`);
+    if (!FRONTS.has(s.front)) bad.push(`${key}: front "${s.front}" is not bots, bugs or squids`);
+    if (typeof s.say !== "string" || !s.say.trim() || s.say.length > 120) bad.push(`${key}: say is 1 to 120 characters`);
+    if (typeof s.source !== "string" || !s.source.startsWith("https://")) bad.push(`${key}: source must be a link`);
+    if (!Array.isArray(s.effects) || !Array.isArray(s.adds) || !Array.isArray(s.removes)) { bad.push(`${key}: effects, adds and removes are lists`); continue; }
+    for (const n of s.effects) {
+      const e = warEffects.effects[String(n)];
+      if (!e) bad.push(`${key}: effect ${n} is not in war-effects.json`);
+      else if (!e.name) bad.push(`${key}: effect ${n} is hidden in war-effects.json`);
+      if (owner.has(n)) bad.push(`${key}: effect ${n} already belongs to ${owner.get(n)}`);
+      owner.set(n, key);
+    }
+    if (s.variant !== null && !variants.has(s.variant)) bad.push(`${key}: no enemy in enemies.json carries variant "${s.variant}"`);
+    for (const n of s.adds) {
+      if (enemyFront.get(n) !== s.front) bad.push(`${key}: adds "${n}", which is not a ${s.front} enemy in enemies.json`);
+    }
+    for (const r of s.removes) {
+      const n = typeof r === "string" ? r : r && r.name;
+      if (typeof r !== "string" && !(r && Number.isInteger(r.from) && r.from >= 1 && r.from <= 10)) bad.push(`${key}: a removal is a name or { name, from } with from 1 to 10`);
+      if (enemyFront.get(n) !== s.front) bad.push(`${key}: removes "${n}", which is not a ${s.front} enemy in enemies.json`);
+    }
+    if (s.restores !== undefined && s.restores !== true) bad.push(`${key}: restores is true or absent`);
+  }
+  if (bad.length) fail(`${bad.length} problem(s) in subfactions.json:`, bad);
 }
 
 /* ------------------------------------------------------------------ */

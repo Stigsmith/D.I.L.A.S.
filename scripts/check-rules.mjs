@@ -20,7 +20,7 @@
 /* scenario. This is the cheap way to notice when one does not.       */
 /* ================================================================== */
 
-import { score, items, readJson, read, FACTIONS } from "./lib/app.mjs";
+import { score, items, subfaction, readJson, read, FACTIONS } from "./lib/app.mjs";
 
 const MISSIONS = readJson("src/data/missions.json");
 const PLANETS = readJson("src/data/planets.json");
@@ -34,7 +34,10 @@ const RANK = { "S+": 6, S: 5, A: 4, B: 3, C: 2, D: 1 };
 /* empty scenario where it could never fire at all.                      */
 function scenariosFor(rule) {
   const when = rule.when || {};
-  const factions = when.faction || FACTIONS;
+  /* A subfaction rule is measured on a planet that subfaction holds, so
+     on its own front with the first one it names. */
+  const subfactions = when.subfaction ? [when.subfaction[0]] : [];
+  const factions = when.faction || (when.subfaction ? [subfaction.SUBFACTIONS[when.subfaction[0]].front] : FACTIONS);
   const hazards = when.hazard || [];
   let biome = (when.biome || [])[0] || null;
   /* A terrain rule needs a biome whose ground answers it: the first one in
@@ -120,7 +123,7 @@ function scenariosFor(rule) {
     squad = squad || 1;
   }
 
-  return factions.map((faction) => ({ faction, hazards, biome, planet, mission, difficulty, squad }));
+  return factions.map((faction) => ({ faction, hazards, biome, planet, mission, difficulty, squad, subfactions }));
 }
 
 /* A pairing fires only inside a build, so a tier row can never show one

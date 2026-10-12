@@ -144,9 +144,21 @@ function HowItWorks() {
         <ul className="flex list-disc flex-col gap-1 pl-5">
           <li>Armour per body part: helldivers.wiki.gg.</li>
           <li>AP above armour: full damage. AP equal to armour: 65%. AP below: no damage.</li>
-          <li>Counted: the enemies a front always has at your difficulty. Event-only strains and brigades are left out.</li>
+          <li>Counted: the enemies a front always has at your difficulty, changed by the subfaction holding the planet.</li>
           <li>Some weak points only open up after armour breaks, like a Charger's legs. The count treats them as always open.</li>
           <li>Armour does not change an item's tier. It counts toward the Build badge, which checks the whole loadout.</li>
+        </ul>
+      </Part>
+      <Part id="subfactions" title="Enemy forces">
+        <p>
+          The game marks the subfaction holding each planet, like Predator Strain or Vote Snatchers. Choose that
+          planet and its subfaction changes the enemies counted and the rules that apply.
+        </p>
+        <ul className="flex list-disc flex-col gap-1 pl-5">
+          <li>Read from the live war, only while it is under 30 minutes old.</li>
+          <li>Each player reads their own. It is never sent to a party.</li>
+          <li>Hive Lords, Dragonroaches and Hive World change the enemies counted and add no points.</li>
+          <li>What each subfaction brings and replaces: helldivers.wiki.gg. The points are our own.</li>
         </ul>
       </Part>
       <Part id="ground" title="Ground and megacities">

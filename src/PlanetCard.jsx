@@ -20,6 +20,10 @@ import { planetFacts, pickShots } from "./lib/planet.js";
 import { planetLandscapes, biomeLandscape, planetArt } from "./lib/assets.js";
 import { Tip, MissingData, HAS_TIP } from "./Tip.jsx";
 import { planetEffects } from "./lib/effects.js";
+import { SUBFACTIONS, subfactionsOn } from "./lib/subfaction.js";
+
+/* The fronts' own colours, literal in every theme like everywhere else. */
+const FRONT_HEX = { bots: "#EF4444", bugs: "#F97316", squids: "#A855F7" };
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 const WIKI = "https://helldivers.wiki.gg/wiki/";
@@ -87,6 +91,11 @@ export default function PlanetCard({ name, compact = false, war = null, titled =
   if (!facts) return null;
   const marked = planetEffects(war, facts.name);
   const gone = marked.gone;
+  /* Who holds it, set apart from the other marks because it changes the
+     ratings. Their own effect lines are left out below. */
+  const forces = gone ? [] : subfactionsOn(war, facts.name);
+  const forceEffects = new Set(forces.flatMap((k) => SUBFACTIONS[k].effects));
+  const others = marked.named.filter((e) => !forceEffects.has(e.id));
   const shots = gone ? [] : pickShots(name, planetLandscapes, biomeLandscape);
   const render = shots.length || gone ? null : planetArt(name);
   const t = facts.temperature;
@@ -134,9 +143,21 @@ export default function PlanetCard({ name, compact = false, war = null, titled =
           </p>
         ) : null}
 
-        {marked.named.length || marked.unnamed || station ? (
+        {forces.length ? (
           <div className="flex flex-col gap-1 border-t border-base-800 pt-2">
-            {marked.named.map((e) => (
+            <p className="text-[9px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>Enemy forces</p>
+            {forces.map((k) => (
+              <p key={k} className="text-[11px] leading-relaxed text-base-400">
+                <span className="font-semibold" style={{ color: FRONT_HEX[SUBFACTIONS[k].front] }}>{SUBFACTIONS[k].name}</span>
+                {compact ? null : <> {SUBFACTIONS[k].say}</>}
+              </p>
+            ))}
+          </div>
+        ) : null}
+
+        {others.length || marked.unnamed || station ? (
+          <div className="flex flex-col gap-1 border-t border-base-800 pt-2">
+            {others.map((e) => (
               <p key={e.id} className="text-[11px] leading-relaxed text-base-400">
                 <span className="font-semibold text-base-100">{e.name}</span>
                 {!compact && e.say ? <> {e.say}</> : null}

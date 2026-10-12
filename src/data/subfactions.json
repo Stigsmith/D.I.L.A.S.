@@ -1,0 +1,203 @@
+{
+  "source": "curator",
+  "note": "The enemy forces a planet can carry, and the game's effect numbers that mean each one. The war marks a planet with bare numbers (war-effects.json names them); this table says which of those numbers is a subfaction, which front it belongs to, and how it changes the enemy list. effects is empty for a subfaction nobody has seen on the map yet: it is never present until its number is added. variant is the label enemies.json gives that subfaction's own enemies, from the wiki's categories. adds names enemies the label misses. removes names the regular enemies it replaces, each a name or { name, from } where it only replaces them from a difficulty. restores, on Invasion Fleet only, puts back everything another subfaction on the same planet removed. Every line comes from the subfaction's page on helldivers.wiki.gg, read 12 October 2026, and source names it.",
+  "subfactions": {
+    "predator-strain": {
+      "name": "Predator Strain",
+      "front": "bugs",
+      "effects": [1245],
+      "variant": "Predator Strain",
+      "adds": [],
+      "removes": [],
+      "say": "Faster Terminids that flank. Predator Hunters cloak. Fire and gas break the cloak.",
+      "source": "https://helldivers.wiki.gg/wiki/Predator_Strain"
+    },
+    "rupture-strain": {
+      "name": "Rupture Strain",
+      "front": "bugs",
+      "effects": [1310],
+      "variant": "Rupture Strain",
+      "adds": [],
+      "removes": [{ "name": "Nursing Spewer", "from": 6 }],
+      "say": "Warriors, Spewers and Chargers burrow. Explosions force them up. A Rupture Spewer bursts on death.",
+      "source": "https://helldivers.wiki.gg/wiki/Rupture_Strain"
+    },
+    "spore-burst-strain": {
+      "name": "Spore Burst Strain",
+      "front": "bugs",
+      "effects": [],
+      "variant": "Spore Burst Strain",
+      "adds": [],
+      "removes": ["Scavenger", "Warrior", "Hunter"],
+      "say": "Faster Terminids in bigger patrols. Their spores make nearby bugs faster. A bug killed while burning releases none.",
+      "source": "https://helldivers.wiki.gg/wiki/Spore_Burst_Strain"
+    },
+    "hive-lords": {
+      "name": "Hive Lords",
+      "front": "bugs",
+      "effects": [1308],
+      "variant": null,
+      "adds": ["Hive Lord"],
+      "removes": [],
+      "say": "One Hive Lord per mission from difficulty 7. 150,000 health, follows you underground, needs anti-tank.",
+      "source": "https://helldivers.wiki.gg/wiki/Hive_Lord"
+    },
+    "dragonroaches": {
+      "name": "Dragonroaches",
+      "front": "bugs",
+      "effects": [1309],
+      "variant": null,
+      "adds": ["Dragonroach"],
+      "removes": ["Bile Titan"],
+      "say": "Flying Terminids that breathe fire, from difficulty 5, in place of Bile Titans. The wings are unarmoured.",
+      "source": "https://helldivers.wiki.gg/wiki/Dragonroach"
+    },
+    "hive-world": {
+      "name": "Hive World",
+      "front": "bugs",
+      "effects": [1311],
+      "variant": null,
+      "adds": [],
+      "removes": [],
+      "say": "20% fewer reinforcements, Eagles rearm 30% slower, pickups give half the ammo. Shrieker swarms and Bug Mines.",
+      "source": "https://helldivers.wiki.gg/wiki/Hive_World"
+    },
+    "jet-brigade": {
+      "name": "The Jet Brigade",
+      "front": "bots",
+      "effects": [1203],
+      "variant": "Jet Brigade",
+      "adds": [],
+      "removes": ["Trooper", "Commissar", "MG Raider", "Devastator", "Hulk Scorcher", "Hulk Bruiser"],
+      "say": "Automatons with jump packs. A destroyed pack explodes and sets fire to everything near it.",
+      "source": "https://helldivers.wiki.gg/wiki/Jet_Brigade"
+    },
+    "incineration-corps": {
+      "name": "The Incineration Corps",
+      "front": "bots",
+      "effects": [1249],
+      "variant": "Incineration Corps",
+      "adds": [],
+      "removes": ["Berserker", "Rocket Raider", "Heavy Devastator", "Hulk Bruiser"],
+      "say": "Automatons with flamethrowers and incendiary rounds. The Shield Generator Pack stops incendiary rounds.",
+      "source": "https://helldivers.wiki.gg/wiki/Incineration_Corps"
+    },
+    "cyborgs": {
+      "name": "Cyborgs",
+      "front": "bots",
+      "effects": [1361],
+      "variant": "Cyborg Legion",
+      "adds": [],
+      "removes": ["Scout Strider", { "name": "Factory Strider", "from": 7 }],
+      "say": "Agitators make nearby Automatons faster. Kill them first. Vox Engines replace Factory Striders from difficulty 7.",
+      "source": "https://helldivers.wiki.gg/wiki/Cyborg_Legion"
+    },
+    "hulk-surge": {
+      "name": "Hulk Surge",
+      "front": "bots",
+      "effects": [],
+      "variant": null,
+      "adds": [],
+      "removes": [],
+      "say": "More Hulks.",
+      "source": "https://helldivers.wiki.gg/wiki/Effects#Combatant_Forces"
+    },
+    "heavy-armor-surge": {
+      "name": "Heavy Armor Surge",
+      "front": "bots",
+      "effects": [],
+      "variant": null,
+      "adds": [],
+      "removes": [],
+      "say": "More Tanks and Striders.",
+      "source": "https://helldivers.wiki.gg/wiki/Effects#Combatant_Forces"
+    },
+    "devastator-surge": {
+      "name": "Devastator Surge",
+      "front": "bots",
+      "effects": [],
+      "variant": null,
+      "adds": [],
+      "removes": [],
+      "say": "More Devastators.",
+      "source": "https://helldivers.wiki.gg/wiki/Effects#Combatant_Forces"
+    },
+    "mindless-masses": {
+      "name": "Mindless Masses",
+      "front": "squids",
+      "effects": [1378],
+      "variant": null,
+      "adds": [],
+      "removes": ["Elevated Overseer", "Stingray"],
+      "say": "Huge numbers of Voteless and more Fleshmobs. No Stingrays and no Elevated Overseers.",
+      "source": "https://helldivers.wiki.gg/wiki/Mindless_Masses"
+    },
+    "appropriators": {
+      "name": "Appropriators",
+      "front": "squids",
+      "effects": [1379],
+      "variant": null,
+      "adds": [],
+      "removes": ["Voteless", "Fleshmob", "Crescent Overseer", "Stingray"],
+      "say": "Illuminate and their machines only. No Voteless, Fleshmobs or Stingrays. Obtruders explode on death.",
+      "source": "https://helldivers.wiki.gg/wiki/Appropriators"
+    },
+    "vote-snatchers": {
+      "name": "Vote Snatchers",
+      "front": "squids",
+      "effects": [1403],
+      "variant": "Vote Snatchers",
+      "adds": [],
+      "removes": ["Overseer", "Elevated Overseer", "Crescent Overseer", "Harvester", "Watcher", "Stingray"],
+      "say": "Crushers and Wretches in place of Overseers, Harvesters, Watchers and Stingrays. No reinforcement calls.",
+      "source": "https://helldivers.wiki.gg/wiki/Vote_Snatchers"
+    },
+    "invasion-fleet": {
+      "name": "Invasion Fleet",
+      "front": "squids",
+      "effects": [1414],
+      "variant": null,
+      "adds": [],
+      "removes": [],
+      "restores": true,
+      "say": "The full Illuminate force, on top of any other subfaction here.",
+      "source": "https://helldivers.wiki.gg/wiki/Invasion_Fleet"
+    },
+    "exostorm-1": {
+      "name": "Exostorm class 1",
+      "front": "squids",
+      "effects": [],
+      "variant": null,
+      "adds": [],
+      "removes": [],
+      "say": "The weather is permanent. Destroying the Exospire core ends most of it.",
+      "source": "https://helldivers.wiki.gg/wiki/Exostorm"
+    },
+    "exostorm-2": {
+      "name": "Exostorm class 2",
+      "front": "squids",
+      "effects": [],
+      "variant": null,
+      "adds": [],
+      "removes": [],
+      "say": "More lightning, and tornadoes that kill anything they pick up. Destroying the Exospire core ends most of it.",
+      "source": "https://helldivers.wiki.gg/wiki/Exostorm"
+    },
+    "exostorm-3": {
+      "name": "Exostorm class 3",
+      "front": "squids",
+      "effects": [],
+      "variant": null,
+      "adds": [],
+      "removes": [],
+      "say": "Constant lightning that kills in medium or light armour. Heavy loss of visibility.",
+      "source": "https://helldivers.wiki.gg/wiki/Exostorm"
+    }
+  },
+  "knownGaps": [
+    "The Helldivers 2 Companion app also names an Acid Brood, an Armored Brood and a Predator Brood, and an Assault, Phalanx and Panzer Division. The wiki has no page for any of them, so none is in this table.",
+    "The Appropriators bring the Gatekeeper, the Obtruder and the Veracitor, and the wiki's enemy tables carry none of the three yet, so the enemy list cannot add them.",
+    "The Great Host is a past subfaction and the Void a past event. Neither is in this table.",
+    "Spore Burst Strain, the three Surges and the three Exostorm classes have no effect number yet, because none has been seen on the map since the war started being read. npm run effects lists every live number; add the number here when one appears."
+  ]
+}

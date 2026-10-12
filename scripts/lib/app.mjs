@@ -40,7 +40,9 @@ function inlineJson(src, ...names) {
 
 const swap = (src, file, url) => src.replaceAll(`from "./${file}.js"`, `from "${url}"`);
 
-const enemiesUrl = asModule(inlineJson(read("src/lib/enemies.js"), "enemies"));
+const subfactionUrl = asModule(inlineJson(read("src/lib/subfaction.js"), "subfactions"));
+
+const enemiesUrl = asModule(swap(inlineJson(read("src/lib/enemies.js"), "enemies"), "subfaction", subfactionUrl));
 
 const itemsUrl = asModule(inlineJson(read("src/lib/items.js"), "items", "warbonds", "vocabulary", "wiki-stats", "game-stats"));
 
@@ -68,6 +70,7 @@ src = swap(src, "items", itemsUrl);
 src = swap(src, "loadouts", loadoutsUrl);
 src = swap(src, "scenario", scenarioUrl);
 src = swap(src, "place", placeUrl);
+src = swap(src, "subfaction", subfactionUrl);
 const scoreUrl = asModule(swap(src, "enemies", enemiesUrl));
 
 src = swap(read("src/lib/squad.js"), "items", itemsUrl);
@@ -108,6 +111,7 @@ export const items = await import(itemsUrl);
 export const place = await import(placeUrl);
 export const armor = await import(armorUrl);
 export const enemies = await import(enemiesUrl);
+export const subfaction = await import(subfactionUrl);
 export const score = await import(scoreUrl);
 export const loadouts = await import(loadoutsUrl);
 export const squad = await import(squadUrl);
