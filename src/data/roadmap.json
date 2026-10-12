@@ -164,6 +164,14 @@
       "say": "Weapon figures and loudness for 105 weapons come from the game's own files, with the wiki filling the rest."
     },
     {
+      "id": "war-markings",
+      "title": "What the game marks on the map",
+      "status": "shipped",
+      "version": "1.35.0",
+      "track": "solo",
+      "say": "A card for every planet with a picture of the ground, and the map shows the Gloom, black holes, attack lines, the space station and what is on each planet."
+    },
+    {
       "id": "difficulty-everywhere",
       "title": "Difficulty and squad size on every front",
       "status": "next",
@@ -179,10 +187,10 @@
     },
     {
       "id": "effects",
-      "title": "Planet effects in the ratings",
-      "status": "later",
+      "title": "Enemy subfactions in the ratings",
+      "status": "next",
       "track": "solo",
-      "say": "Live planet effects, like strains and surges, changing what the tool suggests."
+      "say": "Predator Strain, the Jet Brigade, Vote Snatchers and the rest, read from the live war, changing what the tool suggests for that planet."
     },
     {
       "id": "accounts",
