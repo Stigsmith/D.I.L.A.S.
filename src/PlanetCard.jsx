@@ -16,7 +16,7 @@
 /* card starts at the name.                                           */
 /* ================================================================== */
 
-import { planetFacts, pickShots } from "./lib/planet.js";
+import { planetFacts, pickShots, bannerLayers } from "./lib/planet.js";
 import { planetLandscapes, biomeLandscape, planetArt, markArt, hazardIcon } from "./lib/assets.js";
 import { Tip, MissingData, HAS_TIP } from "./Tip.jsx";
 import { planetEffects } from "./lib/effects.js";
@@ -119,6 +119,9 @@ export default function PlanetCard({ name, compact = false, war = null, titled =
   /* Who holds it, set apart from the other marks because it changes the
      ratings. Their own effect lines are left out below. */
   const forces = gone ? [] : subfactionsOn(war, facts.name);
+  /* A place's banner is the same picture on every planet that has it,
+     so it is seen in this planet's light: its kind of world, its weather. */
+  const layers = bannerLayers(facts, marked.cloud);
   const forceEffects = new Set(forces.flatMap((k) => SUBFACTIONS[k].effects));
   const others = marked.named.filter((e) => !forceEffects.has(e.id));
   const wreck = gone ? markArt(marked.art) : null;
@@ -218,6 +221,10 @@ export default function PlanetCard({ name, compact = false, war = null, titled =
                 <div key={e.id} className="flex flex-col gap-1">
                   <div className={"relative overflow-hidden rounded-sm " + (compact ? "h-14" : "h-20")}>
                     <img src={banner} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                    {layers.map((l) => (
+                      <div key={l.key} aria-hidden="true" className="pointer-events-none absolute inset-0"
+                        style={{ background: l.background, mixBlendMode: l.mix, opacity: l.opacity }} />
+                    ))}
                     <span className="absolute left-1.5 top-1 rounded-sm bg-base-950/75 px-1 text-[10px] font-bold uppercase tracking-wider text-base-100"
                       style={OSWALD}>
                       {e.name}

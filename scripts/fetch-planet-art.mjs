@@ -391,6 +391,10 @@ const MARKS = {
   "jet-brigade-factories": { banner: "JetBrigadeFactoryPOI.png" },
   "xenoentomology-center": { banner: "Xenoentomology Center POI.png" },
   "training-facility": { banner: "Tutorial Gate New.png" },
+  /* terminid-control-system is not fetched: the wiki has no picture of
+     the towers, so its banner is the curator's own, cut by hand from an
+     Arrowhead render (credit bar removed) and kept beside these as
+     banner_terminid-control-system.webp, the original in Marks/Originals. */
 };
 
 /* Debris on the dark of space, cut out whole: every pixel near the

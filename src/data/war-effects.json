@@ -39,7 +39,7 @@
     "1121": { "name": "Predator Brood", "draw": "none", "from": "companion" },
     "1122": { "name": "Armored Brood", "draw": "none", "from": "companion" },
 
-    "1395": { "name": "Terminid Control System+", "draw": "none", "from": "screenshot", "say": "Termicide towers repel Terminids emerging from the Gloom." },
+    "1395": { "name": "Terminid Control System+", "draw": "none", "banner": "terminid-control-system", "from": "screenshot", "say": "Termicide towers repel Terminids emerging from the Gloom." },
     "1400": { "name": "Heavy SEAF presence", "draw": "none", "from": "screenshot", "say": "SEAF forces are heavily deployed across this planet." },
     "1387": { "name": "Communications Array", "draw": "none", "banner": "communications-array", "from": "screenshot", "say": "Relay towers important to Automaton communications." },
     "1287": { "name": "New Hope City", "draw": "none", "from": "screenshot", "say": "The flagship Maximum Security City." },

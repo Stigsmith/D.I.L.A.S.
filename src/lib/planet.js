@@ -58,6 +58,7 @@ export function planetFacts(name) {
     : [];
   return {
     name: p.name,
+    type: p.type || null,
     sector: p.sector && p.sector !== "TBD" ? p.sector : null,
     biome: p.biome ? { slug: p.biome, name: BIOMES[p.biome] ? BIOMES[p.biome].name : p.biome, text: biomeText(p.biome) } : null,
     temperature: temp ? { ...hazard(temp), label: TEMPERATURE[temp] } : null,
@@ -67,6 +68,39 @@ export function planetFacts(name) {
       : null,
     cities,
   };
+}
+
+/* The light a place's banner is seen in on this planet. The game's
+   banners for a place are one picture for every planet that has it, so the
+   card lays the planet over it: a tint for its kind of world, then its
+   weather. Literal colours, like the fronts': a desert is warm in every
+   theme. Each layer is a CSS background and a blend mode. */
+const TYPE_TINT = {
+  desert: "#E0A458", oasis: "#D9B36A", arctic: "#9CC3E6", swamp: "#6E8F4E", forest: "#6F9A4F",
+  grassland: "#8DB062", moor: "#8E927C", primordial: "#C2A23A", magma: "#D9542B", bug: "#B5A642",
+};
+const WEATHER_LAYER = {
+  thick_fog: { background: "linear-gradient(to top, rgb(220 224 230 / 0.55), rgb(220 224 230 / 0.2))", mix: "screen" },
+  rainstorms: { background: "repeating-linear-gradient(105deg, rgb(200 215 235 / 0.22) 0 1px, transparent 1px 7px)", mix: "screen" },
+  blizzards: { background: "radial-gradient(rgb(255 255 255 / 0.5) 1px, transparent 1.5px) 0 0 / 9px 9px, linear-gradient(rgb(230 240 255 / 0.25), rgb(230 240 255 / 0.1))", mix: "screen" },
+  sandstorms: { background: "linear-gradient(100deg, rgb(214 160 90 / 0.5), rgb(214 160 90 / 0.15))", mix: "soft-light" },
+  acid_storms: { background: "linear-gradient(to top, rgb(140 200 60 / 0.45), rgb(140 200 60 / 0.1))", mix: "soft-light" },
+  ion_storms: { background: "radial-gradient(ellipse at 70% 10%, rgb(120 170 255 / 0.5), transparent 60%)", mix: "screen" },
+  volcanic_activity: { background: "linear-gradient(to top, rgb(230 80 30 / 0.5), transparent 70%)", mix: "screen" },
+  fire_tornadoes: { background: "linear-gradient(to top, rgb(240 110 30 / 0.45), transparent 70%)", mix: "screen" },
+  intense_heat: { background: "linear-gradient(to top, rgb(255 150 60 / 0.3), transparent)", mix: "soft-light" },
+  extreme_cold: { background: "linear-gradient(rgb(170 210 255 / 0.3), transparent)", mix: "soft-light" },
+};
+export function bannerLayers(facts, cloud = null) {
+  if (!facts) return [];
+  const out = [];
+  const tint = facts.type ? TYPE_TINT[facts.type] : null;
+  if (tint) out.push({ key: "type", background: tint, mix: "color", opacity: 0.35 });
+  const hazards = [facts.temperature && facts.temperature.slug, ...facts.weather.map((w) => w.slug)].filter(Boolean);
+  for (const h of hazards) if (WEATHER_LAYER[h]) out.push({ key: h, ...WEATHER_LAYER[h], opacity: 1 });
+  /* The Gloom lies over everything under it. */
+  if (cloud) out.push({ key: "cloud", background: `linear-gradient(to top, ${cloud}88, ${cloud}22)`, mix: "soft-light", opacity: 1 });
+  return out;
 }
 
 /* Which shots to show. The planet's own first. With none, another
