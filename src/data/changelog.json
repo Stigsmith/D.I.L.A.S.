@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.36.0",
+    "date": "2026-10-12",
+    "title": "Change of address",
+    "say": "Recruits reported touring the entire tool without noticing they had left the menu. The Ministry has installed signage.",
+    "changes": [
+      "The tour announces Collection when it arrives there and says what the page is for.",
+      "Every tour card names the part of the tool it is in, beside the step count.",
+      "On a phone the tour card's header keeps to one line."
+    ]
+  },
+  {
     "version": "1.35.0",
     "date": "2026-10-12",
     "title": "Know the ground",

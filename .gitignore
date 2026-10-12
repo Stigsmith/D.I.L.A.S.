@@ -62,3 +62,9 @@ src/assets/armor-sets/
 # Reddit promotion drafts and the scripts that make their images. The
 # curator's, kept on this machine and never pushed.
 docs/reddit/
+
+# The working notes: how the tool is built and what is still to build.
+# They describe how the curator works as much as the code, so they stay
+# on this machine. The Roadmap page is the public summary.
+CLAUDE.md
+dilas-roadmap.md

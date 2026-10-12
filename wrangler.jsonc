@@ -9,7 +9,7 @@
   // Deploy with `npm run deploy`, which builds first. Cache rules and security
   // headers are in public/_headers, which Vite copies into dist/.
   //
-  // Modelled on Enodia's wrangler.jsonc in C:\Dev\Enodia, which carries the
+  // Modelled on Enodia's wrangler.jsonc, which carries the
   // longer reasoning behind every key here. Read it before changing one.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "dilas",

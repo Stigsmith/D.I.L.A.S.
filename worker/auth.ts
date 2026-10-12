@@ -2,7 +2,7 @@
  * Accounts. Email and password, and nothing else yet.
  *
  * Ported from Enodia's
- * `worker/auth.ts` in `C:\Dev\Enodia`, nearly verbatim, because every option
+ * `worker/auth.ts`, nearly verbatim, because every option
  * below is a lesson that project paid for. Read its docblocks before changing
  * one; they are longer than these.
  *

@@ -15,6 +15,9 @@
 /* come away knowing what every lit thing does.                        */
 /*                                                                    */
 /* Fields:                                                            */
+/*   section   the part of the tool the step is in, named in the card's */
+/*             header beside the count, so a change of page reads as a */
+/*             new chapter. Each page's first step announces it         */
 /*   route     where to go before the step is shown, as navigate()     */
 /*             takes it. None means stay where you are                 */
 /*   at        the data-tour value to light, or several, best first:   */
@@ -42,12 +45,14 @@ export const BORROWED_FRONT = { id: "bots", label: "Automatons" };
 
 export const TOUR = [
   {
+    section: "Orientation",
     title: "Welcome aboard, Helldiver",
     speech:
       "Attention! You have been selected for a mandatory orientation on the Democratic Intelligent Loadout & Armoury System. Attendance is voluntary. Non-attendance has been noted.",
     plain: "A short tour of the tool. Esc skips it, the arrow keys step through it, and Settings replays it.",
   },
   {
+    section: "Orientation",
     at: ["nav", "nav-main"],
     title: "The chain of command",
     speech:
@@ -59,7 +64,21 @@ export const TOUR = [
   /* untouched collection reads as owning everything, so every step     */
   /* after this one would be recommending gear the player may not have. */
   /* One step per kind of button, because they act on different things. */
+  /* The first step only announces the page: without it the move from   */
+  /* the menu into Collection went unsaid, and every card read as one    */
+  /* place. The curator's ask of 12 October 2026.                       */
   {
+    section: "Collection",
+    route: "collection/warbonds",
+    at: "nav-collection",
+    title: "Report to Collection",
+    speech:
+      "You are now standing in Collection, the Ministry's ledger of every Warbond and weapon to your name. Until you sign it, Super Earth assumes you own the entire arsenal. This is generous, and it is wrong.",
+    plain:
+      "Collection is what you own, in two tabs. Warbonds holds the warbonds you bought and the items inside them, Items holds every single item. Drop Bay suggests only builds you can field, and the build picker hides what you have locked.",
+  },
+  {
+    section: "Collection",
     route: "collection/warbonds",
     at: ["collection-guide", "collection-quickstart"],
     title: "Requisitions first",
@@ -69,6 +88,7 @@ export const TOUR = [
       "Start here. Until your collection is filled in, the tool assumes you own every warbond and every item, and recommends accordingly. The quick start at the top gets you most of the way in one click.",
   },
   {
+    section: "Collection",
     route: "collection/warbonds",
     at: "warbond-tile",
     title: "Warbonds you bought",
@@ -78,6 +98,7 @@ export const TOUR = [
       "Click a warbond's name to switch it between owned and not owned. Not owned locks everything in it at once, everywhere in the tool.",
   },
   {
+    section: "Collection",
     route: "collection/warbonds",
     at: "warbond-contents",
     title: "Medals, spent wisely",
@@ -87,6 +108,7 @@ export const TOUR = [
       "The tick unlocks every item in that warbond, the cross locks them all, and the number counts what you have. Both need the warbond owned first. For single items, use the Items tab.",
   },
   {
+    section: "Collection",
     route: "collection/warbonds",
     at: "warbond-tier",
     title: "Bulk requisition",
@@ -96,6 +118,7 @@ export const TOUR = [
       "Own all and Own none switch a whole tier of warbonds at once. They do not touch the items inside, which keep whatever you set with the tick and the cross.",
   },
   {
+    section: "Collection",
     route: "collection/items",
     at: "item-row",
     title: "Item by item",
@@ -105,6 +128,7 @@ export const TOUR = [
       "Every item has its own padlock: click the row to switch it. Filter by source or slot, then lock or unlock everything shown at once. Armour lives only here. A dim padlock means a warbond you do not own is holding it.",
   },
   {
+    section: "War room",
     route: "scenario",
     at: "war-planner",
     title: "Choose your battlefield",
@@ -114,6 +138,7 @@ export const TOUR = [
       "The war room sets where you are dropping: front, planet and mission. Every rating in the tool reads it, and with the live war it shows which fronts are open.",
   },
   {
+    section: "War room",
     route: "scenario",
     at: "war-difficulty",
     title: "Know your odds",
@@ -123,6 +148,7 @@ export const TOUR = [
       "Difficulty and squad size decide which enemies count and which gear rises. The same rifle rates differently solo on Super Helldive and with 4 players on Hard.",
   },
   {
+    section: "Drop Bay",
     route: "bay",
     at: "drop-slots",
     front: true,
@@ -134,6 +160,7 @@ export const TOUR = [
       "Drop Bay suggests three of your builds for this drop and says why. DROP confirms one, counts it for your squad and adds it to your drop history.",
   },
   {
+    section: "Drop Bay",
     route: "bay",
     at: "scenario-bar",
     front: true,
@@ -145,6 +172,7 @@ export const TOUR = [
       "The scenario bar sits on every page that reads it. Adjust opens the war room, and the bar says so whenever a rule is switched off.",
   },
   {
+    section: "Armoury",
     route: "armoury/builds",
     at: "nav-armoury",
     title: "The Armoury",
@@ -154,6 +182,7 @@ export const TOUR = [
       "Your builds. Builds lists them, Coverage shows what you have for each situation on each front, and History shows what you dropped with.",
   },
   {
+    section: "Tier Lists",
     route: "tiers/primary",
     at: "rating-columns",
     front: true,
@@ -164,6 +193,7 @@ export const TOUR = [
       `The community tier beside the ${BRAND.short} tier for your scenario. Open a row to see what affects it. Either column sorts the list.`,
   },
   {
+    section: "Rules",
     route: "rules",
     at: "nav-rules",
     title: "Full transparency",
@@ -173,6 +203,7 @@ export const TOUR = [
       "The Rules page lists each rule, what it changes where you are dropping, and a switch to turn it off in this browser.",
   },
   {
+    section: "Party",
     at: "party",
     title: "Squad up",
     speech:
@@ -181,6 +212,7 @@ export const TOUR = [
       "A six character code and no account. Each member's dropped build shows in their slot, and everyone follows the host's scenario.",
   },
   {
+    section: "Settings",
     route: "settings",
     at: "tour-replay",
     title: "Mandatory refresher",
@@ -190,6 +222,7 @@ export const TOUR = [
       "Settings also holds themes, Export and Import. Your collection lives in this browser, so export it before clearing anything.",
   },
   {
+    section: "Orientation",
     title: "Dismissed",
     speech:
       "Orientation complete. You are now fully informed, which is the second most dangerous thing a citizen can be. Get out there and spread Managed Democracy.",

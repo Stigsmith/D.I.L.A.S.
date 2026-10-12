@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://dilas.me"><img alt="Open it at dilas.me" src="https://img.shields.io/badge/open-dilas.me-ffe900?style=flat-square&labelColor=1a1a1a"></a>
-  <img alt="Version 1.26.0" src="https://img.shields.io/badge/version-1.26.0-ffe900?style=flat-square&labelColor=1a1a1a">
+  <img alt="Version 1.36.0" src="https://img.shields.io/badge/version-1.36.0-ffe900?style=flat-square&labelColor=1a1a1a">
   <img alt="Game patch 7.1.1" src="https://img.shields.io/badge/game%20patch-7.1.1-ffe900?style=flat-square&labelColor=1a1a1a">
   <img alt="In your browser, no install, no account" src="https://img.shields.io/badge/runs%20in-your%20browser-ffe900?style=flat-square&labelColor=1a1a1a">
 </p>
@@ -37,6 +37,10 @@ A suppressed rifle climbs on a hard bot drop because a sentry dies without wakin
 does better on a frozen planet; a reinforcement booster cannot even be brought on a Commando mission, where nobody
 respawns until you find the pods.
 
+Tell it **your skill level** once (the hardest difficulty four players at your level clear easily) and the
+difficulty, the squad size and the front become one number, peril, which decides when stealth, anti-tank and crowd
+clear start to matter. The same rifle reads differently solo on Super Helldive and with four of you on Hard.
+
 A community tier is an average over every planet, every difficulty and every squad size. D.I.L.A.S. is for the one
 you are actually playing.
 
@@ -57,27 +61,30 @@ on a demolition mission.
 
 Where you set up the drop, laid out like the game's Galactic War screen. **Click the planet where you clicked it in
 the game a minute ago, and its front, biome and hazards fill themselves in.** The map is coloured with the live war,
-fronts ringed and named, the Major Order over the top. Not sure where to go? Say what you are after (against whom,
+fronts ringed and named, the Major Order over the top. Choose a planet and its card opens: a picture of the ground,
+the temperature, the terrain, its cities and what the weather does. Not sure where to go? Say what you are after (against whom,
 what kind of mission, no caves, fewer megacities) and the planner marks the three busiest fronts that fit.
 
 Difficulty steps the way the game steps it, with what each level brings beside it: the missions in an operation, the
 medals, the outposts, the samples, the operation modifiers.
 
-![The war room: the galaxy map across the screen, the planner on the left, difficulty along the bottom](docs/images/war-room.jpg)
+![The war room: the chosen planet's card on the left, the galaxy map across the screen, difficulty along the bottom](docs/images/war-room.jpg)
 
 ### The Star Map
 
-The same map for reading the war rather than setting up a drop. Every front grouped by who you would fight there,
+The same map for reading the war rather than setting up a drop. It shows what the game marks: the Gloom, black holes
+where they are now, fractured and destroyed planets, attack lines and the DSS. Every front grouped by who you would fight there,
 busiest first. Click a planet for who holds it and how far along, how many Helldivers are there, what its hazards
 do, its cities and supply lines, and how it has moved over time. **Drop here** sets it as your drop in one click.
 
 Nobody publishes the war's history, so D.I.L.A.S. keeps its own: one reading an hour, thirty days back.
 
-![The Star Map: a planet's intel beside the map, with the war's running totals](docs/images/star-map.jpg)
+![The Star Map zoomed out: the fronts by who you fight, the Major Order and the war's running totals](docs/images/star-map.jpg)
 
 ### The Armoury
 
-Your builds, saved and named with their stratagems, which the game does not keep. The list you pick from **is the
+Your builds, saved and named with their stratagems, which the game does not keep. Every armour set in the game is
+there to pick, with its weight, armour, speed and stamina, and the weight counts toward the build's reading. The list you pick from **is the
 tier list, already ranked for where you are going.** Coverage answers the question you actually have: do I have
 something for solo on Super Helldive, for a frozen planet, for a Commando mission, on every front? History shows
 where your evenings went, and which builds are gathering dust.
@@ -95,13 +102,16 @@ worked out without it, in your browser only.
 ### And also
 
 - **Collection**: what you own, as the game sells it. Warbonds and the items inside them are separate purchases, so
-  they are two separate switches. A second profile for a second player.
+  they are two separate switches. A quick start fills it in one click, and a second profile covers a second player.
+- **A guided tour** on your first visit, from the Democracy Officer, through every part of the tool. Settings replays it.
 - **Share a build in a link.** The build is written into the link itself, so it works with no account and no server.
 - **Thirteen themes**, ten of them skins with their own atmosphere: tracer fire over Malevelon Creek, rain for the
   ODSTs, the Ministry of Truth on paper.
 - **For a change**: once you have a few drops logged, Drop Bay suggests a build you have not taken lately, and good
   gear you have never brought against this front.
 - **Backup and restore** of everything you own and made, as one file.
+
+![Four of the thirteen themes on the tier list: Automaton, Castellan's Creed, Neon and Malevelon Creek](docs/images/themes.jpg)
 
 ## Use it
 
@@ -158,7 +168,7 @@ Art is optional. With `src/assets` empty, every item reads by its name instead o
 | `src/data/` | Items, ratings, rules, missions, planets, enemies and difficulty, as JSON |
 | `worker/` | The server: a Cloudflare Worker with D1, and a Durable Object per party |
 | `scripts/` | The data fetches and the checks |
-| [`CLAUDE.md`](CLAUDE.md), [`dilas-roadmap.md`](dilas-roadmap.md) | How the tool works and why, and what comes next |
+| `tools/game-dump/` | The program that reads weapon numbers from filediver's decoded game tables |
 
 ## Where the numbers come from
 
@@ -172,6 +182,8 @@ Art is optional. With `src/assets` empty, every item reads by its name instead o
 - **Fonts**: Oswald and JetBrains Mono, served from the tool itself.
 
 Our rating, the role tags and every rule's judgement are ours, and the tool says so wherever they appear.
+
+What comes next is on the [Roadmap](https://dilas.me/#/roadmap), and every release is on the [Changelog](https://dilas.me/#/changelog).
 
 ## Feedback and support
 

@@ -232,7 +232,8 @@ export default function Tour({ navigate, onClose, setMenu, front, setFront, canB
           </span>
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-[0.14em] text-base-500" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-              Democracy Officer · {index + 1} of {TOUR.length}
+              {/* On a phone the speaker gives way, so the section and count keep one line. */}
+              <span className="hidden sm:inline">Democracy Officer · </span>{step.section} · {index + 1} of {TOUR.length}
             </p>
             <h3 className="text-lg font-bold uppercase leading-tight tracking-wide text-brand" style={OSWALD}>{step.title}</h3>
           </div>

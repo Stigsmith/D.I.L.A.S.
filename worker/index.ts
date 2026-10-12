@@ -11,7 +11,7 @@
  * answers on the same hostname, so the whole API works under a policy that
  * never had to be opened up for it.
  *
- * Shaped after Enodia's `worker/index.ts` in `C:\Dev\Enodia`, which carries
+ * Shaped after Enodia's `worker/index.ts`, which carries
  * a dozen more routes. Each arrives here with the stage that needs it, rather
  * than as a route nothing calls.
  *
