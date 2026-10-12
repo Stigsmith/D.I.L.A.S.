@@ -157,7 +157,7 @@ function HowItWorks() {
         <ul className="flex list-disc flex-col gap-1 pl-5">
           <li>Read from the live war, only while it is under 30 minutes old.</li>
           <li>Each player reads their own. It is never sent to a party.</li>
-          <li>Hive Lords, Dragonroaches and Hive World change the enemies counted and add no points.</li>
+          <li>Hive Lords and Dragonroaches change the enemies counted and add no points.</li>
           <li>What each subfaction brings and replaces: helldivers.wiki.gg. The points are our own.</li>
         </ul>
       </Part>

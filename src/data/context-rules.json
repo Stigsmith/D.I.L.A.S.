@@ -3717,6 +3717,170 @@
       "say": "Constant lightning kills Helldivers in medium or light armour. Destroying the Exospire core ends most of it.",
       "source": "helldivers.wiki.gg, Exostorm.",
       "judgement": "The size is ours. Needs a chosen armour set, for its weight."
+    },
+    {
+      "id": "hive-world-eagles",
+      "name": "Eagles less useful · Hive World",
+      "when": {
+        "subfaction": [
+          "hive-world"
+        ]
+      },
+      "match": {
+        "stratType": "eagle"
+      },
+      "delta": -4,
+      "say": "Eagles rearm 30% slower on a Hive World.",
+      "source": "helldivers.wiki.gg, Hive World, the Gloom Source effect: +30% Eagle rearm time.",
+      "judgement": "The size is ours."
+    },
+    {
+      "id": "hive-world-heat-weapons",
+      "name": "Heat weapons help · Hive World",
+      "when": {
+        "subfaction": [
+          "hive-world"
+        ]
+      },
+      "match": {
+        "held": true,
+        "wiki.ammo.feed": [
+          "heat"
+        ]
+      },
+      "delta": 4,
+      "say": "Ammo pickups give half as much on a Hive World. This weapon runs on heat and never runs out of ammo.",
+      "source": "helldivers.wiki.gg, Hive World, the Gloom Source effect: -50% ammo from pickups.",
+      "judgement": "The same reasoning as the Commando heat weapon rule, at a third of its size: resupply still works here."
+    },
+    {
+      "id": "hive-world-supply-pack",
+      "name": "Supply Pack helps · Hive World",
+      "when": {
+        "subfaction": [
+          "hive-world"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "b-1-supply-pack"
+        ]
+      },
+      "delta": 4,
+      "say": "Ammo pickups give half as much on a Hive World. The Supply Pack carries resupplies for the squad.",
+      "source": "helldivers.wiki.gg, Hive World, the Gloom Source effect: -50% ammo from pickups.",
+      "judgement": "Named by hand. The size is ours."
+    },
+    {
+      "id": "hive-world-reinforcements",
+      "name": "Reinforcement boosters help · Hive World",
+      "when": {
+        "subfaction": [
+          "hive-world"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "increased-reinforcement-budget",
+          "flexible-reinforcement-budget"
+        ]
+      },
+      "delta": 4,
+      "say": "A Hive World gives 20% fewer reinforcements. This booster gives more.",
+      "source": "helldivers.wiki.gg, Hive World, the Gloom Source effect: -20% reinforcements.",
+      "judgement": "Named by hand. The size is ours."
+    },
+    {
+      "id": "cyborgs-stagger",
+      "name": "Stagger helps · Cyborgs",
+      "when": {
+        "subfaction": [
+          "cyborgs"
+        ]
+      },
+      "match": {
+        "number": [
+          {
+            "path": "wiki.primary.stun",
+            "gte": 20
+          }
+        ],
+        "anyOf": [
+          {
+            "slot": [
+              "primary",
+              "secondary"
+            ]
+          },
+          {
+            "idIn": [
+              "ac-8-autocannon"
+            ]
+          }
+        ]
+      },
+      "delta": 4,
+      "say": "Radicals sprint as fast as a Helldiver and rush you. Stagger 20 or more stops a Cyborg in its tracks.",
+      "source": "helldivers.wiki.gg, Radical and Agitator: a stagger threshold of 20, and a sprint that keeps up with a Helldiver in light armour. Steam players name the Censor and the Liberator Concussive for the same reason.",
+      "judgement": "Primaries, secondaries and the Autocannon, which players name: a launcher staggers too, and nobody spends a rocket on a Radical. The size is ours. The curator plays Cyborgs as fast and hard to kill."
+    },
+    {
+      "id": "cyborgs-headshots",
+      "name": "One-shot headshots help · Cyborgs",
+      "when": {
+        "subfaction": [
+          "cyborgs"
+        ]
+      },
+      "match": {
+        "number": [
+          {
+            "path": "wiki.primary.dmg",
+            "gte": 150
+          },
+          {
+            "path": "wiki.projectile.velocity",
+            "gte": 1
+          }
+        ],
+        "anyOf": [
+          {
+            "slot": [
+              "primary",
+              "secondary"
+            ]
+          },
+          {
+            "idIn": [
+              "ac-8-autocannon",
+              "apw-1-anti-materiel-rifle",
+              "rs-422-railgun"
+            ]
+          }
+        ]
+      },
+      "delta": 4,
+      "say": "Cyborgs carry 750 main health and over 1,000 on the torso and legs. A Radical's head has 150, so 150 damage kills it in one shot.",
+      "source": "helldivers.wiki.gg, Radical and Agitator. Steam players say headshots are the answer and the body is a bullet sponge.",
+      "judgement": "Projectile weapons only, since a beam's figure is per second. Support weapons only where the wiki or players name them. The size is ours."
+    },
+    {
+      "id": "cyborgs-rock-solid",
+      "name": "Rock Solid helps · Cyborgs",
+      "when": {
+        "subfaction": [
+          "cyborgs"
+        ]
+      },
+      "match": {
+        "idIn": [
+          "rock-solid"
+        ]
+      },
+      "delta": 5,
+      "say": "Radicals knock Helldivers off their feet. Rock Solid stops it.",
+      "source": "helldivers.wiki.gg, Radical.",
+      "judgement": "Named by hand, because the wiki names it. The size is ours."
     }
   ],
   "knownGaps": [
@@ -3739,6 +3903,6 @@
     "Acid resistance on Acclimated and Desert Stormer is read by no rule. The wiki does not say whether it softens an acid storm, which reduces armour effectiveness rather than dealing acid damage. Blunt Force Mitigation's armour rating bonus has no number in its effect, so the acid storm rule cannot scale it.",
     "Stingrays are absent when the Appropriators, Mindless Masses or Vote Snatchers hold an Illuminate planet, and Watchers when the Vote Snatchers do. The rules that need them carry notSubfaction, read from a fresh war. With no fresh war the tool cannot tell, so they still apply on every Illuminate planet.",
     "Your skill level, set per profile, moves peril: each level above Suicide Mission takes 6 off, each below adds 6. It is the player's own answer and nothing checks it. Rules about what spawns read difficulty instead, so a strong player still sees Leviathans from 8.",
-    "The subfaction rules (subfactions.json) apply only while the war is fresh, within 30 minutes. Their sizes are ours; each cites the wiki page it reads. Hive Lords, Dragonroaches and Hive World carry no points at the curator's call: they change the enemy list and are named on the brief, the planet card and the scenario bar. The Cyborgs change the enemy list only, because the wiki names nothing to bring against them that the Automaton front does not already ask for."
+    "The subfaction rules (subfactions.json) apply only while the war is fresh, within 30 minutes. Their sizes are ours; each cites the page it reads. Hive Lords and Dragonroaches carry no points at the curator's call: they change the enemy list and are named on the brief, the planet card and the scenario bar. Hive World's own rules read its Gloom Source effect from the wiki. The same kinds of modifier (slower Eagle rearm, less ammo from pickups, fewer reinforcements, a pilot shortage) are separate effect numbers in the game and turn up on other Gloom planets too, at sizes nobody publishes, so only the Hive World carries rules for them."
   ]
 }

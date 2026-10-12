@@ -5,9 +5,10 @@
     "title": "Know the enemy",
     "say": "Intelligence confirms the enemy is not one enemy. Helldivers are to adjust their loadouts and not their opinion of the enemy.",
     "changes": [
-      "Choose a planet a subfaction holds, like Predator Strain or Vote Snatchers, and the ratings change for it: 23 new rules, each from the wiki's page on that subfaction.",
+      "Choose a planet a subfaction holds, like Predator Strain, Cyborgs or Vote Snatchers, and the ratings change for it: 30 new rules, each from the wiki's page on that subfaction.",
       "The enemies counted for armour follow the subfaction. Hive Lords and Dragonroaches count only on planets that have them.",
       "Stingray and Watcher rules stop applying where the subfaction has no Stingrays or Watchers.",
+      "Hive Worlds mark Eagles down and heat weapons, the Supply Pack and reinforcement boosters up, for slower Eagle rearm, half ammo from pickups and fewer reinforcements.",
       "The scenario bar, the Drop Bay brief and the planet card name the subfaction and what it brings.",
       "The Rules page has an Enemy forces group, and About explains where the subfaction comes from."
     ]
