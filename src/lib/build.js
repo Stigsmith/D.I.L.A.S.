@@ -335,15 +335,32 @@ export const gapsIn = (reading) => reading.notes.filter((n) => n.severity === "r
 
 /* What a change closes: the red and amber notes in one reading that are */
 /* gone from the next, by rule name. The builder's picker tries each     */
-/* candidate in the build and says "Closes: No crowd clear" beside it,   */
+/* candidate in the build and says "Solves: No crowd clear" beside it,   */
 /* the curator's ask of 9 October 2026: a build anchored on an Eruptor   */
 /* should be told which support weapon answers the crowd. It marks, it   */
 /* never reorders: the ranking stays our reading for the drop.           */
-export function closedGaps(before, after) {
+/* Each comes with the rule's solves sentence, on hover in the picker:  */
+/* what the piece does, said for the build it would complete. {front}   */
+/* is the front's name, {open} the share of it the aimed weapons open   */
+/* with the piece in. The curator's ask of 13 October 2026: the warning */
+/* says what is missing, and under "Solves" that reads backwards.       */
+const FRONT_NAME = { bots: "Automatons", bugs: "Terminids", squids: "Illuminate" };
+export const SOLVES_SLOTS = ["front", "open"];
+
+export function closedGaps(before, after, scenario = {}) {
   const still = new Set(after.notes.map((n) => n.id));
+  const reach = after.facts && after.facts.reach;
+  const fill = {
+    front: FRONT_NAME[scenario.faction] || "enemies",
+    open: reach && typeof reach.openShare === "number" ? `${Math.round(reach.openShare * 100)}%` : "most",
+  };
   return gapsIn(before)
     .filter((n) => !still.has(n.id))
-    .map((n) => ({ id: n.id, name: (RULES.rules.find((r) => r.id === n.id) || {}).name || n.id, say: n.say }));
+    .map((n) => {
+      const rule = RULES.rules.find((r) => r.id === n.id) || {};
+      const solves = rule.solves ? rule.solves.replace(/\{(\w+)\}/g, (m, k) => fill[k] ?? m) : n.say;
+      return { id: n.id, name: rule.name || n.id, say: solves };
+    });
 }
 
 /* Ranking a grid. The score is the answer where there is one; a build   */

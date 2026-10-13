@@ -460,6 +460,13 @@ for (const rule of rules) {
   if (!rule.say) ruleProblems.push(`${rule.id} carries no say`);
   /* The Rules page lists every rule by name, and dozens of ids are not
      something a person can scan. A new rule names itself or stops here. */
+  /* A red or amber build note can be solved by a piece in the picker, which
+     says so under "Solves". That needs a sentence for what the piece does;
+     the warning says what is missing and reads backwards there. */
+  if (rule.severity === "red" || rule.severity === "amber") {
+    if (typeof rule.solves !== "string" || !rule.solves.trim() || rule.solves.length > 120) ruleProblems.push(`${rule.id} needs a solves sentence of 1 to 120 characters`);
+    else for (const [, k] of rule.solves.matchAll(/\{(\w+)\}/g)) if (!["front", "open"].includes(k)) ruleProblems.push(`${rule.id} solves names {${k}}, which nothing fills`);
+  }
   if (typeof rule.name !== "string" || !rule.name.trim()) ruleProblems.push(`${rule.id} carries no name for the Rules page`);
   else if (rule.name.length > 90) ruleProblems.push(`${rule.id} has a name longer than 90 characters, which the Rules page cannot fit`);
   /* A rule scaling off the scenario crosses zero and runs both ways. Its

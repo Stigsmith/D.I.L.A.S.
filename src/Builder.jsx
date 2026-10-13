@@ -695,7 +695,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
       } else {
         trial = { ...draft, [picking.key]: it.id };
       }
-      const names = closedGaps(reading, readBuild(trial, at));
+      const names = closedGaps(reading, readBuild(trial, at), at);
       if (names.length) out.set(it.id, names);
     }
     return out;

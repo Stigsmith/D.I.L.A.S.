@@ -23,6 +23,7 @@
       },
       "severity": "amber",
       "say": "The weapons you aim cannot open most enemies on this front. Sentries and orbitals do not count, because they cannot aim for weak points.",
+      "solves": "With it, the weapons you aim open {open} of the {front} at this difficulty.",
       "measured": "Counts only the weapons you aim. Applies when they open less than 70% of the front's enemies."
     },
     {
@@ -45,6 +46,7 @@
       "delta": -12,
       "severity": "red",
       "say": "Nothing in this build opens heavy armour, and at this peril you will meet Chargers or Hulks.",
+      "solves": "Opens heavy armour. The {front} bring heavily armoured enemies at this peril.",
       "measured": "From peril 12, 4 players on Suicide Mission, where the squad checks also start."
     },
     {
@@ -84,6 +86,7 @@
       "delta": -14,
       "severity": "red",
       "say": "Nothing here kills groups of small enemies quickly.",
+      "solves": "Kills groups of small enemies quickly.",
       "measured": "From peril 12, where crowds start to matter."
     },
     {
@@ -123,6 +126,7 @@
       "delta": -10,
       "severity": "amber",
       "say": "Every weapon you aim is built for armour. Add one built for crowds, like a Stalwart beside an Eruptor.",
+      "solves": "Built for crowds, beside weapons built for armour.",
       "measured": "One item cannot show this trade: the Eruptor alone is simply good. Across a build it matters. It needs crowd clear somewhere in the build, so it never adds to No crowd clear."
     },
     {
@@ -141,6 +145,7 @@
       "delta": -12,
       "severity": "red",
       "say": "Nothing here closes bug holes or fabricators without spending a stratagem, and this mission is about destroying them.",
+      "solves": "Closes bug holes and fabricators without spending a stratagem.",
       "measured": "Structure demolition missions only. On other missions, no hole closer is no gap."
     },
     {
