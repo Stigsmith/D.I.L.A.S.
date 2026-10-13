@@ -343,7 +343,7 @@ export function closedGaps(before, after) {
   const still = new Set(after.notes.map((n) => n.id));
   return gapsIn(before)
     .filter((n) => !still.has(n.id))
-    .map((n) => (RULES.rules.find((r) => r.id === n.id) || {}).name || n.id);
+    .map((n) => ({ id: n.id, name: (RULES.rules.find((r) => r.id === n.id) || {}).name || n.id, say: n.say }));
 }
 
 /* Ranking a grid. The score is the answer where there is one; a build   */

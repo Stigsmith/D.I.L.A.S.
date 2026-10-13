@@ -32,7 +32,7 @@ import {
   deriveHeat, heatSources, deriveFire, backpackUsers, hasBackpackConflict, loadoutItemIds, loadoutLockIds,
 } from "./lib/loadouts.js";
 import { shareUrl } from "./lib/share.js";
-import { Tip } from "./Tip.jsx";
+import { Tip, HAS_TIP } from "./Tip.jsx";
 import { getArmorSet, setsForPassive, weightOf } from "./lib/armor.js";
 import { SetStrip, WeightFilter, ArmorSetArt, setLine } from "./ArmorSets.jsx";
 import SlidePane, { TAB_W, PANE_CLASS } from "./SlidePane.jsx";
@@ -281,7 +281,8 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
               /* Warn before the pick, not after. Choosing this would be */
               /* the second thing wanting your back.                     */
               const clash = takenBackpack && (it.stratType === "backpack" || it.usesBackpackSlot === true);
-              /* Which of the build's holes this one fills, by rule name. */
+              /* Which of the build's holes this one fills, by rule name, the
+                 rule's own sentence on hover. */
               const fills = closes ? closes.get(it.id) : null;
               return (
                 <div key={it.id} className="relative">
@@ -299,7 +300,13 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
                       ) : null}
                       {fills ? (
                         <span className="font-semibold text-emerald-400">
-                          Closes: {fills.join(", ")}
+                          Solves:{" "}
+                          {fills.map((g, i) => (
+                            <span key={g.id}>
+                              {i ? ", " : ""}
+                              <Tip text={g.say}><span className={HAS_TIP}>{g.name}</span></Tip>
+                            </span>
+                          ))}
                         </span>
                       ) : null}
                     </div>

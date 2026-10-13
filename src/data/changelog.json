@@ -8,7 +8,7 @@
       "Your skill level is set once, at the top of every page beside the party button. Until it is set, a reminder asks for it each time you open the tool, and the tour shows where it is.",
       "Everything a build is for folds out from a Scenario tab at the editor's left edge, beside tonight's difficulty and squad size. Over Drop Bay the editor fills the screen.",
       "Builds are tagged in the war room's words: its mission kinds, a difficulty range from 1 to 10, and heat, cold, fog or city. Saved builds and old links convert, and a build marked only for cities is no longer refused on hot, cold and foggy planets.",
-      "Choosing gear opens over the build, dimmed behind it. With a mouse, resting on a row shows its full details beside the list.",
+      "Choosing gear opens over the build, dimmed behind it. With a mouse, resting on a row shows its full details beside the list, and hovering what a piece solves explains the problem it fixes.",
       "An opened tier list row lays its details out in blocks, side by side on a wide screen.",
       "The chosen tier filter is ringed in the shape of the badge."
     ]
