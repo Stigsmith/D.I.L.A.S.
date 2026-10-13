@@ -24,20 +24,48 @@ function emptyOutDirInPlace() {
   };
 }
 
-/* The browser tab's title, from src/lib/brand.js, so the name lives in
-   one file. In the page itself rather than set by script, so it is right
-   before the app loads and in a link preview. */
-function brandTitle() {
+/* The browser tab's title and the link preview tags, from src/lib/brand.js,
+   so the name lives in one file. In the page itself rather than set by
+   script, because WhatsApp, Discord and the rest read the page without
+   running it. The image link must be absolute or the apps ignore it, and
+   its ?v= rises whenever public/share.png changes, because they cache
+   previews for days. */
+const SHARE_CARD = { path: "/share.png?v=1", width: 1200, height: 630 };
+
+function brandHead() {
+  const attr = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+  const image = BRAND.url + SHARE_CARD.path;
+  const tags = [
+    ["name", "description", BRAND.description],
+    ["name", "theme-color", "#FFE900"],
+    ["property", "og:type", "website"],
+    ["property", "og:site_name", BRAND.short],
+    ["property", "og:title", `${BRAND.short} · ${BRAND.name}`],
+    ["property", "og:description", BRAND.description],
+    ["property", "og:url", BRAND.url + "/"],
+    ["property", "og:image", image],
+    ["property", "og:image:type", "image/png"],
+    ["property", "og:image:width", String(SHARE_CARD.width)],
+    ["property", "og:image:height", String(SHARE_CARD.height)],
+    ["property", "og:image:alt", `${BRAND.short}: ${BRAND.cardLine}`],
+    ["name", "twitter:card", "summary_large_image"],
+    ["name", "twitter:title", `${BRAND.short} · ${BRAND.name}`],
+    ["name", "twitter:description", BRAND.description],
+    ["name", "twitter:image", image],
+  ].map(([key, name, content]) => `<meta ${key}="${name}" content="${attr(content)}" />`);
   return {
-    name: "dilas-brand-title",
+    name: "dilas-brand-head",
     transformIndexHtml(html) {
-      return html.replace(/<title>[^<]*<\/title>/, `<title>${BRAND.short}</title>`);
+      return html.replace(
+        /<title>[^<]*<\/title>/,
+        `<title>${BRAND.short}</title>\n    ${tags.join("\n    ")}`,
+      );
     },
   };
 }
 
 export default defineConfig({
-  plugins: [react(), emptyOutDirInPlace(), brandTitle()],
+  plugins: [react(), emptyOutDirInPlace(), brandHead()],
   build: {
     emptyOutDir: false,
     /* Vite inlines assets under 4KB as base64 by default. Most stratagem  */

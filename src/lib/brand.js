@@ -26,4 +26,11 @@ export const BRAND = {
   nameLines: ["Democratic Intelligent", "Loadout & Armoury System"],
   short: "D.I.L.A.S.",
   tagline: "unofficial Helldivers 2 community tool",
+  /* What a link to the tool says when it is pasted into a chat: the
+     preview tags vite.config.js writes into index.html, and the share
+     card scripts/share-card.mjs draws. */
+  url: "https://dilas.me",
+  description:
+    "Helldivers 2 tier lists rated for the planet, mission and difficulty you drop on. Build loadouts, track your collection, squad up with a party code.",
+  cardLine: "Tier lists rated for where you drop.",
 };

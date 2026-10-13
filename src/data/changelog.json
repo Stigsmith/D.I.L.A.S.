@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.39.1",
+    "date": "2026-10-13",
+    "title": "Calling card",
+    "say": "Every link to the armoury now carries the Ministry's seal. Helldivers who forward it are reminded that sharing is mandatory.",
+    "changes": [
+      "A link to dilas.me pasted into WhatsApp, Discord or anywhere else opens as a card with the mark, the name and what the tool does."
+    ]
+  },
+  {
     "version": "1.39.0",
     "date": "2026-10-13",
     "title": "The war table",

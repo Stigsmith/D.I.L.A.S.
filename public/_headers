@@ -32,8 +32,9 @@
 # Cloudflare sends by default, and is stated so the intent survives a change
 # of default.
 #
-# favicon.svg is the only other unhashed file and gets that same default:
-# revalidate every visit, answered with a 304 almost every time.
+# favicon.svg and share.png (the link preview card) are the only other
+# unhashed files and get that same default: revalidate every visit,
+# answered with a 304 almost every time.
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
 
