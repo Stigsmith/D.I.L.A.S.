@@ -22,7 +22,7 @@
  * off for exactly as long, for exactly that reason.
  *
  * Off, the Account entry in the sidebar keeps its "v2" tag and its route is
- * refused, the way Exchange and Squad are. On, it opens.
+ * refused. On, it opens.
  *
  * **This is a UI gate and only a UI gate.** /api/auth/* is deployed and
  * reachable whatever this says: somebody who reads the JavaScript can post to

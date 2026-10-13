@@ -406,6 +406,14 @@ export function applies(scenario, when) {
       if (!asArray(want).some((t) => have.includes(t))) return false;
       continue;
     }
+    /* None of these traits. Emergency Evacuation is an escort and a
+       defence at once, and a rule about moving has to be able to leave a
+       mission you also hold out of it. */
+    if (key === "notMission") {
+      const have = traitsOf(scenario.mission);
+      if (asArray(want).some((t) => have.includes(t))) return false;
+      continue;
+    }
     /* Who holds the planet, from the live war: any of these keys from
        subfactions.json. Only the scenario's own front counts. No fresh
        war, or no planet, and a rule asking for one does not fire, the

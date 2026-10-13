@@ -188,10 +188,11 @@
     },
     {
       "id": "curated",
-      "title": "New curated builds",
-      "status": "next",
+      "title": "New curated builds and the Exchange",
+      "status": "shipped",
+      "version": "1.40.0",
       "track": "solo",
-      "say": "Every preset build replaced with a new set, made from the tool's own ratings and rules."
+      "say": "Every curated build replaced with a new set made against the tool's own rules, on the Exchange."
     },
     {
       "id": "accounts",
@@ -211,10 +212,10 @@
     },
     {
       "id": "exchange",
-      "title": "Exchange",
+      "title": "Other players' builds on the Exchange",
       "status": "later",
       "track": "social",
-      "say": "Browse other players' builds and keep the ones you like.",
+      "say": "Browse other players' builds beside the curated ones and keep the ones you like.",
       "release": "v3"
     },
     {

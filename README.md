@@ -91,6 +91,15 @@ where your evenings went, and which builds are gathering dust.
 
 ![Coverage: your best build for fifteen situations per front](docs/images/coverage.jpg)
 
+### The Exchange
+
+**Forty builds made by D.I.L.A.S. itself, each for one situation**: a hot planet, a frozen one, fog, a megacity, a
+blitz, an escort, Hulks or Bile Titans, a Commando mission, one or two of you on Super Helldive. Every one is read by
+the tool's own rules and reads A or better wherever it is offered. Three per front need nothing but free gear. Take a
+copy to make it yours, or drop with it as it is. Other players' builds arrive here with accounts.
+
+![The Exchange: the D.I.L.A.S. builds for an Automaton front, each with its reading for this drop](docs/images/exchange.jpg)
+
 ### Rules you can read, and switch off
 
 Every rule behind our rating is on one page: what it does, where it applies, whether it is our judgement or sourced,

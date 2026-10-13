@@ -118,6 +118,7 @@ export function describeWhen(rule) {
   if (w.weight) out.push(`${list([].concat(w.weight))} armour`);
   if (w.city !== undefined) out.push(w.city ? "megacity planet" : "no megacity");
   if (w.mission) out.push(`${list(w.mission.map((t) => (missionTraits[t] ? missionTraits[t].name : t)))} missions`);
+  if (w.notMission) out.push(`not ${list(w.notMission.map((t) => (missionTraits[t] ? missionTraits[t].name : t)))} missions`);
   if (w.minutes) out.push(numberWords("missions of", w.minutes, " minutes"));
   if (w.difficulty) out.push(numberWords("difficulty", w.difficulty, "", true));
   if (w.squad) out.push(playerWords(w.squad));

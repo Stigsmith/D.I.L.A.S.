@@ -155,8 +155,8 @@ function buildMatches(ctx, match) {
       continue;
     }
     /* Nothing in the build carries any of them. This is the one that     */
-    /* earns its keep: chaff and objective are each present in 36 of the  */
-    /* 39 curated builds, so asking whether a build HAS them fires on     */
+    /* earns its keep: chaff and objective were each present in 36 of the */
+    /* first 39 curated builds, so asking whether a build HAS them fires on     */
     /* 92% and says nothing. Asking whether it lacks them fires on 8%,    */
     /* and those three builds have a real hole.                           */
     if (key === "notCovers") {

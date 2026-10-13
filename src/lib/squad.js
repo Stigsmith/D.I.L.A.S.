@@ -137,10 +137,11 @@ export function squadWarnings(builds, context = {}) {
   /* tag, and limited to what you hold: a sentry cannot pick a weakpoint. */
   /*                                                                      */
   /* The threshold is AP 4, the Heavy class, and it was measured rather   */
-  /* than picked. AP 3 is carried by something in all 39 curated builds,  */
-  /* so a check at that level can never fire. AP 5 is missing from 30 of  */
-  /* them and would fire on more than half of all bot pairs, which is     */
-  /* noise. AP 4 is absent from 14 and fires on 6 of 78. That is a real   */
+  /* than picked. AP 3 was carried by something in all of the first 39   */
+  /* curated builds, so a check at that level never fired. AP 5 was     */
+  /* missing from 30 of them and fired on more than half of all bot      */
+  /* pairs, which is noise. AP 4 was absent from 14 and fired on 6 of 78. */
+  /* That is a real                                                       */
   /* signal, and it is also the class that actually beats Devastators.    */
   /*                                                                      */
   /* Re-measured against enemy armor when that landed, and it holds for   */

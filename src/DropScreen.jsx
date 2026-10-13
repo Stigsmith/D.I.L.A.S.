@@ -46,6 +46,7 @@ import {
 
 import { FACTIONS, FACTION_THEME, TierBadge, StratChip, difficultyAt } from "./Tiers.jsx";
 import { presets, heldGear } from "./lib/loadouts.js";
+import { BRAND } from "./lib/brand.js";
 import { readBuild } from "./lib/build.js";
 import { itemName } from "./lib/items.js";
 import { squadWarnings, isQuietBand, coverageIsQuiet } from "./lib/squad.js";
@@ -208,7 +209,7 @@ function EmptySlot({ onChoose, onStart }) {
       <div className="flex flex-wrap justify-center gap-1.5">
         {onStart ? <SlotButton onClick={onStart} Icon={Plus} primary>Pick a primary</SlotButton> : null}
         <SlotButton onClick={onChoose} Icon={Rocket} primary={!onStart}>
-          {onStart ? "Choose a preset" : "Choose a loadout"}
+          {onStart ? `Choose a ${BRAND.short} build` : "Choose a loadout"}
         </SlotButton>
       </div>
     </div>
@@ -279,7 +280,7 @@ function SuggestionCard({ build, reading, usage, fromPresets, on, onTake, change
       )}
       <div className="mt-auto flex items-center justify-between gap-2">
         <span className="min-w-0 text-[10px] leading-snug text-base-600">
-          {change ? sinceLine(usage) : usageLine(usage) || (fromPresets ? "Curated preset" : "Not dropped with yet")}
+          {change ? sinceLine(usage) : usageLine(usage) || (fromPresets ? `${BRAND.short} build` : "Not dropped with yet")}
         </span>
         {on ? (
           <span className="shrink-0 text-[10px] uppercase tracking-wider text-base-400" style={OSWALD}>In your slot</span>
@@ -313,7 +314,7 @@ function Suggestions({ picks, fromPresets, current, onTake, cut, onStart, change
       </p>
       <p className="mb-3 text-[11px] text-base-500">
         {fromPresets
-          ? "Curated presets, until you have builds of your own that fit."
+          ? `${BRAND.short} builds from the Exchange, until you have builds of your own that fit.`
           : "Your best builds for this drop."}
       </p>
       <div className={"grid grid-cols-1 gap-2 " + (change ? "md:grid-cols-2 xl:grid-cols-4" : "md:grid-cols-3")}>
@@ -373,7 +374,7 @@ function FilledSlot({ label, build, state, scenario, lockedSet, actions, source 
           <div className="min-w-0">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-base-500">{label}</p>
             <h3 className={`text-base font-bold leading-tight ${theme.text}`} style={OSWALD}>{build.name}</h3>
-            <p className="text-[10px] text-base-600">{build.preset ? "Curated preset" : source || "Yours"}</p>
+            <p className="text-[10px] text-base-600">{build.preset ? `${BRAND.short} build` : source || "Yours"}</p>
           </div>
           <Status state={state} />
         </div>
@@ -587,7 +588,7 @@ function BuildPicker({ title, everything, scenario, state, current, onPick, onCl
       <div className="flex flex-wrap items-center gap-3 border-b border-base-800 px-4 py-2.5">
         <div className="relative min-w-[200px] flex-1">
           <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-base-500" />
-          <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search your builds and the presets"
+          <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder={`Search your builds and the ${BRAND.short} builds`}
             className="w-full rounded border border-base-700 bg-base-900 py-1.5 pl-7 pr-2 text-xs text-base-100 placeholder-base-600 outline-none focus:border-base-500" />
         </div>
         {cut.locked > 0 || showLocked ? (
@@ -644,7 +645,7 @@ function BuildPicker({ title, everything, scenario, state, current, onPick, onCl
                     <div className="flex items-center gap-2">
                       {favSet.has(l.id) ? <Star className="h-3.5 w-3.5 shrink-0 fill-accent-400 text-accent-400" /> : null}
                       <span className="truncate text-sm font-bold text-base-100" style={OSWALD}>{l.name}</span>
-                      <span className="shrink-0 text-[10px] uppercase tracking-wider text-base-500">{l.preset ? "Preset" : "Yours"}</span>
+                      <span className="shrink-0 text-[10px] uppercase tracking-wider text-base-500">{l.preset ? BRAND.short : "Yours"}</span>
                     </div>
                     <p className="truncate text-[11px] text-base-500" style={MONO}>{held.join(" · ")}</p>
                   </div>

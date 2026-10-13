@@ -1,7 +1,7 @@
 {
   "name": "dilas",
   "private": true,
-  "version": "1.39.1",
+  "version": "1.40.0",
   "author": "Stigsmith",
   "type": "module",
   "scripts": {

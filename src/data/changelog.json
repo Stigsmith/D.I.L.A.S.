@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.40.0",
+    "date": "2026-10-13",
+    "title": "The Exchange opens",
+    "say": "The Ministry has retired every approved loadout and issued forty new ones. Helldivers attached to the old ones have been reassigned to a quieter front.",
+    "changes": [
+      "The Exchange is open: 40 new D.I.L.A.S. builds, made for one situation each and checked against every rule, with Take a copy and Drop with this.",
+      "Every old curated build is gone. Each front gets three on free gear only.",
+      "The Armoury's Builds tab shows only your own builds.",
+      "Builds now lose points for two support weapons, two backpacks, an emplacement on a blitz, escort or carry mission, and a vehicle or emplacement against Automatons with 1 or 2 of you at high peril.",
+      "Builds gain points for two or more sentries, emplacements or mines on defence and eradicate, and for a jump pack, warp pack, hover pack or FRV on a blitz, escort or carry mission."
+    ]
+  },
+  {
     "version": "1.39.1",
     "date": "2026-10-13",
     "title": "Calling card",

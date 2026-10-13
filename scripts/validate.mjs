@@ -400,7 +400,7 @@ const collect = (node, out, keys) => {
 
 /* Every scenario key applies() knows how to test. */
 const WHEN_KEYS = set([
-  "faction", "hazard", "notHazard", "biome", "mission", "difficulty", "squad", "peril",
+  "faction", "hazard", "notHazard", "biome", "mission", "notMission", "difficulty", "squad", "peril",
   "terrain", "city", "minutes", "weight", "subfaction", "notSubfaction",
 ]);
 
@@ -556,7 +556,7 @@ for (const rule of rules) {
 
   /* A mission trait nothing declares, or an armor trait nothing carries,
      makes a rule that can never fire, and nothing would ever say so. */
-  for (const t of [].concat((rule.when && rule.when.mission) || [])) {
+  for (const t of [].concat((rule.when && rule.when.mission) || [], (rule.when && rule.when.notMission) || [])) {
     if (!missions.traits[t]) ruleProblems.push(`${rule.id} gates on mission trait "${t}", which missions.json does not declare`);
   }
   const refTraits = []; collect(rule.match || {}, refTraits, ["traits"]);

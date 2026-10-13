@@ -38,6 +38,7 @@ import { SetStrip, WeightFilter, ArmorSetArt, setLine } from "./ArmorSets.jsx";
 import SlidePane, { TAB_W, PANE_CLASS } from "./SlidePane.jsx";
 import { DifficultyStepper, SquadCount } from "./WarRoom.jsx";
 import { buildTags, MISSION_KINDS, CONDITIONS } from "./lib/loadouts.js";
+import { BRAND } from "./lib/brand.js";
 import { missionsFor, missionTraits, hazardName } from "./lib/scenario.js";
 import { vocabulary } from "./lib/items.js";
 
@@ -779,7 +780,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
           </button>
           <div className="min-w-0 flex-1">
             <p className="text-lg font-bold leading-tight" style={{ fontFamily: "'Oswald', sans-serif" }}>
-              {stored ? "Adjust your build" : preset ? "Adjust a copy of this preset" : "A new build"}
+              {stored ? "Adjust your build" : preset ? `Adjust a copy of this ${BRAND.short} build` : "A new build"}
             </p>
             <p className="text-[11px] text-base-500">
               Saving puts it in your Drop Bay slot.
@@ -911,7 +912,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
 
         {preset && !stored ? (
           <p className="border-t border-base-800 bg-base-800/40 px-3 py-2 text-[11px] text-base-400">
-            A copy of the curated build <span className="text-base-200">{preset.name}</span>. Save to keep it.
+            A copy of the {BRAND.short} build <span className="text-base-200">{preset.name}</span>. Save to keep it.
           </p>
         ) : null}
       </div>

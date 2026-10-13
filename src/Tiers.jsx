@@ -17,7 +17,7 @@ import {
 /* All 107 sets, keyed by armor passive id, grouped by weight class.  */
 import ARMOR_SETS from "./data/armor-sets.json";
 
-/* The 39 curated builds. Every slot holds an item id.                */
+/* The curated builds. Every slot holds an item id.                   */
 import LOADOUTS from "./data/loadouts.json";
 
 import { itemArt, uiArt, FACTION_GLYPH } from "./lib/assets.js";
@@ -2244,7 +2244,9 @@ export function LoadoutReading({ reading }) {
   );
 }
 
-export function LoadoutCard({ loadout, isFavorite, onToggleFavorite, rankLabel, biome, scenario, lockedSet, onOpen, onDelete, inCompare, onToggleCompare, compareFull }) {
+/* actions: [{ label, Icon, onClick }], buttons along the foot of the card.
+   The Exchange's two, Take a copy and Drop with this. */
+export function LoadoutCard({ loadout, isFavorite, onToggleFavorite, rankLabel, biome, scenario, lockedSet, onOpen, onDelete, inCompare, onToggleCompare, compareFull, actions }) {
   const theme = FACTION_THEME[loadout.faction];
   /* Scored against the front the build is for rather than the one the
      scenario names. A bugs build never appears on a bot screen, and
@@ -2369,6 +2371,17 @@ export function LoadoutCard({ loadout, isFavorite, onToggleFavorite, rankLabel, 
             )}
           </div>
         </div>
+
+        {actions && actions.length ? (
+          <div className="mt-auto flex flex-wrap gap-2 border-t border-base-800 pt-2.5">
+            {actions.map((a) => (
+              <button key={a.label} onClick={() => a.onClick(loadout)}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded border border-base-700 px-2.5 py-1.5 text-xs text-base-300 hover:border-base-500 hover:text-base-100">
+                {a.Icon ? <a.Icon className="h-3.5 w-3.5" /> : null}{a.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   );

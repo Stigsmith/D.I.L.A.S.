@@ -124,7 +124,7 @@ function RuleDetail({ rule, scenario, off, builds, buildsArePresets }) {
 
       <div>
         <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-base-500" style={OSWALD}>
-          {isPairing(rule) ? `What it changes in your builds here${buildsArePresets ? ", using the presets until you have builds" : ""}` : rule.kind === "item" ? "What it changes here" : `Your builds it applies to here${buildsArePresets ? ", using the presets until you have builds" : ""}`}
+          {isPairing(rule) ? `What it changes in your builds here${buildsArePresets ? `, using the ${BRAND.short} builds until you have your own` : ""}` : rule.kind === "item" ? "What it changes here" : `Your builds it applies to here${buildsArePresets ? `, using the ${BRAND.short} builds until you have your own` : ""}`}
         </p>
         {!scenario.faction ? (
           <p className="text-xs text-base-500">Choose a front to see what this rule changes.</p>

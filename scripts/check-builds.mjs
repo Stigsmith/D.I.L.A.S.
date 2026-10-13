@@ -47,22 +47,17 @@ const scenariosFor = (loadout) =>
 /* ------------------------------------------------------------------ */
 /* The sample                                                          */
 /*                                                                     */
-/* The 39 curated builds are not a fair denominator and the curator     */
-/* said so plainly on 22 August 2026: they are legacy AI generations    */
-/* made before this project had stats or scoring behind it, and the     */
-/* numbers show it. 35 of 39 use an S or S+                             */
-/* primary, 13 distinct primaries appear across all of them, and three  */
-/* A tier marksman rifles for bots appear zero times.                   */
-/*                                                                     */
-/* So a rule measured only against them is measured against one narrow  */
-/* corner of what a build can be. Random legal builds are the honest    */
+/* The curated builds are not a fair denominator: each was made for one */
+/* situation and checked against these same rules, so a rule measured  */
+/* only against them is measured against one narrow corner of what a   */
+/* build can be. Random legal builds are the honest                     */
 /* denominator for "does this rule discriminate", because they span the */
 /* pool the rule will actually meet once anyone builds their own.       */
 /*                                                                     */
 /* Both are reported. The curated set still matters as the thing on     */
 /* screen today, and the gap between the two columns is itself worth    */
 /* reading: a rule that fires far more often on the curated set than on */
-/* a random one is describing his 39, not a build.                      */
+/* a random one is describing the curated set, not a build.             */
 /* ------------------------------------------------------------------ */
 
 /* Seeded, so two runs of this report are comparable and a coefficient
@@ -122,7 +117,7 @@ const RANDOM = [];
 }
 
 /* A rule that only ever fires on something you are still writing reads as
-   dead against a set of 39 finished builds, which is a hole in the
+   dead against a set of finished builds, which is a hole in the
    measurement rather than a fault in the rule. So the sample carries one
    half written build alongside the curated ones: the same loadout with
    its stratagems and booster stripped out, which is what the builder
@@ -192,7 +187,7 @@ function missionWith(traits) {
 
 rows.sort((a, b) => b.wild - a.wild || b.spread - a.spread);
 
-console.log("\n  Loadout rule health. Every rule measured on the 39 curated builds plus 3 half written ones,");
+console.log(`\n  Loadout rule health. Every rule measured on the ${PRESETS.length} curated builds plus 3 half written ones,`);
 console.log("  each on its own front, across five difficulties and four squad sizes.\n");
 console.log("  random  curated  fired/pool   moved a tier   rule");
 for (const r of rows) {
@@ -215,7 +210,7 @@ for (const r of rows) {
 /* ranking, it is shifting the whole list sideways.                     */
 /* ------------------------------------------------------------------ */
 
-console.log("\n  What the loadout layer does to the 39, against what their parts alone say.\n");
+console.log(`\n  What the loadout layer does to the ${PRESETS.length}, against what their parts alone say.\n`);
 
 for (const label of ["nothing set", "four at 7", "solo at 10"]) {
   const s =

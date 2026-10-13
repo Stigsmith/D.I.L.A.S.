@@ -20,6 +20,7 @@ import PLANETS from "./data/planets.json";
 import ENEMIES from "./data/enemies.json";
 import WAR_EFFECTS from "./data/war-effects.json";
 import { BRAND } from "./lib/brand.js";
+import { presets } from "./lib/loadouts.js";
 
 /* The patch record moved to src/lib/patch.js in 1.23.0, so the expanded */
 /* row can read it too. Re-exported here for anything importing it from  */
@@ -264,7 +265,7 @@ export function About({ section = null }) {
             </p>
           </Fact>
           <Fact label="Tracks">
-            {items.length} items across 6 slots ({rated} rated), 39 curated builds and {warbonds.length} warbonds
+            {items.length} items across 6 slots ({rated} rated), {presets.length} {BRAND.short} builds and {warbonds.length} warbonds
           </Fact>
         </div>
       </Panel>
@@ -373,8 +374,8 @@ const KNOWN = [
     detail: "Rows show Missing data where that happens. The full list is on About.",
   },
   {
-    what: "The curated builds lean hard on high tiers",
-    detail: "35 of 39 use an S or S+ primary, and only 13 different primaries appear. A new set is planned.",
+    what: "A build's tier is mostly its items' community tiers",
+    detail: "Build rules take points off for what is missing and add a few for suiting the mission, so most good builds read S or S+.",
   },
 ];
 

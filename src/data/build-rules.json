@@ -1,5 +1,5 @@
 {
-  "note": "How the nine slots together read differently from the nine slots apart. Read by src/lib/build.js. Every rule here fires on something that varies between builds, which is the test the item level armour rules failed: 48 of 51 primaries share one of two identical armour readings, so a rule keyed on one item's penetration was describing the pool. Keyed on a whole build, the same reading splits 36 / 41 / 23 across the 39 curated loadouts. A rule states a delta in points on the item scale, where roughly 14 points is one tier, and every rule must carry a `say`, because a score that cannot explain itself is a score nobody should trust.",
+  "note": "How the nine slots together read differently from the nine slots apart. Read by src/lib/build.js. Every rule here fires on something that varies between builds, which is the test the item level armour rules failed: 48 of 51 primaries share one of two identical armour readings, so a rule keyed on one item's penetration was describing the pool. Keyed on a whole build, the same reading splits 36 / 41 / 23 across the first 39 curated loadouts. A rule states a delta in points on the item scale, where roughly 14 points is one tier, and every rule must carry a `say`, because a score that cannot explain itself is a score nobody should trust.",
   "whyThereIsNoCommunityBase": "A tier row shows two ratings side by side because there is an outside opinion to disagree with. There is no community vote on a loadout, and inventing one would be laundering our own judgement through a column that looks sourced. So the base here is the build's own parts, each scored by the same engine and the same rules the tier list shows, and the loadout layer argues with that. partsTier and tier are both returned for exactly the reason the two columns exist: a kit worth an A that fits together like a B is the interesting case, and hiding the A makes the B unarguable.",
   "howACoefficientIsChosen": "The same question score.js asks. At what point should this be worth one tier? A tier is about 14 points. Opening under half the front you are dropping on is worth a tier, which sets the penetration coefficient at 25 against a shortfall of 0.55. Coverage gaps are anchored against peril the way squad.js anchors its own: 12 is where the checks switch on, 22 is where one person carrying the only answer stops being a structure and starts being a single point of failure.",
   "rules": [
@@ -449,6 +449,182 @@
       "measured": "No points: an unfinished build is still being written."
     },
     {
+      "id": "two-support-weapons",
+      "name": "Two support weapons",
+      "when": {},
+      "match": {
+        "count": [
+          {
+            "of": {
+              "stratType": "support",
+              "notGameTags": [
+                "EXPENDABLE"
+              ],
+              "notIdIn": [
+                "ms-11-solo-silo"
+              ]
+            },
+            "gte": 2
+          }
+        ]
+      },
+      "delta": -14,
+      "severity": "red",
+      "say": "You hold one support weapon at a time. The other one stays on the ground.",
+      "solves": "Leaves you one support weapon to hold.",
+      "measured": "About a tier. Expendable launchers and the Solo Silo are not counted, because you fire them and drop them."
+    },
+    {
+      "id": "two-backpacks",
+      "name": "Two backpacks",
+      "when": {},
+      "match": {
+        "count": [
+          {
+            "of": {
+              "anyOf": [
+                {
+                  "stratType": "backpack"
+                },
+                {
+                  "usesBackpackSlot": true
+                }
+              ]
+            },
+            "gte": 2
+          }
+        ]
+      },
+      "delta": -7,
+      "severity": "amber",
+      "say": "You wear one backpack. A squadmate has to carry the other.",
+      "solves": "Frees your back for one backpack.",
+      "measured": "Half a tier, not more: a squadmate can carry the second pack. Counts support weapons that use the backpack slot."
+    },
+    {
+      "id": "emplacement-on-the-move",
+      "name": "Emplacement on a moving mission · blitz, escort and carry",
+      "when": {
+        "mission": [
+          "blitz",
+          "evacuate",
+          "carry"
+        ],
+        "notMission": [
+          "defend"
+        ]
+      },
+      "match": {
+        "count": [
+          {
+            "of": {
+              "stratType": "emplacement"
+            },
+            "gte": 1
+          }
+        ]
+      },
+      "delta": -7,
+      "severity": "amber",
+      "say": "These missions keep you moving. An emplacement stays where it lands.",
+      "solves": "Moves with you on a mission that does not hold one position.",
+      "measured": "Half a tier. Missions that are also a defence, such as Emergency Evacuation, are left out. Sentries are not counted."
+    },
+    {
+      "id": "loud-stratagems-stealth",
+      "name": "Loud stratagems · Automatons, 1 or 2 players, peril 22+",
+      "when": {
+        "faction": [
+          "bots"
+        ],
+        "squad": {
+          "lte": 2
+        },
+        "peril": {
+          "gte": 22
+        }
+      },
+      "match": {
+        "count": [
+          {
+            "of": {
+              "stratType": [
+                "vehicle",
+                "emplacement"
+              ]
+            },
+            "gte": 1
+          }
+        ]
+      },
+      "scaleBy": {
+        "path": "scenario.peril",
+        "from": 16,
+        "times": -0.5,
+        "clamp": 10
+      },
+      "severity": "grey",
+      "say": "A vehicle or emplacement draws patrols and dropships. With 1 or 2 players nobody covers you.",
+      "measured": "The stratagem side of the stealth rules: 3 points at peril 22, growing to most of a tier."
+    },
+    {
+      "id": "holds-ground",
+      "name": "Holds ground · defence and eradicate",
+      "when": {
+        "mission": [
+          "defend",
+          "wave"
+        ]
+      },
+      "match": {
+        "count": [
+          {
+            "of": {
+              "stratType": [
+                "sentry",
+                "emplacement",
+                "mines"
+              ]
+            },
+            "gte": 2
+          }
+        ]
+      },
+      "delta": 5,
+      "say": "Two or more sentries, emplacements or mines. These missions are fought from one position.",
+      "measured": "A third of a tier."
+    },
+    {
+      "id": "moves-fast",
+      "name": "Moves fast · blitz, escort and carry",
+      "when": {
+        "mission": [
+          "blitz",
+          "evacuate",
+          "carry"
+        ],
+        "notMission": [
+          "defend"
+        ]
+      },
+      "match": {
+        "has": {
+          "idIn": [
+            "lift-182-warp-pack",
+            "lift-850-jump-pack",
+            "lift-860-hover-pack",
+            "m-102-gunner-frv",
+            "m-103-supply-frv",
+            "m-104-incinerator-frv"
+          ]
+        }
+      },
+      "delta": 5,
+      "say": "A jump pack, warp pack, hover pack or FRV. These missions are won by getting there first.",
+      "judgement": "No published stat says how fast a stratagem moves you, so the packs and FRVs are named by hand. Exosuits are left out: they walk.",
+      "measured": "A third of a tier. Missions that are also a defence are left out."
+    },
+    {
       "id": "answers-everything",
       "name": "Armour, crowds and holes covered",
       "when": {
@@ -498,7 +674,7 @@
     "Nothing here reads the booster. Armour passives are read since 4 October 2026, by the pairing rules in context-rules.json, which score each part beside the rest of its build: True Grit beside a long reload, Inflammable beside a Cremator. Those move a part's score and so the gear badge, not this layer. Boosters are squad wide and still have no field a rule could key on, and armour weight is not recorded at all.",
     "There is no ammo economy axis and no range band axis. dilas-roadmap.md asks whether those become tagged axes or stay human judgement, and it is still open. A build of three magazine hungry weapons and no resupply is a real hole this cannot see.",
     "Nothing here reads the squad. readBuild judges one loadout and squad.js judges the combination, and neither knows the other ran. A build that is thin on armour is not thin if the other three brought Recoilless rifles, and until the drop screen exists there is nowhere that both readings appear together.",
-    "The curated set scores high before the loadout layer touches it. Parts averages run from 74.6 to 99.1 with a median of 87.9, because 35 of the 39 use an S or S+ primary. That is the set's weakness, and it means most of what this layer does to them is subtract. That is a fact about those 39 builds rather than about the engine, and it is the clearest argument yet for the offline authoring pass.",
+    "At the top, the build tier stops telling builds apart. A build's tier is the mean of its nine items' community tiers, and the build rules mostly subtract, so most good builds read S or S+. Searched with this engine, the best build for any one situation scored within about 3 points of the best for any other. The curated set was made by hand for what each situation asks, and the rules check it, rather than the rules choosing it.",
     "Two rules were written, measured and cut before shipping, both because they described the pool rather than the build. `hole-closers-need-the-angle` asked for a demolition 40 hole closer in a cave, which 86% of random builds do not carry: squad.js can ask that across four builds and get a real answer, and over one build it cannot. `penetration-reaches-everything` fired on 45% of random builds and only ever on bots, because AP 5 is the line where that front stops needing a weak point and most builds carrying any support weapon are already past it. Both facts are true and neither discriminates. They are recorded here rather than shipped, which is the 1.13.0 lesson applied before the fact instead of after.",
     "Nothing in this file rewards a build. It only ever deducts, and that is deliberate rather than an omission. squad.js settled the same question first: silence is the normal state and never a claim of coverage, so a squad with nothing wrong says nothing rather than being congratulated. A build with no holes scores exactly what its parts are worth, and `answers-everything` is the single exception because carrying the whole answer in your hands is rare enough at 22% to be worth saying.",
     "Cut on 9 October 2026 before it shipped: nothing-safe-up-close, a primary and a sidearm that both explode. It fired on 0% of random builds and 29% of the curated ones, all of them through the Grenade Pistol, which is carried to close holes rather than to fight at arm's length. An Eruptor with a Grenade Pistol is a common and deliberate pair, so the rule described a habit, not a fault. Close range safety would need to know what each sidearm is for, which no field says."

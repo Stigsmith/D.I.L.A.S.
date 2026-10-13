@@ -70,7 +70,9 @@ const NAV = [
          quickest way to see what a rule does is to watch the list move. */
       { id: "tiers", label: "Tier Lists", Icon: ListOrdered },
       { id: "collection", label: "Collection", Icon: Library },
-      { id: "exchange", label: "Exchange", Icon: Store, release: "v3" },
+      /* Open since 1.40.0 with the curated builds on it. Other people's
+         builds arrive with accounts. */
+      { id: "exchange", label: "Exchange", Icon: Store },
     ],
   },
 ];
@@ -99,12 +101,12 @@ const ALL_NAV = [...NAV.flatMap((g) => g.items), ...NAV_FOOT];
    screen has to be on screen: the same rule the folded filter pane keeps. */
 /* The Armoury, the editor, the Rules page and a shared build joined on 1
    October 2026: each shows readings that the scenario moves. */
-const SCENARIO_SURFACES = new Set(["tiers", "bay", "armoury", "builder", "rules", "shared"]);
+const SCENARIO_SURFACES = new Set(["tiers", "bay", "armoury", "exchange", "builder", "rules", "shared"]);
 
 /* The pages that recommend or offer gear, and so say something wrong   */
 /* while the collection is untouched. They carry the nudge toward       */
 /* Collection until the active profile is set up. See Collection.jsx.   */
-const NUDGE_SURFACES = new Set(["bay", "armoury", "tiers", "builder", "shared"]);
+const NUDGE_SURFACES = new Set(["bay", "armoury", "exchange", "tiers", "builder", "shared"]);
 
 /* Routable, deliberately absent from the sidebar. The tier list joined on
    1 October 2026: it is the picker inside the Armoury and Drop Bay now,
@@ -723,6 +725,9 @@ export default function App() {
             onUseForDrop={(id) => { updateDrop((d) => ({ ...d, mine: id, confirmed: null })); navigate("bay"); }} />;
         }
         return <ArmouryBuilds state={state} navigate={navigate} faction={scenario.faction} setFaction={setFaction} scenario={scored} />;
+      case "exchange":
+        return <ArmouryBuilds shelf="exchange" state={state} navigate={navigate} faction={scenario.faction} setFaction={setFaction} scenario={scored}
+          onUseForDrop={(id) => { updateDrop((d) => ({ ...d, mine: id, confirmed: null })); navigate("bay"); }} />;
       case "builder": {
         /* Browsing happens in the Armoury. The editor works on one build,
            so landing on it with nothing chosen starts a fresh one, and

@@ -6,9 +6,9 @@
 /* framing and name, 1 October 2026; it was the Loadout Builder plus  */
 /* Drop Bay's second tab until then.                                   */
 /*                                                                    */
-/* Three tabs. Builds browses every build at once, yours and the      */
-/* curated presets, and is what Exchange inherits once there is       */
-/* somewhere for other people's builds to live. Coverage answers "do  */
+/* Three tabs. Builds browses your own builds; the curated ones live   */
+/* on the Exchange, which draws the same grid over its own shelf      */
+/* (ArmouryBuilds with shelf="exchange"). Coverage answers "do        */
 /* I have something for each occasion", per front. History is every  */
 /* drop you confirmed, and the builds gathering dust.                 */
 /*                                                                    */
@@ -27,7 +27,7 @@
 /* ================================================================== */
 
 import { useMemo, useState } from "react";
-import { Plus, Star, FilterX, Snowflake, Info, Lock, AlertTriangle, Rocket, History as HistoryIcon } from "lucide-react";
+import { Plus, Star, FilterX, Snowflake, Info, Lock, AlertTriangle, Rocket, Copy, Store, History as HistoryIcon } from "lucide-react";
 
 import { LoadoutCard, FACTIONS, BIOMES, BIOME_THEME, FactionBar, FactionChooser, DifficultySlider, TierBadge } from "./Tiers.jsx";
 import { presets, deriveHeat, loadoutLockIds, buildTags, MISSION_KINDS, WEATHER } from "./lib/loadouts.js";
@@ -36,6 +36,7 @@ import { withHeat } from "./lib/drop.js";
 import { coverage } from "./lib/coverage.js";
 import { usageOf, daysSince, STALE_DAYS } from "./lib/history.js";
 import { agoText } from "./lib/war.js";
+import { BRAND } from "./lib/brand.js";
 import { difficultyAt } from "./Tiers.jsx";
 
 export const ARMOURY_TABS = [
@@ -81,12 +82,16 @@ function Row({ label, options, value, onChange, hint }) {
    planet ever says cave. */
 const BIOME_CONDITION = { hot: "intense_heat", cold: "extreme_cold", foggy: "thick_fog", urban: "city" };
 
-export default function ArmouryBuilds({ state, navigate, faction, setFaction, scenario }) {
+/* One grid, two shelves. "mine" is the Armoury's Builds tab: your own
+   builds, to open and delete. "exchange" is the Exchange: the curated
+   builds, read only, to copy or drop with. They were one mixed grid with
+   a source switch until the Exchange opened in 1.40.0. */
+export default function ArmouryBuilds({ state, navigate, faction, setFaction, scenario, shelf = "mine", onUseForDrop }) {
+  const exchange = shelf === "exchange";
   const [biome, setBiome] = useState("any");
   const [mission, setMission] = useState("any");
   /* A level from 1 to 10, or 0 for any, held against each build's range. */
   const [level, setLevel] = useState(0);
-  const [source, setSource] = useState("all");
   const [favesOnly, setFavesOnly] = useState(false);
   /* Restored. This existed on the picker Drop Bay replaced and was lost
      in that port, not dropped on purpose. A build you cannot field is
@@ -94,29 +99,21 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
   const [gear, setGear] = useState("all");
   const [confirmDelete, setConfirmDelete] = useState(null);
 
-  /* Both derive their heat flag, which is what this comment always      */
-  /* claimed and the code did not do: presets kept the hand authored     */
-  /* flag out of loadouts.json and only your own builds were derived.    */
-  /*                                                                     */
-  /* That mattered once the derivation stopped keying off damageType.    */
-  /* The authored flags were made the same way, so they say the Purifier */
-  /* and the Blitzer build heat, and the source says neither can. Three  */
-  /* Purifier builds and one Blitzer build were being removed from every */
-  /* hot planet over a mechanic they do not have.                        */
-  /*                                                                     */
-  /* loadouts.json is not rewritten. The curated set is his; its heat     */
-  /* field is simply no longer the thing the gate reads.                 */
-  const everything = useMemo(() => {
-    const mine = state.loadouts.map((l) => ({ ...l, preset: false, heat: deriveHeat(l) }));
-    return [...mine, ...presets.map((p) => ({ ...p, preset: true, heat: deriveHeat(p) }))];
-  }, [state.loadouts]);
+  /* Both shelves derive their heat flag from the gear rather than trust */
+  /* the one stored on the build: the hot planet gate reads the source,  */
+  /* and a hand set flag once kept three Purifier builds off every hot   */
+  /* planet over a mechanic the Purifier does not have.                  */
+  const everything = useMemo(
+    () => exchange
+      ? presets.map((p) => ({ ...p, preset: true, heat: deriveHeat(p) }))
+      : state.loadouts.map((l) => ({ ...l, preset: false, heat: deriveHeat(l) })),
+    [exchange, state.loadouts]
+  );
 
   const { shown, removedByHeat, removedByLock } = useMemo(() => {
     let heatCut = 0;
     let lockCut = 0;
     const out = everything.filter((l) => {
-      if (source === "mine" && l.preset) return false;
-      if (source === "presets" && !l.preset) return false;
       if (favesOnly && !state.favorites.includes(l.id)) return false;
       if (gear === "owned" && loadoutLockIds(l).some((id) => state.lockedSet.has(id))) { lockCut += 1; return false; }
       if (l.faction !== faction) return false;
@@ -138,7 +135,7 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
       return true;
     });
     return { shown: out, removedByHeat: heatCut, removedByLock: lockCut };
-  }, [everything, source, favesOnly, gear, faction, mission, level, biome, state.favorites, state.lockedSet]);
+  }, [everything, favesOnly, gear, faction, mission, level, biome, state.favorites, state.lockedSet]);
 
   /* Cold slows heat buildup, so laser and plasma fire longer before      */
   /* venting. The first version modelled only the hot penalty and missed  */
@@ -150,10 +147,10 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
   /* change which war you are looking at.                                 */
   const clearAll = () => {
     setBiome("any"); setMission("any");
-    setLevel(0); setSource("all"); setFavesOnly(false); setGear("all");
+    setLevel(0); setFavesOnly(false); setGear("all");
   };
   const filtering = biome !== "any" || mission !== "any"
-    || level !== 0 || source !== "all" || favesOnly || gear !== "all";
+    || level !== 0 || favesOnly || gear !== "all";
 
   if (!faction) {
     return <FactionChooser onChoose={setFaction} />;
@@ -167,13 +164,22 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
       <FactionBar faction={faction} onChoose={setFaction} />
 
       <div className="flex flex-wrap items-center gap-3">
-        <button onClick={() => navigate("builder/new")}
-          className="flex items-center gap-1.5 rounded border border-base-200 bg-base-200 px-3 py-1.5 text-xs text-base-900 hover:bg-base-100">
-          <Plus className="h-3.5 w-3.5" /> New loadout
-        </button>
-        <span className="text-[11px] text-base-500">
-          {state.loadouts.length} of your own, {presets.length} curated presets
-        </span>
+        {exchange ? (
+          <p className="max-w-2xl text-xs leading-relaxed text-base-400">
+            {presets.length} builds made by {BRAND.short} and read by its own rules, each for one situation. Take a copy to change it.
+          </p>
+        ) : (
+          <>
+            <button onClick={() => navigate("builder/new")}
+              className="flex items-center gap-1.5 rounded border border-base-200 bg-base-200 px-3 py-1.5 text-xs text-base-900 hover:bg-base-100">
+              <Plus className="h-3.5 w-3.5" /> New loadout
+            </button>
+            <button onClick={() => navigate("exchange")}
+              className="flex items-center gap-1.5 rounded border border-base-700 px-3 py-1.5 text-xs text-base-300 hover:border-base-500 hover:text-base-100">
+              <Store className="h-3.5 w-3.5" /> {BRAND.short} builds
+            </button>
+          </>
+        )}
         {/* The tier list has no menu entry since 1 October 2026; it is the
             picker inside every build. For anyone who prefers it whole, this
             is the door. */}
@@ -192,8 +198,6 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
           <div className="sm:col-span-2">
             <DifficultySlider value={level} onChange={setLevel} hint="filters builds" />
           </div>
-          <Row label="Source" value={source} onChange={setSource}
-            options={[{ id: "all", label: "Everything" }, { id: "mine", label: "Mine" }, { id: "presets", label: "Presets" }]} />
           <Row label="Gear" hint="what you can field" value={gear} onChange={setGear}
             options={[{ id: "all", label: "All builds" }, { id: "owned", label: "Only unlocked gear" }]} />
           <div>
@@ -239,13 +243,30 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
         </div>
       </div>
 
-      {shown.length === 0 ? (
+      {everything.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-base-700 px-4 py-10 text-center">
+          <p className="text-sm text-base-400">No builds of your own yet.</p>
+          <p className="mx-auto mt-1 max-w-md text-xs text-base-600">
+            Start a new loadout, or take a copy of one on the Exchange.
+          </p>
+          <div className="mt-3 flex justify-center gap-2">
+            <button onClick={() => navigate("builder/new")}
+              className="flex items-center gap-1.5 rounded border border-base-200 bg-base-200 px-3 py-1.5 text-xs text-base-900 hover:bg-base-100">
+              <Plus className="h-3.5 w-3.5" /> New loadout
+            </button>
+            <button onClick={() => navigate("exchange")}
+              className="flex items-center gap-1.5 rounded border border-base-700 px-3 py-1.5 text-xs text-base-300 hover:border-base-500 hover:text-base-100">
+              <Store className="h-3.5 w-3.5" /> Open the Exchange
+            </button>
+          </div>
+        </div>
+      ) : shown.length === 0 ? (
         <div className="rounded-lg border border-dashed border-base-700 px-4 py-10 text-center">
           <p className="text-sm text-base-400">No build fits these filters.</p>
           <p className="mx-auto mt-1 max-w-md text-xs text-base-600">
             {removedByHeat > 0
               ? "Every build that fit vents heat, which a hot planet rules out. Try another biome, or build without heat weapons."
-              : "Widen the difficulty or biome, or start a new loadout."}
+              : exchange ? "Widen the difficulty, biome or mission." : "Widen the difficulty or biome, or start a new loadout."}
           </p>
         </div>
       ) : (
@@ -254,12 +275,16 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
             <LoadoutCard key={l.id} loadout={l}
               isFavorite={state.favorites.includes(l.id)}
               onToggleFavorite={state.toggleFavorite}
-              rankLabel={[l.preset ? "Curated preset" : "Yours", usageLabel(state.history, l.id)].filter(Boolean).join(" · ")}
+              rankLabel={[exchange ? `${BRAND.short} build` : "Yours", usageLabel(state.history, l.id)].filter(Boolean).join(" · ")}
               biome={biome}
               scenario={scenario}
               lockedSet={state.lockedSet}
-              onOpen={() => navigate(`builder/${l.id}`)}
-              onDelete={l.preset ? undefined : () => setConfirmDelete(l)} />
+              onOpen={exchange ? undefined : () => navigate(`builder/${l.id}`)}
+              onDelete={exchange ? undefined : () => setConfirmDelete(l)}
+              actions={exchange ? [
+                { label: "Take a copy", Icon: Copy, onClick: () => navigate(`builder/${l.id}`) },
+                ...(onUseForDrop ? [{ label: "Drop with this", Icon: Rocket, onClick: () => onUseForDrop(l.id) }] : []),
+              ] : undefined} />
           ))}
         </div>
       )}
@@ -272,8 +297,7 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
             <h3 className="text-sm font-bold uppercase tracking-wide text-base-100"
               style={{ fontFamily: "'Oswald', sans-serif" }}>Delete this loadout</h3>
             <p className="mt-1 text-xs text-base-400">
-              <span className="text-base-200">{confirmDelete.name}</span> is deleted for good. Presets stay, so you can copy
-              them again.
+              <span className="text-base-200">{confirmDelete.name}</span> is deleted for good.
             </p>
             <div className="mt-3 flex justify-end gap-2">
               <button onClick={() => setConfirmDelete(null)}
@@ -371,8 +395,8 @@ function FrontColumn({ front, rows, navigate }) {
 export function Coverage({ state, navigate, scenario }) {
   const [withPresets, setWithPresets] = useState(false);
   const own = useMemo(() => withHeat(state.loadouts.map((l) => ({ ...l, preset: false }))), [state.loadouts]);
-  /* With nothing of your own, the presets stand in rather than leaving
-     three columns of gaps, and the page says so. */
+  /* With nothing of your own, the Exchange's builds stand in rather than
+     leaving three columns of gaps, and the page says so. */
   const usingPresets = withPresets || own.length === 0;
   const pool = useMemo(
     () => (usingPresets ? [...own, ...withHeat(presets.map((p) => ({ ...p, preset: true })))] : own),
@@ -395,7 +419,7 @@ export function Coverage({ state, navigate, scenario }) {
           {own.length === 0 ? (
             <p className="mt-2 flex items-start gap-1.5 text-xs text-accent-300">
               <Info className="mt-px h-3.5 w-3.5 shrink-0" />
-              No builds of your own yet, so this shows the curated presets.
+              No builds of your own yet, so this shows the {BRAND.short} builds from the Exchange.
             </p>
           ) : null}
         </div>
@@ -403,7 +427,7 @@ export function Coverage({ state, navigate, scenario }) {
           <button onClick={() => setWithPresets((v) => !v)} aria-pressed={withPresets}
             className={"rounded border px-2.5 py-1.5 text-xs transition-colors " +
               (withPresets ? "border-base-200 bg-base-200 text-base-900" : "border-base-700 bg-base-900 text-base-400 hover:border-base-500 hover:text-base-100")}>
-            Count the curated presets too
+            Count the {BRAND.short} builds too
           </button>
         ) : null}
       </div>
