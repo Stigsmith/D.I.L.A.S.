@@ -2543,7 +2543,7 @@
     },
     {
       "id": "frv-easy-ground",
-      "name": "FRVs help · flat, open ground",
+      "name": "FRVs help · open, easy ground",
       "when": {
         "terrain": {
           "driving": [
@@ -2559,8 +2559,8 @@
         ]
       },
       "delta": 8,
-      "say": "Flat, open ground. The FRV drives fastest here and rarely flips.",
-      "judgement": "From play: an oasis map drove easily. The ground for each biome is our own reading."
+      "say": "Open ground. The FRV drives fastest here and rarely flips.",
+      "judgement": "From play: oasis, dune, plains, tundra and Boneyard maps drive easily. The ground for each biome is our own reading."
     },
     {
       "id": "frv-rough-ground",
@@ -2580,8 +2580,25 @@
         ]
       },
       "delta": -10,
-      "say": "On broken, rocky or icy ground the FRV flips on ledges, and you end up walking.",
-      "judgement": "From play: snow, volcanic, rocky canyon and highland planets drive badly, and players on Steam agree. The ground for each biome is our own reading."
+      "say": "On rocky, icy or overgrown ground, or through caves, the FRV flips or gets stuck, and you end up walking.",
+      "judgement": "From play: glacier, magma, rocky canyon, jungle and Hive World planets drive badly, and players on Steam agree. The ground for each biome is our own reading."
+    },
+    {
+      "id": "frv-in-a-city",
+      "name": "FRVs struggle · megacity planet",
+      "when": {
+        "city": true
+      },
+      "match": {
+        "idIn": [
+          "m-102-gunner-frv",
+          "m-103-supply-frv",
+          "m-104-incinerator-frv"
+        ]
+      },
+      "delta": -5,
+      "say": "This planet has a megacity, so you may fight between buildings. Rubble, barricades and tight streets stop an FRV.",
+      "judgement": "From play. Counts half: a megacity on the planet does not mean your mission is in it."
     },
     {
       "id": "jump-pack-in-a-city",

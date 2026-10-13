@@ -189,7 +189,7 @@
   ],
   "terrain": {
     "source": "curator",
-    "note": "What the ground of each biome is like, for the rules about getting around: Muscle Enhancement, the Jump and Warp Packs, and the FRVs. The curator's reading from play, 4 October 2026, drafted from his examples and the biome descriptions in planets.json, and his to correct. ground is what is underfoot: wet (water, mud, deep foliage), snow, dry or mixed. relief is how steep the land is: flat, rolling or steep. driving is how an FRV fares: easy, normal or rough. Null is a biome nobody has walked, and a rule asking about terrain does not fire on it.",
+    "note": "What the ground of each biome is like, for the rules about getting around: Muscle Enhancement, the Jump and Warp Packs, and the FRVs. The curator's reading from play, 4 October 2026, corrected 13 October 2026 (Plains, Boneyard, Tien Kwan and Tundra drive easily; the jungles and Hive World drive badly), drafted from his examples and the biome descriptions in planets.json, and his to correct. ground is what is underfoot: wet (water, mud, deep foliage), snow, dry or mixed. relief is how steep the land is: flat, rolling or steep. driving is how an FRV fares: easy, normal or rough. Null is a biome nobody has walked, and a rule asking about terrain does not fire on it.",
     "fields": {
       "ground": [
         "wet",
@@ -217,18 +217,18 @@
       "arctic_glacier_coldrocky": {
         "ground": "snow",
         "relief": "steep",
-        "driving": "rough"
+        "driving": "easy"
       },
       "arctic_glacier_tien_kwan": {
         "ground": "snow",
         "relief": "steep",
-        "driving": "rough"
+        "driving": "easy"
       },
       "blackhole": null,
       "bug_hiveworld": {
         "ground": "mixed",
         "relief": "rolling",
-        "driving": "normal"
+        "driving": "rough"
       },
       "cyberstan": {
         "ground": "mixed",
@@ -268,7 +268,7 @@
       "moor_baseplanet": {
         "ground": "mixed",
         "relief": "steep",
-        "driving": "rough"
+        "driving": "easy"
       },
       "moor_red": {
         "ground": "mixed",
@@ -278,7 +278,7 @@
       "moor_tundra": {
         "ground": "snow",
         "relief": "rolling",
-        "driving": "rough"
+        "driving": "easy"
       },
       "oasis_base": {
         "ground": "dry",
@@ -293,12 +293,12 @@
       "primordial_base": {
         "ground": "wet",
         "relief": "rolling",
-        "driving": "normal"
+        "driving": "rough"
       },
       "primordial_blue": {
         "ground": "wet",
         "relief": "rolling",
-        "driving": "normal"
+        "driving": "rough"
       },
       "primordial_bug": {
         "ground": "wet",
@@ -313,7 +313,7 @@
       "primordial_purple": {
         "ground": "wet",
         "relief": "rolling",
-        "driving": "normal"
+        "driving": "rough"
       },
       "rift_active": null,
       "sandy_acid": {
