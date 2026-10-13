@@ -18,7 +18,7 @@ import Tour from "./Tour.jsx";
 import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 
 import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser, ScenarioBar } from "./Tiers.jsx";
-import WarRoom, { ScenarioStrip, SkillPick } from "./WarRoom.jsx";
+import WarRoom, { ScenarioStrip, SkillPick, SkillNudge } from "./WarRoom.jsx";
 import StarMap from "./StarMap.jsx";
 import { themeArt } from "./lib/assets.js";
 import DilasMark from "./DilasMark.jsx";
@@ -520,6 +520,9 @@ export default function App() {
   const { filters, patchFilters } = useTierFilters(BLANK_FILTERS, CATEGORIES.map((c) => c.id));
   const { sortBy, setSortBy } = useTierSort();
   const [menuOpen, setMenuOpen] = useState(false);
+  /* Later on the skill reminder: this visit only, never stored, so the
+     reminder is back the next time the tool is opened. */
+  const [skillLater, setSkillLater] = useState(false);
   /* The party menu, top right on every page. */
   const [partyOpen, setPartyOpen] = useState(false);
 
@@ -808,7 +811,7 @@ export default function App() {
               <Sidebar destination={dest} navigate={navigate} onNavigated={() => setMenuOpen(false)}
                 foot={/* A phone has no top bar to hold your skill level, so it */
                   /* sits here, above Rules. From sm up it is in the header.  */
-                  <div className="mb-2 px-2.5 sm:hidden"><SkillPick compact value={state.skill} onChange={state.setSkill} /></div>} />
+                  <div className="mb-2 px-2.5 sm:hidden" data-tour="nav-skill"><SkillPick compact value={state.skill} onChange={state.setSkill} /></div>} />
             </aside>
           </div>
         ) : null}
@@ -839,7 +842,7 @@ export default function App() {
               <PartyButton party={party} open={partyOpen} onToggle={() => setPartyOpen((v) => !v)} />
               {/* Your skill level, once for the whole tool, beside the     */}
               {/* profile it is kept in.                                    */}
-              <SkillPick compact value={state.skill} onChange={state.setSkill} />
+              <span data-tour="skill"><SkillPick compact value={state.skill} onChange={state.setSkill} /></span>
               {/* Which player you are looking at. Always shown, even with */}
               {/* one profile, because every lock on every screen is about */}
               {/* this profile and that should never be a guess.           */}
@@ -918,6 +921,10 @@ export default function App() {
               <div data-tour="collection-nudge">
                 <CollectionNudge onSetUp={() => navigate("collection/warbonds")} onAllOwned={state.markSetUp} />
               </div>
+            ) : null}
+            {/* After the collection, never beside it: that comes first. */}
+            {!state.needsSetup && !state.skill && !skillLater && NUDGE_SURFACES.has(dest) && !inRoom ? (
+              <SkillNudge value={state.skill} onChange={state.setSkill} onLater={() => setSkillLater(true)} />
             ) : null}
             {surface}
           </main>

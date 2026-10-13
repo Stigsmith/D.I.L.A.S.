@@ -127,6 +127,18 @@ export const TOUR = [
     plain:
       "Every item has its own padlock: click the row to switch it. Filter by source or slot, then lock or unlock everything shown at once. Armour lives only here. A dim padlock means a warbond you do not own is holding it.",
   },
+  /* Straight after the collection, the curator's call of 13 October      */
+  /* 2026: like the collection, players have to be told to set it. In the */
+  /* top bar, or the drawer on a phone.                                   */
+  {
+    section: "Your skill level",
+    at: ["skill", "nav-skill"],
+    title: "Know thyself",
+    speech:
+      "Super Earth trusts every citizen to rate their own combat ability honestly. Overestimating it is not a crime. It is merely fatal.",
+    plain:
+      "Set your skill level here: the hardest difficulty four players like you clear easily. Anti-tank, crowd clear and stealth advice start from it. Until you set it, the tool assumes Suicide Mission.",
+  },
   {
     section: "War room",
     route: "scenario",

@@ -1439,7 +1439,7 @@ function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, loc
     <div className={"fx-row rounded-lg border overflow-hidden " + (isLocked && !onSelect ? "border-base-800 bg-base-900/40" : "border-base-800 bg-base-900")}
       onMouseEnter={onHover ? (e) => onHover(item, e.currentTarget) : undefined}
       onMouseLeave={onHover ? () => onHover(null) : undefined}
-      onFocus={onHover ? (e) => onHover(item, e.currentTarget) : undefined}
+      onFocus={onHover ? (e) => onHover(item, e.currentTarget, true) : undefined}
       onBlur={onHover ? () => onHover(null) : undefined}>
       {/* The whole row is the target, not just the chevron. In the picker */}
       {/* that means choose, in the tier list it means expand.             */}

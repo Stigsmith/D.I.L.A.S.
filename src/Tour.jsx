@@ -102,7 +102,10 @@ export default function Tour({ navigate, onClose, setMenu, front, setFront, canB
       setFront(BORROWED_FRONT.id);
     }
     if (step.route) navigate(step.route, { replace: true });
-    setMenu(inMenu(step.at) && !window.matchMedia("(min-width: 1024px)").matches);
+    /* Not when the same thing is also outside the menu and on screen: */
+    /* your skill level is in the drawer only on a phone.              */
+    const outside = [].concat(step.at || []).filter((a) => !a.startsWith("nav"));
+    setMenu(inMenu(step.at) && !window.matchMedia("(min-width: 1024px)").matches && !find(outside));
 
     if (!step.at) {
       setSpot(null);

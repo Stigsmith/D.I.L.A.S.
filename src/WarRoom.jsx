@@ -20,7 +20,7 @@
 /* ================================================================== */
 
 import { useState, useMemo, useRef, useLayoutEffect, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight, ChevronDown, Check, Map as MapIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, Check, AlertTriangle, Map as MapIcon } from "lucide-react";
 
 import GalaxyMap, { MajorOrder } from "./GalaxyMap.jsx";
 import { FACTIONS, Planner, PlanetBar, SearchField, PickRow, Empty, DifficultyIcon, difficultyAt } from "./Tiers.jsx";
@@ -538,6 +538,36 @@ export function SquadCount({ value, onChange, party }) {
             {label}
           </button>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/* The reminder, the curator's ask of 13 October 2026: like the collection,
+   skill level is something a player has to be told to set. Over the pages
+   that recommend, once the collection is set up (that comes first), until
+   it is answered. Later hides it for this visit only, so it is back the
+   next time the tool is opened. The picker is in it, so answering takes
+   one move. */
+export function SkillNudge({ value, onChange, onLater }) {
+  return (
+    <div className="mb-4 flex flex-wrap items-center gap-3 rounded-lg border border-accent-600/60 bg-accent-950/40 px-4 py-3">
+      <AlertTriangle className="h-5 w-5 shrink-0 text-accent-400" />
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-bold uppercase tracking-wide text-accent-300" style={OSWALD}>
+          Set your skill level
+        </p>
+        <p className="text-xs leading-relaxed text-base-300">
+          The hardest difficulty four players like you clear easily. Anti-tank, crowd clear and stealth advice start from it. Until you set it, the tool assumes Suicide Mission.
+        </p>
+      </div>
+      <div className="flex max-w-full flex-wrap items-center gap-2">
+        <SkillPick compact value={value} onChange={onChange} />
+        <button type="button" onClick={onLater}
+          className="rounded border border-base-700 px-3 py-1.5 text-xs uppercase tracking-wider text-base-400 hover:border-base-500 hover:text-base-100"
+          style={OSWALD}>
+          Later
+        </button>
       </div>
     </div>
   );

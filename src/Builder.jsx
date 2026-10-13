@@ -185,21 +185,41 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
   const title = stratSlot != null ? `Stratagem ${stratSlot + 1}` : (SLOTS.find((s) => s.slot === slot) || {}).label;
   const factionMeta = FACTIONS.find((f) => f.id === faction) || FACTIONS[0];
 
-  /* The row under the mouse, after a short pause so sweeping down the
-     list does not flash a card per row. Leaving waits a moment too, so
-     moving from one row to the next swaps the card rather than
-     blinking it. */
+  /* The card waits until the mouse rests on a row, not merely crosses
+     it: every movement restarts the wait, so moving down the list shows
+     nothing. Scrolling hides it, and the rows sliding under a still
+     mouse do not count as resting until the mouse moves again. Moving
+     to another row hides the card and waits again. The curator's call
+     of 13 October 2026: there when you stop to look, never in the way. */
+  const REST_MS = 600;
+  const SCROLL_QUIET_MS = 400;
   const panelRef = useRef(null);
   const hoverTimer = useRef(null);
+  const target = useRef(null);
+  const lastScroll = useRef(0);
   const [hover, setHover] = useState(null);
-  const onHover = useCallback((it, el) => {
+  const showSoon = () => {
     clearTimeout(hoverTimer.current);
-    if (!it) { hoverTimer.current = setTimeout(() => setHover(null), 120); return; }
-    const top = el.getBoundingClientRect().top;
-    hoverTimer.current = setTimeout(() => setHover({ item: it, top }), 150);
+    hoverTimer.current = setTimeout(() => {
+      const t = target.current;
+      if (t) setHover({ item: t.item, top: t.el.getBoundingClientRect().top });
+    }, REST_MS);
+  };
+  /* Which row the mouse is over. Only a keyboard focus starts the wait
+     here; for the mouse, onRest does. */
+  const onHover = useCallback((it, el, focused = false) => {
+    target.current = it ? { item: it, el } : null;
+    if (!it) { clearTimeout(hoverTimer.current); setHover(null); return; }
+    if (focused) showSoon();
   }, []);
+  const onRest = () => {
+    if (!target.current || Date.now() - lastScroll.current < SCROLL_QUIET_MS) return;
+    if (hover && hover.item.id === target.current.item.id) return;
+    if (hover) setHover(null);
+    showSoon();
+  };
   useEffect(() => () => clearTimeout(hoverTimer.current), []);
-  const dropHover = () => { clearTimeout(hoverTimer.current); setHover(null); };
+  const dropHover = () => { lastScroll.current = Date.now(); clearTimeout(hoverTimer.current); setHover(null); };
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center bg-black/60 sm:p-4"
@@ -254,7 +274,8 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-base-950/40 p-4" onScroll={hover ? dropHover : undefined}>
+      <div className="flex-1 overflow-y-auto bg-base-950/40 p-4" onScroll={CAN_HOVER ? dropHover : undefined}
+        onMouseMove={CAN_HOVER ? onRest : undefined}>
         {pool.length === 0 ? (
           <div className="rounded-lg border border-dashed border-base-700 py-10 text-center text-sm text-base-400">
             {hiddenCount > 0 && !showLocked
