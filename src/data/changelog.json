@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.37.2",
+    "date": "2026-10-13",
+    "title": "Closer look",
+    "say": "Helldivers may now inspect a planet before liberating it. Inspection does not count as liberation.",
+    "changes": [
+      "The space station stays on the map when its own feed is busy: its planet and vote come with the rest of the war, and its tactical actions are asked for again every five minutes until they arrive.",
+      "Inside a sector the planets grow as you zoom in and shrink as you zoom out, and the glide into a sector starts them small. You can zoom in further than before.",
+      "The planet search stays at the top of the Star Map's pane while a planet is open."
+    ]
+  },
+  {
     "version": "1.37.1",
     "date": "2026-10-13",
     "title": "Credit where due",

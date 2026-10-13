@@ -106,11 +106,16 @@ export default function StarMap({ selected, onSelect, onDropHere }) {
         gap={GAP_PX} className="absolute z-20"
         style={{ left: GAP_PX, top: GAP_PX, bottom: GAP_PX, width: `min(${PANEL_PX}px, calc(100% - ${GAP_PX + TAB_W}px))` }}
         paneClass={PANE_CLASS} ariaLabel={selected ? `About ${selected}` : "The fronts"}>
+        {/* The search stays at the top whatever the pane shows, so reading
+            one planet never hides the way to the next. */}
+        <div className="border-b border-base-800 px-3 py-2.5">
+          <PlanetSearch query={query} setQuery={setQuery} war={war} chosen={selected} onChoose={(name) => { select(name); setQuery(""); }} />
+        </div>
         {selected ? (
           <Intel key={selected} name={selected} war={live} onBack={() => select(null)} onSelect={select}
             onDropHere={() => onDropHere(selected, frontOf(war, selected))} />
         ) : (
-          <Fronts war={war} live={live} query={query} setQuery={setQuery} onSelect={select} />
+          <Fronts war={war} live={live} onSelect={select} />
         )}
       </SlidePane>
 
@@ -148,7 +153,7 @@ function PanelHead({ title, children }) {
 
 /* Every front you can drop on, grouped by who you would fight there,
    busiest first, the way the game lists its campaigns. */
-function Fronts({ war, live, query, setQuery, onSelect }) {
+function Fronts({ war, live, onSelect }) {
   const groups = useMemo(() => {
     if (!live) return [];
     const all = [...live.planets.entries()].filter(([, w]) => w.campaign && w.front);
@@ -162,7 +167,6 @@ function Fronts({ war, live, query, setQuery, onSelect }) {
     <>
       <PanelHead title="The fronts" />
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 py-3">
-        <PlanetSearch query={query} setQuery={setQuery} war={war} chosen={null} onChoose={(name) => { onSelect(name); setQuery(""); }} />
         {groups.length ? groups.map(({ f, rows, players }) => (
           <section key={f.id} className="flex flex-col gap-1.5">
             <p className="flex items-center gap-2 border-b pb-1 text-[11px] font-semibold uppercase tracking-wider"

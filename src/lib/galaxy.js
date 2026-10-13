@@ -28,9 +28,11 @@ export const VIEW = 1000;
 export const CENTRE = VIEW / 2;
 export const RADIUS = 470;
 
-/* How far in you can go. At 8 the densest cluster has room for every
-   name, and past it the map is mostly empty space. */
-export const MAX_ZOOM = 8;
+/* How far a sector is framed: at 8 the densest cluster has room for
+   every name. You may zoom further in by hand, to look closer at the
+   planets themselves, whose renders grow with the zoom inside a sector. */
+export const SECTOR_MAX_ZOOM = 8;
+export const MAX_ZOOM = 20;
 export const HOME = { k: 1, x: 0, y: 0 };
 
 /* The data's y points up, the way the game draws it: Cyberstan, the
@@ -872,7 +874,7 @@ export function sectorView(sector) {
   const ys = ps.map((p) => p.y);
   const w = Math.max(...xs) - Math.min(...xs);
   const h = Math.max(...ys) - Math.min(...ys);
-  const k = Math.min(MAX_ZOOM, Math.max(SECTOR_MIN_ZOOM, Math.min(VIEW / (w + 2 * SECTOR_PAD), VIEW / (h + 2 * SECTOR_PAD))));
+  const k = Math.min(SECTOR_MAX_ZOOM, Math.max(SECTOR_MIN_ZOOM, Math.min(VIEW / (w + 2 * SECTOR_PAD), VIEW / (h + 2 * SECTOR_PAD))));
   return centreOn({ x: (Math.min(...xs) + Math.max(...xs)) / 2, y: (Math.min(...ys) + Math.max(...ys)) / 2 }, k);
 }
 

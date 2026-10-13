@@ -22,7 +22,9 @@
 /*                                                                    */
 /* Marks keep their size on screen at every zoom, so zooming in       */
 /* spreads the planets apart rather than inflating them, and a        */
-/* planet's name appears once there is room for it.                   */
+/* planet's name appears once there is room for it. The one exception */
+/* is a planet's render inside a sector, which grows with the zoom    */
+/* (worldGrow), so zooming in brings you closer to it.                */
 /*                                                                    */
 /* The war room, the curator's call of 2 October 2026, draws it over */
 /* the whole space right of the menu, tilted back like a table unless */
@@ -68,6 +70,17 @@ const NAME_ALL_MATCHES = 14;
 /* A planet's render inside a sector, in screen pixels. */
 const WORLD_PX = 30;
 const FRONT_WORLD_PX = 36;
+/* How much a render grows with the zoom, against the sector's own frame.
+   The curator's call of 13 October 2026: the renders start small as the
+   map glides in and grow as you zoom closer, rather than standing at one
+   size. Below the frame they shrink faster than the zoom, so the glide in
+   starts near the size of a point of light; above it they grow with it,
+   up to this much. */
+const WORLD_GROW_MAX = 2.5;
+const worldGrow = (k, sectorK) => {
+  const r = k / sectorK;
+  return r < 1 ? r * r : Math.min(WORLD_GROW_MAX, r);
+};
 /* How long a glide between the galaxy and a sector takes. */
 const GLIDE_MS = 480;
 /* The war room draws every mark, name and render this much bigger, since
@@ -638,6 +651,7 @@ export default function GalaxyMap({
         p.y > frameMap.y0 - m && p.y < frameMap.y0 + frameMap.size + m;
     };
     const scale = ppu * view.k;
+    const grow = worlds ? worldGrow(view.k, sectorView(focus).k) : 1;
     const hexOf = (w) => (w && w.front && fronts[w.front] ? fronts[w.front].hex : null);
     const pickAt = new Map(matches ? [] : picks.map((name, i) => [name, i]));
     const showSectors = !tactical && !inSector && scale < SECTOR_UNTIL;
@@ -655,7 +669,7 @@ export default function GalaxyMap({
       const w = !matches && live ? live.get(p.name) : null;
       const front = Boolean(w && w.campaign);
       const roomy = !matches && roomFor.get(p.name) * scale >= NAME_ROOM;
-      const size = front ? FRONT_WORLD_PX : WORLD_PX;
+      const size = (front ? FRONT_WORLD_PX : WORLD_PX) * grow;
       const base = worlds
         ? { name: p.name, x: p.x, y: p.y, offset: size / 2 + 3, side: "below", charPx: 6.4, height: front ? 18 : 12 }
         : { name: p.name, x: p.x, y: p.y, offset: pickAt.has(p.name) ? DOT * 1.5 + 12 : (front ? DOT * 1.5 : DOT) + 5, side: labelSide(p) };
@@ -691,7 +705,7 @@ export default function GalaxyMap({
         nameWar: !matches && live ? live.get(p.name) : null,
       };
     });
-    return { inSector, worlds, showSectors, named, pickAt, rows, hexOf };
+    return { inSector, worlds, grow, showSectors, named, pickAt, rows, hexOf };
   }, [view.k, reach, ppu, chosen, matches, namesMatches, live, fronts, picks, fits, tactical, focus, pad, still, spots]);
 
   const layer = useMemo(() => {
@@ -960,7 +974,7 @@ export default function GalaxyMap({
     const { p, on, found, unfit, dim, hex, front, pulse } = row;
     const hovering = hover === p.name && !on;
     const hoverRing = hovering ? (
-      <circle r={(tactical ? FRONT_WORLD_PX * 0.6 : DOT + 4) * uu} className="pointer-events-none fill-none stroke-base-100" strokeWidth={1.2 * uu} />
+      <circle r={(tactical ? FRONT_WORLD_PX * 0.6 * (row.world ? plan.grow : 1) : DOT + 4) * uu} className="pointer-events-none fill-none stroke-base-100" strokeWidth={1.2 * uu} />
     ) : null;
 
     /* A planet the war destroyed is drawn as what is left of it. Inside a
@@ -971,7 +985,7 @@ export default function GalaxyMap({
        round a dull ember. Only from a fresh war, and only once named. */
     const shape = marks ? marks.shape.get(p.name) : null;
     if (shape) {
-      const size = (row.world ? WORLD_PX : tactical ? 9 : DOT * 2.4) * uu;
+      const size = (row.world ? WORLD_PX * plan.grow : tactical ? 9 : DOT * 2.4) * uu;
       /* The game's own art for what is left, once npm run planet-art --
          --marks has fetched it. Drawn a little larger than a planet,
          because a black hole's glow is wider than the world it was. */
@@ -1031,7 +1045,7 @@ export default function GalaxyMap({
 
     if (row.world) {
       /* In a sector: the planet itself, as the game renders it. */
-      const size = (front ? FRONT_WORLD_PX : WORLD_PX) * uu;
+      const size = (front ? FRONT_WORLD_PX : WORLD_PX) * plan.grow * uu;
       const art = planetArt(p.name);
       return (
         <g opacity={matches && dim ? 0.3 : unfit ? 0.45 : 1}>
@@ -1100,7 +1114,7 @@ export default function GalaxyMap({
      and the number beside it, drawn over the planets so a pick is never
      hidden under a neighbour. */
   const drawPick = (i, uu) => {
-    const ring = (plan.worlds ? FRONT_WORLD_PX * 0.62 : DOT * 1.5 + 8) * uu;
+    const ring = (plan.worlds ? FRONT_WORLD_PX * 0.62 * plan.grow : DOT * 1.5 + 8) * uu;
     const off = ring * 0.72;
     return (
       <g className="pointer-events-none">
@@ -1120,7 +1134,7 @@ export default function GalaxyMap({
     const front = Boolean(nameWar && nameWar.campaign);
     const pick = plan.pickAt.has(p.name);
     if (tactical && row.world) {
-      const gap = (front ? FRONT_WORLD_PX : WORLD_PX) / 2 + 3;
+      const gap = ((front ? FRONT_WORLD_PX : WORLD_PX) * plan.grow) / 2 + 3;
       const done = nameWar ? (nameWar.defence ? nameWar.defence.progress : nameWar.liberation) : null;
       const barW = 32 * uu;
       const barY = (gap + 15) * uu;
@@ -1179,7 +1193,7 @@ export default function GalaxyMap({
     const dss = station ? plan.rows.find((r) => r.p.name === station.planet) : null;
     const dssAt = dss ? place(dss.p) : null;
     if (dssAt) {
-      const off = (plan.worlds ? FRONT_WORLD_PX * 0.62 : 9) * uu;
+      const off = (plan.worlds ? FRONT_WORLD_PX * 0.62 * plan.grow : 9) * uu;
       names.push(
         <g key="dss" transform={dssAt} className="pointer-events-none">
           <g transform={`translate(${off} ${-off})`}>

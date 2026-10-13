@@ -97,6 +97,7 @@ const WAR = {
  */
 const STATUS = {
   warId: 801,
+  time: 83935560,
   planetStatus: [
     { index: 0, owner: 1, health: 1_000_000, players: 0, position: { x: 0.1, y: 0.2 } },
     { index: 196, owner: 3, health: 250_000, players: 4210, position: { x: 0.1, y: 0.2 } },
@@ -108,7 +109,7 @@ const STATUS = {
     { index: 2, galacticEffectId: 1229 }, { index: 2, galacticEffectId: 1229 }, { index: 3, galacticEffectId: 1190 },
     { index: 999, galacticEffectId: 5 }, { index: 1, galacticEffectId: 'gloom' },
   ],
-  spaceStations: [{ id32: 749875195, planetIndex: 3 }],
+  spaceStations: [{ id32: 749875195, planetIndex: 3, currentElectionEndWarTime: 83939990 }],
 }
 
 /** The space station as the community API sent it on 12 October 2026, trimmed. */
@@ -371,6 +372,12 @@ describe('the marks and the space station', () => {
     expect(marks?.moved).toEqual({ BACKWATER: { x: 0.35, y: 0.25 } })
   })
 
+  it('places the station from the status, its vote end converted from war time', () => {
+    const at = Date.parse('2026-10-13T07:10:23Z')
+    expect(trimMarks(PLANETS, STATUS, at)?.station).toEqual({ planet: 'UNDER SIEGE', electionEnd: '2026-10-13T08:24:13.000Z' })
+    expect(trimMarks(PLANETS, { ...STATUS, spaceStations: [] }, at)?.station).toBeNull()
+  })
+
   it('is nothing when the status or the planets are not the shape expected, and bounds a strange one', () => {
     expect(trimMarks(PLANETS, null)).toBeNull()
     expect(trimMarks(null, STATUS)).toBeNull()
@@ -425,16 +432,23 @@ describe('the marks and the space station', () => {
     expect(body.station).toBeNull()
   })
 
-  it('keeps the last good station when a later read fails, and stops serving it after three hours', async () => {
+  it('keeps the marker when the station request is refused, asks again next run, and drops stale actions after three hours', async () => {
     const HOUR = 60 * 60 * 1000
+    type Body = { station: { planet: string; actions: unknown[]; fetchedAt: number } | null }
     await refreshWar(db, identity, fake().fetcher, 1_000_000)
-    const stationDown = fake({ '/api/v2/space-stations': () => new Response('busy', { status: 503 }) })
-    await refreshWar(db, identity, stationDown.fetcher, 1_000_000 + HOUR)
-    let body = await (await war()).json<{ station: { planet: string; fetchedAt: number } | null }>()
-    expect(body.station?.fetchedAt).toBe(1_000_000)
-    await refreshWar(db, identity, stationDown.fetcher, 1_000_000 + 4 * HOUR)
-    body = await (await war()).json<{ station: { planet: string; fetchedAt: number } | null }>()
-    expect(body.station).toBeNull()
+    const refused = fake({ '/api/v2/space-stations': () => new Response('too many', { status: 429 }) })
+    await refreshWar(db, identity, refused.fetcher, 1_000_000 + HOUR)
+    let body = await (await war()).json<Body>()
+    expect(body.station?.planet).toBe('UNDER SIEGE')
+    expect(body.station?.actions).toHaveLength(1)
+    expect(body.station?.fetchedAt).toBe(1_000_000 + HOUR)
+    const next = fake({ '/api/v2/space-stations': () => new Response('too many', { status: 429 }) })
+    await refreshWar(db, identity, next.fetcher, 1_000_000 + HOUR + 300_000)
+    expect(next.calls.some((c) => c.url.endsWith('/space-stations'))).toBe(true)
+    await refreshWar(db, identity, next.fetcher, 1_000_000 + 4 * HOUR)
+    body = await (await war()).json<Body>()
+    expect(body.station?.planet).toBe('UNDER SIEGE')
+    expect(body.station?.actions).toEqual([])
   })
 })
 

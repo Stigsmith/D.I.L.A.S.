@@ -140,6 +140,12 @@ export type WarMarks = {
    * sends them.
    */
   moved: Record<string, { x: number; y: number }>
+  /**
+   * Where the space station is and when its vote ends, from the same status,
+   * so the marker never waits on the hourly station request. Null when the
+   * status lists none. Older snapshots lack it.
+   */
+  station?: { planet: string; electionEnd: string } | null
 }
 
 /** The Democracy Space Station, from `/api/v2/space-stations`, refreshed once an hour. */
@@ -295,7 +301,7 @@ const finite = (v: unknown): v is number => typeof v === 'number' && Number.isFi
  * same run. Pure. Null when either is not the shape expected, which leaves
  * the marks absent and the war standing.
  */
-export function trimMarks(planets: unknown, status: unknown): WarMarks | null {
+export function trimMarks(planets: unknown, status: unknown, now: number = Date.now()): WarMarks | null {
   const s = record(status)
   if (!Array.isArray(planets) || !s) return null
   const nameOf = new Map<number, string>()
@@ -346,7 +352,18 @@ export function trimMarks(planets: unknown, status: unknown): WarMarks | null {
     moved[name] = { x: at.x, y: at.y }
     movedCount += 1
   }
-  return { effects, attacks, moved }
+
+  /* The vote's end is in war seconds, the clock `time` also reads, so it is
+     that far from now. Checked against the community API's own conversion. */
+  let station: WarMarks['station'] = null
+  const first = record(Array.isArray(s.spaceStations) ? s.spaceStations[0] : null)
+  const stationAt = first && finite(first.planetIndex) ? nameOf.get(first.planetIndex) : undefined
+  if (stationAt) {
+    const left = finite(first?.currentElectionEndWarTime) && finite(s.time) ? first.currentElectionEndWarTime - s.time : NaN
+    const ends = Number.isFinite(left) && Math.abs(left) < 30 * 86400 ? new Date(now + left * 1000).toISOString() : ''
+    station = { planet: stationAt, electionEnd: ends }
+  }
+  return { effects, attacks, moved, station }
 }
 
 /**
@@ -430,7 +447,7 @@ export async function refreshWar(
     const trimmed = trimWar(planets, campaigns)
     if (!trimmed) throw new Error('the answer was not a list of planets and a list of campaigns')
     const stats = trimStats(totals)
-    const marks = trimMarks(planets, status)
+    const marks = trimMarks(planets, status, now)
     const payload = JSON.stringify({ planets: trimmed, order: trimOrder(assignments), stats, marks })
     await db.run(sql`
       insert into war_snapshot (id, payload, fetched_at, tried_at, ok, error)
@@ -442,9 +459,12 @@ export async function refreshWar(
     /* The history is context too: if keeping it fails, the snapshot above
        has already landed and stays. */
     const kept = await keepHistory(db, now, trimmed, stats).catch(() => false)
-    /* The space station moves rarely: read on the hourly run, or when none
-       has been read yet, and only when the campaign list was not the fifth. */
-    if (Array.isArray(fromStatus) && (kept || !(await hasStation(db)))) {
+    /* The station's planet and vote ride on the status above; this asks only
+       for its tactical actions. On the hourly run, or whenever the last try
+       failed (the upstream answers 429 at times, its limit shared with
+       whoever else calls from the same address), and only when the campaign
+       list was not the fifth. */
+    if (Array.isArray(fromStatus) && (kept || !(await stationFresh(db)))) {
       await refreshStation(db, identity, fetcher, now).catch(() => false)
     }
     /* The scarring changes when the war razes a planet, which is rare: the
@@ -465,9 +485,10 @@ export async function refreshWar(
 /** How old a station may be before it is not served: two missed hours. */
 export const STATION_TOO_OLD_MS = 3 * 60 * 60 * 1000
 
-async function hasStation(db: DB): Promise<boolean> {
-  const row = await db.get<{ fetched_at: number | null }>(sql`select fetched_at from war_snapshot where id = 'station'`)
-  return Boolean(row && row.fetched_at !== null)
+/** Whether the last station try worked. False when none has been read yet. */
+async function stationFresh(db: DB): Promise<boolean> {
+  const row = await db.get<{ fetched_at: number | null; ok: number }>(sql`select fetched_at, ok from war_snapshot where id = 'station'`)
+  return Boolean(row && row.fetched_at !== null && row.ok === 1)
 }
 
 /**
@@ -577,7 +598,7 @@ export async function readWar(db: DB): Promise<Snapshot | null> {
   return {
     fetchedAt: row.fetched_at, triedAt: row.tried_at, ok: row.ok === 1,
     planets: doc.planets, order: doc.order ?? null, stats: doc.stats ?? null, marks: doc.marks ?? null,
-    station: await readStation(db, row.fetched_at),
+    station: withStatus(doc.marks?.station, await readStation(db, row.fetched_at), row.fetched_at),
     scars: await readScars(db, row.fetched_at),
   }
 }
@@ -673,6 +694,26 @@ async function readScars(db: DB, warAt: number): Promise<Snapshot['scars']> {
     return { ...scars, fetchedAt: row.fetched_at }
   } catch {
     return null
+  }
+}
+
+/**
+ * The station as the status places it, with the actions from the station's
+ * own row when that row is about the same planet. Without a status reading
+ * (an older snapshot), the row alone, as before.
+ */
+function withStatus(
+  fromStatus: WarMarks['station'] | undefined,
+  kept: Snapshot['station'],
+  warAt: number,
+): Snapshot['station'] {
+  if (!fromStatus) return fromStatus === null ? null : kept
+  const same = kept && kept.planet.toUpperCase() === fromStatus.planet.toUpperCase()
+  return {
+    planet: fromStatus.planet,
+    electionEnd: fromStatus.electionEnd || (same ? kept.electionEnd : ''),
+    actions: same ? kept.actions : [],
+    fetchedAt: warAt,
   }
 }
 
