@@ -7,11 +7,11 @@
 /* which is extracted art and so missing from a fresh clone.          */
 /*                                                                    */
 /* The favicon keeps its plate and shield; here the skull stands on   */
-/* its own, framed tight so it draws larger. It takes the brand       */
-/* colour, and the eye, nose and seams are cut out with a mask, so    */
-/* whatever surface it sits on shows through in every theme. The      */
-/* right half is darkened a little so the split reads. The red optic  */
-/* stays red in every theme.                                          */
+/* its own, framed tight so it draws larger. The bone half is white,  */
+/* and black on the light themes (--mark-bone in index.css); it never */
+/* takes the skin's colour. The robot half is the favicon's gunmetal  */
+/* and the optic red, both fixed. The eye, nose and seams are cut out */
+/* with a mask, so the surface behind shows through.                  */
 /* ================================================================== */
 
 import { useId } from "react";
@@ -21,8 +21,8 @@ const SKULL = "M61 21.5H67L93.5 32V61L100 70V72L90 84L89 85.5H87L82 81.5L80 82L7
 export default function DilasMark({ className = "h-9 w-9", title = null }) {
   /* Two marks render at once (sidebar and drawer), so the ids differ. */
   const id = useId().replace(/:/g, "");
-  const brand = "rgb(var(--brand))";
-  const ink = "rgb(var(--brand-ink))";
+  /* --mark-bone in index.css: white, black on the light themes. */
+  const bone = "var(--mark-bone, #F2F0E8)";
   return (
     <svg viewBox="22 16 84 86" className={className} aria-hidden={title ? undefined : "true"} role={title ? "img" : undefined}>
       {title ? <title>{title}</title> : null}
@@ -38,6 +38,12 @@ export default function DilasMark({ className = "h-9 w-9", title = null }) {
           <path d="M64 73.5L58.5 81L60 83H68L69.5 81Z" fill="#000" />
           <circle cx="81" cy="65.5" r="9.5" fill="#000" />
         </mask>
+        {/* The favicon's gunmetal, fixed in every theme like the optic. */}
+        <linearGradient id={`${id}s`} x1="0" y1="0" x2="0.4" y2="1">
+          <stop offset="0" stopColor="#C9CED6" />
+          <stop offset=".45" stopColor="#7C828C" />
+          <stop offset="1" stopColor="#3E434B" />
+        </linearGradient>
         <radialGradient id={`${id}g`}>
           <stop offset="0" stopColor="#FF5A4A" stopOpacity=".9" />
           <stop offset=".45" stopColor="#EF4444" stopOpacity=".45" />
@@ -50,9 +56,9 @@ export default function DilasMark({ className = "h-9 w-9", title = null }) {
         </radialGradient>
       </defs>
       <g mask={`url(#${id}m)`}>
-        <path d={SKULL} fill={brand} />
-        {/* The gunmetal half: the brand colour, darkened, so the split reads. */}
-        <path d={SKULL} fill={ink} fillOpacity=".3" clipPath={`url(#${id}r)`} />
+        <path d={SKULL} fill={bone} />
+        {/* The robot half: gunmetal grey, as on the favicon. */}
+        <path d={SKULL} fill={`url(#${id}s)`} clipPath={`url(#${id}r)`} />
       </g>
       <circle cx="81" cy="65.5" r="18" fill={`url(#${id}g)`} />
       <circle cx="81" cy="65.5" r="6.2" fill={`url(#${id}l)`} />

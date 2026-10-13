@@ -605,6 +605,22 @@
     inset 0 0 34px rgb(var(--fx-glow) / var(--fx-glow-strength));
 }
 
+/* Scrollbars follow the theme: a thin thumb from the base ramp on a    */
+/* clear track, so a pane's own surface shows through. The standard     */
+/* properties, which Chromium, Edge and Firefox all read; neither is    */
+/* inherited for width, so it goes on every element.                    */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--base-600)) transparent;
+}
+
+/* The bone half of the D.I.L.A.S. skull (src/DilasMark.jsx). White in  */
+/* every theme, so the mark does not take the skin's colour; black on   */
+/* the light themes, where white would vanish into the page.           */
+:root { --mark-bone: #F2F0E8; }
+[data-theme="light"],
+[data-theme="ministry-of-truth"] { --mark-bone: #121214; }
+
 /* The brand rule under the masthead, glowing on skins that glow. */
 .fx-stripe {
   box-shadow: 0 0 16px rgb(var(--fx-glow) / calc(var(--fx-glow-strength) * 4));

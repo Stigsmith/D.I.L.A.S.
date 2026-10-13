@@ -33,6 +33,7 @@ import { subfactionsOn } from "./lib/subfaction.js";
 import { vocabulary } from "./lib/items.js";
 import { Tip, HAS_TIP } from "./Tip.jsx";
 import PlanetCard from "./PlanetCard.jsx";
+import SlidePane, { RightPanes, TAB_W, PANE_CLASS } from "./SlidePane.jsx";
 import { planetEffects } from "./lib/effects.js";
 import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 
@@ -115,7 +116,7 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
   };
 
   const bottom = (bar.h || 64) + GAP_PX;
-  const insets = { left: plannerOpen ? (wide ? PANEL_PX + GAP_PX : 0) : TAB_PX, bottom };
+  const insets = { left: plannerOpen ? (wide ? PANEL_PX + GAP_PX + TAB_W : 0) : TAB_PX, bottom };
 
   return (
     <div ref={roomRef} className="relative w-full overflow-hidden"
@@ -133,54 +134,41 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
         picks={plan ? plan.picks.map((x) => x.name) : []} fits={plan && plan.count ? plan.fits : null} />
 
       {/* Left: where would you like to play. */}
-      {plannerOpen ? (
-        <aside className="absolute z-20 flex flex-col overflow-hidden rounded-lg border border-base-700/80 bg-base-950/90 shadow-2xl backdrop-blur-md"
-          style={{ left: GAP_PX, top: GAP_PX, bottom: wide ? GAP_PX : bottom, width: `min(${PANEL_PX}px, calc(100% - ${2 * GAP_PX}px))` }}
-          aria-label="Where would you like to play" data-tour="war-planner">
-          <div className="flex items-center justify-between gap-2 border-b border-base-800 px-3 py-2.5">
-            <p className="text-sm font-bold text-base-100" style={OSWALD}>Where would you like to play?</p>
-            <button type="button" onClick={() => setPlanner(false)} title="Fold away" aria-label="Fold the planner away"
-              className="rounded border border-base-800 p-1 text-base-400 hover:border-base-600 hover:text-base-100">
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 py-3">
-            <PlanetSearch query={query} setQuery={setQuery} war={war} chosen={scenario.planet} onChoose={choose} />
-            {scenario.planet ? <ChosenPlanet name={scenario.planet} war={war} open={cardOpen} onToggle={() => setCardOpen(!cardOpen)} /> : null}
-            <Planner bare scenario={scenario} setFaction={setFaction} prefs={prefs} setPrefs={setPrefs}
-              war={war} plan={plan} onChoose={choose} />
-            {scenario.faction ? (
-              <PlanetBar stack scenario={scenario} setMission={setMission} clearEnvironment={clearEnvironment}
-                kind={prefs.kind} onClearKind={() => setPrefs({ kind: null })}
-                hideHazards={Boolean(scenario.planet && cardOpen)} />
-            ) : null}
-            <WarLine war={war} />
-          </div>
-        </aside>
-      ) : (
-        <button type="button" onClick={() => setPlanner(true)} data-tour="war-planner"
-          className="absolute left-0 top-1/2 z-20 flex -translate-y-1/2 items-center gap-1.5 rounded-r-md border border-l-0 border-base-700 bg-base-950/90 px-1.5 py-3 text-base-300 shadow-xl backdrop-blur-md hover:text-base-100"
-          title="Where would you like to play?">
-          <span className="text-[11px] font-semibold uppercase tracking-wider [writing-mode:vertical-rl] rotate-180" style={OSWALD}>
-            Where to play
-          </span>
-          <ChevronRight className="h-4 w-4" />
-        </button>
-      )}
+      <SlidePane side="left" open={plannerOpen} onToggle={() => setPlanner(!plannerOpen)} label="Where to play"
+        gap={GAP_PX} className="absolute z-20" tour="war-planner"
+        style={{ left: GAP_PX, top: GAP_PX, bottom: wide ? GAP_PX : bottom, width: `min(${PANEL_PX}px, calc(100% - ${GAP_PX + TAB_W}px))` }}
+        paneClass={PANE_CLASS} ariaLabel="Where would you like to play">
+        <div className="border-b border-base-800 px-3 py-2.5">
+          <p className="text-sm font-bold text-base-100" style={OSWALD}>Where would you like to play?</p>
+        </div>
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 py-3">
+          <PlanetSearch query={query} setQuery={setQuery} war={war} chosen={scenario.planet} onChoose={choose} />
+          {scenario.planet ? <ChosenPlanet name={scenario.planet} war={war} open={cardOpen} onToggle={() => setCardOpen(!cardOpen)} /> : null}
+          <Planner bare scenario={scenario} setFaction={setFaction} prefs={prefs} setPrefs={setPrefs}
+            war={war} plan={plan} onChoose={choose} />
+          {scenario.faction ? (
+            <PlanetBar stack scenario={scenario} setMission={setMission} clearEnvironment={clearEnvironment}
+              kind={prefs.kind} onClearKind={() => setPrefs({ kind: null })}
+              hideHazards={Boolean(scenario.planet && cardOpen)} />
+          ) : null}
+          <WarLine war={war} />
+        </div>
+      </SlidePane>
 
       {/* Right: the Major Order and the war so far, over the map. */}
       {(war && war.fresh && (war.order || war.stats)) ? (
-        <div className="absolute z-10 flex flex-col gap-2 overflow-y-auto"
-          style={{
-            right: GAP_PX,
-            top: wide ? GAP_PX : 52,
-            width: `min(20rem, calc(100% - ${2 * GAP_PX}px))`,
-            maxHeight: `calc(100% - ${bottom + GAP_PX + 84}px)`,
-          }}>
-          <MajorOrder order={war.order} fronts={FRONTS}
-            open={orderOpen === null ? wide : orderOpen} onToggle={() => setOrderOpen(!(orderOpen === null ? wide : orderOpen))} />
-          <WarTotals stats={war.stats} open={totalsOpen} onToggle={() => setTotalsOpen(!totalsOpen)} />
-        </div>
+        <RightPanes top={wide ? GAP_PX : 52} bottom={bottom + GAP_PX + 84} room={room}
+          panes={[
+            war.order ? {
+              label: "Major Order", open: orderOpen === null ? wide : orderOpen,
+              onToggle: () => setOrderOpen(!(orderOpen === null ? wide : orderOpen)),
+              body: <MajorOrder order={war.order} fronts={FRONTS} />,
+            } : null,
+            war.stats ? {
+              label: "The war so far", open: totalsOpen, onToggle: () => setTotalsOpen(!totalsOpen),
+              body: <WarTotals stats={war.stats} open />,
+            } : null,
+          ]} />
       ) : null}
 
       {/* Bottom: how hard in a card of its own, centred under the open
@@ -364,7 +352,7 @@ export function big(n) {
 /* The war's running totals, as the community API keeps them. Shown only
    for what arrived; a row with no figure is left out rather than zero.
    `trend` is the Star Map's line of how many were fighting, hour by hour. */
-export function WarTotals({ stats, open, onToggle, trend = null }) {
+export function WarTotals({ stats, open, onToggle = null, trend = null }) {
   if (!stats) return null;
   const rows = [
     ["Terminids killed", stats.bugs, FRONTS.bugs.hex],
@@ -377,14 +365,14 @@ export function WarTotals({ stats, open, onToggle, trend = null }) {
   ].filter(([, n]) => n);
   return (
     <div className="overflow-hidden rounded-md border border-base-700/80 bg-base-950/85 text-left shadow-xl backdrop-blur-sm">
-      <button type="button" onClick={onToggle} aria-expanded={open}
-        className="flex w-full items-baseline justify-between gap-3 px-3 py-2 text-left">
+      <button type="button" onClick={onToggle || undefined} disabled={!onToggle} aria-expanded={open}
+        className="flex w-full items-baseline justify-between gap-3 px-3 py-2 text-left disabled:cursor-default">
         <span className="text-[10px] font-semibold uppercase tracking-wider text-base-400" style={OSWALD}>
           The war so far
         </span>
         <span className="flex items-center gap-1.5 text-[10px] text-base-500">
           {stats.players ? `${stats.players.toLocaleString("en-GB")} Helldivers in it now` : null}
-          <ChevronDown className={"h-3 w-3 self-center transition-transform " + (open ? "rotate-180" : "")} />
+          {onToggle ? <ChevronDown className={"h-3 w-3 self-center transition-transform " + (open ? "rotate-180" : "")} /> : null}
         </span>
       </button>
       {open && trend ? <div className="border-t border-base-800 px-3 pt-2">{trend}</div> : null}

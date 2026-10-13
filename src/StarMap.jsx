@@ -23,7 +23,7 @@
 /* ================================================================== */
 
 import { useState, useMemo, useRef } from "react";
-import { ChevronLeft, ChevronRight, MapPin, Users } from "lucide-react";
+import { ChevronLeft, MapPin, Users } from "lucide-react";
 
 import GalaxyMap, { MajorOrder } from "./GalaxyMap.jsx";
 import { FACTIONS } from "./Tiers.jsx";
@@ -34,6 +34,7 @@ import { planetByName, biomeInfo, biomeName } from "./lib/scenario.js";
 import { planetArt, markArt } from "./lib/assets.js";
 import { planetEffects } from "./lib/effects.js";
 import PlanetCard from "./PlanetCard.jsx";
+import SlidePane, { RightPanes, TAB_W, PANE_CLASS } from "./SlidePane.jsx";
 
 const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 
@@ -97,46 +98,37 @@ export default function StarMap({ selected, onSelect, onDropHere }) {
         height: "calc(100dvh - var(--shell-chrome, 56px) - 0.5rem)",
         background: "radial-gradient(ellipse 80% 70% at 55% 42%, rgb(var(--base-900)) 0%, rgb(var(--base-950)) 72%)",
       }}>
-      <GalaxyMap room openOnChosen insets={{ left: panelOpen ? (wide ? PANEL_PX + GAP_PX : 0) : TAB_PX }}
+      <GalaxyMap room openOnChosen insets={{ left: panelOpen ? (wide ? PANEL_PX + GAP_PX + TAB_W : 0) : TAB_PX }}
         chosen={selected} query={query} onChoose={select} war={war} fronts={FRONTS}
         label="The galaxy map. Click a sector to go in, then a planet to read about it." />
 
-      {panelOpen ? (
-        <aside className="absolute z-20 flex flex-col overflow-hidden rounded-lg border border-base-700/80 bg-base-950/90 shadow-2xl backdrop-blur-md"
-          style={{ left: GAP_PX, top: GAP_PX, bottom: GAP_PX, width: `min(${PANEL_PX}px, calc(100% - ${2 * GAP_PX}px))` }}
-          aria-label={selected ? `About ${selected}` : "The fronts"}>
-          {selected ? (
-            <Intel key={selected} name={selected} war={live} onBack={() => select(null)} onSelect={select}
-              onDropHere={() => onDropHere(selected, frontOf(war, selected))} onFold={() => setPanel(false)} />
-          ) : (
-            <Fronts war={war} live={live} query={query} setQuery={setQuery} onSelect={select} onFold={() => setPanel(false)} />
-          )}
-        </aside>
-      ) : (
-        <button type="button" onClick={() => setPanel(true)}
-          className="absolute left-0 top-1/2 z-20 flex -translate-y-1/2 items-center gap-1.5 rounded-r-md border border-l-0 border-base-700 bg-base-950/90 px-1.5 py-3 text-base-300 shadow-xl backdrop-blur-md hover:text-base-100"
-          title={selected ? `About ${selected}` : "The fronts"}>
-          <span className="rotate-180 text-[11px] font-semibold uppercase tracking-wider [writing-mode:vertical-rl]" style={OSWALD}>
-            {selected || "The fronts"}
-          </span>
-          <ChevronRight className="h-4 w-4" />
-        </button>
-      )}
+      <SlidePane side="left" open={panelOpen} onToggle={() => setPanel(!panelOpen)} label={selected || "The fronts"}
+        gap={GAP_PX} className="absolute z-20"
+        style={{ left: GAP_PX, top: GAP_PX, bottom: GAP_PX, width: `min(${PANEL_PX}px, calc(100% - ${GAP_PX + TAB_W}px))` }}
+        paneClass={PANE_CLASS} ariaLabel={selected ? `About ${selected}` : "The fronts"}>
+        {selected ? (
+          <Intel key={selected} name={selected} war={live} onBack={() => select(null)} onSelect={select}
+            onDropHere={() => onDropHere(selected, frontOf(war, selected))} />
+        ) : (
+          <Fronts war={war} live={live} query={query} setQuery={setQuery} onSelect={select} />
+        )}
+      </SlidePane>
 
       {live && (live.order || live.stats) ? (
-        <div className="absolute z-10 flex flex-col gap-2 overflow-y-auto"
-          style={{
-            right: GAP_PX,
-            top: wide ? GAP_PX : 52,
-            width: `min(20rem, calc(100% - ${2 * GAP_PX}px))`,
-            maxHeight: `calc(100% - ${2 * GAP_PX + 84}px)`,
-          }}>
-          <MajorOrder order={live.order} fronts={FRONTS}
-            open={orderOpen === null ? wide : orderOpen} onToggle={() => setOrderOpen(!(orderOpen === null ? wide : orderOpen))} />
-          <WarTotals stats={live.stats} open={totalsOpen === null ? wide : totalsOpen}
-            onToggle={() => setTotalsOpen(!(totalsOpen === null ? wide : totalsOpen))}
-            trend={trend.status === "ok" && trend.data.points.length > 1 ? <PlayersOverTime trend={trend.data} /> : null} />
-        </div>
+        <RightPanes top={wide ? GAP_PX : 52} bottom={GAP_PX + 84} room={room}
+          panes={[
+            live.order ? {
+              label: "Major Order", open: orderOpen === null ? wide : orderOpen,
+              onToggle: () => setOrderOpen(!(orderOpen === null ? wide : orderOpen)),
+              body: <MajorOrder order={live.order} fronts={FRONTS} />,
+            } : null,
+            live.stats ? {
+              label: "The war so far", open: totalsOpen === null ? wide : totalsOpen,
+              onToggle: () => setTotalsOpen(!(totalsOpen === null ? wide : totalsOpen)),
+              body: <WarTotals stats={live.stats} open
+                trend={trend.status === "ok" && trend.data.points.length > 1 ? <PlayersOverTime trend={trend.data} /> : null} />,
+            } : null,
+          ]} />
       ) : null}
     </div>
   );
@@ -146,21 +138,17 @@ export default function StarMap({ selected, onSelect, onDropHere }) {
 /* The fronts                                                          */
 /* ------------------------------------------------------------------ */
 
-function PanelHead({ title, onFold, children }) {
+function PanelHead({ title, children }) {
   return (
     <div className="flex items-center justify-between gap-2 border-b border-base-800 px-3 py-2.5">
       <div className="min-w-0">{children || <p className="text-sm font-bold text-base-100" style={OSWALD}>{title}</p>}</div>
-      <button type="button" onClick={onFold} title="Fold away" aria-label="Fold the panel away"
-        className="shrink-0 rounded border border-base-800 p-1 text-base-400 hover:border-base-600 hover:text-base-100">
-        <ChevronLeft className="h-4 w-4" />
-      </button>
     </div>
   );
 }
 
 /* Every front you can drop on, grouped by who you would fight there,
    busiest first, the way the game lists its campaigns. */
-function Fronts({ war, live, query, setQuery, onSelect, onFold }) {
+function Fronts({ war, live, query, setQuery, onSelect }) {
   const groups = useMemo(() => {
     if (!live) return [];
     const all = [...live.planets.entries()].filter(([, w]) => w.campaign && w.front);
@@ -172,7 +160,7 @@ function Fronts({ war, live, query, setQuery, onSelect, onFold }) {
 
   return (
     <>
-      <PanelHead title="The fronts" onFold={onFold} />
+      <PanelHead title="The fronts" />
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 py-3">
         <PlanetSearch query={query} setQuery={setQuery} war={war} chosen={null} onChoose={(name) => { onSelect(name); setQuery(""); }} />
         {groups.length ? groups.map(({ f, rows, players }) => (
@@ -233,7 +221,7 @@ function Bar({ share, hex }) {
 /* One planet                                                          */
 /* ------------------------------------------------------------------ */
 
-function Intel({ name, war, onBack, onSelect, onDropHere, onFold }) {
+function Intel({ name, war, onBack, onSelect, onDropHere }) {
   /* Mars is drawn and read like a planet, though the war does not list it. */
   const lm = landmarkOf(name);
   const p = planetByName.get(name) || (lm ? { name: lm.name, sector: lm.sector, biome: null, links: [] } : null);
@@ -251,7 +239,7 @@ function Intel({ name, war, onBack, onSelect, onDropHere, onFold }) {
 
   return (
     <>
-      <PanelHead onFold={onFold}>
+      <PanelHead>
         <button type="button" onClick={onBack}
           className="flex items-center gap-1 text-[11px] uppercase tracking-wider text-base-400 hover:text-base-100" style={OSWALD}>
           <ChevronLeft className="h-3.5 w-3.5" /> All fronts

@@ -6,9 +6,10 @@
     "say": "The Ministry acknowledges that Liberty was delivered with help. The helpers have been thanked, in writing, on the record.",
     "changes": [
       "About says who made the tool and how: Stigsmith, AI-assisted, with Claude writing the code.",
-      "Where the numbers come from is one ledger: every project the tool is built on, what it supplies, and how much, such as 246 items rated by u.gg or 281 planets from helldivers-2/json.",
-      "The fonts, icons and frameworks are credited too.",
-      "The skull beside the name stands on its own, larger, without the shield. The browser tab icon keeps it."
+      "Where the numbers come from is one ledger: every project the tool is built on, what it supplies, and how much, such as 246 items rated by u.gg or 281 planets from helldivers-2/json. The fonts, icons and frameworks are credited too.",
+      "Every pane over the Star Map and the war room slides in from its edge, pulled by a tab that moves with it: the planner, the fronts, the Major Order and the war so far.",
+      "The skull beside the name stands on its own, larger, half bone and half gunmetal, black on the light themes. The browser tab icon keeps its shield.",
+      "Scrollbars are thin and take the theme's colours."
     ]
   },
   {
