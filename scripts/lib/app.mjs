@@ -61,7 +61,7 @@ const placeUrl = asModule(inlineJson(read("src/lib/place.js"), "planets", "missi
 
 const armorUrl = asModule(inlineJson(read("src/lib/armor.js"), "armor"));
 
-let src = inlineJson(read("src/lib/loadouts.js"), "loadouts");
+let src = inlineJson(read("src/lib/loadouts.js"), "loadouts", "missions");
 src = swap(src, "armor", armorUrl);
 const loadoutsUrl = asModule(swap(src, "items", itemsUrl));
 
@@ -98,7 +98,7 @@ const dropUrl = asModule(swap(src, "scenario", scenarioUrl));
 src = swap(read("src/lib/coverage.js"), "drop", dropUrl);
 const coverageUrl = asModule(swap(src, "scenario", scenarioUrl));
 
-src = inlineJson(read("src/lib/share.js"), "vocabulary");
+src = read("src/lib/share.js");
 const shareModuleUrl = asModule(swap(src, "drop", dropUrl));
 
 const galaxyUrl = asModule(inlineJson(read("src/lib/galaxy.js"), "planets", "landmarks"));

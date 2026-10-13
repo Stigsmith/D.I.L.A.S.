@@ -26,7 +26,10 @@ for (const f of ["bots", "bugs", "squids"]) {
   ok(hot.cut.heat === heatBuilds && hot.shown.every((l) => !l.heat), `${f}: hot removes all ${heatBuilds} heat builds`);
   ok(plain.shown.every((l) => l.faction === f), `${f}: only this front`);
   const d7 = drop.dropPool(all, { faction: f, difficulty: 7 });
-  ok(d7.shown.every((l) => l.diff.includes("high")), `${f}: difficulty 7 keeps only builds declaring 7-9 (${d7.shown.length} of ${plain.shown.length})`);
+  ok(d7.shown.every((l) => l.levels[0] <= 7 && l.levels[1] >= 7), `${f}: difficulty 7 keeps only builds whose range holds 7 (${d7.shown.length} of ${plain.shown.length})`);
+  const cold = drop.dropPool(all, { faction: f, hazards: ["extreme_cold"] });
+  ok(cold.shown.every((l) => { const w = l.conditions.filter((c) => c !== "city"); return !w.length || w.includes("extreme_cold"); }),
+    `${f}: extreme cold keeps only builds naming no weather or naming cold (${cold.shown.length} of ${plain.shown.length})`);
 }
 
 /* locks only hide when asked */
@@ -121,9 +124,16 @@ ok(opened && opened.primary === sample.primary && opened.strats.join() === sampl
 ok(opened.name === "Füsilier ✦ build" && opened.blurb === "Bring the Quasar.", "names and notes survive any characters");
 const enc = (o) => Buffer.from(JSON.stringify(o)).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 ok(share.readShareCode(enc({ v: 1, n: "x", f: "evil" })) === null, "a link naming a front that does not exist opens nothing");
-const hostile = share.readShareCode(enc({ v: 1, n: "x", f: "bots", p: "orbital-laser", t: ["<img>", "orbital-laser"], d: ["high", "nonsense"], m: ["hot", "lava"] }));
-ok(hostile && hostile.primary === null && hostile.strats[0] === null && hostile.strats[1] === "orbital-laser" && hostile.diff.join() === "high" && hostile.biomes.join() === "hot",
+const hostile = share.readShareCode(enc({ v: 1, n: "x", f: "bots", p: "orbital-laser", t: ["<img>", "orbital-laser"], x: ["blitz", "<b>"], l: [9, 99], c: ["thick_fog", "lava"] }));
+ok(hostile && hostile.primary === null && hostile.strats[0] === null && hostile.strats[1] === "orbital-laser" && hostile.missions.join() === "blitz" && hostile.levels.join() === "1,10" && hostile.conditions.join() === "thick_fog",
   "a hostile link keeps only items in their right slots and values the tool knows");
+{
+const oldLink = share.readShareCode(enc({ v: 1, n: "x", f: "bots", d: ["mid", "high"], m: ["hot", "urban", "cave"] }));
+ok(oldLink && oldLink.levels.join() === "5,9" && oldLink.conditions.join() === "intense_heat,city" && !("diff" in oldLink) && !("biomes" in oldLink),
+  "a link from before 13 October 2026 opens with its bands and biomes in the war room's words");
+const carried = share.readShareCode(share.shareCode({ ...sample, missions: ["defend"], levels: [7, 10], conditions: ["extreme_cold"] }));
+ok(carried.missions.join() === "defend" && carried.levels.join() === "7,10" && carried.conditions.join() === "extreme_cold", "a link carries what the build is for");
+}
 ok(share.readShareCode("") === null && share.readShareCode("!!!") === null && share.readShareCode("x".repeat(5000)) === null && share.readShareCode("abcd") === null,
   "a mangled link opens nothing and throws nothing");
 
@@ -196,7 +206,7 @@ ok(!drop.untriedHere(bots, { history: recent, lockedSet: lockFirst }).some((u) =
    the same as one carrying a locked weapon. ownership.js puts the set's
    id in the locked set beside the items. */
 {
-  const worn = { id: "w1", name: "Worn", faction: "bots", armor: "scout", armorSet: "sc-34-infiltrator", diff: [], biomes: [], strats: [] };
+  const worn = { id: "w1", name: "Worn", faction: "bots", armor: "scout", armorSet: "sc-34-infiltrator", missions: [], levels: [1, 10], conditions: [], strats: [] };
   const pool = drop.dropPool([worn], { faction: "bots" }, { lockedSet: new Set(["sc-34-infiltrator"]), showLocked: false });
   ok(pool.shown.length === 0 && pool.cut.locked === 1, "a build wearing a locked armour set is hidden with the locked builds");
 }

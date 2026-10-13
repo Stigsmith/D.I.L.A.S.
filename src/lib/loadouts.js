@@ -6,10 +6,69 @@
 /* ================================================================== */
 
 import PRESETS from "../data/loadouts.json";
+import MISSIONS from "../data/missions.json";
 import { getItem, ventsHeat } from "./items.js";
 import { getArmorSet } from "./armor.js";
 
 export const presets = PRESETS;
+
+/* ------------------------------------------------------------------ */
+/* What a build is for, in the war room's words                        */
+/*                                                                     */
+/* The curator's call of 13 October 2026, when these moved into the     */
+/* editor's Scenario pane: a build is tagged in the words the war room  */
+/* uses, not the tool's older ones.                                     */
+/*   missions    the war room's mission kinds (missions.json traits).   */
+/*               None means any mission. Not a gate                     */
+/*   levels      [from, to], difficulty 1 to 10. Drop Bay offers the    */
+/*               build only inside it                                   */
+/*   conditions  the planet hazards that decide what Drop Bay offers    */
+/*               (heat, cold, fog), and city. A build naming weather is */
+/*               offered on a planet with weather only if it names that */
+/*               one; city is a label, because the city is a guess      */
+/*                                                                     */
+/* Builds saved before this carried mission and alt (five of the same   */
+/* kinds), diff (four bands) and biomes (hot, cold, foggy, urban,       */
+/* cave). buildTags reads either, so nothing saved has to be rewritten  */
+/* by hand. Cave goes: no planet ever says cave.                        */
+/* ------------------------------------------------------------------ */
+
+export const MISSION_KINDS = Object.keys(MISSIONS.traits);
+export const WEATHER = ["intense_heat", "extreme_cold", "thick_fog"];
+export const CONDITIONS = [...WEATHER, "city"];
+export const ANY_LEVELS = [1, 10];
+
+const BAND_LEVELS = { low: [1, 4], mid: [5, 6], high: [7, 9], extreme: [10, 10] };
+const OLD_BIOME = { hot: "intense_heat", cold: "extreme_cold", foggy: "thick_fog", urban: "city" };
+
+const level = (n) => (Number.isInteger(n) && n >= 1 && n <= 10 ? n : null);
+
+export function buildTags(l = {}) {
+  const missions = Array.isArray(l.missions)
+    ? l.missions
+    : [l.mission, ...(Array.isArray(l.alt) ? l.alt : [])];
+  let levels = null;
+  if (Array.isArray(l.levels) && level(l.levels[0]) && level(l.levels[1])) {
+    levels = [Math.min(l.levels[0], l.levels[1]), Math.max(l.levels[0], l.levels[1])];
+  } else if (Array.isArray(l.diff)) {
+    const spans = l.diff.map((b) => BAND_LEVELS[b]).filter(Boolean);
+    if (spans.length) levels = [Math.min(...spans.map((s) => s[0])), Math.max(...spans.map((s) => s[1]))];
+  }
+  const conditions = Array.isArray(l.conditions)
+    ? l.conditions
+    : (Array.isArray(l.biomes) ? l.biomes : []).map((b) => OLD_BIOME[b]);
+  return {
+    missions: [...new Set(missions)].filter((m) => MISSION_KINDS.includes(m)),
+    levels: levels || [...ANY_LEVELS],
+    conditions: [...new Set(conditions)].filter((c) => CONDITIONS.includes(c)),
+  };
+}
+
+/* The same build in the new words and only those. */
+export function withTags(l) {
+  const { mission, alt, diff, biomes, ...rest } = l;
+  return { ...rest, ...buildTags(l) };
+}
 
 export const SLOTS = [
   { key: "primary", label: "Primary", slot: "primary" },
@@ -111,10 +170,9 @@ export function emptyLoadout(faction = "bugs") {
     preset: false,
     forkedFrom: null,
     faction,
-    mission: "standard",
-    alt: [],
-    diff: ["mid", "high"],
-    biomes: [],
+    missions: [],
+    levels: [5, 9],
+    conditions: [],
     fire: false,
     primary: null,
     secondary: null,
@@ -140,9 +198,7 @@ export function forkPreset(preset) {
     preset: false,
     forkedFrom: preset.id,
     strats: [...preset.strats],
-    alt: [...preset.alt],
-    diff: [...preset.diff],
-    biomes: [...preset.biomes],
+    ...buildTags(preset),
     updatedAt: new Date().toISOString(),
   };
 }
@@ -154,9 +210,7 @@ export function duplicateLoadout(l) {
     name: `${l.name} copy`,
     preset: false,
     strats: [...l.strats],
-    alt: [...(l.alt || [])],
-    diff: [...(l.diff || [])],
-    biomes: [...(l.biomes || [])],
+    ...buildTags(l),
     updatedAt: new Date().toISOString(),
   };
 }
@@ -179,7 +233,7 @@ export function cleanLoadout(l) {
   if (set && set.passive !== armor) set = null;
   return {
     ...emptyLoadout(l.faction),
-    ...l,
+    ...withTags(l),
     preset: false,
     primary: slotOk(l.primary, "primary"),
     secondary: slotOk(l.secondary, "secondary"),

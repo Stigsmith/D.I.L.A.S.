@@ -29,8 +29,9 @@
 import { useMemo, useState } from "react";
 import { Plus, Star, FilterX, Snowflake, Info, Lock, AlertTriangle, Rocket, History as HistoryIcon } from "lucide-react";
 
-import { LoadoutCard, FACTIONS, BIOMES, BIOME_THEME, MISSION_TYPES, FactionBar, FactionChooser, DifficultySlider, bandForLevel, TierBadge } from "./Tiers.jsx";
-import { presets, deriveHeat, loadoutLockIds } from "./lib/loadouts.js";
+import { LoadoutCard, FACTIONS, BIOMES, BIOME_THEME, FactionBar, FactionChooser, DifficultySlider, TierBadge } from "./Tiers.jsx";
+import { presets, deriveHeat, loadoutLockIds, buildTags, MISSION_KINDS, WEATHER } from "./lib/loadouts.js";
+import { missionTraits } from "./lib/scenario.js";
 import { withHeat } from "./lib/drop.js";
 import { coverage } from "./lib/coverage.js";
 import { usageOf, daysSince, STALE_DAYS } from "./lib/history.js";
@@ -76,14 +77,15 @@ function Row({ label, options, value, onChange, hint }) {
   );
 }
 
+/* The filter's biome, as the condition a build names. Cave has none: no
+   planet ever says cave. */
+const BIOME_CONDITION = { hot: "intense_heat", cold: "extreme_cold", foggy: "thick_fog", urban: "city" };
+
 export default function ArmouryBuilds({ state, navigate, faction, setFaction, scenario }) {
   const [biome, setBiome] = useState("any");
   const [mission, setMission] = useState("any");
-  /* A level from 1 to 10, or 0 for any. The four bands are what a build */
-  /* declares and what the gate below reads, so the level derives one     */
-  /* rather than replacing it and no saved build has to migrate.          */
+  /* A level from 1 to 10, or 0 for any, held against each build's range. */
   const [level, setLevel] = useState(0);
-  const difficulty = bandForLevel(level);
   const [source, setSource] = useState("all");
   const [favesOnly, setFavesOnly] = useState(false);
   /* Restored. This existed on the picker Drop Bay replaced and was lost
@@ -118,22 +120,25 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
       if (favesOnly && !state.favorites.includes(l.id)) return false;
       if (gear === "owned" && loadoutLockIds(l).some((id) => state.lockedSet.has(id))) { lockCut += 1; return false; }
       if (l.faction !== faction) return false;
-      if (mission !== "any" && l.mission !== mission && !(l.alt || []).includes(mission)) return false;
-      if (difficulty !== "any" && !(l.diff || []).includes(difficulty)) return false;
+      const tags = buildTags(l);
+      /* A build naming no mission is for any mission. */
+      if (mission !== "any" && tags.missions.length && !tags.missions.includes(mission)) return false;
+      if (level && (level < tags.levels[0] || level > tags.levels[1])) return false;
 
       if (biome !== "any") {
         /* Hot planets speed up heat buildup, so a heat venting kit is   */
         /* removed from the pool rather than flagged.                    */
         if (biome === "hot" && l.heat) { heatCut += 1; return false; }
-        /* A build declaring biomes is specialised for them. One that    */
-        /* declares none is general purpose and always survives.         */
-        const built = l.biomes || [];
-        if (built.length && !built.includes(biome)) return false;
+        /* A build naming weather is for that weather. One naming none   */
+        /* is general purpose and always survives. Urban asks for city.  */
+        const want = BIOME_CONDITION[biome];
+        const named = biome === "urban" ? tags.conditions : tags.conditions.filter((c) => WEATHER.includes(c));
+        if (want && named.length && !named.includes(want)) return false;
       }
       return true;
     });
     return { shown: out, removedByHeat: heatCut, removedByLock: lockCut };
-  }, [everything, source, favesOnly, gear, faction, mission, difficulty, biome, state.favorites, state.lockedSet]);
+  }, [everything, source, favesOnly, gear, faction, mission, level, biome, state.favorites, state.lockedSet]);
 
   /* Cold slows heat buildup, so laser and plasma fire longer before      */
   /* venting. The first version modelled only the hot penalty and missed  */
@@ -181,9 +186,9 @@ export default function ArmouryBuilds({ state, navigate, faction, setFaction, sc
       <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Row label="Biome" hint="filters builds" value={biome} onChange={setBiome}
-            options={[ANY, ...BIOMES.filter((b) => b.id !== "any")]} />
+            options={[ANY, ...BIOMES.filter((b) => BIOME_CONDITION[b.id])]} />
           <Row label="Mission" value={mission} onChange={setMission}
-            options={[ANY, ...MISSION_TYPES]} />
+            options={[ANY, ...MISSION_KINDS.map((id) => ({ id, label: missionTraits[id].name }))]} />
           <div className="sm:col-span-2">
             <DifficultySlider value={level} onChange={setLevel} hint="filters builds" />
           </div>

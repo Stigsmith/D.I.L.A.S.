@@ -17,7 +17,7 @@
 /* ================================================================== */
 
 import vocabulary from "../data/vocabulary.json";
-import { deriveHeat, loadoutLockIds, cleanLoadout } from "./loadouts.js";
+import { deriveHeat, loadoutLockIds, cleanLoadout, buildTags, WEATHER } from "./loadouts.js";
 import { traitsOf } from "./scenario.js";
 import { readBuild, byReading } from "./build.js";
 import { usageOf, itemsDroppedWith, dropsOn, daysSince, ENOUGH_DROPS, STALE_DAYS } from "./history.js";
@@ -89,9 +89,10 @@ export function dropContext(scenario = {}) {
 /*  - heat, because a hot planet removes a build that vents it. That   */
 /*    is a locked decision: if the answer is do not bring this, it     */
 /*    should not be offered                                            */
-/*  - the difficulty band a build declares, the other locked gate      */
-/*  - a declared biome that is not this one. A build declaring none is */
-/*    general purpose and always survives                              */
+/*  - the difficulty range a build declares, the other locked gate     */
+/*  - declared weather that is not this planet's. A build naming no     */
+/*    weather is general purpose and always survives; city never gates, */
+/*    because the city is a guess                                       */
 /*                                                                     */
 /* Gear you have not unlocked is hidden rather than gated, and only    */
 /* for your own slot: the lock list is yours, and it says nothing       */
@@ -113,11 +114,13 @@ export function withHeat(builds) {
    still what that person is bringing, and says so separately. */
 export function gateOf(l, scenario = {}) {
   const biome = gateBiome(scenario);
-  const band = bandFor(scenario.difficulty);
+  const lvl = Number(scenario.difficulty) || 0;
+  const { levels, conditions } = buildTags(l);
   if (biome === "hot" && l.heat) return "heat";
-  if (band !== "any" && !(l.diff || []).includes(band)) return "band";
-  const built = l.biomes || [];
-  if (biome !== "any" && built.length && !built.includes(biome)) return "biome";
+  if (lvl && (lvl < levels[0] || lvl > levels[1])) return "band";
+  const weather = conditions.filter((c) => WEATHER.includes(c));
+  const here = (scenario.hazards || []).filter((h) => WEATHER.includes(h));
+  if (here.length && weather.length && !here.some((h) => weather.includes(h))) return "biome";
   return null;
 }
 
@@ -212,7 +215,7 @@ export function readDrop(drop, resolve) {
 /* field is the one thing on a shared screen worth not sending.         */
 /* ------------------------------------------------------------------ */
 
-const WIRE_FIELDS = ["id", "name", "faction", "preset", "primary", "secondary", "grenade", "armor", "armorSet", "booster", "strats", "diff", "biomes", "updatedAt"];
+const WIRE_FIELDS = ["id", "name", "faction", "preset", "primary", "secondary", "grenade", "armor", "armorSet", "booster", "strats", "missions", "levels", "conditions", "updatedAt"];
 
 export function packBuild(l) {
   if (!l) return null;
@@ -232,8 +235,6 @@ export function unpackBuild(raw) {
     ...clean,
     name,
     preset: raw.preset === true,
-    diff: Array.isArray(raw.diff) ? raw.diff.filter((d) => typeof d === "string") : [],
-    biomes: Array.isArray(raw.biomes) ? raw.biomes.filter((b) => typeof b === "string") : [],
   };
 }
 

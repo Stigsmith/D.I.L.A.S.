@@ -30,6 +30,7 @@ import {
 } from "./lib/scenario.js";
 import { scoreItem, scenarioIsSet } from "./lib/score.js";
 import { readBuild, explainScore } from "./lib/build.js";
+import { buildTags } from "./lib/loadouts.js";
 import { describeArmour } from "./lib/enemies.js";
 import { SUBFACTIONS, subfactionsIn } from "./lib/subfaction.js";
 import { Tip, MissingData, HAS_TIP } from "./Tip.jsx";
@@ -2241,7 +2242,8 @@ export function LoadoutCard({ loadout, isFavorite, onToggleFavorite, rankLabel, 
     () => (scenario && scenario.faction ? readBuild(loadout, { ...scenario, faction: loadout.faction }) : null),
     [loadout, scenario]
   );
-  const biomeMatch = biome !== "any" && loadout.biomes.includes(biome);
+  const biomeMatch = biome !== "any" && buildTags(loadout).conditions.includes(
+    { hot: "intense_heat", cold: "extreme_cold", foggy: "thick_fog", urban: "city" }[biome]);
   const fireNote = biome === "hot" && loadout.fire;
   const lockedHere = loadoutItems(loadout).filter((id) => lockedSet.has(id));
   const staleHere = loadoutItems(loadout)

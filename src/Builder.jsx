@@ -22,7 +22,7 @@ import {
 
 import {
   TierRow, RowDetail, TierBadge, ItemArt, sourceLabelFor, itemStatSummary,
-  FACTIONS, FACTION_THEME, BIOMES, MISSION_TYPES, DIFFICULTIES, CAT_META, STRAT_GROUP, FactionBar, LoadoutReading,
+  FACTIONS, FACTION_THEME, CAT_META, STRAT_GROUP, FactionBar, LoadoutReading,
 } from "./Tiers.jsx";
 import { CATEGORIES, getItem, itemName, judgedTier, TIER_RANK, averageRank, rank, eatsBackpack } from "./lib/items.js";
 import { readBuild, gapsIn, closedGaps } from "./lib/build.js";
@@ -37,6 +37,9 @@ import { getArmorSet, setsForPassive, weightOf } from "./lib/armor.js";
 import { SetStrip, WeightFilter, ArmorSetArt, setLine } from "./ArmorSets.jsx";
 import SlidePane, { TAB_W, PANE_CLASS } from "./SlidePane.jsx";
 import { DifficultyStepper, SquadCount } from "./WarRoom.jsx";
+import { buildTags, MISSION_KINDS, CONDITIONS } from "./lib/loadouts.js";
+import { missionsFor, missionTraits, hazardName } from "./lib/scenario.js";
+import { vocabulary } from "./lib/items.js";
 
 /* A fresh build with one item already in its slot, for "build around
    it" from Drop Bay: the curator's "you never tried this here". */
@@ -438,31 +441,6 @@ function Slot({ label, itemId, setId = null, locked, onOpen, warn, faction, scen
 /* Builder                                                             */
 /* ------------------------------------------------------------------ */
 
-const MultiToggle = ({ label, hint, options, value, onChange }) => (
-  <div>
-    <div className="mb-1.5 flex items-baseline gap-2">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500"
-        style={{ fontFamily: "'Oswald', sans-serif" }}>{label}</span>
-      {hint ? <span className="text-[9px] lowercase text-base-600">{hint}</span> : null}
-    </div>
-    <div className="flex flex-wrap gap-1.5">
-      {options.map((o) => {
-        const on = value.includes(o.id);
-        return (
-          <button key={o.id}
-            onClick={() => onChange(on ? value.filter((v) => v !== o.id) : [...value, o.id])}
-            aria-pressed={on} title={o.title}
-            className={"rounded border px-2.5 py-1.5 text-xs transition-colors " +
-              (on ? "border-base-200 bg-base-200 text-base-900"
-                 : "border-base-700 bg-base-900 text-base-400 hover:border-base-500 hover:text-base-100")}>
-            {o.label}
-          </button>
-        );
-      })}
-    </div>
-  </div>
-);
-
 /**
  * `overlay` is set when the builder opens over the drop screen:
  * { onClose, onSaved(id) }. Saving then hands the build back to the slot
@@ -474,15 +452,50 @@ const MultiToggle = ({ label, hint, options, value, onChange }) => (
 /* The quick scenario switcher                                         */
 /*                                                                     */
 /* Folded away at the editor's left edge and pulled out by its tab,    */
-/* the Star Map's way, the curator's call of 13 October 2026. It took  */
-/* the place of the full width front bar. The front here is the        */
-/* build's own and is saved with it; difficulty and how many of you    */
-/* are the scenario's, which the picker and the reading rank for.      */
+/* the Star Map's way, the curator's call of 13 October 2026. Two      */
+/* halves. This build is for: what the build is tagged for and saved   */
+/* with (front, missions, difficulty range, conditions, fire, note),   */
+/* in the war room's words, see buildTags. Where you are dropping: the */
+/* scenario's difficulty and how many of you, which the picker and the */
+/* reading rank for. Planet and mission stay in the war room.          */
 /* The tab sits at the left edge of whatever holds the editor: the     */
 /* screen over Drop Bay, the page beside the menu in the Armoury.      */
 /* ------------------------------------------------------------------ */
 
-function ScenarioPane({ rootRef, faction, onFaction, scenario, controls }) {
+/* A small heading inside the pane. */
+function PaneHead({ children, hint }) {
+  return (
+    <span className="flex items-baseline gap-2">
+      <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500"
+        style={{ fontFamily: "'Oswald', sans-serif" }}>{children}</span>
+      {hint ? <span className="text-[10px] text-base-600">{hint}</span> : null}
+    </span>
+  );
+}
+
+/* One chip that switches on and off. */
+function PaneChip({ on, onClick, title, children }) {
+  return (
+    <button type="button" onClick={onClick} aria-pressed={on} title={title}
+      className={"rounded border px-2 py-1 text-[11px] transition-colors " +
+        (on ? "border-base-200 bg-base-200 text-base-900"
+          : "border-base-700 bg-base-900 text-base-400 hover:border-base-500 hover:text-base-100")}>
+      {children}
+    </button>
+  );
+}
+
+const toggleIn = (list, id) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
+
+/* The mission kinds that exist on a front: Commando is Automaton only. */
+const kindsOn = (front) => {
+  const on = new Set(missionsFor(front).flatMap((m) => m.traits));
+  return MISSION_KINDS.filter((k) => on.has(k));
+};
+
+const PANE_TITLE = "text-sm font-bold uppercase tracking-wide text-base-100";
+
+function ScenarioPane({ rootRef, draft, patch, heat, heatFrom, scenario, controls }) {
   const [open, setOpen] = useState(false);
   const [left, setLeft] = useState(0);
   useLayoutEffect(() => {
@@ -495,25 +508,106 @@ function ScenarioPane({ rootRef, faction, onFaction, scenario, controls }) {
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, [rootRef]);
+  const { missions, levels, conditions } = buildTags(draft);
+  const levelSelect = (value, onChange, label) => (
+    <select value={value} onChange={(e) => onChange(Number(e.target.value))} aria-label={label}
+      className="min-w-0 flex-1 rounded border border-base-700 bg-base-900 px-1.5 py-1 text-[11px] text-base-100">
+      {vocabulary.difficulties.map((d) => (
+        <option key={d.level} value={d.level}>{d.level} · {d.name}</option>
+      ))}
+    </select>
+  );
   return (
     <div className="pointer-events-none fixed inset-y-0 right-0 z-[35] overflow-hidden" style={{ left }}>
       {/* Centred on a wrapper: the pane's own transform is its slide. */}
-      <div className="absolute top-1/2 -translate-y-1/2" style={{ left: 12, width: `min(20rem, calc(100% - ${TAB_W + 24}px))` }}>
+      <div className="absolute top-1/2 -translate-y-1/2" style={{ left: 12, width: `min(24rem, calc(100% - ${TAB_W + 24}px))` }}>
       <SlidePane side="left" open={open} onToggle={() => setOpen((v) => !v)} label="Scenario" ariaLabel="Scenario"
         className="relative" paneClass={PANE_CLASS}>
-        <div className="flex flex-col gap-4 p-4">
+        {/* Sized to fit a laptop screen whole. Scrolls only on a smaller one. */}
+        <div className="flex flex-col gap-3 overflow-y-auto p-4" style={{ maxHeight: "calc(100vh - 24px)" }}>
+          <p className={PANE_TITLE} style={{ fontFamily: "'Oswald', sans-serif" }}>This build is for</p>
+          <FactionBar compact faction={draft.faction} onChoose={(id) => patch({ faction: id })} />
+
           <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500"
-              style={{ fontFamily: "'Oswald', sans-serif" }}>
-              This build is for
-            </span>
-            <FactionBar compact faction={faction} onChoose={onFaction} />
+            <PaneHead hint="none means any">Missions</PaneHead>
+            <div className="flex flex-wrap gap-1">
+              {kindsOn(draft.faction).map((k) => (
+                <PaneChip key={k} on={missions.includes(k)} title={missionTraits[k].line}
+                  onClick={() => patch({ missions: toggleIn(missions, k) })}>
+                  {missionTraits[k].name}
+                </PaneChip>
+              ))}
+            </div>
           </div>
+
+          <div className="flex flex-col gap-1.5">
+            <PaneHead hint="Drop Bay offers it only in this range">Difficulty</PaneHead>
+            <div className="flex items-center gap-1.5 text-[11px] text-base-500">
+              {levelSelect(levels[0], (n) => patch({ levels: [n, Math.max(n, levels[1])] }), "Lowest difficulty")}
+              to
+              {levelSelect(levels[1], (n) => patch({ levels: [Math.min(n, levels[0]), n] }), "Highest difficulty")}
+            </div>
+            {/* The range at a glance, one mark per level. */}
+            <div className="flex gap-0.5" aria-hidden="true">
+              {vocabulary.difficulties.map((d) => (
+                <span key={d.level} className={"h-1 flex-1 rounded-full " +
+                  (d.level >= levels[0] && d.level <= levels[1] ? "bg-brand" : "bg-base-800")} />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <PaneHead hint="none means anywhere">Conditions</PaneHead>
+            <div className="flex flex-wrap gap-1">
+              {CONDITIONS.map((c) => (
+                <PaneChip key={c} on={conditions.includes(c)}
+                  title={c === "city"
+                    ? "Planets with a megacity. A label only: the tool cannot tell whether a mission is in the city."
+                    : `Drop Bay offers it on a planet with heat, cold or fog only if it names that one.`}
+                  onClick={() => patch({ conditions: toggleIn(conditions, c) })}>
+                  {c === "city" ? "City" : hazardName(c)}
+                </PaneChip>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5 text-[11px]">
+            <PaneHead>Behaviour</PaneHead>
+            <span className={"flex items-center gap-1.5 " + (heat ? "text-base-200" : "text-base-500")}
+              title="Set from your gear. Hot planets rule heat builds out.">
+              <Thermometer className="h-3.5 w-3.5 shrink-0" />
+              {heat ? `Vents heat: ${heatFrom.map((i) => i.name).join(", ")}` : "No heat weapons"}
+            </span>
+            <span className="flex flex-wrap items-center gap-2">
+              <button type="button" onClick={() => patch({ fire: !draft.fire })} aria-pressed={draft.fire}
+                className={"flex w-fit items-center gap-1.5 rounded border px-2 py-1 transition-colors " +
+                  (draft.fire ? "border-accent-500 bg-accent-500 text-accent-950"
+                    : "border-base-700 bg-base-900 text-base-400 hover:border-base-500 hover:text-base-100")}>
+                <Flame className="h-3.5 w-3.5" />
+                Fire based kit
+              </button>
+              {draft.fire !== deriveFire(draft) ? (
+                <span className="text-base-600">The gear suggests {deriveFire(draft) ? "yes" : "no"}. Your call wins.</span>
+              ) : null}
+            </span>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <PaneHead>Note</PaneHead>
+            <textarea value={draft.blurb} onChange={(e) => patch({ blurb: e.target.value })} rows={2}
+              placeholder="What this build is for"
+              className="w-full rounded border border-base-700 bg-base-900 px-2.5 py-1.5 text-xs text-base-100 placeholder-base-600 outline-none focus:border-base-500" />
+          </div>
+
           {controls ? (
-            <>
+            <div className="flex flex-col gap-3 border-t border-base-800 pt-3">
+              <p className="flex items-baseline gap-2">
+                <span className={PANE_TITLE} style={{ fontFamily: "'Oswald', sans-serif" }}>Where you are dropping</span>
+                <span className="text-[10px] text-base-500">the picker ranks for this</span>
+              </p>
               <DifficultyStepper value={scenario.difficulty} onChange={controls.setDifficulty} />
               <SquadCount value={scenario.squad} onChange={controls.setSquad} party={controls.party} />
-            </>
+            </div>
           ) : null}
         </div>
       </SlidePane>
@@ -694,7 +788,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
       {/* scenario. A build is for a front and keeps that when you save it, */}
       {/* so changing it changes what you are making, not where the rest   */}
       {/* of the tool is looking. The picker already ranks by it.          */}
-      <ScenarioPane rootRef={rootRef} faction={draft.faction} onFaction={(id) => patch({ faction: id })}
+      <ScenarioPane rootRef={rootRef} draft={draft} patch={patch} heat={heat} heatFrom={heatFrom}
         scenario={scenario} controls={controls} />
 
       {picking ? (
@@ -867,66 +961,6 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
         </div>
       </div>
 
-      {/* Metadata */}
-      <div className="rounded-lg border border-base-800 bg-base-900/60 p-4">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-base-500"
-              style={{ fontFamily: "'Oswald', sans-serif" }}>Mission</span>
-            <div className="flex flex-wrap gap-1.5">
-              {MISSION_TYPES.map((m) => (
-                <button key={m.id} onClick={() => patch({ mission: m.id })} aria-pressed={draft.mission === m.id}
-                  className={"rounded border px-2.5 py-1.5 text-xs transition-colors " +
-                    (draft.mission === m.id ? "border-base-200 bg-base-200 text-base-900"
-                      : "border-base-700 bg-base-900 text-base-400 hover:border-base-500 hover:text-base-100")}>
-                  {m.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <MultiToggle label="Difficulty" hint="filters builds" options={DIFFICULTIES}
-            value={draft.diff} onChange={(v) => patch({ diff: v })} />
-
-          <MultiToggle label="Built for these biomes" hint="none means anywhere"
-            options={BIOMES.filter((b) => b.id !== "any")}
-            value={draft.biomes} onChange={(v) => patch({ biomes: v })} />
-
-          <div>
-            <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-base-500"
-              style={{ fontFamily: "'Oswald', sans-serif" }}>Behaviour</span>
-            <div className="flex flex-col gap-1.5 text-[11px]">
-              <span className={"flex items-center gap-1.5 " + (heat ? "text-base-200" : "text-base-500")}>
-                <Thermometer className="h-3.5 w-3.5" />
-                {heat
-                  ? `Vents heat: ${heatFrom.map((i) => i.name).join(", ")}`
-                  : "No heat weapons"}
-              </span>
-              <span className="text-base-600">Set from your gear. Hot planets rule heat builds out.</span>
-              <button onClick={() => patch({ fire: !draft.fire })} aria-pressed={draft.fire}
-                className={"mt-1 flex w-fit items-center gap-1.5 rounded border px-2.5 py-1.5 transition-colors " +
-                  (draft.fire ? "border-accent-500 bg-accent-500 text-accent-950"
-                    : "border-base-700 bg-base-900 text-base-400 hover:border-base-500 hover:text-base-100")}>
-                <Flame className="h-3.5 w-3.5" />
-                Fire based kit
-              </button>
-              {draft.fire !== deriveFire(draft) ? (
-                <span className="text-base-600">
-                  The gear suggests {deriveFire(draft) ? "yes" : "no"}. Your call wins.
-                </span>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="sm:col-span-2 lg:col-span-3">
-            <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-base-500"
-              style={{ fontFamily: "'Oswald', sans-serif" }}>Note</span>
-            <textarea value={draft.blurb} onChange={(e) => patch({ blurb: e.target.value })} rows={2}
-              placeholder="What this build is for"
-              className="w-full rounded border border-base-700 bg-base-900 px-2.5 py-1.5 text-xs text-base-100 placeholder-base-600 outline-none focus:border-base-500" />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

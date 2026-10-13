@@ -218,6 +218,9 @@ const badRef = [];
 const wrongSlot = [];
 const loadoutIds = new Set();
 const dupeLoadouts = [];
+const badTags = [];
+const MISSION_KINDS = new Set(Object.keys(missions.traits));
+const BUILD_CONDITIONS = new Set(["intense_heat", "extreme_cold", "thick_fog", "city"]);
 for (const l of loadouts) {
   if (loadoutIds.has(l.id)) dupeLoadouts.push(l.id);
   loadoutIds.add(l.id);
@@ -236,7 +239,18 @@ for (const l of loadouts) {
     else if (item.slot !== "stratagem") wrongSlot.push(`${l.id}.strats references ${ref}, which is a ${item.slot}, not a stratagem`);
   }
   if (l.strats.length !== 4) wrongSlot.push(`${l.id} carries ${l.strats.length} stratagems, not 4`);
+
+  /* What the build is for, in the war room's words (buildTags in
+     src/lib/loadouts.js, which keeps the same three lists). */
+  for (const m of l.missions || []) if (!MISSION_KINDS.has(m)) badTags.push(`${l.id}.missions names ${m}, which is not a mission kind`);
+  const lv = l.levels;
+  if (!Array.isArray(lv) || lv.length !== 2 || !lv.every((n) => Number.isInteger(n) && n >= 1 && n <= 10) || lv[0] > lv[1]) {
+    badTags.push(`${l.id}.levels must be [from, to] between 1 and 10`);
+  }
+  for (const c of l.conditions || []) if (!BUILD_CONDITIONS.has(c)) badTags.push(`${l.id}.conditions names ${c}`);
+  for (const old of ["mission", "alt", "diff", "biomes"]) if (old in l) badTags.push(`${l.id} still carries the old ${old} field`);
 }
+if (badTags.length) fail(`${badTags.length} loadout tag(s) the tool does not know:`, badTags);
 if (dupeLoadouts.length) fail(`${dupeLoadouts.length} duplicate loadout id(s):`, [...new Set(dupeLoadouts)]);
 if (badRef.length) fail(`${badRef.length} loadout reference(s) matching no item:`, badRef);
 if (wrongSlot.length) fail(`${wrongSlot.length} loadout slot(s) holding the wrong kind of item:`, wrongSlot);

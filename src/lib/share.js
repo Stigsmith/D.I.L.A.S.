@@ -14,15 +14,12 @@
 /* one place that does that.                                          */
 /* ================================================================== */
 
-import vocabulary from "../data/vocabulary.json";
 import { unpackBuild } from "./drop.js";
 
 /* A link is anyone's text, so the few free values a build carries are
    held to the lists the tool knows. A party build comes from this tool;
    a link could come from anywhere. */
 const FRONTS = new Set(["bots", "bugs", "squids"]);
-const BANDS = new Set(vocabulary.difficulties.map((d) => d.band));
-const GATE_BIOMES = new Set(["hot", "cold", "foggy", "urban", "cave"]);
 
 /* A link longer than this is not a build. Nine ids, a name and a note
    come to well under a thousand characters. */
@@ -30,11 +27,15 @@ const MAX_CODE = 4000;
 const MAX_NOTE = 280;
 
 /* Short keys, because every character is in the link. v says which
-   shape, so a later one can be read alongside this one. */
+   shape, so a later one can be read alongside this one. d and m are the
+   difficulty bands and biomes links carried before 13 October 2026: read,
+   converted by buildTags like any old build, and never written. */
 const KEYS = [
   ["n", "name"], ["f", "faction"], ["p", "primary"], ["s", "secondary"], ["g", "grenade"],
-  ["a", "armor"], ["w", "armorSet"], ["b", "booster"], ["t", "strats"], ["d", "diff"], ["m", "biomes"], ["o", "blurb"],
+  ["a", "armor"], ["w", "armorSet"], ["b", "booster"], ["t", "strats"],
+  ["x", "missions"], ["l", "levels"], ["c", "conditions"], ["o", "blurb"],
 ];
+const OLD_KEYS = [["d", "diff"], ["m", "biomes"]];
 
 function toBase64Url(text) {
   const bytes = new TextEncoder().encode(text);
@@ -77,12 +78,10 @@ export function readShareCode(code) {
   }
   if (!raw || typeof raw !== "object" || raw.v !== 1) return null;
   const long = { id: "shared" };
-  for (const [short, key] of KEYS) if (raw[short] !== undefined) long[key] = raw[short];
+  for (const [short, key] of [...KEYS, ...OLD_KEYS]) if (raw[short] !== undefined) long[key] = raw[short];
   if (!FRONTS.has(long.faction)) return null;
   const build = unpackBuild(long);
   if (!build) return null;
-  build.diff = build.diff.filter((d) => BANDS.has(d));
-  build.biomes = build.biomes.filter((b) => GATE_BIOMES.has(b));
   const blurb = typeof raw.o === "string" ? raw.o.trim().slice(0, MAX_NOTE) : "";
   return { ...build, preset: false, blurb };
 }
