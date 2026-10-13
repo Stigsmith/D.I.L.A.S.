@@ -6,10 +6,12 @@
 /* whose art is not on disk. It replaced the game's booster skull,    */
 /* which is extracted art and so missing from a fresh clone.          */
 /*                                                                    */
-/* The favicon's colours are fixed; here they are the theme's. The    */
-/* yellow plate is dropped, the shield takes the brand colour and the */
-/* skull the brand ink, the pair every theme already sets to read on  */
-/* each other. The red optic stays red in every theme.                */
+/* The favicon keeps its plate and shield; here the skull stands on   */
+/* its own, framed tight so it draws larger. It takes the brand       */
+/* colour, and the eye, nose and seams are cut out with a mask, so    */
+/* whatever surface it sits on shows through in every theme. The      */
+/* right half is darkened a little so the split reads. The red optic  */
+/* stays red in every theme.                                          */
 /* ================================================================== */
 
 import { useId } from "react";
@@ -22,10 +24,20 @@ export default function DilasMark({ className = "h-9 w-9", title = null }) {
   const brand = "rgb(var(--brand))";
   const ink = "rgb(var(--brand-ink))";
   return (
-    <svg viewBox="8 2 112 126" className={className} aria-hidden={title ? undefined : "true"} role={title ? "img" : undefined}>
+    <svg viewBox="22 16 84 86" className={className} aria-hidden={title ? undefined : "true"} role={title ? "img" : undefined}>
       {title ? <title>{title}</title> : null}
       <defs>
         <clipPath id={`${id}r`}><rect x="64" y="0" width="64" height="128" /></clipPath>
+        {/* White keeps the skull, black cuts it away. */}
+        <mask id={`${id}m`} maskUnits="userSpaceOnUse" x="0" y="0" width="128" height="128">
+          <path d={SKULL} fill="#fff" />
+          <path d="M64 46H93.5M64 88H79M64 22V98" stroke="#000" strokeWidth="2.4" fill="none" />
+          <circle cx="72" cy="39" r="1.8" fill="#000" />
+          <circle cx="86" cy="39" r="1.8" fill="#000" />
+          <circle cx="47" cy="65.5" r="8" fill="#000" />
+          <path d="M64 73.5L58.5 81L60 83H68L69.5 81Z" fill="#000" />
+          <circle cx="81" cy="65.5" r="9.5" fill="#000" />
+        </mask>
         <radialGradient id={`${id}g`}>
           <stop offset="0" stopColor="#FF5A4A" stopOpacity=".9" />
           <stop offset=".45" stopColor="#EF4444" stopOpacity=".45" />
@@ -37,17 +49,12 @@ export default function DilasMark({ className = "h-9 w-9", title = null }) {
           <stop offset="1" stopColor="#C81E1E" />
         </radialGradient>
       </defs>
-      <path d="M64 6L13 16V92C13 104 34 116 64 124C94 116 115 104 115 92V16Z" fill={brand} />
-      <path d={SKULL} fill={ink} />
-      {/* The gunmetal half: the same ink, lifted, so the split reads. */}
-      <path d={SKULL} fill={brand} fillOpacity=".28" clipPath={`url(#${id}r)`} />
-      <path d="M64 46H93.5M64 88H79M64 22V98" stroke={brand} strokeWidth="2.4" fill="none" />
-      <circle cx="72" cy="39" r="1.8" fill={brand} />
-      <circle cx="86" cy="39" r="1.8" fill={brand} />
-      <circle cx="47" cy="65.5" r="8" fill={brand} />
-      <path d="M64 73.5L58.5 81L60 83H68L69.5 81Z" fill={brand} />
-      <circle cx="81" cy="65.5" r="22" fill={`url(#${id}g)`} />
-      <circle cx="81" cy="65.5" r="9.5" fill={ink} />
+      <g mask={`url(#${id}m)`}>
+        <path d={SKULL} fill={brand} />
+        {/* The gunmetal half: the brand colour, darkened, so the split reads. */}
+        <path d={SKULL} fill={ink} fillOpacity=".3" clipPath={`url(#${id}r)`} />
+      </g>
+      <circle cx="81" cy="65.5" r="18" fill={`url(#${id}g)`} />
       <circle cx="81" cy="65.5" r="6.2" fill={`url(#${id}l)`} />
     </svg>
   );

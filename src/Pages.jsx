@@ -13,11 +13,13 @@
 import { useState, useEffect } from "react";
 import { AlertTriangle, Bug, ChevronDown } from "lucide-react";
 import { artCounts } from "./lib/assets.js";
-import { items, warbonds, statsFor, statsSourceFor, gameSource } from "./lib/items.js";
+import { items, warbonds, statsFor, statsSourceFor, gameSource, wikiStats } from "./lib/items.js";
 import CHANGELOG from "./data/changelog.json";
 import ROADMAP from "./data/roadmap.json";
+import PLANETS from "./data/planets.json";
+import ENEMIES from "./data/enemies.json";
+import WAR_EFFECTS from "./data/war-effects.json";
 import { BRAND } from "./lib/brand.js";
-import DilasMark from "./DilasMark.jsx";
 
 /* The patch record moved to src/lib/patch.js in 1.23.0, so the expanded */
 /* row can read it too. Re-exported here for anything importing it from  */
@@ -182,13 +184,10 @@ function HowItWorks() {
 }
 
 /* ------------------------------------------------------------------ */
-/* The greeting and the thanks. Shaped after the Helldivers 2           */
-/* Companion's About page, the curator's model for saying thank you:   */
-/* a banner, who made it, then every project it is built on with what  */
-/* that project gave.                                                   */
+/* Who made it, and the ledger of sources. Every row says what that    */
+/* source supplies and, where the tool can count it, how much: the     */
+/* thanks is the data itself, in the tool's own row shape.             */
 /* ------------------------------------------------------------------ */
-
-const STRIPES = "repeating-linear-gradient(135deg, rgb(var(--brand)) 0px, rgb(var(--brand)) 10px, rgb(var(--base-950)) 10px, rgb(var(--base-950)) 20px)";
 
 function Link({ href, children }) {
   return (
@@ -199,48 +198,38 @@ function Link({ href, children }) {
   );
 }
 
-function Greeting({ rated }) {
+/* A label and its value. */
+function Fact({ label, children }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-base-800 bg-base-900">
-      <div className="h-2 fx-stripe" style={{ backgroundImage: STRIPES }} />
-      <div className="flex flex-col items-center gap-2 px-4 pb-4 pt-5 text-center">
-        <DilasMark className="h-12 w-12" />
-        <h2 className="text-2xl font-bold uppercase tracking-wide text-brand" style={{ fontFamily: "'Oswald', sans-serif" }}>
-          Greetings, Helldivers
-        </h2>
-        <p className="max-w-xl text-sm leading-relaxed text-base-300">
-          {BRAND.short} is a free, fan-made Helldivers 2 tool: tier lists rated for where you drop, a loadout builder,
-          your collection, a live party and the galaxy map. No ads, nothing to buy. Not affiliated with Arrowhead Game
-          Studios.
-        </p>
-        <p className="text-[13px] text-base-500">
-          {items.length} items across 6 slots ({rated} rated), 39 curated builds and {warbonds.length} warbonds. Every
-          rating shows its source and date.
-        </p>
-      </div>
-      <div className="border-t border-base-800 bg-base-950/40 px-4 py-3 text-center">
-        <p className="text-sm text-base-200">
-          Made by <span className="font-semibold text-base-100">Stigsmith</span>, built with{" "}
-          <Link href="https://www.anthropic.com/claude">Claude</Link>.
-        </p>
-        <p className="mx-auto mt-1 max-w-xl text-[13px] leading-relaxed text-base-500">
-          AI-assisted development. Stigsmith decides what the tool does, curates the data and checks every change.
-          Claude, Anthropic's AI model, writes the code.
-        </p>
-      </div>
-      <div className="h-2 fx-stripe" style={{ backgroundImage: STRIPES }} />
+    <div className="grid grid-cols-[6.5rem_1fr] gap-3">
+      <span className="text-base-200">{label}</span>
+      <div>{children}</div>
     </div>
   );
 }
 
-function Credit({ name, href, licence = null, children }) {
+/* One source: name and licence, what it supplies, and a count where the
+   tool can make one. The count sits where a tier row keeps its badge. */
+function Source({ name, href, licence = null, count = null, unit = null, children }) {
   return (
-    <div className="flex flex-col gap-1.5 rounded border border-base-800 bg-base-950/40 px-3 py-2.5">
-      <p className="text-sm font-semibold uppercase tracking-wide" style={{ fontFamily: "'Oswald', sans-serif" }}>
-        <Link href={href}>{name}</Link>
+    <div className="fx-row grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 px-4 py-3 sm:grid-cols-[12rem_1fr_7rem]">
+      <div className="min-w-0">
+        <p className="text-sm font-semibold uppercase tracking-wide" style={{ fontFamily: "'Oswald', sans-serif" }}>
+          <Link href={href}>{name}</Link>
+        </p>
+        {licence ? <p className="text-[11px] text-base-500">{licence}</p> : null}
+      </div>
+      <p className="col-span-2 row-start-2 text-[13px] leading-relaxed text-base-400 sm:col-span-1 sm:col-start-2 sm:row-start-1">
+        {children}
       </p>
-      <p className="text-[13px] leading-relaxed text-base-400">{children}</p>
-      {licence ? <p className="text-[12px] leading-relaxed text-base-500">{licence}</p> : null}
+      <div className="text-right sm:col-start-3 sm:row-start-1">
+        {count !== null ? (
+          <>
+            <p className="text-lg font-bold leading-none text-brand" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{count}</p>
+            <p className="mt-1 text-[11px] leading-tight text-base-500">{unit}</p>
+          </>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -253,66 +242,88 @@ export function About({ section = null }) {
     if (el) el.scrollIntoView({ block: "start" });
   }, [section]);
   const fromGame = items.filter((i) => statsSourceFor(i.id) === "game").length;
+  const fromWiki = Object.keys(wikiStats).length;
+  const labelled = Object.values(WAR_EFFECTS.effects).filter((e) => e.from === "companion").length;
   const snapshot = gameSource.snapshotDate
     ? new Date(`${gameSource.snapshotDate}T12:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
     : null;
   return (
     <div className="flex flex-col gap-4">
-      <Greeting rated={rated} />
+      <Panel title="What this is">
+        <p className="text-base-300">
+          A free, fan-made Helldivers 2 tool: tier lists rated for where you drop, a loadout builder, your collection,
+          a live party and the galaxy map. No ads, nothing to buy.
+        </p>
+        <div className="flex flex-col gap-1.5">
+          <Fact label="Made by">Stigsmith</Fact>
+          <Fact label="Built with">
+            <Link href="https://www.anthropic.com/claude">Claude</Link>
+            <p className="text-[13px] text-base-500">
+              AI-assisted development. Stigsmith decides what the tool does, curates the data and checks every change.
+              Claude, Anthropic's AI model, writes the code.
+            </p>
+          </Fact>
+          <Fact label="Tracks">
+            {items.length} items across 6 slots ({rated} rated), 39 curated builds and {warbonds.length} warbonds
+          </Fact>
+        </div>
+      </Panel>
 
       {/* Attribution is a licence condition, not a courtesy. The wiki's    */}
       {/* data is CC BY-NC-SA, which requires credit, requires derived      */}
       {/* data to carry the same licence, and forbids commercial use. The   */}
-      {/* rest is thanks: every card says what that project gave the tool.  */}
-      <Panel title="Built on the work of">
-        <p className="text-base-300">
-          {BRAND.short} stands on other people's work. Thank you to every project below.
-        </p>
-        <p className="text-[13px] text-base-500">
-          <span className="text-base-300">Game version</span> {PATCH.game} {PATCH.gameName}, {PATCH.gameDate}.
-        </p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Credit name="Helldivers Wiki" href="https://helldivers.wiki.gg"
-            licence={<>Licensed <Link href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</Link>.
-              {" "}{BRAND.short} credits it, shares anything derived from it under the same terms, and is non-commercial.</>}>
-            Reload times, stratagems, every enemy's armour per body part, armour sets, subfactions, missions, the
-            difficulty table, and the planet renders and landscape shots. The community updates it within days of a patch.
-          </Credit>
-          <Credit name="u.gg" href="https://u.gg/hd2/tier-list">
-            Every community tier: players' votes per item and per front. Stamped {PATCH.ratings}, read on {PATCH.readOn}.
-            u.gg dates each list separately, so ratings carry different patch stamps.
-          </Credit>
-          <Credit name="filediver" href={gameSource.url} licence="BSD 3-Clause.">
-            Damage, armour penetration, magazines, rate of fire, handling and loudness for {fromGame} weapons, from the
-            game's own files{snapshot ? `, snapshot of ${snapshot}` : ""}. {BRAND.short} reads that published snapshot
-            and never opens your game install.
-          </Credit>
-          <Credit name="Helldivers 2 community API" href="https://api.helldivers2.dev">
-            The live war every 5 minutes: who holds each planet, the Major Order, attack lines, the space station and
-            where a black hole has drifted. Also planet positions and supply lines. Your browser only talks to{" "}
-            {BRAND.short}'s server and sends nothing about you. War data older than 30 minutes is not shown.
-          </Credit>
-          <Credit name="helldivers-2/json" href="https://github.com/helldivers-2/json" licence="MIT.">
-            Every planet with its biome and environmental hazards.
-          </Credit>
-          <Credit name="Helldivers 2 Companion" href="https://helldiverscompanion.com">
-            The labels for the game's planet effects, which the game sends as numbers only, and the scorch level that
-            makes a scorched world. An effect not named yet shows as Missing data.
-          </Credit>
-          <Credit name="DiveHarder" href="https://github.com/helldivers-2/diveharder_api.py">
-            A community API for the game's war data, from the helldivers-2 organisation that keeps the war readable
-            for every fan tool.
-          </Credit>
-          <Credit name="Arrowhead Game Studios" href="https://www.arrowheadgamestudios.com">
-            Helldivers 2 itself, the patch notes behind every balance change, and how scorched each planet is, read
-            once an hour from the game's own server.
-          </Credit>
+      {/* rest is thanks.                                                   */}
+      <div className="overflow-hidden rounded-lg border border-base-800 bg-base-900">
+        <div className="border-b border-base-800 px-4 py-2.5">
+          <h3 className="text-sm font-bold uppercase tracking-wide text-base-100" style={{ fontFamily: "'Oswald', sans-serif" }}>
+            Where the numbers come from
+          </h3>
+          <p className="text-[13px] text-base-300">
+            {BRAND.short} is built on these projects. Thank you to every one of them.
+          </p>
         </div>
-        <p className="text-[13px] text-base-500">
+        <div className="divide-y divide-base-800">
+          <Source name="u.gg" href="https://u.gg/hd2/tier-list" count={rated} unit="items rated">
+            Every community tier, voted by players per front. Stamped {PATCH.ratings}, read on {PATCH.readOn}. Each list
+            is dated separately.
+          </Source>
+          <Source name="Helldivers Wiki" href="https://helldivers.wiki.gg" count={fromWiki} unit="items with stats"
+            licence={<>CC BY-NC-SA 4.0 · <Link href="https://creativecommons.org/licenses/by-nc-sa/4.0">licence</Link></>}>
+            Reload times, stratagems, armour per body part for {ENEMIES.enemies.length} enemies, armour sets,
+            subfactions, missions, the difficulty table, and the planet renders and landscape shots. {BRAND.short} credits
+            it, shares anything derived from it under the same terms, and is non-commercial.
+          </Source>
+          <Source name="filediver" href={gameSource.url} licence="BSD 3-Clause" count={fromGame} unit="weapons from game files">
+            Damage, penetration, magazines, rate of fire, handling and loudness, from the game's own
+            files{snapshot ? `, snapshot of ${snapshot}` : ""}. {BRAND.short} reads that snapshot and never opens your
+            game install.
+          </Source>
+          <Source name="Helldivers 2 API" href="https://api.helldivers2.dev" count="5 min" unit="between reads">
+            The live war: who holds each planet, the Major Order, attack lines, the space station, drifting black holes,
+            planet positions and supply lines. Your browser only talks to {BRAND.short}'s server and sends nothing about
+            you. War data older than 30 minutes is not shown.
+          </Source>
+          <Source name="helldivers-2/json" href="https://github.com/helldivers-2/json" licence="MIT" count={PLANETS.planets.length} unit="planets">
+            Every planet with its biome and environmental hazards.
+          </Source>
+          <Source name="Helldivers 2 Companion" href="https://helldiverscompanion.com" count={labelled} unit="effect labels">
+            Names for the game's planet effects, which the game sends as numbers only, and the scorch level that makes a
+            scorched world. An effect not named yet shows as Missing data.
+          </Source>
+          <Source name="DiveHarder" href="https://github.com/helldivers-2/diveharder_api.py">
+            A community API for the game's war data, from the helldivers-2 organisation behind the API and dataset
+            above.
+          </Source>
+          <Source name="Arrowhead Game Studios" href="https://www.arrowheadgamestudios.com" count={PATCH.game} unit={PATCH.gameName}>
+            Helldivers 2 itself, the patch notes behind every balance change, and how scorched each planet is, read once
+            an hour from the game's own server.
+          </Source>
+        </div>
+        <p className="border-t border-base-800 px-4 py-2.5 text-[12px] text-base-500">
           Also: the Oswald and JetBrains Mono typefaces (SIL Open Font License), Lucide icons (ISC), and React, Vite,
           Tailwind CSS and Cloudflare Workers.
         </p>
-      </Panel>
+      </div>
 
       <HowItWorks />
 

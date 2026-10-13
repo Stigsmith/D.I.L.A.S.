@@ -185,7 +185,7 @@ Art is optional. With `src/assets` empty, every item reads by its name instead o
   its patch notes.
 - **Fonts**: Oswald and JetBrains Mono, served from the tool itself.
 
-Thank you to every one of them. The About page gives each its own card.
+Thank you to every one of them. The About page lists each with what it supplies.
 
 D.I.L.A.S. is AI-assisted: Stigsmith decides what it does, curates the data and checks every change, and
 [Claude](https://www.anthropic.com/claude) writes the code.
