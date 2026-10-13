@@ -77,6 +77,7 @@ export default function TierBadge({
   grain = true,
   size = 44,
   quiet = false,
+  selected = false,
   className = "",
 }) {
   /* One id per instance. A shared or random one makes badges inherit    */
@@ -207,10 +208,31 @@ export default function TierBadge({
         fontWeight="700" fontSize="33" fill={letterCol}>{tier}</text>
     );
 
-  /* Draw order is load bearing: glow, interior, rim, letter. */
+  /* Selection is a ring outside the rim, following the plate's own cut  */
+  /* corners. A wide stroke, masked so only its outer edge shows and a   */
+  /* clear gap is left between ring and rim. Nothing lands inside the    */
+  /* plate, so the plate itself never changes, Ghost included. Drawn     */
+  /* past the viewBox, hence overflow visible.                           */
+  let ring = null;
+  if (selected) {
+    defs.push(
+      <mask key="r" id={`r${uid}`} maskUnits="userSpaceOnUse" x="-10" y="-10" width="64" height="78">
+        <rect x="-10" y="-10" width="64" height="78" fill="#fff" />
+        <path d={PLATE} fill="#000" stroke="#000" strokeWidth="5" strokeLinejoin="round" />
+      </mask>
+    );
+    ring = (
+      <path d={PLATE} fill="none" stroke="rgb(var(--base-100))" strokeWidth="9" strokeLinejoin="round"
+        mask={`url(#r${uid})`} />
+    );
+  }
+
+  /* Draw order is load bearing: ring, glow, interior, rim, letter. */
   return (
-    <svg width={size} height={h} viewBox="0 0 44 58" className={cls} role="img" aria-label={`Tier ${tier}`}>
+    <svg width={size} height={h} viewBox="0 0 44 58" className={cls} role="img" aria-label={`Tier ${tier}`}
+      style={selected ? { overflow: "visible" } : undefined}>
       <defs>{defs}</defs>
+      {ring}
       {glowNode}
       <g clipPath={`url(#c${uid})`}>{interior}</g>
       <path d={PLATE} fill="none" stroke={col} strokeWidth="1.8" />

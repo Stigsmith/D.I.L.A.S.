@@ -216,6 +216,13 @@
       "track": "social",
       "say": "Browse other players' builds and keep the ones you like.",
       "release": "v3"
+    },
+    {
+      "id": "more-looks",
+      "title": "More warbond themes and badge styles",
+      "status": "later",
+      "track": "solo",
+      "say": "Someday: more warbond skins, and more finishes and effects for the tier badges."
     }
   ]
 }

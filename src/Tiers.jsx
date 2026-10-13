@@ -319,7 +319,7 @@ function ItemArt({ item, className = "h-9 w-9", dim }) {
   );
 }
 
-export { TierBadge, TierRow, sourceLabelFor, statSummary as itemStatSummary, ItemArt, Chips, KIND_META, FACTIONS, FACTION_THEME, BIOMES, BIOME_THEME, MISSION_TYPES, DIFFICULTIES, CAT_META, STRAT_GROUP, tierStyle, FactionBar, FactionChooser, StratChip };
+export { TierBadge, TierRow, RowDetail, sourceLabelFor, statSummary as itemStatSummary, ItemArt, Chips, KIND_META, FACTIONS, FACTION_THEME, BIOMES, BIOME_THEME, MISSION_TYPES, DIFFICULTIES, CAT_META, STRAT_GROUP, tierStyle, FactionBar, FactionChooser, StratChip };
 
 /**
  * quiet steps a badge back because its column is not the one the list
@@ -367,18 +367,17 @@ function TierChips({ label, value, onChange }) {
       {/* Selection is a ring around the plate, never a change to the plate  */}
       {/* itself: the badge already spends its rim, its glow and its fill on */}
       {/* saying which tier this is, and there is nothing left to spend on   */}
-      {/* saying which one is chosen.                                        */}
+      {/* saying which one is chosen. The ring follows the plate's cut       */}
+      {/* corners, drawn by the badge, rather than a rectangle round it.     */}
       <div className="flex flex-wrap gap-2">
         {TIER_ORDER.map((t) => {
           const active = t === value;
           return (
             <button key={t} onClick={() => onChange(t)} aria-pressed={active}
               title={active ? `Showing ${t} and above` : `Show ${t} and above`}
-              className={"rounded p-0.5 transition-all " +
-                (active
-                  ? "opacity-100 ring-2 ring-base-100"
-                  : "opacity-45 hover:opacity-90")}>
-              <TierBadgePlate tier={t} size={30} finish={finish}
+              className={"p-1 transition-all " +
+                (active ? "opacity-100" : "opacity-45 hover:opacity-90")}>
+              <TierBadgePlate tier={t} size={30} finish={finish} selected={active}
                 sheen={surface.sheen} glow={surface.glow} grain={surface.grain} />
             </button>
           );
@@ -1002,9 +1001,13 @@ function Fact({ label, tip = null, missing = false, why, tone = null, children }
   );
 }
 
+/* One block of the expanded row. The blocks flow into columns, so a wide
+   screen reads them side by side instead of one long column, and a short
+   block tucks under another rather than leaving a hole. */
+const BLOCK = "mb-2.5 break-inside-avoid rounded-md border border-base-800 bg-base-900/60 p-2.5";
 function Section({ title, tip = null, children }) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className={"flex flex-col gap-1.5 " + BLOCK}>
       <p className="text-[10px] font-semibold uppercase tracking-wider text-base-500">
         {tip ? <Tip text={tip}><span className={HAS_TIP}>{title}</span></Tip> : title}
       </p>
@@ -1013,7 +1016,7 @@ function Section({ title, tip = null, children }) {
   );
 }
 
-function RowDetail({ item, faction, scored, difficulty, subfactions }) {
+function RowDetail({ item, faction, scored, difficulty, subfactions, compact = false }) {
   const sets = item.slot === "armor" ? ARMOR_SETS[item.id] : null;
   const art = itemArt(item.id);
   const s = item.stats;
@@ -1051,13 +1054,15 @@ function RowDetail({ item, faction, scored, difficulty, subfactions }) {
         </div>
       ) : null}
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      {/* Blocks in columns: one on a phone, two on a tablet, three on a big */}
+      {/* screen. Compact stops at two, for the builder's hover card.        */}
+      <div className={"-mb-2.5 gap-2.5 md:columns-2 " + (compact ? "" : "xl:columns-3")}>
         {art ? (
-          <img src={art} alt="" loading="lazy" decoding="async"
-            className="h-24 w-full shrink-0 object-contain sm:w-48" />
+          <div className={"flex items-center justify-center " + BLOCK}>
+            <img src={art} alt="" loading="lazy" decoding="async" className="h-24 w-full object-contain" />
+          </div>
         ) : null}
 
-        <div className="flex min-w-0 flex-1 flex-col gap-3">
           <Section title={strat ? "Call in" : "Numbers"}>
             <Fact label="Penetration">
               {s.ap !== null ? `AP${s.ap}${s.apClass ? ` ${s.apClass}` : ""}` : null}
@@ -1279,7 +1284,6 @@ function RowDetail({ item, faction, scored, difficulty, subfactions }) {
               ))}
             </Section>
           ) : null}
-        </div>
       </div>
     </div>
   );
@@ -1393,8 +1397,9 @@ export function statSummary(item) {
 
 /* onSelect turns the row into a picker entry. The lock, favorite and    */
 /* expand controls inside it stop propagation so tapping them does not   */
-/* also choose the item.                                                 */
-function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, lockedByWarbond, toggleLock, isFav, toggleFav, open, onToggleOpen, onSelect }) {
+/* also choose the item. onHover tells the picker which row the mouse or */
+/* keyboard is on, for its stats card, and null when it leaves.          */
+function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, lockedByWarbond, toggleLock, isFav, toggleFav, open, onToggleOpen, onSelect, onHover }) {
   const stop = (fn) => (e) => { e.stopPropagation(); fn(); };
   const { id, name, flag } = item;
   /* factionFilter is a real front now, never "all": the table does not   */
@@ -1429,7 +1434,13 @@ function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, loc
     /* fx-row lights the leading edge and bleeds inward on skins that glow, */
     /* and collapses to nothing on the ones that do not. Both the Foundry   */
     /* and the Creek studies do exactly this on row hover.                  */
-    <div className={"fx-row rounded-lg border overflow-hidden " + (isLocked ? "border-base-800 bg-base-900/40" : "border-base-800 bg-base-900")}>
+    /* Solid in the picker even when locked: the picker's list is see     */
+    /* through between rows, and a locked row should not be.              */
+    <div className={"fx-row rounded-lg border overflow-hidden " + (isLocked && !onSelect ? "border-base-800 bg-base-900/40" : "border-base-800 bg-base-900")}
+      onMouseEnter={onHover ? (e) => onHover(item, e.currentTarget) : undefined}
+      onMouseLeave={onHover ? () => onHover(null) : undefined}
+      onFocus={onHover ? (e) => onHover(item, e.currentTarget) : undefined}
+      onBlur={onHover ? () => onHover(null) : undefined}>
       {/* The whole row is the target, not just the chevron. In the picker */}
       {/* that means choose, in the tier list it means expand.             */}
       <div className="flex items-stretch cursor-pointer hover:bg-base-800/50"

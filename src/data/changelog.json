@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.37.3",
+    "date": "2026-10-13",
+    "title": "At a glance",
+    "say": "The Ministry has rearranged the armoury's paperwork into tidy boxes. Helldivers are reminded the boxes are also classified.",
+    "changes": [
+      "Your skill level is set once, at the top of every page beside the party button, and is no longer in the war room or on the tier list.",
+      "An opened tier list row lays its details out in blocks, side by side on a wide screen.",
+      "Choosing gear in a build opens over the build, which stays visible behind it, dimmed.",
+      "With a mouse, resting on a row while choosing gear shows its full details beside the list.",
+      "The chosen tier filter is ringed in the shape of the badge."
+    ]
+  },
+  {
     "version": "1.37.2",
     "date": "2026-10-13",
     "title": "Closer look",

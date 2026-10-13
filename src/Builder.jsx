@@ -2,7 +2,7 @@
 /* THE ARMOURY'S EDITOR                                               */
 /* Where a build is made, and the only place one is changed.           */
 /*                                                                    */
-/* Tapping a slot opens a picker over the whole screen, and that       */
+/* Tapping a slot opens a picker over the screen, and that            */
 /* picker is the tier list: the same row, ranked by what each item is  */
 /* worth where you are dropping, with the vote beside it. Since 1      */
 /* October 2026 the tier list has no menu entry of its own, by the     */
@@ -14,14 +14,14 @@
 /* build straight into your slot.                                      */
 /* ================================================================== */
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef, useLayoutEffect } from "react";
 import {
   X, Search, Plus, Save, Copy, Trash2, Star, Lock, AlertTriangle, ArrowUp, ArrowDown,
   Thermometer, Flame, ChevronLeft, Backpack, Link2, Check,
 } from "lucide-react";
 
 import {
-  TierRow, TierBadge, ItemArt, sourceLabelFor, itemStatSummary,
+  TierRow, RowDetail, TierBadge, ItemArt, sourceLabelFor, itemStatSummary,
   FACTIONS, FACTION_THEME, BIOMES, MISSION_TYPES, DIFFICULTIES, CAT_META, STRAT_GROUP, FactionBar, LoadoutReading,
 } from "./Tiers.jsx";
 import { CATEGORIES, getItem, itemName, judgedTier, TIER_RANK, averageRank, rank, eatsBackpack } from "./lib/items.js";
@@ -56,7 +56,48 @@ function rankedFor(factionMeta, scenario) {
 
 /* ------------------------------------------------------------------ */
 /* Picker overlay                                                      */
+/*                                                                     */
+/* A pop-up, not a page: one panel the width of the list, over the     */
+/* screen you came from, dimmed. The list itself is see through        */
+/* between the rows, the curator's ask of 13 October 2026. Clicking    */
+/* the dimmed screen closes it, like Escape.                           */
 /* ------------------------------------------------------------------ */
+
+/* Only a device with a mouse gets the hover card. A phone has no hover,
+   and tapping a row chooses it. */
+const CAN_HOVER = typeof window !== "undefined" && window.matchMedia
+  ? window.matchMedia("(hover: hover)").matches : false;
+const CARD_W = 600;
+const CARD_GAP = 12;
+const EDGE = 16;
+
+/* The expanded tier row for the row under the mouse, beside the panel
+   when there is room for it, otherwise over the panel's right side.
+   Level with the row, kept inside the screen, and never in the way of a
+   click. */
+function HoverCard({ hover, panelRef, faction, scored, scenario }) {
+  const cardRef = useRef(null);
+  const [top, setTop] = useState(hover.top);
+  const panel = panelRef.current ? panelRef.current.getBoundingClientRect() : null;
+  const vw = window.innerWidth;
+  const free = panel ? vw - panel.right - CARD_GAP - EDGE : 0;
+  const width = free >= 400 ? Math.min(CARD_W, free) : Math.min(CARD_W, vw - 2 * EDGE);
+  const left = free >= 400 ? panel.right + CARD_GAP : vw - width - EDGE;
+  useLayoutEffect(() => {
+    const h = cardRef.current ? cardRef.current.offsetHeight : 0;
+    setTop(Math.max(EDGE, Math.min(hover.top, window.innerHeight - h - EDGE)));
+  }, [hover]);
+  return (
+    <div ref={cardRef} aria-hidden="true"
+      className="pointer-events-none fixed z-[60] overflow-hidden rounded-lg border border-base-700 bg-base-950 shadow-2xl"
+      style={{ left, top, width, maxHeight: `calc(100vh - ${2 * EDGE}px)` }}>
+      <p className="truncate border-b border-base-800 px-3 py-2 text-sm text-base-100"
+        style={{ fontFamily: "'JetBrains Mono', monospace" }}>{hover.item.name}</p>
+      <RowDetail compact item={hover.item} faction={faction} scored={scored}
+        difficulty={scenario.difficulty || 0} subfactions={scenario.subfactions || null} />
+    </div>
+  );
+}
 
 function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario, takenBackpack, taken = [], closes = null, lockedSet, favoriteItems, onPick, onPickSet, onClear, onClose }) {
   const [query, setQuery] = useState("");
@@ -144,9 +185,27 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
   const title = stratSlot != null ? `Stratagem ${stratSlot + 1}` : (SLOTS.find((s) => s.slot === slot) || {}).label;
   const factionMeta = FACTIONS.find((f) => f.id === faction) || FACTIONS[0];
 
+  /* The row under the mouse, after a short pause so sweeping down the
+     list does not flash a card per row. Leaving waits a moment too, so
+     moving from one row to the next swaps the card rather than
+     blinking it. */
+  const panelRef = useRef(null);
+  const hoverTimer = useRef(null);
+  const [hover, setHover] = useState(null);
+  const onHover = useCallback((it, el) => {
+    clearTimeout(hoverTimer.current);
+    if (!it) { hoverTimer.current = setTimeout(() => setHover(null), 120); return; }
+    const top = el.getBoundingClientRect().top;
+    hoverTimer.current = setTimeout(() => setHover({ item: it, top }), 150);
+  }, []);
+  useEffect(() => () => clearTimeout(hoverTimer.current), []);
+  const dropHover = () => { clearTimeout(hoverTimer.current); setHover(null); };
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-base-950">
-      <div className="flex items-center gap-3 border-b border-base-800 px-4 py-3">
+    <div className="fixed inset-0 z-50 flex justify-center bg-black/60 sm:p-4"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div ref={panelRef} className="flex w-full max-w-[58rem] flex-col overflow-hidden border-base-800 sm:rounded-lg sm:border">
+      <div className="flex items-center gap-3 border-b border-base-800 bg-base-950 px-4 py-3">
         <button onClick={onClose} aria-label="Close picker"
           className="rounded p-1.5 text-base-400 hover:bg-base-800 hover:text-base-100">
           <ChevronLeft className="h-5 w-5" />
@@ -171,7 +230,7 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 border-b border-base-800 px-4 py-2.5">
+      <div className="flex flex-wrap items-center gap-3 border-b border-base-800 bg-base-950 px-4 py-2.5">
         <div className="relative min-w-[200px] flex-1">
           <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-base-500" />
           <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search"
@@ -195,7 +254,7 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto bg-base-950/40 p-4" onScroll={hover ? dropHover : undefined}>
         {pool.length === 0 ? (
           <div className="rounded-lg border border-dashed border-base-700 py-10 text-center text-sm text-base-400">
             {hiddenCount > 0 && !showLocked
@@ -236,7 +295,7 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
                     isLocked={lockedSet.has(it.id)} lockedByWarbond={false}
                     toggleLock={() => {}} isFav={favSet.has(it.id)} toggleFav={() => {}}
                     open={false} onToggleOpen={() => {}}
-                    onSelect={() => onPick(it.id)} />
+                    onSelect={() => onPick(it.id)} onHover={CAN_HOVER ? onHover : undefined} />
                   {armour ? (
                     <SetStrip sets={setsOf(it.id)} current={currentSet} accent={factionMeta.hex} lockedSet={lockedSet}
                       onPick={(id) => onPickSet(id)} />
@@ -247,6 +306,11 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
           </div>
         )}
       </div>
+      </div>
+      {hover ? (
+        <HoverCard hover={hover} panelRef={panelRef} faction={faction}
+          scored={scored.get(hover.item.id) || null} scenario={scenario} />
+      ) : null}
     </div>
   );
 }

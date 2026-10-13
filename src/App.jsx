@@ -18,7 +18,7 @@ import Tour from "./Tour.jsx";
 import { SETTINGS, readSetting, writeSetting } from "./lib/storage.js";
 
 import { TierBrowser, BackupPanel, BLANK_FILTERS, FactionBar, FactionChooser, ScenarioBar } from "./Tiers.jsx";
-import WarRoom, { ScenarioStrip } from "./WarRoom.jsx";
+import WarRoom, { ScenarioStrip, SkillPick } from "./WarRoom.jsx";
 import StarMap from "./StarMap.jsx";
 import { themeArt } from "./lib/assets.js";
 import DilasMark from "./DilasMark.jsx";
@@ -233,7 +233,7 @@ function SidebarLink({ item, active, onClick }) {
 /* and the surface disagree about which one is open on a cold link.       */
 const LANDING = { tiers: "tiers/primary", collection: "collection/warbonds", bay: "bay", armoury: "armoury/builds" };
 
-function Sidebar({ destination, navigate, onNavigated }) {
+function Sidebar({ destination, navigate, onNavigated, foot = null }) {
   const go = (id) => { navigate(LANDING[id] || id); onNavigated(); };
   return (
     <nav className="flex h-full flex-col gap-5 overflow-y-auto p-3" data-tour="nav">
@@ -255,6 +255,7 @@ function Sidebar({ destination, navigate, onNavigated }) {
         ))}
       </div>
       <div className="mt-auto border-t border-base-800 pt-3 flex flex-col gap-0.5">
+        {foot}
         {NAV_FOOT.map((item) => (
           <SidebarLink key={item.id} item={item} active={destination === item.id} onClick={() => go(item.id)} />
         ))}
@@ -678,7 +679,7 @@ export default function App() {
       return (
         <WarRoom scenario={scenario} setFaction={setFaction} setPlanet={setPlanet} setMission={setMission}
           setDifficulty={setDifficulty} setSquad={setSquad} clearEnvironment={clearEnvironment}
-          onDone={closeScenario} party={party} skill={state.skill} setSkill={state.setSkill} />
+          onDone={closeScenario} party={party} />
       );
     }
     switch (dest) {
@@ -686,7 +687,7 @@ export default function App() {
         return (
           <div className="flex flex-col gap-4">
           <ScenarioStrip scenario={scenario} setFaction={setFaction} setDifficulty={setDifficulty} setSquad={setSquad}
-            party={party} onWarRoom={openScenario} skill={state.skill} setSkill={state.setSkill} />
+            party={party} onWarRoom={openScenario} />
           <TierBrowser
             catId={catId}
             faction={scenario.faction}
@@ -804,7 +805,10 @@ export default function App() {
                   <X className="h-5 w-5 text-base-400" />
                 </button>
               </div>
-              <Sidebar destination={dest} navigate={navigate} onNavigated={() => setMenuOpen(false)} />
+              <Sidebar destination={dest} navigate={navigate} onNavigated={() => setMenuOpen(false)}
+                foot={/* A phone has no top bar to hold your skill level, so it */
+                  /* sits here, above Rules. From sm up it is in the header.  */
+                  <div className="mb-2 px-2.5 sm:hidden"><SkillPick compact value={state.skill} onChange={state.setSkill} /></div>} />
             </aside>
           </div>
         ) : null}
@@ -833,6 +837,9 @@ export default function App() {
               {/* The party, on every page: the curator's placement, next to   */}
               {/* who you are, the way the game keeps your squad in a corner. */}
               <PartyButton party={party} open={partyOpen} onToggle={() => setPartyOpen((v) => !v)} />
+              {/* Your skill level, once for the whole tool, beside the     */}
+              {/* profile it is kept in.                                    */}
+              <SkillPick compact value={state.skill} onChange={state.setSkill} />
               {/* Which player you are looking at. Always shown, even with */}
               {/* one profile, because every lock on every screen is about */}
               {/* this profile and that should never be a guess.           */}

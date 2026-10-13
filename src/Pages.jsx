@@ -139,7 +139,7 @@ function HowItWorks() {
           <li>1 player on difficulty 7 is peril 22 against the Terminids, 24 against the Automatons.</li>
         </ul>
         <p className="text-base-500">
-          Set your skill level beside How many of you, in the war room or on the tier list. Player figures follow the patrol
+          Set your skill level once, at the top of every page beside the party button. Player figures follow the patrol
           spawn rates on helldivers.wiki.gg. The front figure and the Suicide Mission anchor are judgements from play.
         </p>
       </Part>
