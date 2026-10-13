@@ -728,6 +728,13 @@ async function main() {
 
   const stats = {};
   const missing = [];
+  /* Every wiki name the join used, so what it did not use can be listed */
+  /* as gear the tool may not have yet. npm run patch reads that list.   */
+  const used = new Set();
+  const stratName = new Map();
+  for (const n of Object.keys(pool.stratagems)) {
+    for (const key of [norm(n), norm(stripDesignation(n))]) if (key && !stratName.has(key)) stratName.set(key, n);
+  }
   for (const it of wanted) {
     const name =
       OVERRIDES[it.id] || index.get(norm(it.name)) || index.get(norm(stripDesignation(it.name))) || null;
@@ -736,7 +743,26 @@ async function main() {
     const got = name ? extract(pool, name, strat) : null;
     if (got) stats[it.id] = got;
     else missing.push(it);
+    for (const k of [name, stratName.get(norm(it.name)), stratName.get(norm(stripDesignation(it.name)))]) if (k) used.add(k);
+    for (const a of it.aliases || []) {
+      for (const key of [norm(a), norm(stripDesignation(a))]) {
+        if (index.get(key)) used.add(index.get(key));
+        if (stratName.get(key)) used.add(stratName.get(key));
+      }
+    }
   }
+  /* The module also lists the parts a stratagem is made of: a sentry's  */
+  /* gun (SWP_), an underbarrel, a drone (AX/... 0), an exosuit's arms.   */
+  /* Those are never items of their own, so they are left out by shape.   */
+  const part = (n) => /_|\s0$|^AX\//.test(n) || /EXOSUIT .+|^(LUMBERER|BREAKTHROUGH) .+/.test(n);
+  const unused = [...new Set([...Object.keys(pool.weapons), ...Object.keys(pool.stratagems)])]
+    .filter((n) => !used.has(n) && !part(n))
+    .filter((n) => !used.has(index.get(norm(n))) || index.get(norm(n)) === n)
+    /* The same gear spelt twice, once as a weapon and once as a stratagem */
+    /* (C4 PACK beside B/MD C4 PACK). Whole names only, so a new variant   */
+    /* like a Liberator with a suffix still shows.                         */
+    .filter((n) => ![...used].some((u) => norm(u).includes(norm(n)) || norm(n).includes(norm(u))))
+    .sort();
 
   /* Reload times, from each held weapon's own article. Only onto items   */
   /* the data module already matched, so a reload never arrives alone.    */
@@ -763,6 +789,8 @@ async function main() {
     console.log(`\n  UNEXPECTED MISSES, these want an override:`);
     for (const m of surprises) console.log(`    ${m.id.padEnd(34)} ${m.name}`);
   }
+  console.log(`\n  NOT IN THE TOOL ${unused.length}  (on the wiki, matched to no item: new gear, or a rename)`);
+  for (const n of unused) console.log(`    ${n}`);
 
   /* Planets. Biome and hazards are static facts about a planet, so this */
   /* ships as a table and the app never makes a network call.            */

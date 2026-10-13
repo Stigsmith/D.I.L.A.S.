@@ -38,6 +38,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { slug } from "./lib/slug.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SMALL = join(ROOT, "Image Library", "Planets");
@@ -59,9 +60,7 @@ const ONLY = (() => {
 })();
 
 /* The same slug the rest of the art uses, so a file identifies itself. */
-export const slug = (s) =>
-  s.toLowerCase().replace(/['’.]/g, "").replace(/&/g, " and ")
-    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+export { slug };
 
 const planets = JSON.parse(readFileSync(join(ROOT, "src", "data", "planets.json"), "utf8")).planets;
 /* Mars and anything else the map draws that the war does not list. */

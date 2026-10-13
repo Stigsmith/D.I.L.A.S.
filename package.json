@@ -23,6 +23,7 @@
     "armor-art": "node scripts/fetch-armor.mjs --art",
     "planet-art": "node scripts/fetch-planet-art.mjs",
     "effects": "node scripts/war-effects.mjs",
+    "patch": "node scripts/patch.mjs",
     "rules": "node scripts/check-rules.mjs",
     "builds": "node scripts/check-builds.mjs",
     "fonts": "node scripts/fonts.mjs",

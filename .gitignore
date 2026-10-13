@@ -60,6 +60,9 @@ src/assets/hazards/
 # here from the library. Game art, not kept either.
 src/assets/armor-sets/
 
+# What npm run patch found last time. Re-made on every run.
+.patch-report.txt
+
 # The game data fetch: filediver's source, our built dump tool and its
 # JSON output. Re-made by npm run game -- --refresh. Never committed.
 .game-data/

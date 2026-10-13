@@ -111,6 +111,31 @@ for (const m of data.missions) {
 }
 if (none.length) console.log(`\n  ${none.length} mission(s) state no time limit, and keep none.`);
 
+/* Missions the wiki lists that the tool does not. missions.json is kept */
+/* by hand, because the fronts and traits are the curator's, so a new    */
+/* one is only ever reported here, never added. npm run patch reads it.  */
+const CATEGORY = join(CACHE, "mission-category.json");
+/* On the wiki's list and not a mission you drop on. */
+const NOT_A_MISSION = new Set(["Earn Your Helldiver Cape"]);
+async function category() {
+  if (!REFRESH && existsSync(CATEGORY)) return JSON.parse(readFileSync(CATEGORY, "utf8")).titles;
+  const url = new URL(API);
+  for (const [k, v] of Object.entries({
+    action: "query", list: "categorymembers", cmtitle: "Category:Main Objectives",
+    cmlimit: "500", cmnamespace: "0", format: "json", formatversion: "2",
+  })) url.searchParams.set(k, v);
+  const res = await fetch(url, { headers: HEADERS });
+  if (!res.ok) throw new Error(`mission list: ${res.status} ${res.statusText}`);
+  const titles = ((await res.json()).query?.categorymembers || []).map((c) => c.title);
+  writeFileSync(CATEGORY, JSON.stringify({ fetchedAt: new Date().toISOString(), titles }));
+  return titles;
+}
+const squash = (s) => String(s).toLowerCase().replace(/[^a-z0-9]/g, "");
+const known = new Set(data.missions.flatMap((m) => [squash(m.name), squash(articleFor(m.name).split("/")[0])]));
+const unlisted = (await category()).filter((t) => !NOT_A_MISSION.has(t) && !known.has(squash(t.split("/")[0])));
+console.log(`\n  NOT IN THE TOOL ${unlisted.length}  (on the wiki's mission list, not in missions.json)`);
+for (const t of unlisted) console.log(`    ${t}`);
+
 if (!changed) {
   console.log("\n  src/data/missions.json is already current.\n");
 } else if (WRITE) {
