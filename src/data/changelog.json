@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.37.1",
+    "date": "2026-10-13",
+    "title": "Credit where due",
+    "say": "The Ministry acknowledges that Liberty was delivered with help. The helpers have been thanked, in writing, on the record.",
+    "changes": [
+      "About opens with a greeting: what the tool is, that it is free, and who made it.",
+      "About says how it is made: AI-assisted, with Claude writing the code.",
+      "Every project the tool is built on has its own card on About, saying what it gave: the Helldivers Wiki, u.gg, filediver, the community API, helldivers-2/json, the Helldivers 2 Companion, DiveHarder and Arrowhead.",
+      "The fonts, icons and frameworks are credited too."
+    ]
+  },
+  {
     "version": "1.37.0",
     "date": "2026-10-12",
     "title": "Know the enemy",

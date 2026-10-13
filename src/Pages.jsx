@@ -17,6 +17,7 @@ import { items, warbonds, statsFor, statsSourceFor, gameSource } from "./lib/ite
 import CHANGELOG from "./data/changelog.json";
 import ROADMAP from "./data/roadmap.json";
 import { BRAND } from "./lib/brand.js";
+import DilasMark from "./DilasMark.jsx";
 
 /* The patch record moved to src/lib/patch.js in 1.23.0, so the expanded */
 /* row can read it too. Re-exported here for anything importing it from  */
@@ -180,6 +181,70 @@ function HowItWorks() {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* The greeting and the thanks. Shaped after the Helldivers 2           */
+/* Companion's About page, the curator's model for saying thank you:   */
+/* a banner, who made it, then every project it is built on with what  */
+/* that project gave.                                                   */
+/* ------------------------------------------------------------------ */
+
+const STRIPES = "repeating-linear-gradient(135deg, rgb(var(--brand)) 0px, rgb(var(--brand)) 10px, rgb(var(--base-950)) 10px, rgb(var(--base-950)) 20px)";
+
+function Link({ href, children }) {
+  return (
+    <a href={href} target="_blank" rel="noreferrer noopener"
+      className="text-base-200 underline decoration-base-600 underline-offset-2 hover:text-base-100 hover:decoration-brand">
+      {children}
+    </a>
+  );
+}
+
+function Greeting({ rated }) {
+  return (
+    <div className="overflow-hidden rounded-lg border border-base-800 bg-base-900">
+      <div className="h-2 fx-stripe" style={{ backgroundImage: STRIPES }} />
+      <div className="flex flex-col items-center gap-2 px-4 pb-4 pt-5 text-center">
+        <DilasMark className="h-12 w-12" />
+        <h2 className="text-2xl font-bold uppercase tracking-wide text-brand" style={{ fontFamily: "'Oswald', sans-serif" }}>
+          Greetings, Helldivers
+        </h2>
+        <p className="max-w-xl text-sm leading-relaxed text-base-300">
+          {BRAND.short} is a free, fan-made Helldivers 2 tool: tier lists rated for where you drop, a loadout builder,
+          your collection, a live party and the galaxy map. No ads, nothing to buy. Not affiliated with Arrowhead Game
+          Studios.
+        </p>
+        <p className="text-[13px] text-base-500">
+          {items.length} items across 6 slots ({rated} rated), 39 curated builds and {warbonds.length} warbonds. Every
+          rating shows its source and date.
+        </p>
+      </div>
+      <div className="border-t border-base-800 bg-base-950/40 px-4 py-3 text-center">
+        <p className="text-sm text-base-200">
+          Made by <span className="font-semibold text-base-100">Stigsmith</span>, built with{" "}
+          <Link href="https://www.anthropic.com/claude">Claude</Link>.
+        </p>
+        <p className="mx-auto mt-1 max-w-xl text-[13px] leading-relaxed text-base-500">
+          AI-assisted development. Stigsmith decides what the tool does, curates the data and checks every change.
+          Claude, Anthropic's AI model, writes the code.
+        </p>
+      </div>
+      <div className="h-2 fx-stripe" style={{ backgroundImage: STRIPES }} />
+    </div>
+  );
+}
+
+function Credit({ name, href, licence = null, children }) {
+  return (
+    <div className="flex flex-col gap-1.5 rounded border border-base-800 bg-base-950/40 px-3 py-2.5">
+      <p className="text-sm font-semibold uppercase tracking-wide" style={{ fontFamily: "'Oswald', sans-serif" }}>
+        <Link href={href}>{name}</Link>
+      </p>
+      <p className="text-[13px] leading-relaxed text-base-400">{children}</p>
+      {licence ? <p className="text-[12px] leading-relaxed text-base-500">{licence}</p> : null}
+    </div>
+  );
+}
+
 export function About({ section = null }) {
   const rated = items.filter((i) => Object.values(i.ratings).some((r) => r && r.tier)).length;
   useEffect(() => {
@@ -187,105 +252,69 @@ export function About({ section = null }) {
     const el = document.getElementById(`about-${section}`);
     if (el) el.scrollIntoView({ block: "start" });
   }, [section]);
+  const fromGame = items.filter((i) => statsSourceFor(i.id) === "game").length;
+  const snapshot = gameSource.snapshotDate
+    ? new Date(`${gameSource.snapshotDate}T12:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
+    : null;
   return (
     <div className="flex flex-col gap-4">
-      <Panel title="What this is" note="A fan-made Helldivers 2 tool">
+      <Greeting rated={rated} />
+
+      {/* Attribution is a licence condition, not a courtesy. The wiki's    */}
+      {/* data is CC BY-NC-SA, which requires credit, requires derived      */}
+      {/* data to carry the same licence, and forbids commercial use. The   */}
+      {/* rest is thanks: every card says what that project gave the tool.  */}
+      <Panel title="Built on the work of">
         <p className="text-base-300">
-          A Helldivers 2 tier list and loadout tool: ratings, stats, the live war and your own builds in one place.
+          {BRAND.short} stands on other people's work. Thank you to every project below.
         </p>
-        <p>
-          Every rating shows its source and date. A rating older than a game change is flagged. An unrated item shows
-          a question mark.
+        <p className="text-[13px] text-base-500">
+          <span className="text-base-300">Game version</span> {PATCH.game} {PATCH.gameName}, {PATCH.gameDate}.
         </p>
-        <p>
-          It tracks {items.length} items across 6 slots ({rated} rated), 39 curated builds and {warbonds.length} warbonds.
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Credit name="Helldivers Wiki" href="https://helldivers.wiki.gg"
+            licence={<>Licensed <Link href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</Link>.
+              {" "}{BRAND.short} credits it, shares anything derived from it under the same terms, and is non-commercial.</>}>
+            Reload times, stratagems, every enemy's armour per body part, armour sets, subfactions, missions, the
+            difficulty table, and the planet renders and landscape shots. The community updates it within days of a patch.
+          </Credit>
+          <Credit name="u.gg" href="https://u.gg/hd2/tier-list">
+            Every community tier: players' votes per item and per front. Stamped {PATCH.ratings}, read on {PATCH.readOn}.
+            u.gg dates each list separately, so ratings carry different patch stamps.
+          </Credit>
+          <Credit name="filediver" href={gameSource.url} licence="BSD 3-Clause.">
+            Damage, armour penetration, magazines, rate of fire, handling and loudness for {fromGame} weapons, from the
+            game's own files{snapshot ? `, snapshot of ${snapshot}` : ""}. {BRAND.short} reads that published snapshot
+            and never opens your game install.
+          </Credit>
+          <Credit name="Helldivers 2 community API" href="https://api.helldivers2.dev">
+            The live war every 5 minutes: who holds each planet, the Major Order, attack lines, the space station and
+            where a black hole has drifted. Also planet positions and supply lines. Your browser only talks to{" "}
+            {BRAND.short}'s server and sends nothing about you. War data older than 30 minutes is not shown.
+          </Credit>
+          <Credit name="helldivers-2/json" href="https://github.com/helldivers-2/json" licence="MIT.">
+            Every planet with its biome and environmental hazards.
+          </Credit>
+          <Credit name="Helldivers 2 Companion" href="https://helldiverscompanion.com">
+            The labels for the game's planet effects, which the game sends as numbers only, and the scorch level that
+            makes a scorched world. An effect not named yet shows as Missing data.
+          </Credit>
+          <Credit name="DiveHarder" href="https://github.com/helldivers-2/diveharder_api.py">
+            A community API for the game's war data, from the helldivers-2 organisation that keeps the war readable
+            for every fan tool.
+          </Credit>
+          <Credit name="Arrowhead Game Studios" href="https://www.arrowheadgamestudios.com">
+            Helldivers 2 itself, the patch notes behind every balance change, and how scorched each planet is, read
+            once an hour from the game's own server.
+          </Credit>
+        </div>
+        <p className="text-[13px] text-base-500">
+          Also: the Oswald and JetBrains Mono typefaces (SIL Open Font License), Lucide icons (ISC), and React, Vite,
+          Tailwind CSS and Cloudflare Workers.
         </p>
       </Panel>
 
       <HowItWorks />
-
-      <Panel title="Where the numbers come from">
-        <div className="flex flex-col gap-1.5">
-          <p><span className="text-base-200">Game version</span> {PATCH.game} {PATCH.gameName}, {PATCH.gameDate}.</p>
-          <p><span className="text-base-200">Ratings</span> u.gg community vote aggregates, stamped {PATCH.ratings}, read on {PATCH.readOn}.</p>
-        </div>
-        <p>
-          u.gg dates each list separately, so ratings carry different patch stamps. An item changed after its vote
-          carries a caveat.
-        </p>
-        <p className="text-base-500">
-          Armour classes, damage, capacities, demolition force, armour sets and warbond contents come from this
-          project's reference tables and helldivers.wiki.gg. Balance changes come from Arrowhead's patch notes.
-        </p>
-      </Panel>
-
-      <Panel title="Weapon stats come from the game">
-        <p>
-          Damage, armour penetration, magazines, rate of fire, handling and loudness for{" "}
-          {items.filter((i) => statsSourceFor(i.id) === "game").length} weapons come from the game's own files,
-          through the snapshot{" "}
-          <a href={gameSource.url} target="_blank" rel="noreferrer noopener"
-            className="text-base-200 underline hover:text-base-100">filediver</a> publishes
-          {gameSource.snapshotDate
-            ? `, dated ${new Date(`${gameSource.snapshotDate}T12:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`
-            : ""}.
-        </p>
-        <p className="text-base-500">The tool reads that published snapshot. It never opens your game install.</p>
-      </Panel>
-
-      {/* Attribution is a licence condition, not a courtesy. The fetched  */}
-      {/* stats are CC BY-NC-SA, which requires credit, requires derived   */}
-      {/* data to carry the same licence, and forbids commercial use.      */}
-      <Panel title="Everything else comes from the Helldivers Wiki">
-        <p>
-          Reload times, stratagem data, the weapons the game files do not cover and every enemy's armour per body
-          part come from{" "}
-          <a href="https://helldivers.wiki.gg" target="_blank" rel="noreferrer noopener"
-            className="text-base-200 underline hover:text-base-100">helldivers.wiki.gg</a>, which the community
-          updates within days of a patch.
-        </p>
-        <p className="text-base-500">
-          That data is published under the{" "}
-          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0" target="_blank" rel="noreferrer noopener"
-            className="text-base-200 underline hover:text-base-100">Creative Commons BY-NC-SA 4.0</a>{" "}
-          licence. This tool credits it, shares anything derived from it under the same terms, and is
-          non-commercial.
-        </p>
-        <p className="text-base-500">
-          Planets, their biomes and their environmental hazards come from the{" "}
-          <a href="https://github.com/helldivers-2/json" target="_blank" rel="noreferrer noopener"
-            className="text-base-200 underline hover:text-base-100">helldivers-2/json</a>{" "}
-          community dataset, MIT licensed. Thanks also to the people behind{" "}
-          <a href="https://github.com/helldivers-2/diveharder_api.py" target="_blank" rel="noreferrer noopener"
-            className="text-base-200 underline hover:text-base-100">DiveHarder</a>{" "}
-          and the wider helldivers-2 community organisation, whose work is why any of this is available at all.
-        </p>
-      </Panel>
-
-      <Panel title="The galaxy map and the live war">
-        <p>
-          Planet positions and supply lines come from the{" "}
-          <a href="https://api.helldivers2.dev" target="_blank" rel="noreferrer noopener"
-            className="text-base-200 underline hover:text-base-100">helldivers-2 community API</a> and ship with the
-          tool.
-        </p>
-        <p className="text-base-500">
-          Live data comes from the same API: who holds each planet, the fronts, the Major Order, attack lines, the
-          space station and where a black hole has drifted. The tool's server reads it every 5 minutes. Your browser
-          only talks to the tool's server and sends nothing about you. Data older than 30 minutes is not shown.
-        </p>
-        <p className="text-base-500">
-          The game marks planets with effects as numbers only. The names on the map, such as Gloom, Meridian black hole
-          or New Hope City, are ours, read off the game's own map and checked against the labels in the{" "}
-          <a href="https://helldiverscompanion.com" target="_blank" rel="noreferrer noopener"
-            className="text-base-200 underline hover:text-base-100">Helldivers 2 Companion</a>. An effect we have not named yet
-          shows as Missing data.
-        </p>
-        <p className="text-base-500">
-          Scorched worlds come from the game's own server: how scarred each planet is, 0 to 100, read once an hour.
-          10 or more is a scorched world, the threshold the Helldivers 2 Companion uses.
-        </p>
-      </Panel>
 
       <Panel title="Role tags are ours">
         <p>

@@ -179,7 +179,16 @@ Art is optional. With `src/assets` empty, every item reads by its name instead o
   [helldivers.wiki.gg](https://helldivers.wiki.gg), CC BY-NC-SA 4.0.
 - **Planets, biomes and hazards**: [helldivers-2/json](https://github.com/helldivers-2/json), MIT. Map positions,
   supply lines and the live war: [api.helldivers2.dev](https://api.helldivers2.dev).
+- **Planet effect labels and the scorched world threshold**: the [Helldivers 2 Companion](https://helldiverscompanion.com).
+  Thanks also to [DiveHarder](https://github.com/helldivers-2/diveharder_api.py) and the helldivers-2 organisation.
+- **How scorched each planet is, and every balance change**: Arrowhead Game Studios, from the game's own server and
+  its patch notes.
 - **Fonts**: Oswald and JetBrains Mono, served from the tool itself.
+
+Thank you to every one of them. The About page gives each its own card.
+
+D.I.L.A.S. is AI-assisted: Stigsmith decides what it does, curates the data and checks every change, and
+[Claude](https://www.anthropic.com/claude) writes the code.
 
 Our rating, the role tags and every rule's judgement are ours, and the tool says so wherever they appear.
 
