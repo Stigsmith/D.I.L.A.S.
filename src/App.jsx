@@ -715,7 +715,7 @@ export default function App() {
       case "bay":
         return <DropScreen state={state} navigate={navigate} scenario={scored}
           drop={drop} update={updateDrop} party={party} sync={partySync}
-          onOpenParty={() => setPartyOpen(true)} />;
+          onOpenParty={() => setPartyOpen(true)} controls={{ setDifficulty, setSquad, party }} />;
       case "armoury":
         if (armouryTab === "coverage") return <Coverage state={state} navigate={navigate} scenario={scored} />;
         if (armouryTab === "history") {
@@ -731,7 +731,7 @@ export default function App() {
         const newFront = param && param.startsWith("new-") ? param.slice(4) : null;
         const id = param && param !== "new" && !newFront ? param : null;
         return <Builder key={param || "new"} state={state} loadoutId={id} navigate={navigate}
-          faction={newFront || scenario.faction} scenario={scored} />;
+          faction={newFront || scenario.faction} scenario={scored} controls={{ setDifficulty, setSquad, party }} />;
       }
       case "rules":
         return <Rules scenario={scored} rulesOff={rulesOff} toggleRule={toggleRule} clearRules={clearRules} state={state} />;

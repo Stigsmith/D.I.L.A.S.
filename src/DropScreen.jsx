@@ -741,7 +741,7 @@ function SquadReadout({ counted, context, waitingOnYou, mineUncounted }) {
 
 /* ------------------------------------------------------------------ */
 
-export default function DropScreen({ state, navigate, scenario, drop, update, party, sync, onOpenParty }) {
+export default function DropScreen({ state, navigate, scenario, drop, update, party, sync, onOpenParty, controls = null }) {
   /* Whether the picker for your slot is open. */
   const [picking, setPicking] = useState(null);
   /* The editor over this screen: { key, id, startWith }, or null. id is
@@ -942,8 +942,9 @@ export default function DropScreen({ state, navigate, scenario, drop, update, pa
           your slot, still to confirm, and brings you back here. */}
       {editing ? (
         <div className="fixed inset-0 z-[60] overflow-y-auto bg-base-950" role="dialog" aria-modal="true" aria-label="Adjust a build">
-          <div className="mx-auto max-w-6xl p-4 sm:p-6">
-            <Builder key={editing.key} state={state} loadoutId={editing.id} navigate={navigate}
+          {/* The whole screen, the curator's call of 13 October 2026. */}
+          <div className="p-4 sm:p-6">
+            <Builder key={editing.key} state={state} loadoutId={editing.id} navigate={navigate} controls={controls}
               faction={scenario.faction} scenario={scenario} startWith={editing.startWith} seedItem={editing.seedItem}
               overlay={{
                 onClose: () => setEditing(null),

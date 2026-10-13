@@ -1434,12 +1434,10 @@ function TierRow({ item, factionFilter, scenario, sortBy = "ours", isLocked, loc
     /* fx-row lights the leading edge and bleeds inward on skins that glow, */
     /* and collapses to nothing on the ones that do not. Both the Foundry   */
     /* and the Creek studies do exactly this on row hover.                  */
-    /* Solid in the picker even when locked: the picker's list is see     */
-    /* through between rows, and a locked row should not be.              */
-    <div className={"fx-row rounded-lg border overflow-hidden " + (isLocked && !onSelect ? "border-base-800 bg-base-900/40" : "border-base-800 bg-base-900")}
+    <div className={"fx-row rounded-lg border overflow-hidden " + (isLocked ? "border-base-800 bg-base-900/40" : "border-base-800 bg-base-900")}
       onMouseEnter={onHover ? (e) => onHover(item, e.currentTarget) : undefined}
       onMouseLeave={onHover ? () => onHover(null) : undefined}
-      onFocus={onHover ? (e) => onHover(item, e.currentTarget, true) : undefined}
+      onFocus={onHover ? (e) => onHover(item, e.currentTarget) : undefined}
       onBlur={onHover ? () => onHover(null) : undefined}>
       {/* The whole row is the target, not just the chevron. In the picker */}
       {/* that means choose, in the tier list it means expand.             */}
@@ -1803,11 +1801,11 @@ function FactionChooser({ onChoose }) {
 /* Full width above the filter pane rather than inside it, because it is  */
 /* not a filter. A filter narrows a list you can already see; this        */
 /* decides whether there is a list at all.                                */
-function FactionBar({ faction, onChoose }) {
+function FactionBar({ faction, onChoose, compact = false }) {
   return (
     <div className="flex items-stretch gap-2 sm:gap-3">
       {FACTIONS.map((f) => (
-        <FactionPick key={f.id} faction={f} on={f.id === faction} onChoose={onChoose} />
+        <FactionPick key={f.id} faction={f} on={f.id === faction} onChoose={onChoose} compact={compact} />
       ))}
     </div>
   );

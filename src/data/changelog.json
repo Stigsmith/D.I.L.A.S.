@@ -9,7 +9,8 @@
       "Until your skill level is set, a reminder asks for it each time you open the tool, once your collection is done. The tour shows where it is.",
       "An opened tier list row lays its details out in blocks, side by side on a wide screen.",
       "Choosing gear in a build opens over the build, which stays visible behind it, dimmed.",
-      "With a mouse, resting on a row while choosing gear shows its full details beside the list. Moving or scrolling hides them.",
+      "With a mouse, resting on a row while choosing gear shows its full details beside the list.",
+      "The build editor's front, difficulty and squad size fold out from a Scenario tab at its left edge. Over Drop Bay the editor fills the screen.",
       "The chosen tier filter is ringed in the shape of the badge."
     ]
   },

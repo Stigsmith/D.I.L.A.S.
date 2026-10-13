@@ -35,6 +35,8 @@ import { shareUrl } from "./lib/share.js";
 import { Tip } from "./Tip.jsx";
 import { getArmorSet, setsForPassive, weightOf } from "./lib/armor.js";
 import { SetStrip, WeightFilter, ArmorSetArt, setLine } from "./ArmorSets.jsx";
+import SlidePane, { TAB_W, PANE_CLASS } from "./SlidePane.jsx";
+import { DifficultyStepper, SquadCount } from "./WarRoom.jsx";
 
 /* A fresh build with one item already in its slot, for "build around
    it" from Drop Bay: the curator's "you never tried this here". */
@@ -58,9 +60,8 @@ function rankedFor(factionMeta, scenario) {
 /* Picker overlay                                                      */
 /*                                                                     */
 /* A pop-up, not a page: one panel the width of the list, over the     */
-/* screen you came from, dimmed. The list itself is see through        */
-/* between the rows, the curator's ask of 13 October 2026. Clicking    */
-/* the dimmed screen closes it, like Escape.                           */
+/* screen you came from, dimmed, the curator's ask of 13 October 2026.  */
+/* The panel is solid. Clicking the dimmed screen closes it, like Esc.  */
 /* ------------------------------------------------------------------ */
 
 /* Only a device with a mouse gets the hover card. A phone has no hover,
@@ -185,18 +186,15 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
   const title = stratSlot != null ? `Stratagem ${stratSlot + 1}` : (SLOTS.find((s) => s.slot === slot) || {}).label;
   const factionMeta = FACTIONS.find((f) => f.id === faction) || FACTIONS[0];
 
-  /* The card waits until the mouse rests on a row, not merely crosses
-     it: every movement restarts the wait, so moving down the list shows
-     nothing. Scrolling hides it, and the rows sliding under a still
-     mouse do not count as resting until the mouse moves again. Moving
-     to another row hides the card and waits again. The curator's call
+  /* The card waits a moment after the mouse lands on a row, so passing
+     over rows shows nothing. Moving to another row hides it and waits
+     again. Scrolling hides it, and it comes back for the row under the
+     mouse the same moment after the scrolling stops. The curator's call
      of 13 October 2026: there when you stop to look, never in the way. */
-  const REST_MS = 600;
-  const SCROLL_QUIET_MS = 400;
+  const REST_MS = 400;
   const panelRef = useRef(null);
   const hoverTimer = useRef(null);
   const target = useRef(null);
-  const lastScroll = useRef(0);
   const [hover, setHover] = useState(null);
   const showSoon = () => {
     clearTimeout(hoverTimer.current);
@@ -205,21 +203,13 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
       if (t) setHover({ item: t.item, top: t.el.getBoundingClientRect().top });
     }, REST_MS);
   };
-  /* Which row the mouse is over. Only a keyboard focus starts the wait
-     here; for the mouse, onRest does. */
-  const onHover = useCallback((it, el, focused = false) => {
+  const onHover = useCallback((it, el) => {
     target.current = it ? { item: it, el } : null;
-    if (!it) { clearTimeout(hoverTimer.current); setHover(null); return; }
-    if (focused) showSoon();
+    setHover(null);
+    if (it) showSoon(); else clearTimeout(hoverTimer.current);
   }, []);
-  const onRest = () => {
-    if (!target.current || Date.now() - lastScroll.current < SCROLL_QUIET_MS) return;
-    if (hover && hover.item.id === target.current.item.id) return;
-    if (hover) setHover(null);
-    showSoon();
-  };
   useEffect(() => () => clearTimeout(hoverTimer.current), []);
-  const dropHover = () => { lastScroll.current = Date.now(); clearTimeout(hoverTimer.current); setHover(null); };
+  const onScroll = () => { setHover(null); if (target.current) showSoon(); };
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center bg-black/60 sm:p-4"
@@ -274,8 +264,7 @@ function Picker({ slot, stratSlot, current, currentSet = null, faction, scenario
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-base-950/40 p-4" onScroll={CAN_HOVER ? dropHover : undefined}
-        onMouseMove={CAN_HOVER ? onRest : undefined}>
+      <div className="flex-1 overflow-y-auto bg-base-950 p-4" onScroll={CAN_HOVER ? onScroll : undefined}>
         {pool.length === 0 ? (
           <div className="rounded-lg border border-dashed border-base-700 py-10 text-center text-sm text-base-400">
             {hiddenCount > 0 && !showLocked
@@ -481,7 +470,60 @@ const MultiToggle = ({ label, hint, options, value, onChange }) => (
  * picker straight away, which is how somebody with no builds yet starts
  * one from Drop Bay: the first thing they see is the list.
  */
-export default function Builder({ state, loadoutId, navigate, faction, scenario, overlay = null, startWith = null, seedItem = null }) {
+/* ------------------------------------------------------------------ */
+/* The quick scenario switcher                                         */
+/*                                                                     */
+/* Folded away at the editor's left edge and pulled out by its tab,    */
+/* the Star Map's way, the curator's call of 13 October 2026. It took  */
+/* the place of the full width front bar. The front here is the        */
+/* build's own and is saved with it; difficulty and how many of you    */
+/* are the scenario's, which the picker and the reading rank for.      */
+/* The tab sits at the left edge of whatever holds the editor: the     */
+/* screen over Drop Bay, the page beside the menu in the Armoury.      */
+/* ------------------------------------------------------------------ */
+
+function ScenarioPane({ rootRef, faction, onFaction, scenario, controls }) {
+  const [open, setOpen] = useState(false);
+  const [left, setLeft] = useState(0);
+  useLayoutEffect(() => {
+    const measure = () => {
+      const root = rootRef.current;
+      const holder = root ? root.closest("main, [role=dialog]") : null;
+      setLeft(holder ? holder.getBoundingClientRect().left : 0);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [rootRef]);
+  return (
+    <div className="pointer-events-none fixed inset-y-0 right-0 z-[35] overflow-hidden" style={{ left }}>
+      {/* Centred on a wrapper: the pane's own transform is its slide. */}
+      <div className="absolute top-1/2 -translate-y-1/2" style={{ left: 12, width: `min(20rem, calc(100% - ${TAB_W + 24}px))` }}>
+      <SlidePane side="left" open={open} onToggle={() => setOpen((v) => !v)} label="Scenario" ariaLabel="Scenario"
+        className="relative" paneClass={PANE_CLASS}>
+        <div className="flex flex-col gap-4 p-4">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500"
+              style={{ fontFamily: "'Oswald', sans-serif" }}>
+              This build is for
+            </span>
+            <FactionBar compact faction={faction} onChoose={onFaction} />
+          </div>
+          {controls ? (
+            <>
+              <DifficultyStepper value={scenario.difficulty} onChange={controls.setDifficulty} />
+              <SquadCount value={scenario.squad} onChange={controls.setSquad} party={controls.party} />
+            </>
+          ) : null}
+        </div>
+      </SlidePane>
+      </div>
+    </div>
+  );
+}
+
+export default function Builder({ state, loadoutId, navigate, faction, scenario, overlay = null, startWith = null, seedItem = null, controls = null }) {
+  const rootRef = useRef(null);
   const stored = state.loadouts.find((l) => l.id === loadoutId);
   const preset = presets.find((p) => p.id === loadoutId);
 
@@ -617,7 +659,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div ref={rootRef} className="flex flex-col gap-4">
       {overlay ? (
         <div className="flex flex-wrap items-center gap-3 border-b border-base-800 pb-3">
           <button onClick={close} aria-label="Back to the drop"
@@ -648,18 +690,12 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
         </div>
       ) : null}
 
-      {/* The same control the tier list and Drop Bay carry, but bound to  */}
-      {/* the build rather than to the scenario. A build is for a front and   */}
-      {/* keeps that when you save it, so changing it here changes what    */}
-      {/* you are making, not where the rest of the tool is looking. The   */}
-      {/* picker below already ranks by it.                                */}
-      <div className="flex flex-col gap-1.5">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-base-500"
-          style={{ fontFamily: "'Oswald', sans-serif" }}>
-          This build is for
-        </span>
-        <FactionBar faction={draft.faction} onChoose={(id) => patch({ faction: id })} />
-      </div>
+      {/* The front control is bound to the build rather than to the      */}
+      {/* scenario. A build is for a front and keeps that when you save it, */}
+      {/* so changing it changes what you are making, not where the rest   */}
+      {/* of the tool is looking. The picker already ranks by it.          */}
+      <ScenarioPane rootRef={rootRef} faction={draft.faction} onFaction={(id) => patch({ faction: id })}
+        scenario={scenario} controls={controls} />
 
       {picking ? (
         <Picker
