@@ -592,8 +592,9 @@ function PrefChip({ on, onClick, disabled, title, children }) {
 }
 
 /* `bare` drops the card and the title, for the war room's panel, which
-   carries both itself. */
-function Planner({ scenario, setFaction, prefs, setPrefs, war, plan, onChoose, bare = false }) {
+   carries both itself. `banners` draws the fronts as tall banners, and
+   `onClearFront` lets a second click on the picked one clear it. */
+function Planner({ scenario, setFaction, prefs, setPrefs, war, plan, onChoose, bare = false, banners = false, onClearFront = null }) {
   const front = scenario.faction;
   const f = FACTIONS.find((x) => x.id === front);
   const onFront = missionsFor(front);
@@ -616,8 +617,8 @@ function Planner({ scenario, setFaction, prefs, setPrefs, war, plan, onChoose, b
       <PlanStep n={1} label="Against">
         <div className="flex gap-2">
           {FACTIONS.map((x) => (
-            <FactionPick key={x.id} faction={x} compact on={x.id === front} dimmed={Boolean(front) && x.id !== front}
-              onChoose={(id) => setFaction(id)} />
+            <FactionPick key={x.id} faction={x} compact={!banners} banner={banners} on={x.id === front}
+              dimmed={Boolean(front) && x.id !== front} onChoose={(id) => setFaction(id)} onClear={onClearFront} />
           ))}
         </div>
       </PlanStep>
@@ -1614,9 +1615,13 @@ export const BLANK_FILTERS = {
 
 const factionArt = (id, shape) => uiArt(`faction_picker_${shape}_${id}`);
 
-/* `compact` is the planner's size: icon over name at every width, because
-   three of them share a narrow column there. */
-function FactionPick({ faction: f, on, hero, dimmed, onChoose, compact = false }) {
+/* `compact` is a small size: icon over name at every width, because
+   three of them share a narrow column. `banner` is the war room's: the
+   tall banners the chooser wore before the map, the curator's call of 13
+   October 2026, now that the planner's column has the room. A banner
+   keeps the picked and dimmed states the hero has no use for, and
+   clicking the picked one again clears the front (`onClear`). */
+function FactionPick({ faction: f, on, hero, dimmed, onChoose, onClear = null, compact = false, banner = false }) {
   /* The chooser has no chosen one, so dimming all three there would be  */
   /* three greyed out buttons asking to be pressed. Hero is always lit;  */
   /* the bar lights only the front you are on.                           */
@@ -1625,24 +1630,30 @@ function FactionPick({ faction: f, on, hero, dimmed, onChoose, compact = false }
   /* picked: the two you did not pick step back so the one you did reads */
   /* at a glance. With nothing picked none of them dim, which is what    */
   /* keeps the first visit an invitation rather than a rejection.        */
-  const lit = on || hero;
-  const art = factionArt(f.id, hero ? "tall" : "wide");
+  const tall = hero || banner;
+  const lit = on || hero || (banner && !dimmed);
+  const art = factionArt(f.id, tall ? "tall" : "wide");
+  const clears = banner && on && onClear;
+  /* A dimmed banner keeps its colour, only quieter. */
+  const tinted = lit || (banner && dimmed);
 
   return (
-    <button onClick={() => onChoose(f.id)} aria-pressed={hero ? undefined : on}
-      title={`Rank everything against ${f.label}`}
+    <button onClick={() => (clears ? onClear() : onChoose(f.id))} aria-pressed={hero ? undefined : on}
+      title={clears ? "Click again to clear the front" : `Rank everything against ${f.label}`}
       className={
         "group relative flex flex-1 overflow-hidden rounded-lg border-2 transition-all duration-200 " +
         (hero
           ? "aspect-[1/2] max-w-[9rem] flex-col items-center justify-end gap-1.5 px-3 pb-4 hover:-translate-y-1 sm:max-w-[clamp(7rem,calc((100vh-34rem)/2),13rem)] sm:gap-2"
-          : compact
-            ? "min-h-[3.25rem] flex-col items-center justify-center gap-1 px-1 py-2"
-            : "min-h-[3.25rem] flex-col items-center justify-center gap-1 px-2 py-2 sm:min-h-[3.5rem] sm:flex-row sm:gap-2.5") +
+          : banner
+            ? "aspect-[3/5] min-w-0 flex-col items-center justify-end gap-1.5 px-1.5 pb-3 hover:-translate-y-0.5"
+            : compact
+              ? "min-h-[3.25rem] flex-col items-center justify-center gap-1 px-1 py-2"
+              : "min-h-[3.25rem] flex-col items-center justify-center gap-1 px-2 py-2 sm:min-h-[3.5rem] sm:flex-row sm:gap-2.5") +
         (on ? " -translate-y-0.5" : "") +
         (dimmed ? " opacity-60 saturate-50 hover:opacity-100 hover:saturate-100" : "") +
         (lit ? "" : " border-base-800 hover:-translate-y-0.5 hover:border-base-600")
       }
-      style={lit
+      style={tinted
         ? {
             borderColor: on ? f.hex : dimmed ? f.hex + "2b" : f.hex + "66",
             /* Picked glows harder and sits on a wider, softer pool. The  */
@@ -1660,7 +1671,7 @@ function FactionPick({ faction: f, on, hero, dimmed, onChoose, compact = false }
       {art ? (
         <span aria-hidden="true"
           className={"pointer-events-none absolute inset-0 bg-cover bg-center transition-opacity duration-300 " +
-            (hero
+            (tall
               ? (on ? "opacity-65 group-hover:opacity-80" : dimmed ? "opacity-25 group-hover:opacity-60" : "opacity-45 group-hover:opacity-75")
               : on ? "opacity-40" : "opacity-[0.16] group-hover:opacity-35")}
           style={{ backgroundImage: `url(${art})` }} />
@@ -1672,7 +1683,7 @@ function FactionPick({ faction: f, on, hero, dimmed, onChoose, compact = false }
         style={{ backgroundColor: lit ? f.hex + "1a" : "rgb(var(--base-950) / 0.5)" }} />
       <span aria-hidden="true" className="pointer-events-none absolute inset-0"
         style={{
-          backgroundImage: hero
+          backgroundImage: tall
             ? "linear-gradient(to top, rgb(var(--base-950) / 0.94) 14%, rgb(var(--base-950) / 0.4) 58%, transparent)"
             : "linear-gradient(to right, rgb(var(--base-950) / 0.86), rgb(var(--base-950) / 0.5))",
         }} />
@@ -1681,22 +1692,22 @@ function FactionPick({ faction: f, on, hero, dimmed, onChoose, compact = false }
       {/* strength when chosen, a hint on hover so the button says which  */}
       {/* colour it is about to become.                                   */}
       <span className={"absolute inset-x-0 top-0 h-[3px] transition-opacity duration-200 " +
-          (on ? "opacity-100" : hero ? "opacity-70 group-hover:opacity-100" : "opacity-0 group-hover:opacity-60")}
+          (on ? "opacity-100" : lit && tall ? "opacity-70 group-hover:opacity-100" : "opacity-0 group-hover:opacity-60")}
         style={{ backgroundColor: f.hex }} />
 
       <f.Icon
         className={"relative shrink-0 transition-all duration-200 " +
-          (hero ? "h-9 w-9 sm:h-12 sm:w-12" : compact ? "h-5 w-5" : "h-5 w-5 sm:h-6 sm:w-6") +
-          (lit ? "" : " opacity-45 group-hover:opacity-80")}
-        style={{ color: lit ? f.hex : "rgb(var(--base-400))" }} />
+          (hero ? "h-9 w-9 sm:h-12 sm:w-12" : banner ? "h-9 w-9" : compact ? "h-5 w-5" : "h-5 w-5 sm:h-6 sm:w-6") +
+          (tinted ? "" : " opacity-45 group-hover:opacity-80")}
+        style={{ color: tinted ? f.hex : "rgb(var(--base-400))" }} />
 
-      <span className={"relative font-bold uppercase leading-none tracking-wider transition-colors " +
-          (hero ? "text-xs sm:text-base" : compact ? "text-[10px]" : "text-[11px] sm:text-sm")}
-        style={{ fontFamily: "'Oswald', sans-serif", color: lit ? f.hex : "rgb(var(--base-500))" }}>
+      <span className={"relative max-w-full truncate font-bold uppercase leading-none tracking-wider transition-colors " +
+          (hero ? "text-xs sm:text-base" : banner ? "text-[13px]" : compact ? "text-[10px]" : "text-[11px] sm:text-sm")}
+        style={{ fontFamily: "'Oswald', sans-serif", color: tinted ? f.hex : "rgb(var(--base-500))" }}>
         {f.label}
       </span>
 
-      {hero ? (
+      {tall ? (
         <span className="relative text-[9px] uppercase tracking-widest text-base-400 sm:text-[10px]">{f.short}</span>
       ) : null}
     </button>

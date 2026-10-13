@@ -502,7 +502,7 @@ const kindsOn = (front) => {
 
 const PANE_TITLE = "text-sm font-bold uppercase tracking-wide text-base-100";
 
-function ScenarioPane({ rootRef, draft, patch, heat, heatFrom, scenario, controls }) {
+function ScenarioPane({ rootRef, draft, patch, heat, heatFrom, scenario, controls, dropping = false }) {
   const [open, setOpen] = useState(false);
   const [left, setLeft] = useState(0);
   useLayoutEffect(() => {
@@ -533,7 +533,17 @@ function ScenarioPane({ rootRef, draft, patch, heat, heatFrom, scenario, control
         {/* Sized to fit a laptop screen whole. Scrolls only on a smaller one. */}
         <div className="flex flex-col gap-3 overflow-y-auto p-4" style={{ maxHeight: "calc(100vh - 24px)" }}>
           <p className={PANE_TITLE} style={{ fontFamily: "'Oswald', sans-serif" }}>This build is for</p>
-          <FactionBar compact faction={draft.faction} onChoose={(id) => patch({ faction: id })} />
+          {/* Over Drop Bay the front is the drop's, set in the war room: the
+              curator's call of 13 October 2026. Changing it here mid drop
+              would leave the planet and the slot disagreeing with the build. */}
+          {dropping ? (
+            <p className="text-sm font-bold uppercase tracking-wide"
+              style={{ fontFamily: "'Oswald', sans-serif", color: (FACTIONS.find((f) => f.id === draft.faction) || {}).hex }}>
+              {(FACTIONS.find((f) => f.id === draft.faction) || { label: "No front" }).label}
+            </p>
+          ) : (
+            <FactionBar compact faction={draft.faction} onChoose={(id) => patch({ faction: id })} />
+          )}
 
           <div className="flex flex-col gap-1.5">
             <PaneHead hint="none means any">Missions</PaneHead>
@@ -796,7 +806,7 @@ export default function Builder({ state, loadoutId, navigate, faction, scenario,
       {/* so changing it changes what you are making, not where the rest   */}
       {/* of the tool is looking. The picker already ranks by it.          */}
       <ScenarioPane rootRef={rootRef} draft={draft} patch={patch} heat={heat} heatFrom={heatFrom}
-        scenario={scenario} controls={controls} />
+        scenario={scenario} controls={controls} dropping={Boolean(overlay)} />
 
       {picking ? (
         <Picker

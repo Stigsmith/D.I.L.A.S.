@@ -947,3 +947,19 @@ body {
     animation: none;
   }
 }
+
+/* The skill picker at level 10: a soft emergency red that breathes. The
+   lower levels hold a still glow, set inline in SkillPick (WarRoom.jsx). */
+.skill-alarm {
+  box-shadow: 0 0 0 1px rgb(239 68 68 / 0.7), 0 0 16px rgb(239 68 68 / 0.6);
+  animation: skill-alarm 1.6s ease-in-out infinite;
+}
+@keyframes skill-alarm {
+  0%, 100% { box-shadow: 0 0 0 1px rgb(239 68 68 / 0.55), 0 0 10px rgb(239 68 68 / 0.35); }
+  50% { box-shadow: 0 0 0 1px rgb(248 113 113 / 0.9), 0 0 22px rgb(239 68 68 / 0.75); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skill-alarm {
+    animation: none;
+  }
+}

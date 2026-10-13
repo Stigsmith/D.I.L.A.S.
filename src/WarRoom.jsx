@@ -7,12 +7,13 @@
 /* a scenario screen that stacked a planner, a map, a difficulty dial */
 /* and a mission picker down a page.                                  */
 /*                                                                    */
-/*   left    "Where would you like to play?": the search, the         */
-/*           planner and what you are dropping on, folding to a tab   */
-/*   right   the Major Order and the war's running totals, laid over  */
-/*           the map rather than taking room from it                  */
+/*   left    "Where would you like to play?": the search, the fronts  */
+/*           as tall banners and the planner, folding to a tab        */
+/*   right   the Major Order, the war's running totals and the chosen */
+/*           planet's card, laid over the map, each folding to a tab  */
 /*   bottom  difficulty, stepped the way the game steps it, with what */
-/*           the level brings off the wiki, how many of you, and Done */
+/*           the level brings off the wiki, how many of you, the      */
+/*           planet and the mission, and Done                         */
 /*                                                                    */
 /* On a wide screen the open planner takes its width off the map, so  */
 /* the galaxy is never drawn under it. On a narrow one it lays over   */
@@ -20,13 +21,13 @@
 /* ================================================================== */
 
 import { useState, useMemo, useRef, useLayoutEffect, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight, ChevronDown, Check, AlertTriangle, Map as MapIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Check, AlertTriangle, Map as MapIcon, Globe2, Crosshair, X } from "lucide-react";
 
 import GalaxyMap, { MajorOrder } from "./GalaxyMap.jsx";
-import { FACTIONS, Planner, PlanetBar, SearchField, PickRow, Empty, DifficultyIcon, difficultyAt } from "./Tiers.jsx";
+import { FACTIONS, Planner, SearchField, PickRow, Empty, DifficultyIcon, difficultyAt } from "./Tiers.jsx";
 import { searchPlanets, unplaced, frontOf, suggestFronts, landmarkOf } from "./lib/galaxy.js";
 import { useWar, agoText } from "./lib/war.js";
-import { usePlannerPrefs, planets, biomeName, loudHazards, hazardName } from "./lib/scenario.js";
+import { usePlannerPrefs, planets, biomeName, loudHazards, hazardName, missionsFor, missionTraits, traitsOf } from "./lib/scenario.js";
 import { levelFacts, levelNew, outpostSummary, DIFFICULTY_SOURCE } from "./lib/difficulty.js";
 import { enemiesUpTo, arrivalsAt, arrivalsLine } from "./lib/enemies.js";
 import { subfactionsOn } from "./lib/subfaction.js";
@@ -115,6 +116,14 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
     if (!wide) setPlanner(false);
   };
 
+  /* A second click on the picked front clears it, and the planet and
+     mission with it: a planet left standing would name a front that is
+     no longer chosen. */
+  const clearFront = () => {
+    setFaction(null);
+    clearEnvironment();
+  };
+
   const bottom = (bar.h || 64) + GAP_PX;
   const insets = { left: plannerOpen ? (wide ? PANEL_PX + GAP_PX + TAB_W : 0) : TAB_PX, bottom };
 
@@ -143,30 +152,33 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
         </div>
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 py-3">
           <PlanetSearch query={query} setQuery={setQuery} war={war} chosen={scenario.planet} onChoose={choose} />
-          {scenario.planet ? <ChosenPlanet name={scenario.planet} war={war} open={cardOpen} onToggle={() => setCardOpen(!cardOpen)} /> : null}
-          <Planner bare scenario={scenario} setFaction={setFaction} prefs={prefs} setPrefs={setPrefs}
-            war={war} plan={plan} onChoose={choose} />
-          {scenario.faction ? (
-            <PlanetBar stack scenario={scenario} setMission={setMission} clearEnvironment={clearEnvironment}
-              kind={prefs.kind} onClearKind={() => setPrefs({ kind: null })}
-              hideHazards={Boolean(scenario.planet && cardOpen)} />
-          ) : null}
+          <Planner bare banners scenario={scenario} setFaction={setFaction} prefs={prefs} setPrefs={setPrefs}
+            war={war} plan={plan} onChoose={choose} onClearFront={clearFront} />
           <WarLine war={war} />
         </div>
       </SlidePane>
 
-      {/* Right: the Major Order and the war so far, over the map. */}
-      {(war && war.fresh && (war.order || war.stats)) ? (
-        <RightPanes top={wide ? GAP_PX : 52} bottom={bottom + GAP_PX + 84} room={room}
+      {/* Right: the Major Order, the war so far and the planet, over the map. */}
+      {((war && war.fresh && (war.order || war.stats)) || scenario.planet) ? (
+        <RightPanes top={wide ? GAP_PX : 52} bottom={bottom + GAP_PX}
           panes={[
-            war.order ? {
+            war && war.fresh && war.order ? {
               label: "Major Order", open: orderOpen === null ? wide : orderOpen,
               onToggle: () => setOrderOpen(!(orderOpen === null ? wide : orderOpen)),
               body: <MajorOrder order={war.order} fronts={FRONTS} />,
             } : null,
-            war.stats ? {
+            war && war.fresh && war.stats ? {
               label: "The war so far", open: totalsOpen, onToggle: () => setTotalsOpen(!totalsOpen),
               body: <WarTotals stats={war.stats} open />,
+            } : null,
+            scenario.planet ? {
+              label: "The planet", open: cardOpen, onToggle: () => setCardOpen(!cardOpen), keep: true,
+              body: (
+                <div className="overflow-hidden rounded-md border border-base-700/80 bg-base-950/90 shadow-xl backdrop-blur-sm"
+                  data-tour="war-planet-card">
+                  <PlanetCard name={scenario.planet} war={war} />
+                </div>
+              ),
             } : null,
           ]} />
       ) : null}
@@ -178,12 +190,15 @@ export default function WarRoom({ scenario, setFaction, setPlanet, setMission, s
           bar read as chrome and the difficulty got lost in it. */}
       <div ref={barRef}
         className={"pointer-events-none absolute z-20 " +
-          (wide ? "grid grid-cols-[1fr_auto_1fr] items-end gap-3" : "flex flex-col items-stretch gap-2")}
+          (wide ? "grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3" : "flex flex-col items-stretch gap-2")}
         style={{ bottom: GAP_PX, right: GAP_PX, left: (plannerOpen && wide ? PANEL_PX + GAP_PX : 0) + GAP_PX }}>
-        {wide ? <span /> : null}
         <DifficultyCard level={scenario.difficulty} faction={scenario.faction} onChange={setDifficulty}
           subfactions={subfactionsOn(war, scenario.planet)}
-          squad={<SquadCount value={scenario.squad} onChange={setSquad} party={party} />} />
+          squad={<SquadCount value={scenario.squad} onChange={setSquad} party={party} />}
+          target={scenario.faction ? (
+            <DropTarget scenario={scenario} setMission={setMission} clearEnvironment={clearEnvironment}
+              kind={prefs.kind} onClearKind={() => setPrefs({ kind: null })} />
+          ) : null} />
         {onDone && scenario.faction ? (
           <button type="button" onClick={onDone}
             className={"pointer-events-auto flex items-center justify-center gap-1.5 rounded-lg border border-brand bg-brand px-5 py-2 text-sm font-bold uppercase tracking-wide text-brand-ink shadow-2xl hover:brightness-110 " +
@@ -292,26 +307,6 @@ function usePlanetCardOpen() {
   return [open, choose];
 }
 
-/* The planet you chose: its card, which folds down to its name. */
-function ChosenPlanet({ name, war, open, onToggle }) {
-  return (
-    <div className="shrink-0 overflow-hidden rounded-lg border border-base-800 bg-base-900/60" data-tour="war-planet-card">
-      <button type="button" onClick={onToggle} aria-expanded={open}
-        className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-base-400" style={OSWALD}>
-          {open ? "The planet" : name}
-        </span>
-        <ChevronDown className={"h-3.5 w-3.5 text-base-500 transition-transform " + (open ? "rotate-180" : "")} />
-      </button>
-      {open ? (
-        <div className="border-t border-base-800">
-          <PlanetCard name={name} war={war} />
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
 /* How fresh the war is, and what to do with the map. */
 export function WarLine({ war }) {
   return (
@@ -395,7 +390,9 @@ export function WarTotals({ stats, open, onToggle = null, trend = null }) {
 /* The game steps difficulty with two arrows either side of the mark and
    the name, so this does too. Level 0 is "not said", one step below
    Trivial, because a level you have not chosen is not the easiest one. */
-export function DifficultyStepper({ value, onChange }) {
+/* `source` turns "Level N of 10" into the credit for the figures beside
+   it: a link to where they come from, with the licence on hover. */
+export function DifficultyStepper({ value, onChange, source = null }) {
   const level = Number(value) || 0;
   const d = difficultyAt(level);
   const step = (by) => onChange(Math.max(0, Math.min(10, level + by)));
@@ -414,9 +411,17 @@ export function DifficultyStepper({ value, onChange }) {
           <span className="block truncate text-sm font-bold uppercase leading-none tracking-wide text-base-100" style={OSWALD}>
             {d ? d.name : "Difficulty"}
           </span>
-          <span className="mt-1 block text-[10px] leading-none text-base-500">
-            {d ? `Level ${d.level} of 10` : "not set"}
-          </span>
+          {d && source ? (
+            <Tip as="a" href={source.url} target="_blank" rel="noreferrer"
+              text={`The figures for each level are from the ${source.name}, ${source.licence}. Click to open it.`}
+              className={"mt-1 block w-fit text-[10px] leading-none text-base-500 hover:text-base-300 " + HAS_TIP}>
+              Level {d.level} of 10
+            </Tip>
+          ) : (
+            <span className="mt-1 block text-[10px] leading-none text-base-500">
+              {d ? `Level ${d.level} of 10` : "not set"}
+            </span>
+          )}
         </span>
       </div>
       <button type="button" className={arrow} onClick={() => step(1)} disabled={level === 10}
@@ -432,25 +437,150 @@ export function DifficultyStepper({ value, onChange }) {
    the wiki's Difficulty table, with what it means for the ratings last.
    The sentences the tiles stand for are their tooltips. */
 /* How many of you sits beside the stepper: difficulty and squad size are
-   the two halves of how hard this is, and the ratings read them together. */
-function DifficultyCard({ level, faction, onChange, squad, subfactions }) {
+   the two halves of how hard this is, and the ratings read them together.
+   `target`, the planet and the mission, stands at the card's right, the
+   curator's call of 13 October 2026, so the whole drop is set in one
+   place under the map. */
+function DifficultyCard({ level, faction, onChange, squad, subfactions, target = null }) {
   const f = levelFacts(level);
   const fresh = levelNew(level);
   return (
-    <div className="pointer-events-auto flex flex-col items-center gap-2 rounded-lg border border-base-700/80 bg-base-950/90 px-4 py-2.5 shadow-2xl backdrop-blur-md"
+    <div className="pointer-events-auto flex max-w-full flex-col items-stretch gap-3 justify-self-center rounded-lg border border-base-700/80 bg-base-950/90 px-4 py-2.5 shadow-2xl backdrop-blur-md sm:flex-row"
       data-tour="war-difficulty">
-      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-        <DifficultyStepper value={level} onChange={onChange} />
-        <span className="hidden h-8 w-px bg-base-800 sm:block" aria-hidden="true" />
-        {squad}
+      <div className="flex min-w-0 flex-col items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+          <DifficultyStepper value={level} onChange={onChange} source={DIFFICULTY_SOURCE} />
+          <span className="hidden h-8 w-px bg-base-800 sm:block" aria-hidden="true" />
+          {squad}
+        </div>
+        {f ? (
+          <LevelTiles facts={f} level={level} faction={faction} fresh={fresh} subfactions={subfactions} />
+        ) : (
+          <p className="max-w-sm text-center text-[11px] leading-relaxed text-base-500">
+            Set a difficulty to see what the level brings.
+          </p>
+        )}
       </div>
-      {f ? (
-        <LevelTiles facts={f} level={level} faction={faction} fresh={fresh} subfactions={subfactions} />
-      ) : (
-        <p className="max-w-sm text-center text-[11px] leading-relaxed text-base-500">
-          Set a difficulty to see what the level brings.
-        </p>
-      )}
+      {target ? (
+        <>
+          <span className="hidden w-px self-stretch bg-base-800 sm:block" aria-hidden="true" />
+          <div className="flex min-w-0 flex-col justify-center">{target}</div>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+/* Where you are dropping and the mission, small enough to stand in the
+   difficulty card. The planet is chosen on the map, the planner or the
+   search, so here it only says and clears. The mission list opens
+   upward, over the map, since the card sits at the bottom of the room.
+   What a mission's traits mean is on hover; the planet's hazards are on
+   its card. */
+function DropTarget({ scenario, setMission, clearEnvironment, kind = null, onClearKind }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const box = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const away = (e) => { if (box.current && !box.current.contains(e.target)) setOpen(false); };
+    const key = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("pointerdown", away);
+    document.addEventListener("keydown", key);
+    return () => {
+      document.removeEventListener("pointerdown", away);
+      document.removeEventListener("keydown", key);
+    };
+  }, [open]);
+
+  const onFront = useMemo(
+    () => missionsFor(scenario.faction).filter((m) => !kind || m.traits.includes(kind)),
+    [scenario.faction, kind]
+  );
+  const hits = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return onFront;
+    return onFront.filter((m) => m.name.toLowerCase().includes(q) ||
+      m.traits.some((t) => ((missionTraits[t] || {}).name || t).toLowerCase().includes(q)));
+  }, [query, onFront]);
+
+  const byHand = scenario.biome || scenario.hazards.length;
+  const placed = Boolean(scenario.planet || byHand);
+  const placeLabel = scenario.planet || (byHand ? biomeName(scenario.biome) || "Set by hand" : "Choose a planet");
+  const placeSub = scenario.planet ? biomeName(scenario.biome) : byHand ? "set by hand" : "on the map or in the search";
+  const traits = scenario.mission ? traitsOf(scenario.mission) : [];
+  const missionSub = scenario.mission
+    ? traits.map((t) => (missionTraits[t] || {}).name || t).join(" · ") || "no special demands"
+    : `${onFront.length} ${kind ? missionTraits[kind].name.toLowerCase() + " " : ""}${onFront.length === 1 ? "mission" : "missions"} on this front`;
+  const missionTip = traits.length ? (
+    <div className="flex flex-col gap-1">
+      {traits.map((t) => (
+        <p key={t}><span className="text-base-100">{(missionTraits[t] || {}).name || t}.</span> {(missionTraits[t] || {}).line}</p>
+      ))}
+    </div>
+  ) : null;
+  const pick = (name) => { setMission(name); setOpen(false); setQuery(""); };
+  const label = "block text-[9px] font-semibold uppercase tracking-wider text-base-500";
+  const mono = { fontFamily: "'JetBrains Mono', monospace" };
+
+  return (
+    <div ref={box} className="relative flex w-full flex-col gap-1.5 sm:w-56">
+      <div className="flex items-center gap-2 rounded border border-base-800 bg-base-900 px-2.5 py-1.5">
+        <Globe2 className={"h-3.5 w-3.5 shrink-0 " + (placed ? "text-base-300" : "text-base-600")} />
+        <span className="min-w-0 flex-1">
+          <span className={label} style={OSWALD}>Dropping on</span>
+          <span className={"block truncate text-xs " + (placed ? "text-base-100" : "text-base-500")} style={mono}>{placeLabel}</span>
+          <span className="block truncate text-[10px] text-base-600">{placeSub}</span>
+        </span>
+        {placed ? (
+          <button type="button" onClick={clearEnvironment} title="Clear the planet and the mission" aria-label="Clear the planet"
+            className="shrink-0 rounded p-1 text-base-600 hover:bg-base-800 hover:text-base-200">
+            <X className="h-3.5 w-3.5" />
+          </button>
+        ) : null}
+      </div>
+
+      <Tip passive text={open ? null : missionTip} as="div">
+        <button type="button" onClick={() => { setQuery(""); setOpen(!open); }} aria-expanded={open}
+          className={"flex w-full items-center gap-2 rounded border px-2.5 py-1.5 text-left transition-colors " +
+            (open ? "border-base-500 bg-base-800/60" : "border-base-700 bg-base-900 hover:border-base-500")}>
+          <Crosshair className={"h-3.5 w-3.5 shrink-0 " + (scenario.mission ? "text-base-300" : "text-base-600")} />
+          <span className="min-w-0 flex-1">
+            <span className={label} style={OSWALD}>Mission</span>
+            <span className={"block truncate text-xs " + (scenario.mission ? "text-base-100" : "text-base-500")} style={mono}>
+              {scenario.mission || "Not set"}
+            </span>
+            <span className="block truncate text-[10px] text-base-600">{missionSub}</span>
+          </span>
+          <ChevronUp className={"h-3.5 w-3.5 shrink-0 text-base-500 transition-transform " + (open ? "rotate-180" : "")} />
+        </button>
+      </Tip>
+
+      {open ? (
+        <div className="absolute bottom-full right-0 z-30 mb-2 flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2 rounded-lg border border-base-700 bg-base-950/95 p-2.5 shadow-2xl backdrop-blur-md">
+          <SearchField placeholder={"Search " + onFront.length + " missions on this front"} query={query} setQuery={setQuery} />
+          {kind ? (
+            <p className="flex flex-wrap items-center gap-x-2 px-2 text-[11px] text-base-500">
+              Showing {missionTraits[kind].name.toLowerCase()} missions only.
+              {onClearKind ? (
+                <button type="button" onClick={onClearKind} className="text-base-400 underline hover:text-base-100">show every mission</button>
+              ) : null}
+            </p>
+          ) : null}
+          <div className="flex max-h-72 flex-col gap-1 overflow-y-auto text-left">
+            <PickRow on={!scenario.mission} onClick={() => pick("")} title="Not set" sub="rate gear for any mission" tags={[]} />
+            {hits.length === 0 ? (
+              <Empty>No mission by that name on this front.</Empty>
+            ) : hits.map((m) => (
+              <PickRow key={m.name} on={m.name === scenario.mission} onClick={() => pick(m.name)}
+                title={m.name}
+                sub={((missionTraits[m.traits[0]] || {}).line || "").slice(0, 88)}
+                tags={m.traits.map((t) => ({ key: t, label: (missionTraits[t] || {}).name || t }))} />
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -500,11 +630,6 @@ function LevelTiles({ facts: f, level, faction, fresh, subfactions }) {
           <span className="block text-[10px] font-normal text-accent-300">new: {arrival.names[0]}</span>
         ) : null}
       </Tile>
-      <a href={DIFFICULTY_SOURCE.url} target="_blank" rel="noreferrer"
-        className="self-center px-2 text-[9px] uppercase tracking-wider text-base-600 underline hover:text-base-300"
-        title={`${DIFFICULTY_SOURCE.name}, ${DIFFICULTY_SOURCE.licence}`}>
-        wiki
-      </a>
     </div>
   );
 }
@@ -580,8 +705,20 @@ export function SkillNudge({ value, onChange, onLater }) {
    curator's call of 13 October 2026), not in each scenario control.
    Outlined until it is answered, the way the collection nudge asks for
    setup first. `compact` is the top bar's short label. */
+/* The glow round the skill picker, the curator's ask of 13 October 2026:
+   a faint light green at the bottom, warming through yellow and orange,
+   and at 10 a soft emergency red that pulses (`.skill-alarm` in
+   index.css, still under reduced motion). Literal colours, like the
+   faction hexes: a warning ramp is not a theme's to repaint. */
+const SKILL_GLOW = [
+  null,
+  ["134 239 172", 0.16], ["134 239 172", 0.22], ["190 242 100", 0.26], ["253 224 71", 0.3], ["250 204 21", 0.34],
+  ["251 146 60", 0.38], ["249 115 22", 0.42], ["234 88 12", 0.48], ["239 68 68", 0.52], ["239 68 68", 0.6],
+];
+
 export function SkillPick({ value, onChange, compact = false }) {
   const v = Number(value) || 0;
+  const glow = SKILL_GLOW[v] || null;
   return (
     <div className="flex items-center gap-1.5">
       <Tip text="The hardest difficulty four players at your skill level clear easily. Warnings and the stealth and anti-tank rules start from there.">
@@ -589,14 +726,20 @@ export function SkillPick({ value, onChange, compact = false }) {
           {compact ? "Skill" : "Your skill level"}
         </span>
       </Tip>
-      <select value={v} onChange={(e) => onChange(Number(e.target.value))} aria-label="Your skill level"
-        className={"rounded border bg-base-900 px-1.5 py-1 text-[11px] " +
-          (v ? "border-base-700 text-base-100" : "border-accent-500 text-accent-300")}>
-        <option value={0}>Not set</option>
-        {vocabulary.difficulties.map((d) => (
-          <option key={d.level} value={d.level}>{d.level} · {d.name}</option>
-        ))}
-      </select>
+      <span className={"flex items-center gap-1 rounded " + (v === 10 ? "skill-alarm" : "")}
+        style={glow && v !== 10
+          ? { boxShadow: `0 0 0 1px rgb(${glow[0]} / ${glow[1] + 0.1}), 0 0 ${6 + v}px rgb(${glow[0]} / ${glow[1]})` }
+          : undefined}>
+        {v ? <DifficultyIcon level={v} className="ml-1 h-5 w-9 shrink-0" /> : null}
+        <select value={v} onChange={(e) => onChange(Number(e.target.value))} aria-label="Your skill level"
+          className={"rounded border bg-base-900 px-1.5 py-1 text-[11px] " +
+            (v ? "border-base-700 text-base-100" : "border-accent-500 text-accent-300")}>
+          <option value={0}>Not set</option>
+          {vocabulary.difficulties.map((d) => (
+            <option key={d.level} value={d.level}>{d.level} · {d.name}</option>
+          ))}
+        </select>
+      </span>
     </div>
   );
 }

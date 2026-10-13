@@ -24,7 +24,8 @@
 /* spreads the planets apart rather than inflating them, and a        */
 /* planet's name appears once there is room for it. The one exception */
 /* is a planet's render inside a sector, which grows with the zoom    */
-/* (worldGrow), so zooming in brings you closer to it.                */
+/* (worldGrow), steadily up to full zoom, so zooming in brings you    */
+/* closer to it.                                                      */
 /*                                                                    */
 /* The war room, the curator's call of 2 October 2026, draws it over */
 /* the whole space right of the menu, tilted back like a table unless */
@@ -74,12 +75,17 @@ const FRONT_WORLD_PX = 36;
    The curator's call of 13 October 2026: the renders start small as the
    map glides in and grow as you zoom closer, rather than standing at one
    size. Below the frame they shrink faster than the zoom, so the glide in
-   starts near the size of a point of light; above it they grow with it,
-   up to this much. */
-const WORLD_GROW_MAX = 2.5;
+   starts near the size of a point of light; above it they grow steadily
+   all the way in, reaching this much exactly at MAX_ZOOM in every sector.
+   A cap reached earlier let the tilt's perspective shrink the planets
+   drifting toward the back over the last of the zoom. */
+const WORLD_GROW_MAX = 3;
 const worldGrow = (k, sectorK) => {
   const r = k / sectorK;
-  return r < 1 ? r * r : Math.min(WORLD_GROW_MAX, r);
+  if (r < 1) return r * r;
+  const span = Math.log(MAX_ZOOM / sectorK);
+  if (!(span > 0)) return WORLD_GROW_MAX;
+  return WORLD_GROW_MAX ** Math.min(1, Math.log(r) / span);
 };
 /* How long a glide between the galaxy and a sector takes. */
 const GLIDE_MS = 480;
@@ -705,12 +711,23 @@ export default function GalaxyMap({
         nameWar: !matches && live ? live.get(p.name) : null,
       };
     });
-    return { inSector, worlds, grow, showSectors, named, pickAt, rows, hexOf };
+    /* The ground near enough to the view to be worth drawing, in map units.
+       Deep in a sector a territory glow or a fog bank is hundreds of map
+       units wide on screen, and painting the ones far off it every frame is
+       what slowed the last of the zoom. The margin outlasts a pan between
+       two redraws, so nothing pops in at the edge. */
+    const margin = (VIEW * 0.35 + pad) / view.k;
+    const near = {
+      x0: -view.x / view.k - margin, y0: -view.y / view.k - margin,
+      x1: (VIEW - view.x) / view.k + margin, y1: (VIEW - view.y) / view.k + margin,
+    };
+    return { inSector, worlds, grow, showSectors, named, pickAt, rows, hexOf, near };
   }, [view.k, reach, ppu, chosen, matches, namesMatches, live, fronts, picks, fits, tactical, focus, pad, still, spots]);
 
   const layer = useMemo(() => {
-    const { inSector, showSectors, named } = plan;
+    const { inSector, showSectors, named, near } = plan;
     const halo = { paintOrder: "stroke", strokeLinejoin: "round" };
+    const nearby = (x, y, r) => x + r > near.x0 && x - r < near.x1 && y + r > near.y0 && y - r < near.y1;
 
     /* Sectors as blocks, the game's way, and the curator's description of
        it, 30 September 2026: one big block per sector with only its outer
@@ -736,6 +753,24 @@ export default function GalaxyMap({
        it, so neighbours run together the way the game's cloud does. An
        attack line runs from the attacker, dashed, in the colour of
        whoever holds it. */
+    /* A cloud disc is 34 across its middle, and the blur and the drift
+       carry its edge about 60 further. */
+    const CLOUD_R = 34;
+    const FOG_REACH = CLOUD_R + 60;
+    const clouds = marks ? marks.clouds.filter((c) => nearby(c.x, c.y, FOG_REACH * 2)) : [];
+    const fogBanks = [...new Set(clouds.map((c) => c.colour))].map((colour, i) => {
+      const discs = clouds.filter((c) => c.colour === colour);
+      /* The filter works over this box only: the bank's own extent, cut to
+         the ground near the view. Beyond it is off screen, so the picture
+         is the same, and deep in a sector the browser no longer blurs and
+         drifts a bank twenty times its size every frame. The noise is laid
+         in map units, so cutting the box never moves a wisp. */
+      const x0 = Math.max(near.x0, Math.min(...discs.map((c) => c.x)) - FOG_REACH);
+      const y0 = Math.max(near.y0, Math.min(...discs.map((c) => c.y)) - FOG_REACH);
+      const x1 = Math.min(near.x1, Math.max(...discs.map((c) => c.x)) + FOG_REACH);
+      const y1 = Math.min(near.y1, Math.max(...discs.map((c) => c.y)) + FOG_REACH);
+      return { colour, discs, id: `${gid}-fog-${i}`, box: { x: x0, y: y0, width: Math.max(1, x1 - x0), height: Math.max(1, y1 - y0) } };
+    });
     const marked = marks ? (
       <g className="pointer-events-none">
         {/* One fog bank per colour, not a soft disc per planet: the discs are
@@ -744,23 +779,25 @@ export default function GalaxyMap({
             edge drifts, and thinned by the same noise into wisps. In map
             units, so the cloud keeps its shape as you zoom. */}
         <defs>
-          <filter id={`${gid}-fog`} x="-25%" y="-25%" width="150%" height="150%" colorInterpolationFilters="sRGB">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="13" result="mass" />
-            <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="4" seed="11" result="noise" />
-            <feDisplacementMap in="mass" in2="noise" scale="30" xChannelSelector="R" yChannelSelector="G" result="drift" />
-            <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.7 -0.3" result="wisps" />
-            <feComposite in="drift" in2="wisps" operator="in" result="fog" />
-            <feGaussianBlur in="fog" stdDeviation="2.5" />
-          </filter>
+          {fogBanks.map(({ id, box }) => (
+            <filter key={id} id={id} filterUnits="userSpaceOnUse" {...box} colorInterpolationFilters="sRGB">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="13" result="mass" />
+              <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="4" seed="11" result="noise" />
+              <feDisplacementMap in="mass" in2="noise" scale="30" xChannelSelector="R" yChannelSelector="G" result="drift" />
+              <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.7 -0.3" result="wisps" />
+              <feComposite in="drift" in2="wisps" operator="in" result="fog" />
+              <feGaussianBlur in="fog" stdDeviation="2.5" />
+            </filter>
+          ))}
         </defs>
-        {[...new Set(marks.clouds.map((c) => c.colour))].map((colour) => (
-          <g key={colour} filter={`url(#${gid}-fog)`} opacity={matches ? 0.25 : 0.7}>
-            {marks.clouds.filter((c) => c.colour === colour).map((c) => (
-              <circle key={c.name} cx={c.x} cy={c.y} r={34} fill={colour} />
+        {fogBanks.map(({ colour, discs, id }) => (
+          <g key={colour} filter={`url(#${id})`} opacity={matches ? 0.25 : 0.7}>
+            {discs.map((c) => (
+              <circle key={c.name} cx={c.x} cy={c.y} r={CLOUD_R} fill={colour} />
             ))}
           </g>
         ))}
-        {marks.attacks.map(([a, b]) => {
+        {marks.attacks.filter(([a, b]) => nearby((a.x + b.x) / 2, (a.y + b.y) / 2, Math.hypot(a.x - b.x, a.y - b.y) / 2)).map(([a, b]) => {
           const hex = a.hex || null;
           return (
             <line key={a.name + ">" + b.name} x1={a.x} y1={a.y} x2={b.x} y2={b.y}
@@ -885,7 +922,7 @@ export default function GalaxyMap({
             <g className="pointer-events-none" opacity={matches ? 0.35 : 1}>
               {spots.map((p) => {
                 const w = live.get(p.name);
-                if (!w || !w.front) return null;
+                if (!w || !w.front || !nearby(p.x, p.y, 62)) return null;
                 let angle = Math.atan2(p.y - CENTRE, p.x - CENTRE);
                 if (angle < 0) angle += 2 * Math.PI;
                 return (

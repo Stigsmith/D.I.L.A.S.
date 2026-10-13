@@ -24,25 +24,31 @@ const OSWALD = { fontFamily: "'Oswald', sans-serif" };
 /* The big left panes' own box. */
 export const PANE_CLASS = "rounded-lg border border-base-700/80 bg-base-950/90 shadow-2xl backdrop-blur-md";
 
+/* How tall a folded pane stands: just its tab, whose words run down it. */
+const tabHeight = (label) => Math.round(label.length * 7.2 + 64);
+
 /**
- * The right edge's stack: the Major Order and the war so far, each its
- * own pane with its own tab. A folded pane keeps its place in the stack,
- * so the tabs never jump. `panes` holds { label, open, onToggle, body }
- * or null; `room` is the room's size, which splits the height between
- * them so a long briefing scrolls rather than running off the bottom.
+ * The right edge's stack: the Major Order, the war so far and the chosen
+ * planet, each its own pane with its own tab. A folded pane keeps its
+ * place in the stack as just its tab, so the tabs never jump. `panes`
+ * holds { label, open, onToggle, body, keep } or null. Each open pane
+ * takes the height it needs; when they do not all fit between `top` and
+ * `bottom`, the others give way first and scroll, and a pane marked
+ * `keep` (the planet card) holds its size longest.
  */
-export function RightPanes({ panes, top, bottom, room, gap = 12 }) {
+export function RightPanes({ panes, top, bottom, gap = 12 }) {
   const list = panes.filter(Boolean);
   if (!list.length) return null;
-  const avail = Math.max(160, (room.h || 600) - top - bottom);
-  const each = Math.floor((avail - 8 * (list.length - 1)) / list.length);
   return (
     <div className="pointer-events-none absolute z-10 flex flex-col items-stretch gap-2"
-      style={{ right: gap, top, width: `min(20rem, calc(100% - ${gap + TAB_W}px))` }}>
+      style={{ right: gap, top, bottom, width: `min(20rem, calc(100% - ${gap + TAB_W}px))` }}>
       {list.map((p) => (
         <SlidePane key={p.label} side="right" open={p.open} onToggle={p.onToggle} label={p.label} gap={gap}
-          className="relative" ariaLabel={p.label}>
-          <div className="overflow-y-auto rounded-md" style={{ maxHeight: each }}>{p.body}</div>
+          className="relative flex min-h-0 flex-col" ariaLabel={p.label}
+          style={p.open
+            ? { flex: `0 ${p.keep ? 0.05 : 1} auto`, minHeight: tabHeight(p.label) }
+            : { flex: "0 0 auto", height: tabHeight(p.label) }}>
+          <div className="min-h-0 overflow-y-auto rounded-md">{p.body}</div>
         </SlidePane>
       ))}
     </div>
